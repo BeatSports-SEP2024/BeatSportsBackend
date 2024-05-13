@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BeatSportsAPI.Domain.Entities;
-public class Owner
+public class Customer : BaseAuditableEntity
 {
     [ForeignKey("Account")]
     public Guid AccountId { get; set; }
