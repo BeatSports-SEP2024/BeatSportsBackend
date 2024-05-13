@@ -1,5 +1,5 @@
 ﻿using BeatSportsAPI.Application.Common.Interfaces;
-using BeatSportsAPI.Infrastructure.Files;
+using BeatSportsAPI.Infrastructure.Files.Maps;
 using BeatSportsAPI.Infrastructure.Identity;
 using BeatSportsAPI.Infrastructure.Persistence;
 using BeatSportsAPI.Infrastructure.Persistence.Interceptors;
@@ -29,7 +29,6 @@ public static class ConfigureServices
         }
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
-
         services.AddScoped<ApplicationDbContextInitialiser>();
 
         services

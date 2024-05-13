@@ -1,0 +1,21 @@
+﻿namespace BeatSportsAPI.Domain.Entities.PaymentEntity;
+public class Payment : BaseAuditableEntity
+{
+    public string PaymentContent { get; set; } = string.Empty;
+    public string PaymentCurrency { get; set; } = string.Empty;
+    /// <summary>
+    /// Reference from order/booking to merchant
+    /// </summary>
+    public string PaymentRefId { get; set; } = string.Empty;
+    public decimal? RequiredAmount { get; set; }
+    public DateTime? PaymentDate { get; set; } = DateTime.Now;
+    public DateTime? ExpireDate { get; set; }
+    public string? PaymentLanguage { get; set; } = string.Empty;
+    public decimal? PaidAmount { get; set; }
+    public string? PaymentStatus { get; set; } = string.Empty;
+    public string? PaymentLastMessage { get; set; } = string.Empty;
+
+    //Relationship
+    public virtual Merchant Merchant { get; set; } = null!;
+    public virtual PaymentDestination PaymentDestination { get; set; } = null!;
+}
