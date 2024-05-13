@@ -18,4 +18,5 @@ public class Payment : BaseAuditableEntity
     //Relationship
     public virtual Merchant Merchant { get; set; } = null!;
     public virtual PaymentDestination PaymentDestination { get; set; } = null!;
+    public virtual Booking Booking { get; set; } = null!;
 }

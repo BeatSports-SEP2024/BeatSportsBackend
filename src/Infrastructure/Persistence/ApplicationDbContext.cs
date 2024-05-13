@@ -1,6 +1,9 @@
 ﻿using System.Reflection;
+using System.Reflection.Emit;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Domain.Entities;
+using BeatSportsAPI.Domain.Entities.CourtEntity;
+using BeatSportsAPI.Domain.Entities.PaymentEntity;
 using BeatSportsAPI.Infrastructure.Identity;
 using BeatSportsAPI.Infrastructure.Persistence.Interceptors;
 using Duende.IdentityServer.EntityFramework.Options;
@@ -25,11 +28,55 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
         _mediator = mediator;
         _auditableEntitySaveChangesInterceptor = auditableEntitySaveChangesInterceptor;
     }
+    public DbSet<Court> Courts { get; set; }
+    public DbSet<CourtSportCategory> CourtSportCategories { get; set; }
+    public DbSet<CourtSubdivision> CourtSubdivisions { get; set; }  
+    public DbSet<CourtTimePeriod> CourtTimePeriods { get; set; }
+    public DbSet<Merchant> Merchants { get; set; }
+    public DbSet<Payment> Payments { get; set; }
+    public DbSet<PaymentDestination> PaymentsDestination { get; set; }
+    public DbSet<PaymentNotification> PaymentsNotification { get; set; }
+    public DbSet<PaymentSignature> PaymentsSignature { get; set; }
+    public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
+    public DbSet<Account> Accounts { get; set; }
+    public DbSet<Admin> Admins { get; set; }
+    public DbSet<Booking> Bookings { get; set; }
+    public DbSet<BookingDetail> BookingDetails { get; set; }
+    public DbSet<Customer> Customers { get; set; }
+    public DbSet<Owner> Owners { get; set; }
+    public DbSet<SportCategory> SportsCategories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        builder.Entity<CourtSportCategory>(entity =>
+        {
+            entity.HasKey(ss => new { ss.CourtId, ss.SportCategoryId });
 
+            entity.HasOne(ss => ss.Court)
+            .WithMany(ss => ss.CourtCategories)
+            .HasForeignKey(ss => ss.CourtId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(ss => ss.SportCategory)
+            .WithMany(ss => ss.CourtSportCategories)
+            .HasForeignKey(ss => ss.SportCategoryId)
+            .OnDelete(DeleteBehavior.NoAction);
+        });
+        builder.Entity<CourtTimePeriod>(entity =>
+        {
+            entity.HasKey(ss => new { ss.CourtId, ss.TimePeriodId });
+
+            entity.HasOne(ss => ss.Court)
+            .WithMany(ss => ss.CourtTimePeriods)
+            .HasForeignKey(ss => ss.CourtId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(ss => ss.TimePeriod)
+            .WithMany(ss => ss.CourtTimePeriods)
+            .HasForeignKey(ss => ss.TimePeriodId)
+            .OnDelete(DeleteBehavior.NoAction);
+        });
         base.OnModelCreating(builder);
     }
 

@@ -34,10 +34,10 @@ public static class ConfigureServices
         services
             .AddDefaultIdentity<ApplicationUser>()
             .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<ApplicationDbContext>();
+            .AddEntityFrameworkStores<ApplicationDbContext>();/*
 
         services.AddIdentityServer()
-            .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
+            .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();*/
 
         services.AddTransient<IDateTime, DateTimeService>();
         services.AddTransient<IIdentityService, IdentityService>();

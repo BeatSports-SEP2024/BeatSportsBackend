@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using BeatSportsAPI.Domain.Entities.CourtEntity;
 
 namespace BeatSportsAPI.Domain.Entities;
 public class Customer : BaseAuditableEntity
@@ -7,4 +8,5 @@ public class Customer : BaseAuditableEntity
     public Guid AccountId { get; set; }
 
     public virtual Account Account { get; set; }
+    public virtual IList<BookingDetail> BookingDetails { get; set; }
 }

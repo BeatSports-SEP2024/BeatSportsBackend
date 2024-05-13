@@ -1,6 +1,9 @@
 using BeatSportsAPI.Infrastructure.Persistence;
 using WebAPI;
+using Hangfire;
 using Microsoft.OpenApi.Models;
+using BeatSportsAPI.Application.Common.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +11,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddWebUIServices();
+
+
+builder.Services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"),
+                new Hangfire.SqlServer.SqlServerStorageOptions()
+                {
+                    //TODO: Change hangfire sql server option
+                }));
+builder.Services.AddHangfireServer();
+
 builder.Services.AddSwaggerGen(config => 
 {
     config.SwaggerDoc("v1", new OpenApiInfo { Title = "BeatSportsAPI", Version = "v1"});
@@ -61,12 +77,6 @@ else
 app.UseHealthChecks("/health");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
-/*app.UseSwaggerUi3(settings =>
-{
-    settings.Path = "/api";
-    settings.DocumentPath = "/api/specification.json";
-});*/
 app.UseSwagger();
 app.UseSwaggerUI();
 
