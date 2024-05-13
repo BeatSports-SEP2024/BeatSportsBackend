@@ -9,13 +9,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="MediatR" Version="9.0.0" />
+      <Compile Remove="Events\**" />
+      <Compile Remove="Exceptions\**" />
+      <Compile Remove="ValueObjects\**" />
+      <EmbeddedResource Remove="Events\**" />
+      <EmbeddedResource Remove="Exceptions\**" />
+      <EmbeddedResource Remove="ValueObjects\**" />
+      <None Remove="Events\**" />
+      <None Remove="Exceptions\**" />
+      <None Remove="ValueObjects\**" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Events\" />
-      <Folder Include="Exceptions\" />
-      <Folder Include="ValueObjects\" />
+      <PackageReference Include="MediatR" Version="9.0.0" />
     </ItemGroup>
 
 </Project>
