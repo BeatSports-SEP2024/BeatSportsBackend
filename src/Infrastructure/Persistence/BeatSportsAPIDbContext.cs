@@ -2,6 +2,7 @@
 using System.Reflection.Emit;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Domain.Entities;
+using BeatSportsAPI.Domain.Entities.PaymentEntity;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
 using BeatSportsAPI.Domain.Entities.PaymentEntity;
 using BeatSportsAPI.Infrastructure.Identity;
@@ -13,13 +14,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace BeatSportsAPI.Infrastructure.Persistence;
-public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, IApplicationDbContext
+public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>, IBeatSportsDbContext
 {
     private readonly IMediator _mediator;
     private readonly AuditableEntitySaveChangesInterceptor _auditableEntitySaveChangesInterceptor;
 
-    public ApplicationDbContext(
-        DbContextOptions<ApplicationDbContext> options,
+    public BeatSportsAPIDbContext(
+        DbContextOptions<BeatSportsAPIDbContext> options,
         IOptions<OperationalStoreOptions> operationalStoreOptions,
         IMediator mediator,
         AuditableEntitySaveChangesInterceptor auditableEntitySaveChangesInterceptor)
@@ -45,6 +46,17 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Owner> Owners { get; set; }
     public DbSet<SportCategory> SportsCategories { get; set; }
+
+    public DbSet<Account> Accounts { get; set; }
+    public DbSet<Admin> Admins { get; set; }
+    public DbSet<Customer> Customers { get; set; }
+    public DbSet<Owner> Owners { get; set; }
+    public DbSet<Payment> Payments { get; set; }
+    public DbSet<PaymentDestination> PaymentsDestinations { get; set; }
+    public DbSet<PaymentNotification> PaymentNotifications { get; set; }
+    public DbSet<PaymentSignature> PaymentSignatures { get; set; }
+    public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
+    public DbSet<Merchant> Merchants { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

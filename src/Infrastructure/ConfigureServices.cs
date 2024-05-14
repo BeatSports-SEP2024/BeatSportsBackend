@@ -18,26 +18,26 @@ public static class ConfigureServices
 
         if (configuration.GetValue<bool>("UseInMemoryDatabase"))
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<BeatSportsAPIDbContext>(options =>
                 options.UseInMemoryDatabase("BeatSportsAPIDb"));
         }
         else
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<BeatSportsAPIDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
-                    builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
+                    builder => builder.MigrationsAssembly(typeof(BeatSportsAPIDbContext).Assembly.FullName)));
         }
 
-        services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
-        services.AddScoped<ApplicationDbContextInitialiser>();
+        services.AddScoped<IBeatSportsDbContext>(provider => provider.GetRequiredService<BeatSportsAPIDbContext>());
+        services.AddScoped<BeatSportsAPIDbContextInitialiser>();
 
         services
             .AddDefaultIdentity<ApplicationUser>()
             .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<ApplicationDbContext>();/*
+            .AddEntityFrameworkStores<BeatSportsAPIDbContext>();
 
         services.AddIdentityServer()
-            .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();*/
+            .AddApiAuthorization<ApplicationUser, BeatSportsAPIDbContext>();
 
         services.AddTransient<IDateTime, DateTimeService>();
         services.AddTransient<IIdentityService, IdentityService>();
