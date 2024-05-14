@@ -36,6 +36,11 @@ public static class ConfigureServices
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<BeatSportsAPIDbContext>();
 
+        services
+            .AddIdentity<IdentityUser, IdentityRole>()
+            .AddEntityFrameworkStores<BeatSportsAPIDbContext>()
+            .AddDefaultTokenProviders();
+
         services.AddIdentityServer()
             .AddApiAuthorization<ApplicationUser, BeatSportsAPIDbContext>();
 
