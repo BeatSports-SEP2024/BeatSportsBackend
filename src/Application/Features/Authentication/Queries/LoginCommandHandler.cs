@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
-using BeatSportsAPI.Application.Features.Authetication.Queries;
 using BeatSportsAPI.Application.Models.Authentication;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -18,9 +17,10 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginModelRespo
     private readonly IBeatSportsDbContext _beatSportsDbContext;
     private readonly IIdentityService _identityService;
 
-    public LoginCommandHandler(IMapper mapper, IBeatSportsDbContext beatSportsDbContext)
+    public LoginCommandHandler(IMapper mapper, IBeatSportsDbContext beatSportsDbContext, IIdentityService identityService)
     {
         _mapper = mapper;
+        _identityService = identityService;
         _beatSportsDbContext = beatSportsDbContext;
     }
 

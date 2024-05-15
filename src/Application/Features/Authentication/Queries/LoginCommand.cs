@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using BeatSportsAPI.Application.Models.Authentication;
 using MediatR;
 
-namespace BeatSportsAPI.Application.Features.Authetication.Queries;
+namespace BeatSportsAPI.Application.Features.Authentication.Queries;
 public class LoginCommand : IRequest<LoginModelResponse>
 {
     public string Username { get; set; } = null!;

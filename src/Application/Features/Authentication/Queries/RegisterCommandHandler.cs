@@ -31,11 +31,11 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, BeatSport
         byte[] passwordHash, passwordSalt;
         PasswordHashingExtension.CreatePasswordHashing(
             request.Password,
-            out passwordHash,
-            out passwordSalt
+            out passwordSalt,
+            out passwordHash
         );
 
-        var combinedPassword = $"{Convert.ToBase64String(passwordHash)}:{Convert.ToBase64String(passwordSalt)}";
+        var combinedPassword = $"{Convert.ToBase64String(passwordSalt)}:{Convert.ToBase64String(passwordHash)}";
 
         var newUser = new Account
         {

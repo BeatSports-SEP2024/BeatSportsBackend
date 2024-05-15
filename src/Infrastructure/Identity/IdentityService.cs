@@ -150,22 +150,24 @@ public class IdentityService : IIdentityService
         {
             throw new NotFoundException("Cannot find this user");
         }
-        //Split hashed password into 2 parts: Hash and Salt
+        // Split hashed password into 2 parts: Salt and Hash
         var passwordParts = user.Password.Split(':');
-        if(passwordParts.Length != 2)
+        if (passwordParts.Length != 2)
         {
             throw new FormatException("Password stored is invalid");
         }
-        var storedPasswordHash = Convert.FromBase64String(passwordParts[0]);
-        var storedPasswordSalt = Convert.FromBase64String(passwordParts[1]);
-        //Check password when login 
+        var storedPasswordSalt = Convert.FromBase64String(passwordParts[0]);
+        var storedPasswordHash = Convert.FromBase64String(passwordParts[1]);
+        // Check password when login 
+        Console.WriteLine(storedPasswordSalt);
+        Console.WriteLine(storedPasswordHash);
         var isPasswordValid = PasswordHashingExtension.VerifyPasswordHash
             (
                 loginModelRequest.Password,
                 storedPasswordSalt,
                 storedPasswordHash
             );
-        if (!isPasswordValid) 
+        if (!isPasswordValid)
         {
             throw new UnauthorizedAccessException("Cannot Login");
         }
@@ -179,29 +181,29 @@ public class IdentityService : IIdentityService
     public async Task<string> RegisterAccountAsync(RegisterModelRequest registerModelRequest, CancellationToken cancellationToken)
     {
         var existedUser = _beatSportsDbContext.Accounts
-            .Where(u => u.UserName == registerModelRequest.UserName)
+            .Where(u => u.UserName == registerModelRequest.UserName && u.Email == registerModelRequest.Email)
             .FirstOrDefault();
         if (existedUser != null)
         {
             throw new NotFoundException("This user is existed");
         }
-        byte[] passwordHash, passwordSalt = null;
-        Application.Common.Ultilities.PasswordHashingExtension.CreatePasswordHashing(
-            registerModelRequest.Password, 
-            out passwordHash, 
-            out passwordSalt
+        PasswordHashingExtension.CreatePasswordHashing(
+            registerModelRequest.Password,
+            out byte[] passwordSalt,
+            out byte[] passwordHash
         );
-        var passwordHashString = Convert.ToBase64String(passwordHash);
         var passwordSaltString = Convert.ToBase64String(passwordSalt);
-
+        var passwordHashString = Convert.ToBase64String(passwordHash);
+        Console.WriteLine(passwordSaltString);
+        Console.WriteLine(passwordHashString);
         // Combine them into one string separated by a special character (e.g., ':')
-        var combinedPassword = $"{passwordHashString}:{passwordSaltString}";
+        var combinedPassword = $"{passwordSaltString}:{passwordHashString}";
         var newUser = new Account
         {
             UserName = registerModelRequest.UserName,
             Password = combinedPassword,
             Email = registerModelRequest.Email,
-            FirstName = registerModelRequest.FirstName, 
+            FirstName = registerModelRequest.FirstName,
             LastName = registerModelRequest.LastName,
             DateOfBirth = registerModelRequest.DateOfBirth,
             Gender = registerModelRequest.Gender,
@@ -214,4 +216,5 @@ public class IdentityService : IIdentityService
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
         return "Create new account successfully";
     }
+
 }

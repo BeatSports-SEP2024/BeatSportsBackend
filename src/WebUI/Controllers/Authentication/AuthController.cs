@@ -22,7 +22,7 @@ public class AuthController : ApiControllerBase
         var response = await _identityService.AuthenticateAsync(request);
         return new BeatSportsResponse
         {
-            Message = "Login Successfully"
+            Message = "Login Successfully",
         };
     }
 
