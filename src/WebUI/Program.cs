@@ -4,6 +4,7 @@ using Hangfire;
 using Microsoft.OpenApi.Models;
 using BeatSportsAPI.Application.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using BeatSportsAPI.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 

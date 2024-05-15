@@ -1,11 +1,13 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Runtime;
+﻿using System.Data;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Models.Authentication;
+using BeatSportsAPI.Application.Common.Ultilities;
+using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Infrastructure.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -113,11 +115,11 @@ public class IdentityService : IIdentityService
         string audience = GetJsonInAppSettingsExtension.GetJson("Jwt:Audience");
 
         var claims = new List<Claim>()
-    {
+        {
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         new Claim(JwtRegisteredClaimNames.Sub, loginRequest.Username),
         new Claim(ClaimTypes.Role, "Administrator")
-    };
+        };
 
         var expiry = DateTime.UtcNow.AddMinutes(30);
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -141,37 +143,75 @@ public class IdentityService : IIdentityService
         {
             throw new ArgumentException("Username and password must be provided.");
         }
-
-        //var user = await _userManager.FindByNameAsync(loginModelRequest.Username);
-        //if (user == null)
-        //{
-        //    // Throw more specific exception or handle this scenario appropriately
-        //    throw new KeyNotFoundException("User does not exist.");
-        //}
-
-        //var validPassword = await _userManager.CheckPasswordAsync(user, loginModelRequest.Password);
-        //if (!validPassword)
-        //{
-        //    // Consider throwing an exception or handling this case specifically
-        //    throw new UnauthorizedAccessException("Password is incorrect.");
-        //}
-
-        //// User is authenticated; generate token
-        //var tokenModel = await GenerateToken(new LoginModelRequest
-        //{
-        //    Username = user.UserName,
-        //});
         var user = _beatSportsDbContext.Accounts
-            .Where(u => u.UserName == loginModelRequest.Username && u.Password == loginModelRequest.Password)
+            .Where(u => u.UserName == loginModelRequest.Username)
             .FirstOrDefault();
         if (user == null)
         {
             throw new NotFoundException("Cannot find this user");
+        }
+        //Split hashed password into 2 parts: Hash and Salt
+        var passwordParts = user.Password.Split(':');
+        if(passwordParts.Length != 2)
+        {
+            throw new FormatException("Password stored is invalid");
+        }
+        var storedPasswordHash = Convert.FromBase64String(passwordParts[0]);
+        var storedPasswordSalt = Convert.FromBase64String(passwordParts[1]);
+        //Check password when login 
+        var isPasswordValid = PasswordHashingExtension.VerifyPasswordHash
+            (
+                loginModelRequest.Password,
+                storedPasswordSalt,
+                storedPasswordHash
+            );
+        if (!isPasswordValid) 
+        {
+            throw new UnauthorizedAccessException("Cannot Login");
         }
         var tokenModel = await GenerateToken(new LoginModelRequest
         {
             Username = loginModelRequest.Username,
         });
         return tokenModel.AccessToken;
+    }
+
+    public async Task<string> RegisterAccountAsync(RegisterModelRequest registerModelRequest, CancellationToken cancellationToken)
+    {
+        var existedUser = _beatSportsDbContext.Accounts
+            .Where(u => u.UserName == registerModelRequest.UserName)
+            .FirstOrDefault();
+        if (existedUser != null)
+        {
+            throw new NotFoundException("This user is existed");
+        }
+        byte[] passwordHash, passwordSalt = null;
+        Application.Common.Ultilities.PasswordHashingExtension.CreatePasswordHashing(
+            registerModelRequest.Password, 
+            out passwordHash, 
+            out passwordSalt
+        );
+        var passwordHashString = Convert.ToBase64String(passwordHash);
+        var passwordSaltString = Convert.ToBase64String(passwordSalt);
+
+        // Combine them into one string separated by a special character (e.g., ':')
+        var combinedPassword = $"{passwordHashString}:{passwordSaltString}";
+        var newUser = new Account
+        {
+            UserName = registerModelRequest.UserName,
+            Password = combinedPassword,
+            Email = registerModelRequest.Email,
+            FirstName = registerModelRequest.FirstName, 
+            LastName = registerModelRequest.LastName,
+            DateOfBirth = registerModelRequest.DateOfBirth,
+            Gender = registerModelRequest.Gender,
+            ProfilePictureURL = registerModelRequest.ProfilePictureURL,
+            Bio = registerModelRequest.Bio,
+            PhoneNumber = registerModelRequest.PhoneNumber,
+            Role = registerModelRequest.Role
+        };
+        await _beatSportsDbContext.Accounts.AddAsync(newUser, cancellationToken);
+        await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
+        return "Create new account successfully";
     }
 }
