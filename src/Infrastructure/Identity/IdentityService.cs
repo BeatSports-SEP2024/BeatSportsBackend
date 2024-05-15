@@ -115,7 +115,8 @@ public class IdentityService : IIdentityService
         var claims = new List<Claim>()
     {
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        new Claim(JwtRegisteredClaimNames.Sub, loginRequest.Username)
+        new Claim(JwtRegisteredClaimNames.Sub, loginRequest.Username),
+        new Claim(ClaimTypes.Role, "Administrator")
     };
 
         var expiry = DateTime.UtcNow.AddMinutes(30);
@@ -161,7 +162,8 @@ public class IdentityService : IIdentityService
         //    Username = user.UserName,
         //});
         var user = _beatSportsDbContext.Accounts
-            .Where(u => u.UserName == loginModelRequest.Username && u.Password == loginModelRequest.Password);
+            .Where(u => u.UserName == loginModelRequest.Username && u.Password == loginModelRequest.Password)
+            .FirstOrDefault();
         if (user == null)
         {
             throw new NotFoundException("Cannot find this user");
