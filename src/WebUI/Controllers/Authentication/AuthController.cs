@@ -17,12 +17,13 @@ public class AuthController : ApiControllerBase
     }
     [HttpPost]
     [Route("login")]
-    public async Task<BeatSportsResponse> Login([FromBody] LoginModelRequest request)
+    public async Task<LoginResponse> Login([FromBody] LoginModelRequest request)
     {
         var response = await _identityService.AuthenticateAsync(request);
-        return new BeatSportsResponse
+        return new LoginResponse
         {
             Message = "Login Successfully",
+            AccessToken = response,
         };
     }
 

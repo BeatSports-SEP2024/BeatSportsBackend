@@ -27,7 +27,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginModelRespo
     public async Task<LoginModelResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var existedUser = await _beatSportsDbContext.Accounts
-            .FirstOrDefaultAsync(user => user.UserName == request.Username && user.Password == request.Password);
+            .FirstOrDefaultAsync(user => user.UserName == request.Username);
 
         if (existedUser == null)
         {
