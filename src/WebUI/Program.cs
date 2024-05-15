@@ -24,9 +24,9 @@ builder.Services.AddHangfire(configuration => configuration
                 }));
 builder.Services.AddHangfireServer();
 
-builder.Services.AddSwaggerGen(config => 
+builder.Services.AddSwaggerGen(config =>
 {
-    config.SwaggerDoc("v1", new OpenApiInfo { Title = "BeatSportsAPI", Version = "v1"});
+    config.SwaggerDoc("v1", new OpenApiInfo { Title = "BeatSportsAPI", Version = "v1" });
     config.DescribeAllParametersInCamelCase();
     config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {

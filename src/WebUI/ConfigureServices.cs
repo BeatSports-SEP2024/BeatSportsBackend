@@ -2,6 +2,7 @@
 using BeatSportsAPI.Infrastructure.Persistence;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using WebAPI.Filters;

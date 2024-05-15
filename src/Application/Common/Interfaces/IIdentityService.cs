@@ -1,4 +1,5 @@
 ﻿using BeatSportsAPI.Application.Common.Models;
+using BeatSportsAPI.Application.Models.Authentication;
 
 namespace BeatSportsAPI.Application.Common.Interfaces;
 public interface IIdentityService
@@ -8,6 +9,8 @@ public interface IIdentityService
     Task<bool> IsInRoleAsync(string userId, string role);
 
     Task<bool> AuthorizeAsync(string userId, string policyName);
+
+    Task<string> AuthenticateAsync(LoginModelRequest loginModelRequest);
 
     Task<(Result Result, string UserId)> CreateUserAsync(string userName, string password);
 
