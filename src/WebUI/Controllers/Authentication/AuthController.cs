@@ -10,21 +10,24 @@ namespace WebAPI.Controllers.Authentication;
 public class AuthController : ApiControllerBase
 {
     private readonly IIdentityService _identityService;
+    private readonly IMediator _mediator;
 
-    public AuthController(IIdentityService identityService)
+    public AuthController(IIdentityService identityService, IMediator mediator)
     {
         _identityService = identityService;
+        _mediator = mediator;
     }
     [HttpPost]
     [Route("login")]
-    public async Task<LoginResponse> Login([FromBody] LoginModelRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginModelRequest request)
     {
-        var response = await _identityService.AuthenticateAsync(request);
-        return new LoginResponse
+        if (!ModelState.IsValid)
         {
-            Message = "Login Successfully",
-            AccessToken = response,
-        };
+            return BadRequest(ModelState);
+        }
+        var response = await _mediator.Send(request);
+
+        return Ok(response);
     }
 
     [HttpPost]

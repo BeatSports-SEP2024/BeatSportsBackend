@@ -6,42 +6,37 @@ using System.Threading.Tasks;
 using AutoMapper;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
+using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Models.Authentication;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Authentication.Queries;
-public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginModelResponse>
+public class LoginCommandHandler : IRequestHandler<LoginModelRequest, LoginResponse>
 {
     private readonly IMapper _mapper;
     private readonly IBeatSportsDbContext _beatSportsDbContext;
     private readonly IIdentityService _identityService;
+    private readonly IMediator _mediator;
 
-    public LoginCommandHandler(IMapper mapper, IBeatSportsDbContext beatSportsDbContext, IIdentityService identityService)
+    public LoginCommandHandler(IMapper mapper, IBeatSportsDbContext beatSportsDbContext, IIdentityService identityService, IMediator mediator)
     {
         _mapper = mapper;
+        _mediator = mediator;
         _identityService = identityService;
         _beatSportsDbContext = beatSportsDbContext;
     }
 
-    public async Task<LoginModelResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
+    public async Task<LoginResponse> Handle(LoginModelRequest request, CancellationToken cancellationToken)
     {
-        var existedUser = await _beatSportsDbContext.Accounts
-            .FirstOrDefaultAsync(user => user.UserName == request.Username);
-
-        if (existedUser == null)
+        var loginResponse = await _identityService.AuthenticateAsync(request);
+        if (loginResponse == null)
         {
-            throw new NotFoundException("This user does not exist");
+            throw new BadRequestException("An error occur when process");
         }
-
-        var loginRequest = _mapper.Map<LoginModelRequest>(existedUser);
-
-        // Trả về một chuỗi là AccessToken từ phương thức AuthenticateAsync
-        string accessToken = await _identityService.AuthenticateAsync(loginRequest);
-
-        var response = _mapper.Map<LoginModelResponse>(existedUser);
-        response.Token = accessToken;  // Đảm bảo accessToken là kiểu string
-
-        return response;
+        return new LoginResponse {
+            Message = "Login Successfully",
+            AccessToken = loginResponse
+        };
     }
 }

@@ -136,7 +136,15 @@ public class IdentityService : IIdentityService
 
         return new TokenModel { AccessToken = tokenString };
     }
-
+    /// <summary>
+    /// Login Method and Generate AccessToken
+    /// </summary>
+    /// <param name="loginModelRequest"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="NotFoundException"></exception>
+    /// <exception cref="FormatException"></exception>
+    /// <exception cref="UnauthorizedAccessException"></exception>
     public async Task<string> AuthenticateAsync(LoginModelRequest loginModelRequest)
     {
         if (string.IsNullOrWhiteSpace(loginModelRequest.Username) || string.IsNullOrWhiteSpace(loginModelRequest.Password))
