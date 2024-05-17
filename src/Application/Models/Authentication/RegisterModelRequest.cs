@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Domain.Common;
+using MediatR;
 
 namespace BeatSportsAPI.Application.Models.Authentication;
-public class RegisterModelRequest : BaseEntity
+public class RegisterModelRequest : BaseEntity, IRequest<BeatSportsResponse>
 {
     public string UserName { get; set; } = null!;
     public string Password { get; set; } = null!;
@@ -19,5 +23,5 @@ public class RegisterModelRequest : BaseEntity
     public string? ProfilePictureURL { get; set; }
     public string? Bio { get; set; }
     public string PhoneNumber { get; set; } = null!;
-    public string Role { get; set; } = null!;
+    //public string Role { get; set; } = null!;
 }

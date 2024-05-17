@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using BeatSportsAPI.Domain.Enums;
 
 namespace BeatSportsAPI.Infrastructure.Identity;
 public class IdentityService : IIdentityService
@@ -102,6 +103,9 @@ public class IdentityService : IIdentityService
 
     public async Task<TokenModel> GenerateToken(LoginModelRequest loginRequest)
     {
+        var user = await _beatSportsDbContext.Accounts
+            .FirstOrDefaultAsync(u => u.UserName == loginRequest.Username);
+        var userRole = user.Role;
         JwtSecurityTokenHandler jwtHandler = new JwtSecurityTokenHandler();
         var secretKey = GetJsonInAppSettingsExtension.GetJson("Jwt:SecretKey");
         if (string.IsNullOrWhiteSpace(secretKey))
@@ -118,7 +122,7 @@ public class IdentityService : IIdentityService
         {
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         new Claim(JwtRegisteredClaimNames.Sub, loginRequest.Username),
-        new Claim(ClaimTypes.Role, "Administrator")
+        new Claim(ClaimTypes.Role, userRole)
         };
 
         var expiry = DateTime.UtcNow.AddMinutes(30);
@@ -186,6 +190,13 @@ public class IdentityService : IIdentityService
         return tokenModel.AccessToken;
     }
 
+    /// <summary>
+    /// Register new account, hash password
+    /// </summary>
+    /// <param name="registerModelRequest"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    /// <exception cref="NotFoundException"></exception>
     public async Task<string> RegisterAccountAsync(RegisterModelRequest registerModelRequest, CancellationToken cancellationToken)
     {
         var existedUser = _beatSportsDbContext.Accounts
@@ -202,8 +213,6 @@ public class IdentityService : IIdentityService
         );
         var passwordSaltString = Convert.ToBase64String(passwordSalt);
         var passwordHashString = Convert.ToBase64String(passwordHash);
-        Console.WriteLine(passwordSaltString);
-        Console.WriteLine(passwordHashString);
         // Combine them into one string separated by a special character (e.g., ':')
         var combinedPassword = $"{passwordSaltString}:{passwordHashString}";
         var newUser = new Account
@@ -218,7 +227,7 @@ public class IdentityService : IIdentityService
             ProfilePictureURL = registerModelRequest.ProfilePictureURL,
             Bio = registerModelRequest.Bio,
             PhoneNumber = registerModelRequest.PhoneNumber,
-            Role = registerModelRequest.Role
+            Role = Role.Customer.ToString(),
         };
         await _beatSportsDbContext.Accounts.AddAsync(newUser, cancellationToken);
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);

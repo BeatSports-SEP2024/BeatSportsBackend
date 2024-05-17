@@ -31,13 +31,14 @@ public class AuthController : ApiControllerBase
     }
 
     [HttpPost]
-    [Route("register")]
-    public async Task<BeatSportsResponse> Register([FromBody] RegisterModelRequest request, CancellationToken cancellationToken)
+    [Route("register/customer")]
+    public async Task<IActionResult> Register([FromBody] RegisterModelRequest request, CancellationToken cancellationToken)
     {
-        var response = await _identityService.RegisterAccountAsync(request, cancellationToken);
-        return new BeatSportsResponse
+        if(!ModelState.IsValid)
         {
-            Message = "Create new user successfully"
-        };
+            return BadRequest(ModelState);
+        }
+        var response = await _mediator.Send(request);
+        return Ok(response);
     }
 }
