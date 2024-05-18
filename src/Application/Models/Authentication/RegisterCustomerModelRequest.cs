@@ -8,11 +8,12 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Domain.Common;
+using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Models.Authentication;
-public class RegisterModelRequest : IRequest<BeatSportsResponse>
+public class RegisterCustomerModelRequest : IRequest<BeatSportsResponse>
 {
     public string UserName { get; set; } = null!;
     public string Password { get; set; } = null!;
@@ -28,4 +29,11 @@ public class RegisterModelRequest : IRequest<BeatSportsResponse>
     public string PhoneNumber { get; set; } = null!;
     [EnumDataType(typeof(RoleEnums))]
     public RoleEnums Role { get; set; } 
+    public CustomerModels Customer { get; set; }
+
+    public class CustomerModels
+    {
+        public int RewardPoints { get; set; }
+        public string Address { get; set; } = null!;
+    }
 }

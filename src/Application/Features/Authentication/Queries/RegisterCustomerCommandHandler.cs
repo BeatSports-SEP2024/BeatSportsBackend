@@ -8,22 +8,23 @@ using BeatSportsAPI.Domain.Entities;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Authentication.Queries;
-public class RegisterCommandHandler : IRequestHandler<RegisterModelRequest, BeatSportsResponse>
+public class RegisterCustomerCommandHandler : IRequestHandler<RegisterCustomerModelRequest, BeatSportsResponse>
 {
     private readonly IIdentityService _identityService;
 
-    public RegisterCommandHandler(IIdentityService identityService)
+    public RegisterCustomerCommandHandler(IIdentityService identityService)
     {
         _identityService = identityService;
     }
 
-    public async Task<BeatSportsResponse> Handle(RegisterModelRequest request, CancellationToken cancellationToken)
+    public async Task<BeatSportsResponse> Handle(RegisterCustomerModelRequest request, CancellationToken cancellationToken)
     {
-        var registerResponse = await _identityService.RegisterAccountAsync(request, cancellationToken);
+        var registerResponse = await _identityService.RegisterCustomerAccountAsync(request, cancellationToken);
         if(registerResponse  == null)
         {
             throw new BadRequestException("An error is occurred when process");
         }
+
         return new BeatSportsResponse
         {
             Message = "Create new user successfully"

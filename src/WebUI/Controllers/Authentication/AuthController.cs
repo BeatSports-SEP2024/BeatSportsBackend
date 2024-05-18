@@ -32,9 +32,21 @@ public class AuthController : ApiControllerBase
 
     [HttpPost]
     [Route("register/customer")]
-    public async Task<IActionResult> Register([FromBody] RegisterModelRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> RegisterCustomer([FromBody] RegisterCustomerModelRequest request, CancellationToken cancellationToken)
     {
         if(!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var response = await _mediator.Send(request);
+        return Ok(response);
+    }
+
+    [HttpPost]
+    [Route("register/owner")]
+    public async Task<IActionResult> RegisterOwner([FromBody] RegisterOwnerModelRequest request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
