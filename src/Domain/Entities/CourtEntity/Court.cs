@@ -12,7 +12,8 @@ public class Court : BaseAuditableEntity
     public TimeSpan TimeEnd { get; set; }
 
     public virtual Owner Owner { get; set; }
+    public virtual IList<Campaign> Campaigns { get; set; }
+    public virtual IList<TimePeriod> TimePeriods { get; set; }
+    public virtual IList<Feedback> Feedback { get; set; }
     public virtual IList<CourtSportCategory> CourtCategories { get; set; }
-    public virtual IList<CourtTimePeriod> CourtTimePeriods { get; set; }
-    public virtual IList<BookingDetail> BookingDetails { get; set; }
 }

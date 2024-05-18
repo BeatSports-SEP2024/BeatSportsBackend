@@ -1,9 +1,10 @@
-﻿    using System.Reflection;
+﻿using System.Reflection;
 using System.Reflection.Emit;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
 using BeatSportsAPI.Domain.Entities.PaymentEntity;
+using BeatSportsAPI.Domain.Entities.Room;
 using BeatSportsAPI.Infrastructure.Identity;
 using BeatSportsAPI.Infrastructure.Persistence.Interceptors;
 using Duende.IdentityServer.EntityFramework.Entities;
@@ -34,9 +35,16 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
     public DbSet<Court> Courts { get; set; }
     public DbSet<CourtSportCategory> CourtSportCategories { get; set; }
     public DbSet<CourtSubdivision> CourtSubdivisions { get; set; }
-    public DbSet<CourtTimePeriod> CourtTimePeriods { get; set; }
     public DbSet<Booking> Bookings { get; set; }
-    public DbSet<BookingDetail> BookingDetails { get; set; }
+    public DbSet<PaymentMethod> PaymentMethods { get; set; }
+    public DbSet<Level> Levels { get; set; }
+    public DbSet<RoomMember> RoomMembers { get; set; }
+    public DbSet<RoomMatch> RoomMatches { get; set; }
+    public DbSet<Campaign> Campaigns { get; set; }
+    public DbSet<Feedback> Feedbacks { get; set; }
+    public DbSet<Transaction> Transactions { get; set; }
+    public DbSet<Wallet> Wallets { get; set; }
+    public DbSet<TimePeriod> TimePeriods { get; set; }
     public DbSet<RefreshToken> RefreshToken { get; set; }
 
     public BeatSportsAPIDbContext(
@@ -67,18 +75,18 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
             .HasForeignKey(ss => ss.SportCategoryId)
             .OnDelete(DeleteBehavior.NoAction);
         });
-        builder.Entity<CourtTimePeriod>(entity =>
+        builder.Entity<RoomMember>(entity =>
         {
-            entity.HasKey(ss => new { ss.CourtId, ss.TimePeriodId });
+            entity.HasKey(ss => new { ss.CustomerId, ss.RoomId });
 
-            entity.HasOne(ss => ss.Court)
-            .WithMany(ss => ss.CourtTimePeriods)
-            .HasForeignKey(ss => ss.CourtId)
+            entity.HasOne(ss => ss.Customer)
+            .WithMany(ss => ss.RoomMembers)
+            .HasForeignKey(ss => ss.CustomerId)
             .OnDelete(DeleteBehavior.NoAction);
 
-            entity.HasOne(ss => ss.TimePeriod)
-            .WithMany(ss => ss.CourtTimePeriods)
-            .HasForeignKey(ss => ss.TimePeriodId)
+            entity.HasOne(ss => ss.RoomMatch)
+            .WithMany(ss => ss.RoomMembers)
+            .HasForeignKey(ss => ss.RoomId)
             .OnDelete(DeleteBehavior.NoAction);
         });
         builder.Entity<PaymentNotification>()
