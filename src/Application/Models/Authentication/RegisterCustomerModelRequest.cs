@@ -33,9 +33,4 @@ public class RegisterCustomerModelRequest : IRequest<BeatSportsResponse>
     [EnumDataType(typeof(RoleEnums))]
     public RoleEnums Role { get; set; } 
     public string Address { get; set; } = null!;
-
-    public class CustomerModels
-    {
-        public int RewardPoints { get; set; }       
-    }
 }

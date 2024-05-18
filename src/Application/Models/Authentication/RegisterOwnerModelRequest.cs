@@ -28,9 +28,4 @@ public class RegisterOwnerModelRequest : IRequest<BeatSportsResponse>
     public string PhoneNumber { get; set; } = null!;
     [EnumDataType(typeof(RoleEnums))]
     public RoleEnums Role { get; set; }
-
-    public class OwnerModels 
-    {
-        
-    }
 }
