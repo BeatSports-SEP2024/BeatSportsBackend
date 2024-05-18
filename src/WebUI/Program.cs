@@ -4,6 +4,7 @@ using Hangfire;
 using Microsoft.OpenApi.Models;
 using BeatSportsAPI.Application.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using BeatSportsAPI.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,9 +25,9 @@ builder.Services.AddHangfire(configuration => configuration
                 }));
 builder.Services.AddHangfireServer();
 
-builder.Services.AddSwaggerGen(config => 
+builder.Services.AddSwaggerGen(config =>
 {
-    config.SwaggerDoc("v1", new OpenApiInfo { Title = "BeatSportsAPI", Version = "v1"});
+    config.SwaggerDoc("v1", new OpenApiInfo { Title = "BeatSportsAPI", Version = "v1" });
     config.DescribeAllParametersInCamelCase();
     config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -63,7 +64,7 @@ if (app.Environment.IsDevelopment())
     // Initialise and seed database
     using (var scope = app.Services.CreateScope())
     {
-        var initialiser = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitialiser>();
+        var initialiser = scope.ServiceProvider.GetRequiredService<BeatSportsAPIDbContextInitialiser>();
         await initialiser.InitialiseAsync();
         await initialiser.SeedAsync();
     }

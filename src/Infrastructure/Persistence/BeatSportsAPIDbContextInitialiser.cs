@@ -9,14 +9,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace BeatSportsAPI.Infrastructure.Persistence;
-public class ApplicationDbContextInitialiser
+public class BeatSportsAPIDbContextInitialiser
 {
-    private readonly ILogger<ApplicationDbContextInitialiser> _logger;
-    private readonly ApplicationDbContext _context;
+    private readonly ILogger<BeatSportsAPIDbContextInitialiser> _logger;
+    private readonly BeatSportsAPIDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
 
-    public ApplicationDbContextInitialiser(ILogger<ApplicationDbContextInitialiser> logger, ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+    public BeatSportsAPIDbContextInitialiser(ILogger<BeatSportsAPIDbContextInitialiser> logger, BeatSportsAPIDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
     {
         _logger = logger;
         _context = context;

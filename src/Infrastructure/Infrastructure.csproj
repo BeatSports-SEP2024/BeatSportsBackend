@@ -29,6 +29,17 @@
 
     <ItemGroup>
       <Folder Include="Files\Maps\" />
+      <Folder Include="Migrations\" />
+      <Folder Include="Persistence\Migrations\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Persistence\BeatSportsAPIDbContext.cs">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Compile>
+      <Compile Update="Persistence\BeatSportsAPIDbContextInitialiser.cs">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Compile>
     </ItemGroup>
 
 </Project>
