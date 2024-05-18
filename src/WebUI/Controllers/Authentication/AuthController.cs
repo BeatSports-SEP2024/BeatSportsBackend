@@ -50,11 +50,11 @@ public class AuthController : ApiControllerBase
         var response = new BeatSportsResponse();
         
         var refreshToken = _identityService.GetRefreshToken(token);
-        if (refreshToken == null || accesstoken != refreshToken.AccessToken)
+        if (refreshToken == null || accessToken != refreshToken.AccessToken)
         {
             response.Message = "Invalid Refresh Token";
             return Ok(response);
-        }else if(refreshToken.TokenExpires < DateTime.Now || accesstoken != refreshToken.AccessToken)
+        }else if(refreshToken.TokenExpires < DateTime.Now || accessToken != refreshToken.AccessToken)
         {
             response.Message = "Token expired.";
             return Ok(response);

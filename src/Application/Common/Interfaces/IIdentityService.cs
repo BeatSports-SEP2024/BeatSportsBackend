@@ -10,8 +10,6 @@ public interface IIdentityService
     Task<bool> IsInRoleAsync(string userId, string role);
     Task<bool> AuthorizeAsync(string userId, string policyName);
     Task<LoginResponse> AuthenticateAsync(LoginModelRequest loginModelRequest);
-    Task<string> RegisterAccountAsync(RegisterModelRequest registerModelRequest, CancellationToken cancellationToken);
-   
     Task<string> RegisterCustomerAccountAsync(RegisterCustomerModelRequest registerModelRequest, CancellationToken cancellationToken);
     Task<string> RegisterOwnerAccountAsync(RegisterOwnerModelRequest registerModelRequest, CancellationToken cancellationToken);
     Task<(Result Result, string UserId)> CreateUserAsync(string userName, string password);
