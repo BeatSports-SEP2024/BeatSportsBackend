@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -7,6 +8,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Domain.Common;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Models.Authentication;
@@ -19,7 +21,8 @@ public class RegisterModelRequest : BaseEntity, IRequest<BeatSportsResponse>
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public DateTime DateOfBirth { get; set; }
-    public string Gender { get; set; } = null!;
+    [EnumDataType(typeof(Gender))]
+    public Gender Gender { get; set; }
     public string? ProfilePictureURL { get; set; }
     public string? Bio { get; set; }
     public string PhoneNumber { get; set; } = null!;

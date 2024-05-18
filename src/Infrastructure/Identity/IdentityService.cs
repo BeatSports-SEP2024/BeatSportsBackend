@@ -105,7 +105,9 @@ public class IdentityService : IIdentityService
     {
         var user = await _beatSportsDbContext.Accounts
             .FirstOrDefaultAsync(u => u.UserName == loginRequest.Username);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
         var userRole = user.Role;
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
         JwtSecurityTokenHandler jwtHandler = new JwtSecurityTokenHandler();
         var secretKey = GetJsonInAppSettingsExtension.GetJson("Jwt:SecretKey");
         if (string.IsNullOrWhiteSpace(secretKey))
@@ -115,8 +117,12 @@ public class IdentityService : IIdentityService
 
         SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
         string issuer = GetJsonInAppSettingsExtension.GetJson("Jwt:Issuer");
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
         string audience = GetJsonInAppSettingsExtension.GetJson("Jwt:Audience");
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
         var claims = new List<Claim>()
         {
@@ -223,7 +229,7 @@ public class IdentityService : IIdentityService
             FirstName = registerModelRequest.FirstName,
             LastName = registerModelRequest.LastName,
             DateOfBirth = registerModelRequest.DateOfBirth,
-            Gender = registerModelRequest.Gender,
+            Gender = registerModelRequest.Gender.ToString(),
             ProfilePictureURL = registerModelRequest.ProfilePictureURL,
             Bio = registerModelRequest.Bio,
             PhoneNumber = registerModelRequest.PhoneNumber,
