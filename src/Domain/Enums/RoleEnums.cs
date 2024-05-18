@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BeatSportsAPI.Domain.Enums;
-public enum Role
+public enum RoleEnums
 {
     Admin,
     Owner,

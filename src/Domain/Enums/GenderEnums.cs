@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BeatSportsAPI.Domain.Enums;
-public enum Gender
+public enum GenderEnums
 {
     Male,
     Female,

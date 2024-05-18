@@ -233,11 +233,10 @@ public class IdentityService : IIdentityService
             ProfilePictureURL = registerModelRequest.ProfilePictureURL,
             Bio = registerModelRequest.Bio,
             PhoneNumber = registerModelRequest.PhoneNumber,
-            Role = Role.Customer.ToString(),
+            Role = RoleEnums.Customer.ToString(),
         };
         await _beatSportsDbContext.Accounts.AddAsync(newUser, cancellationToken);
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
         return "Create new account successfully";
     }
-
 }
