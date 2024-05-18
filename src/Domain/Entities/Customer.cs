@@ -6,7 +6,7 @@ public class Customer : BaseAuditableEntity
 {
     [ForeignKey("Account")]
     public Guid AccountId { get; set; }
-    public int RewardPoints { get; set; }
+    public int RewardPoints { get; set; } = 0;
     public string Address { get; set; }
 
     public virtual Account Account { get; set; }

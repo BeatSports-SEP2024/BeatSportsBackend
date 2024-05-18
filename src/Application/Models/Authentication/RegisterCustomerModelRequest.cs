@@ -15,9 +15,12 @@ using MediatR;
 namespace BeatSportsAPI.Application.Models.Authentication;
 public class RegisterCustomerModelRequest : IRequest<BeatSportsResponse>
 {
-    public string UserName { get; set; } = null!;
-    public string Password { get; set; } = null!;
 
+    [Required]
+    public string UserName { get; set; } = null!;
+    [Required]
+    public string Password { get; set; } = null!;
+    [EmailAddress]
     public string? Email { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
@@ -29,11 +32,10 @@ public class RegisterCustomerModelRequest : IRequest<BeatSportsResponse>
     public string PhoneNumber { get; set; } = null!;
     [EnumDataType(typeof(RoleEnums))]
     public RoleEnums Role { get; set; } 
-    public CustomerModels Customer { get; set; }
+    public string Address { get; set; } = null!;
 
     public class CustomerModels
     {
-        public int RewardPoints { get; set; }
-        public string Address { get; set; } = null!;
+        public int RewardPoints { get; set; }       
     }
 }

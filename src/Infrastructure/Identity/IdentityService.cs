@@ -239,8 +239,7 @@ public class IdentityService : IIdentityService
         var newCustomer = new Customer
         {
             Account = newUser,
-            RewardPoints = registerModelRequest.Customer.RewardPoints,
-            Address = registerModelRequest.Customer.Address
+            Address = registerModelRequest.Address
         };
         await _beatSportsDbContext.Customers.AddAsync(newCustomer, cancellationToken);
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);

@@ -7,9 +7,12 @@ using Microsoft.EntityFrameworkCore;
 using BeatSportsAPI.Application;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var configuration = builder.Configuration;
 
 
 // Add services to the container.
@@ -28,6 +31,26 @@ builder.Services.AddHangfire(configuration => configuration
                     //TODO: Change hangfire sql server option
                 }));
 builder.Services.AddHangfireServer();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"])),
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidIssuer = configuration["JWT:Issuer"],
+        ValidAudience = configuration["JWT:Audience"]
+    };
+});
 
 builder.Services.AddSwaggerGen(config =>
 {
