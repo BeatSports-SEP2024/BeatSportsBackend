@@ -105,7 +105,9 @@ public class IdentityService : IIdentityService
     {
         var user = await _beatSportsDbContext.Accounts
             .FirstOrDefaultAsync(u => u.UserName == loginRequest.Username);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
         var userRole = user.Role;
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
         JwtSecurityTokenHandler jwtHandler = new JwtSecurityTokenHandler();
         var secretKey = GetJsonInAppSettingsExtension.GetJson("Jwt:SecretKey");
         if (string.IsNullOrWhiteSpace(secretKey))
@@ -115,8 +117,12 @@ public class IdentityService : IIdentityService
 
         SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
         string issuer = GetJsonInAppSettingsExtension.GetJson("Jwt:Issuer");
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
         string audience = GetJsonInAppSettingsExtension.GetJson("Jwt:Audience");
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
         var claims = new List<Claim>()
         {
@@ -197,7 +203,7 @@ public class IdentityService : IIdentityService
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <exception cref="NotFoundException"></exception>
-    public async Task<string> RegisterAccountAsync(RegisterModelRequest registerModelRequest, CancellationToken cancellationToken)
+    public async Task<string> RegisterCustomerAccountAsync(RegisterCustomerModelRequest registerModelRequest, CancellationToken cancellationToken)
     {
         var existedUser = _beatSportsDbContext.Accounts
             .Where(u => u.UserName == registerModelRequest.UserName && u.Email == registerModelRequest.Email)
@@ -223,15 +229,69 @@ public class IdentityService : IIdentityService
             FirstName = registerModelRequest.FirstName,
             LastName = registerModelRequest.LastName,
             DateOfBirth = registerModelRequest.DateOfBirth,
-            Gender = registerModelRequest.Gender,
+            Gender = registerModelRequest.Gender.ToString(),
             ProfilePictureURL = registerModelRequest.ProfilePictureURL,
             Bio = registerModelRequest.Bio,
             PhoneNumber = registerModelRequest.PhoneNumber,
-            Role = Role.Customer.ToString(),
+            Role = RoleEnums.Customer.ToString(),
         };
         await _beatSportsDbContext.Accounts.AddAsync(newUser, cancellationToken);
+        var newCustomer = new Customer
+        {
+            Account = newUser,
+            Address = registerModelRequest.Address
+        };
+        await _beatSportsDbContext.Customers.AddAsync(newCustomer, cancellationToken);
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
         return "Create new account successfully";
     }
 
+    /// <summary>
+    /// Create account for owner
+    /// </summary>
+    /// <param name="registerModelRequest"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    /// <exception cref="NotFoundException"></exception>
+    public async Task<string> RegisterOwnerAccountAsync(RegisterOwnerModelRequest registerModelRequest, CancellationToken cancellationToken)
+    {
+        var existedUser = _beatSportsDbContext.Accounts
+            .Where(u => u.UserName == registerModelRequest.UserName && u.Email == registerModelRequest.Email)
+            .FirstOrDefault();
+        if (existedUser != null)
+        {
+            throw new NotFoundException("This user is existed");
+        }
+        PasswordHashingExtension.CreatePasswordHashing(
+            registerModelRequest.Password,
+            out byte[] passwordSalt,
+            out byte[] passwordHash
+        );
+        var passwordSaltString = Convert.ToBase64String(passwordSalt);
+        var passwordHashString = Convert.ToBase64String(passwordHash);
+        // Combine them into one string separated by a special character (e.g., ':')
+        var combinedPassword = $"{passwordSaltString}:{passwordHashString}";
+        var newUser = new Account
+        {
+            UserName = registerModelRequest.UserName,
+            Password = combinedPassword,
+            Email = registerModelRequest.Email,
+            FirstName = registerModelRequest.FirstName,
+            LastName = registerModelRequest.LastName,
+            DateOfBirth = registerModelRequest.DateOfBirth,
+            Gender = registerModelRequest.Gender.ToString(),
+            ProfilePictureURL = registerModelRequest.ProfilePictureURL,
+            Bio = registerModelRequest.Bio,
+            PhoneNumber = registerModelRequest.PhoneNumber,
+            Role = RoleEnums.Owner.ToString(),
+        };
+        await _beatSportsDbContext.Accounts.AddAsync(newUser, cancellationToken);
+        var newOwner = new Owner
+        {
+            Account = newUser,
+        };
+        await _beatSportsDbContext.Owners.AddAsync(newOwner, cancellationToken);
+        await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
+        return "Create new account successfully";
+    }
 }
