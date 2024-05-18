@@ -26,7 +26,7 @@ public class AuthController : ApiControllerBase
             return BadRequest(ModelState);
         }
         var response = await _mediator.Send(request);
-
+        
         return Ok(response);
     }
 
@@ -39,10 +39,33 @@ public class AuthController : ApiControllerBase
             return BadRequest(ModelState);
         }
         var response = await _mediator.Send(request);
+        
         return Ok(response);
     }
 
     [HttpPost]
+    [Route("refresh-token")]
+    public async Task<IActionResult> RefreshToken(string username, string accessToken, string token)
+    {
+        var response = new BeatSportsResponse();
+        
+        var refreshToken = _identityService.GetRefreshToken(token);
+        if (refreshToken == null || accesstoken != refreshToken.AccessToken)
+        {
+            response.Message = "Invalid Refresh Token";
+            return Ok(response);
+        }else if(refreshToken.TokenExpires < DateTime.Now || accesstoken != refreshToken.AccessToken)
+        {
+            response.Message = "Token expired.";
+            return Ok(response);
+        }
+
+        var re = await _identityService.SetNewRefreshTokenAsync(username);
+        
+        return Ok(re);
+    }
+    
+	[HttpPost]
     [Route("register/owner")]
     public async Task<IActionResult> RegisterOwner([FromBody] RegisterOwnerModelRequest request, CancellationToken cancellationToken)
     {

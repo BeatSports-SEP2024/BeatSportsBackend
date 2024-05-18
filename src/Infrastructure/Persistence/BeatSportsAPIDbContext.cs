@@ -37,6 +37,7 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
     public DbSet<CourtTimePeriod> CourtTimePeriods { get; set; }
     public DbSet<Booking> Bookings { get; set; }
     public DbSet<BookingDetail> BookingDetails { get; set; }
+    public DbSet<RefreshToken> RefreshToken { get; set; }
 
     public BeatSportsAPIDbContext(
         DbContextOptions<BeatSportsAPIDbContext> options,
@@ -114,5 +115,10 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
         await _mediator.DispatchDomainEvents(this);
 
         return await base.SaveChangesAsync(cancellationToken);
+    }
+
+    void IBeatSportsDbContext.SaveChanges()
+    {
+        base.SaveChanges();
     }
 }

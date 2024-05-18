@@ -36,7 +36,8 @@ public class LoginCommandHandler : IRequestHandler<LoginModelRequest, LoginRespo
         }
         return new LoginResponse {
             Message = "Login Successfully",
-            AccessToken = loginResponse
+            AccessToken = loginResponse.AccessToken,
+            RefreshToken = loginResponse.RefreshToken,
         };
     }
 }
