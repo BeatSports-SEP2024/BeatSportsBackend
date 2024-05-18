@@ -2,6 +2,7 @@
 using BeatSportsAPI.Domain.Entities.CourtEntity;
 using BeatSportsAPI.Domain.Entities.PaymentEntity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace BeatSportsAPI.Application.Common.Interfaces;
 public interface IBeatSportsDbContext
@@ -23,5 +24,7 @@ public interface IBeatSportsDbContext
     public DbSet<CourtTimePeriod> CourtTimePeriods { get; set; }
     public DbSet<Booking> Bookings { get; set; }
     public DbSet<BookingDetail> BookingDetails { get; set; }
+    public DbSet<RefreshToken> RefreshToken { get; set; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+    void SaveChanges();
 }
