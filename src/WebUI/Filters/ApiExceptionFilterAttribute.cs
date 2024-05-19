@@ -16,6 +16,8 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
                 { typeof(NotFoundException), HandleNotFoundException },
                 { typeof(UnauthorizedAccessException), HandleUnauthorizedAccessException },
                 { typeof(ForbiddenAccessException), HandleForbiddenAccessException },
+                { typeof(BadRequestException), HandleBadRequestException },
+
             };
     }
 
@@ -113,6 +115,23 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
         context.Result = new ObjectResult(details)
         {
             StatusCode = StatusCodes.Status403Forbidden
+        };
+
+        context.ExceptionHandled = true;
+    }
+
+    private void HandleBadRequestException(ExceptionContext context)
+    {
+        var details = new ProblemDetails
+        {
+            Status = StatusCodes.Status400BadRequest,
+            Title = "BadRequest",
+            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+        };
+
+        context.Result = new ObjectResult(details)
+        {
+            StatusCode = StatusCodes.Status400BadRequest
         };
 
         context.ExceptionHandled = true;
