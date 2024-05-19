@@ -30,7 +30,5 @@ public class RegisterCustomerModelRequest : IRequest<BeatSportsResponse>
     public string? ProfilePictureURL { get; set; }
     public string? Bio { get; set; }
     public string PhoneNumber { get; set; } = null!;
-    [EnumDataType(typeof(RoleEnums))]
-    public RoleEnums Role { get; set; } 
     public string Address { get; set; } = null!;
 }
