@@ -13,17 +13,6 @@ public class TimePeriodController : ApiControllerBase
     {
         _mediator = mediator;
     }
-    [HttpPost]
-    public async Task<IActionResult> CreateTimePeriod([FromBody] CreateTimePeriodCommand request)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-        var response = await _mediator.Send(request);
-
-        return Ok(response);
-    }
     [HttpGet]
     public async Task<IActionResult> GetTimePeriod([FromQuery] GetTimePeriodCommand request)
     {
@@ -35,6 +24,17 @@ public class TimePeriodController : ApiControllerBase
 
         return Ok(response);
     }
+    [HttpPost]
+    public async Task<IActionResult> CreateTimePeriod([FromBody] CreateTimePeriodCommand request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var response = await _mediator.Send(request);
+
+        return Ok(response);
+    } 
     [HttpPut]
     public async Task<IActionResult> UpdateTimePeriod(UpdateTimePeriodCommand request)
     {

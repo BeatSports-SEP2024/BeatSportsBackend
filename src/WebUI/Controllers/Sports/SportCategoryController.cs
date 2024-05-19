@@ -13,6 +13,17 @@ public class SportCategoryController : ApiControllerBase
     {
         _mediator = mediator;
     }
+    [HttpGet]
+    public async Task<IActionResult> GetSportCategory([FromQuery] GetSportCategoriesCommand request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var response = await _mediator.Send(request);
+
+        return Ok(response);
+    }
     [HttpPost]
     public async Task<IActionResult> CreateSportCategory(CreateSportCategoriesCommand request)
     {
@@ -45,16 +56,5 @@ public class SportCategoryController : ApiControllerBase
         var response = await _mediator.Send(request);
 
         return Ok(response);
-    }
-    [HttpGet]
-    public async Task<IActionResult> GetSportCategory([FromQuery] GetSportCategoriesCommand request)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-        var response = await _mediator.Send(request);
-
-        return Ok(response);
-    }
+    }  
 }
