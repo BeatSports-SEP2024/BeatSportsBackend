@@ -16,6 +16,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using BeatSportsAPI.Domain.Enums;
+using System.Security.Cryptography;
+using System.Threading;
+using Microsoft.AspNetCore.Http;
+using Azure;
+using BeatSportsAPI.Application.Common.Response;
 
 namespace BeatSportsAPI.Infrastructure.Identity;
 public class IdentityService : IIdentityService
@@ -155,7 +160,7 @@ public class IdentityService : IIdentityService
     /// <exception cref="NotFoundException"></exception>
     /// <exception cref="FormatException"></exception>
     /// <exception cref="UnauthorizedAccessException"></exception>
-    public async Task<string> AuthenticateAsync(LoginModelRequest loginModelRequest)
+    public async Task<LoginResponse> AuthenticateAsync(LoginModelRequest loginModelRequest)
     {
         if (string.IsNullOrWhiteSpace(loginModelRequest.Username) || string.IsNullOrWhiteSpace(loginModelRequest.Password))
         {
@@ -193,7 +198,123 @@ public class IdentityService : IIdentityService
         {
             Username = loginModelRequest.Username,
         });
-        return tokenModel.AccessToken;
+
+        
+
+        //create new refeshToken and save to DB
+        var refreshToken = GenerateRefreshToken();
+        SetRefreshToken(refreshToken, user, tokenModel);
+        var loginResponse = new LoginResponse
+        {
+            AccessToken = tokenModel.AccessToken,
+            RefreshToken = refreshToken
+        };
+        return loginResponse;
+    }
+
+    private RefreshTokenModel GenerateRefreshToken()
+    {
+        var refreshToken = new RefreshTokenModel
+        {
+            Token = GenerateRandomAlphanumericString(16),
+            Expires = DateTime.Now.AddDays(1)
+        };
+
+        return refreshToken;
+    }
+
+    private void SetRefreshToken(RefreshTokenModel newRefreshToken, Account user, TokenModel accessToken)
+    {
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Expires = newRefreshToken.Expires,
+        };
+        
+        var refreshToken = _beatSportsDbContext.RefreshToken.Where(x => x.AccountId == user.Id).FirstOrDefault();
+        if(refreshToken != null) {
+            refreshToken.AccessToken = accessToken.AccessToken;
+            refreshToken.Token = newRefreshToken.Token;
+            refreshToken.TokenExpires = newRefreshToken.Expires;
+            refreshToken.TokenCreated = newRefreshToken.Created;
+
+            _beatSportsDbContext.RefreshToken.Update(refreshToken);
+            _beatSportsDbContext.SaveChanges();
+        }
+        else
+        {
+            var newRef = new RefreshToken
+            {
+                AccountId = user.Id,
+                AccessToken = accessToken.AccessToken,
+                Token = newRefreshToken.Token,
+                TokenCreated = newRefreshToken.Created,
+                TokenExpires = newRefreshToken.Expires,
+            };
+
+            _beatSportsDbContext.RefreshToken.Add(newRef);
+            _beatSportsDbContext.SaveChanges(); 
+        }
+        
+    }
+
+    public async Task<LoginResponse> SetNewRefreshTokenAsync(string userId)
+    {
+        var user = _beatSportsDbContext.Accounts
+            .Where(u => u.UserName == userId)
+            .FirstOrDefault();
+        var loginModel = new LoginModelRequest
+        {
+            Username = user.UserName
+        };
+
+        if (loginModel.Username == null)
+        {
+            throw new UnauthorizedAccessException("Invalid.");
+        }
+        var tokenModel = await GenerateToken(new LoginModelRequest
+        {
+            Username = loginModel.Username,
+        });
+
+
+
+        //create new refeshToken and save to DB
+        var refreshToken = GenerateRefreshToken();
+        SetRefreshToken(refreshToken, user, tokenModel);
+        var loginResponse = new LoginResponse
+        {
+            Message = "Login Successfully",
+            AccessToken = tokenModel.AccessToken,
+            RefreshToken = refreshToken
+        };
+        
+        return loginResponse;
+    }
+   
+
+    public RefreshToken GetRefreshToken (string token)
+    {
+        var refreshToken = _beatSportsDbContext.RefreshToken.Where(x => x.Token.Equals(token)).FirstOrDefault();
+        return refreshToken;
+    }
+
+    public static string GenerateRandomAlphanumericString(int length)
+    {
+        const string validCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        var stringBuilder = new StringBuilder();
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            var byteBuffer = new byte[sizeof(uint)];
+
+            while (length-- > 0)
+            {
+                rng.GetBytes(byteBuffer);
+                var num = BitConverter.ToUInt32(byteBuffer, 0);
+                stringBuilder.Append(validCharacters[(int)(num % (uint)validCharacters.Length)]);
+            }
+        }
+        return stringBuilder.ToString();
     }
 
     /// <summary>
