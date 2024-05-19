@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BeatSportsAPI.Domain.Entities.CourtEntity;
-public class CourtSportCategory
+public class CourtSportCategory : BaseAuditableEntity
 {
     [ForeignKey("Court")]
     public Guid CourtId { get; set; }
