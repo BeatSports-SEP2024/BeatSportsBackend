@@ -38,7 +38,7 @@ public class UpdateTimePeriodHandler : IRequestHandler<UpdateTimePeriodCommand, 
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
         return new BeatSportsResponse
         {
-            Message = "Uppdate Successfully"
+            Message = "Update Successfully"
         };
     }
 }
