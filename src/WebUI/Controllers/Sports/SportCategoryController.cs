@@ -24,6 +24,17 @@ public class SportCategoryController : ApiControllerBase
 
         return Ok(response);
     }
+    [HttpGet("id")]
+    public async Task<IActionResult> GetSportCategoryById([FromQuery] GetSportCategoryByIdCommand request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var response = await _mediator.Send(request);
+
+        return Ok(response);
+    }
     [HttpPost]
     public async Task<IActionResult> CreateSportCategory(CreateSportCategoriesCommand request)
     {
