@@ -1,27 +1,10 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using System.Threading;
-using Azure.Core;
-using BeatSportsAPI.Application.Common.Exceptions;
-using BeatSportsAPI.Application.Common.Interfaces;
+﻿using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
-using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Application.Features.Authentication.Command.AuthGoogle;
+using BeatSportsAPI.Application.Features.Authentication.Queries;
 using BeatSportsAPI.Application.Models.Authentication;
-using BeatSportsAPI.Domain.Entities;
-using BeatSportsAPI.Domain.Enums;
-using BeatSportsAPI.Infrastructure.Common;
-using BeatSportsAPI.Infrastructure.Persistence;
-using Duende.IdentityServer.Validation;
-using Google;
-using Google.Apis.Auth;
-using Google.Apis.Auth.OAuth2;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 
 namespace WebAPI.Controllers.Authentication;
 
@@ -82,8 +65,7 @@ public class AuthController : ApiControllerBase
         
         return Ok(re);
     }
-    
-	[HttpPost]
+    [HttpPost]
     [Route("register/owner")]
     public async Task<IActionResult> RegisterOwner([FromBody] RegisterOwnerModelRequest request, CancellationToken cancellationToken)
     {
@@ -94,7 +76,6 @@ public class AuthController : ApiControllerBase
         var response = await _mediator.Send(request);
         return Ok(response);
     }
-
     #region Login with google
     [HttpPost("google")]
     public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest data)
