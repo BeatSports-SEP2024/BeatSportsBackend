@@ -19,20 +19,36 @@ public class UpdateSportCategoriesHandler : IRequestHandler<UpdateSportCategorie
             .FirstOrDefault();
         if (existedCategory == null)
         {
-            throw new NotFoundException("Time Period does not existed");
+            throw new NotFoundException("Sport category does not existed");
         }
-        foreach (PropertyInfo property in request.GetType().GetProperties())
+        foreach (PropertyInfo requestProperty in request.GetType().GetProperties())
         {
-            var value = property.GetValue(request, null);
-            if (value != null)
+            var requestValue = requestProperty.GetValue(request, null);
+            if (requestValue != null)
             {
-                PropertyInfo propertyInfo = existedCategory.GetType().GetProperty(property.Name);
-                if (propertyInfo != null && propertyInfo.CanWrite)
+                PropertyInfo courtSportProperty = existedCategory.GetType().GetProperty(requestProperty.Name);
+                if (courtSportProperty != null && courtSportProperty.CanWrite)
                 {
-                    propertyInfo.SetValue(existedCategory, value, null);
+                    if (courtSportProperty.PropertyType.IsEnum)
+                    {
+                        // Chuyển đổi giá trị từ request sang kiểu enum tương ứng
+                        var enumValue = Enum.Parse(courtSportProperty.PropertyType, requestValue.ToString());
+                        courtSportProperty.SetValue(existedCategory, enumValue, null);
+                    }
+                    else if (courtSportProperty.PropertyType == typeof(string) && requestProperty.PropertyType.IsEnum)
+                    {
+                        // Chuyển đổi giá trị enum từ request sang string
+                        var stringValue = requestValue.ToString();
+                        courtSportProperty.SetValue(existedCategory, stringValue, null);
+                    }
+                    else
+                    {
+                        courtSportProperty.SetValue(existedCategory, requestValue, null);
+                    }
                 }
             }
         }
+
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
         return new BeatSportsResponse
         {
