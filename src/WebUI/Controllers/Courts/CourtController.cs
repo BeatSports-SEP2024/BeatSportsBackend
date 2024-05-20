@@ -1,6 +1,7 @@
 ﻿using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Courts.Commands.CreateCourt;
+using BeatSportsAPI.Application.Features.Courts.Commands.DeleteCourt;
 using BeatSportsAPI.Application.Features.Courts.Commands.UpdateCourt;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAll;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetById;
@@ -25,6 +26,11 @@ public class CourtController : ApiControllerBase
     }
     [HttpPut]
     public async Task<BeatSportsResponse> Update(UpdateCourtCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+    [HttpDelete]
+    public async Task<BeatSportsResponse> Delete(DeleteCourtCommand request)
     {
         return await _mediator.Send(request);
     }
