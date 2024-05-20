@@ -11,7 +11,7 @@ using MediatR;
 using AutoMapper.QueryableExtensions;
 using AutoFilterer.Extensions;
 
-namespace BeatSportsAPI.Application.Features.Authentication.Queries;
+namespace BeatSportsAPI.Application.Features.Accounts.Queries;
 public class GetAccountByIdHandler : IRequestHandler<GetAccountByIdCommand, AccountResponse>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
@@ -24,10 +24,10 @@ public class GetAccountByIdHandler : IRequestHandler<GetAccountByIdCommand, Acco
     public Task<AccountResponse> Handle(GetAccountByIdCommand request, CancellationToken cancellationToken)
     {
         var isExistedAccount = _beatSportsDbContext.Accounts
-            .Where(a => !a.IsDelete)
+            .Where(a => a.Id == request.AccountId && !a.IsDelete)
             .ProjectTo<AccountResponse>(_mapper.ConfigurationProvider)
             .FirstOrDefault();
-        if(isExistedAccount == null)
+        if (isExistedAccount == null)
         {
             throw new BadRequestException($"Account with id: {request.AccountId} is not existed");
         }

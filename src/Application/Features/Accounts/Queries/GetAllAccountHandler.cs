@@ -12,7 +12,7 @@ using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 
-namespace BeatSportsAPI.Application.Features.Authentication.Queries;
+namespace BeatSportsAPI.Application.Features.Accounts.Queries;
 public class GetAllAccountHandler : IRequestHandler<GetAllAccountCommand, PaginatedList<AccountResponse>>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;

@@ -9,10 +9,10 @@ using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
 
-namespace BeatSportsAPI.Application.Features.Authentication.Queries;
+namespace BeatSportsAPI.Application.Features.Accounts.Queries;
 public class GetAllAccountCommand : IRequest<PaginatedList<AccountResponse>>
 {
-    public int PageIndex { get; set; }  
+    public int PageIndex { get; set; }
     public int PageSize { get; set; }
     [EnumDataType(typeof(RoleEnums))]
     public RoleEnums Role { get; set; }

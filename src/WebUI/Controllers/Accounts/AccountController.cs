@@ -1,4 +1,4 @@
-﻿using BeatSportsAPI.Application.Features.Authentication.Queries;
+﻿using BeatSportsAPI.Application.Features.Accounts.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

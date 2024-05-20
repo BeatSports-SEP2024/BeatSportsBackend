@@ -4,7 +4,7 @@ using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
 
-namespace BeatSportsAPI.Application.Features.Authentication.Queries;
+namespace BeatSportsAPI.Application.Features.Accounts.Queries;
 public class GetAccountByIdCommand : IRequest<AccountResponse>
 {
     [Required]
