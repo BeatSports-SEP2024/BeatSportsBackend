@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Newtonsoft.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -31,6 +32,11 @@ builder.Services.AddHangfire(configuration => configuration
                     //TODO: Change hangfire sql server option
                 }));
 builder.Services.AddHangfireServer();
+builder.Services.AddHttpClient();
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+});
 
 builder.Services.AddAuthentication(options =>
 {
