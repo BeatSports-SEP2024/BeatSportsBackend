@@ -21,6 +21,10 @@ using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Azure;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Features.Authentication.Command.AuthGoogle;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using Google.Apis.Auth;
+using Newtonsoft.Json;
 
 namespace BeatSportsAPI.Infrastructure.Identity;
 public class IdentityService : IIdentityService
@@ -31,6 +35,7 @@ public class IdentityService : IIdentityService
     private readonly JwtSettings _jwtSettings;
     private readonly IConfiguration _configuration;
     private readonly IBeatSportsDbContext _beatSportsDbContext;
+    private readonly IHttpClientFactory _httpClientFactory;
 
     public IdentityService(
         UserManager<ApplicationUser> userManager,
@@ -38,7 +43,8 @@ public class IdentityService : IIdentityService
         IAuthorizationService authorizationService,
         IConfiguration configuration,
         IOptions<JwtSettings> jwtSettings,
-        IBeatSportsDbContext beatSportsDbContext
+        IBeatSportsDbContext beatSportsDbContext,
+        IHttpClientFactory httpClientFactory
         )
     {
         _jwtSettings = jwtSettings.Value;
@@ -47,6 +53,7 @@ public class IdentityService : IIdentityService
         _userClaimsPrincipalFactory = userClaimsPrincipalFactory;
         _authorizationService = authorizationService;
         _beatSportsDbContext = beatSportsDbContext;
+        _httpClientFactory = httpClientFactory;
     }
 
     public async Task<string> GetUserNameAsync(string userId)
@@ -415,4 +422,151 @@ public class IdentityService : IIdentityService
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
         return "Create new account successfully";
     }
+
+    #region Login with goole token
+    public async Task<GoogleLoginResponse> GoogleLoginAuthAsync(GoogleLoginRequest request, CancellationToken cancellationToken)
+    {
+        string idToken = request.IdToken;
+        var googleClientIdAndroid = _configuration["Google:ClientIdAndroid"];
+        var googleClientIdIOS = _configuration["Google:ClientIdIOS"];
+        string platform = request.Platform;
+        //var googleClientSecret = _configuration["Google:ClientSecret"];
+
+        string googleClientId = platform.ToLower() == "android" ? googleClientIdAndroid! : googleClientIdIOS!;
+        try
+        {
+            //var tokenResponse = await ExchangeAuthorizationCodeAsync(idToken, googleClientId, googleClientSecret!);
+
+            var validationSettings = new GoogleJsonWebSignature.ValidationSettings
+            {
+                Audience = new[] { googleClientId }
+            };
+            var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, validationSettings);
+
+
+            var account = await _beatSportsDbContext.Accounts.Where(a => a.GoogleId == payload.Subject).SingleOrDefaultAsync();
+            if (account == null)
+            {
+                PasswordHashingExtension.CreatePasswordHashing(
+                        "Password1@",
+                        out byte[] passwordSalt,
+                        out byte[] passwordHash
+                    );
+                var passwordSaltString = Convert.ToBase64String(passwordSalt);
+                var passwordHashString = Convert.ToBase64String(passwordHash);
+                // Combine them into one string separated by a special character (e.g., ':')
+                var combinedPassword = $"{passwordSaltString}:{passwordHashString}";
+                account = new Account
+                {
+                    GoogleId = payload.Subject,
+                    UserName = payload.Name,
+                    Password = combinedPassword,
+                    Email = payload.Email,
+                    FirstName = payload.FamilyName,
+                    LastName = payload.GivenName,
+                    DateOfBirth = DateTime.Now,
+                    ProfilePictureURL = payload.Picture,
+                    Role = RoleEnums.Customer.ToString(),
+                };
+                await _beatSportsDbContext.Accounts.AddAsync(account, cancellationToken);
+                var newCustomer = new Customer
+                {
+                    Account = account
+                };
+                await _beatSportsDbContext.Customers.AddAsync(newCustomer, cancellationToken);
+                await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
+            }
+            var token = GenerateJwtGoogleToken(account);
+            var response = new GoogleLoginResponse
+            {
+                AccessToken = token,
+                //RefreshToken = tokenResponse,
+                User = new UserResponse { Email = account.Email!, 
+                    LastName= account.LastName!, 
+                    ProfilePictureURL = account.ProfilePictureURL! 
+                }
+            };
+
+            return response;
+        }
+        catch (Exception ex)
+        {
+            throw new BadRequestException($"Invalid Google token {ex.Message}");
+        }
+    }
+
+    private string GenerateJwtGoogleToken(Account account)
+    {
+        var user = _beatSportsDbContext.Accounts
+            .FirstOrDefault(u => u.UserName == account.UserName);
+        var userRole = user.Role;
+        JwtSecurityTokenHandler jwtHandler = new JwtSecurityTokenHandler();
+        var secretKey = GetJsonInAppSettingsExtension.GetJson("Jwt:SecretKey");
+        if (string.IsNullOrWhiteSpace(secretKey))
+        {
+            throw new InvalidOperationException("JWT secret key is not configured properly.");
+        }
+
+        SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+        string issuer = GetJsonInAppSettingsExtension.GetJson("Jwt:Issuer");
+        string audience = GetJsonInAppSettingsExtension.GetJson("Jwt:Audience");
+
+        var claims = new List<Claim>()
+        {
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim(JwtRegisteredClaimNames.Sub, account.UserName),
+        new Claim(ClaimTypes.Role, userRole)
+        };
+
+        var expiry = DateTime.UtcNow.AddMinutes(30);
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Issuer = issuer,
+            Audience = audience,
+            Subject = new ClaimsIdentity(claims),
+            Expires = expiry,
+            SigningCredentials = credentials
+        };
+
+        var token = jwtHandler.CreateToken(tokenDescriptor);
+        string tokenString = jwtHandler.WriteToken(token);
+
+        return tokenString;
+    }
+
+    #region refreshToken for google
+    private async Task<TokenResponse> ExchangeAuthorizationCodeAsync(string code, string clientId, string clientSecret)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://oauth2.googleapis.com/token");
+        var content = new FormUrlEncodedContent(new[]
+        {
+        new KeyValuePair<string, string>("code", code),
+        new KeyValuePair<string, string>("client_id", clientId),
+        new KeyValuePair<string, string>("client_secret", clientSecret),
+        new KeyValuePair<string, string>("redirect_uri", "https://auth.expo.io/@nhannnn/BeatSports_AppUser"),
+        new KeyValuePair<string, string>("grant_type", "authorization_code"),
+        });
+        request.Content = content;
+
+        var client = _httpClientFactory.CreateClient();
+        var response = await client.SendAsync(request);
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Error exchanging authorization code: {errorContent}");
+        }
+
+        var payload = await response.Content.ReadAsStringAsync();
+        var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(payload);
+
+        if (tokenResponse == null)
+        {
+            throw new Exception($"Failed to deserialize token response: {payload}");
+        }
+        return tokenResponse;
+    }
+    #endregion
+
+    #endregion
 }
