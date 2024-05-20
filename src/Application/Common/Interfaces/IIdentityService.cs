@@ -1,5 +1,6 @@
 ﻿using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Features.Authentication.Command.AuthGoogle;
 using BeatSportsAPI.Application.Models.Authentication;
 using BeatSportsAPI.Domain.Entities;
 
@@ -16,4 +17,7 @@ public interface IIdentityService
     Task<Result> DeleteUserAsync(string userId);
     public RefreshToken GetRefreshToken(string token);
     Task<LoginResponse> SetNewRefreshTokenAsync(string userId);
+
+    Task<GoogleLoginResponse> GoogleLoginAuthAsync(GoogleLoginRequest request, CancellationToken cancellationToken);
 }
+    
