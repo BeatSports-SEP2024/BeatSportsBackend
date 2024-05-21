@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;
 [ApiController]
-[Route("api/v1/[controller]")]
+[Route("api/v1/[controller]s")]
 public abstract class ApiControllerBase : ControllerBase
 {
     private ISender _mediator = null!;

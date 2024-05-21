@@ -1,5 +1,7 @@
 ﻿using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Features.Authentication.Command.AuthGoogle;
+using BeatSportsAPI.Application.Features.Authentication.Queries;
 using BeatSportsAPI.Application.Models.Authentication;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -63,8 +65,7 @@ public class AuthController : ApiControllerBase
         
         return Ok(re);
     }
-    
-	[HttpPost]
+    [HttpPost]
     [Route("register/owner")]
     public async Task<IActionResult> RegisterOwner([FromBody] RegisterOwnerModelRequest request, CancellationToken cancellationToken)
     {
@@ -75,4 +76,17 @@ public class AuthController : ApiControllerBase
         var response = await _mediator.Send(request);
         return Ok(response);
     }
+    #region Login with google
+    [HttpPost("google")]
+    public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest data)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var response = await _mediator.Send(data);
+        return Ok(response);
+    }
+
+    #endregion
 }
