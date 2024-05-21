@@ -9,6 +9,7 @@ using BeatSportsAPI.Domain.Entities;
 namespace BeatSportsAPI.Application.Common.Response;
 public class AccountResponse : IMapFrom<Account>
 {
+    public Guid AccountId {  get; set; }
     public string? Email { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }

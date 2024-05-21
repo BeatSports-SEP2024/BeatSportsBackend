@@ -1,5 +1,7 @@
-using System.Reflection;
+﻿using System.Reflection;
 using AutoMapper;
+using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Domain.Entities;
 
 namespace BeatSportsAPI.Application.Common.Mappings;
 public class MappingProfile : Profile
@@ -7,6 +9,13 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         ApplyMappingsFromAssembly(Assembly.GetExecutingAssembly());
+        CreateMap<Account, AccountResponse>()
+            .ForMember(dest => dest.AccountId, opt => opt.MapFrom(src => src.Id));
+        CreateMap<Customer, CustomerResponse>()
+            .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.Id));
+        CreateMap<Owner, OwnerResponse>()
+            .ForMember(dest => dest.OwnerId, opt => opt.MapFrom(src => src.Id));
+
     }
 
     private void ApplyMappingsFromAssembly(Assembly assembly)
