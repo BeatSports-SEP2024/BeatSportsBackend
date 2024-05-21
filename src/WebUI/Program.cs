@@ -16,7 +16,15 @@ using Microsoft.Extensions.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("*").AllowAnyHeader().AllowAnyMethod();
+                      });
+});
 // Add services to the container.
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
@@ -38,10 +46,6 @@ builder.Services.AddHangfire(configuration => configuration
                 }));
 builder.Services.AddHangfireServer();
 builder.Services.AddHttpClient();
-builder.Services.AddControllers().AddNewtonsoftJson(options =>
-{
-    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-});
 
 builder.Services.AddAuthentication(options =>
 {
@@ -114,6 +118,7 @@ else
     app.UseHsts();
 }
 
+app.UseCors(MyAllowSpecificOrigins);
 app.UseHealthChecks("/health");
 app.UseHttpsRedirection();
 app.UseStaticFiles();

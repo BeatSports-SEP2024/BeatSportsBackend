@@ -10,7 +10,7 @@ public class Payment : BaseAuditableEntity
     [ForeignKey("PaymentDestination")]
     public Guid PaymentDestinationId { get; set; }
     [ForeignKey("Merchant")]
-    public Guid MerchanId { get; set; }
+    public Guid MerchantId { get; set; }
     public string PaymentContent { get; set; } = string.Empty;
     public string PaymentCurrency { get; set; } = string.Empty;
     /// <summary>
