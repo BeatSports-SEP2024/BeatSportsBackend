@@ -26,7 +26,6 @@
     <ItemGroup>
       <Folder Include="Features\Customers\Commands\" />
       <Folder Include="Features\Owners\Commands\" />
-      <Folder Include="Features\Wallets\Commands\CreateWithdrawls\" />
       <Folder Include="Features\Wallets\Queries\" />
     </ItemGroup>
 

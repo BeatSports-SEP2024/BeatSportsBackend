@@ -1,12 +1,15 @@
 ﻿using System.Net;
 using BeatSportsAPI.Application.Common.Base;
+using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Features.Wallets.Commands.CreateDeposits;
+using BeatSportsAPI.Application.Features.Wallets.Commands.CreateWithdrawls;
 using BeatSportsAPI.Application.Features.Wallets.Commands.ProcessVnpayPaymentReturnCommand;
 using BeatSportsAPI.Application.Features.Wallets.Dtos;
 using Duende.IdentityServer.Extensions;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Services.VnPay.Config;
 using Services.VnPay.Response;
@@ -19,12 +22,16 @@ public class PaymentController : ControllerBase
 {
     private readonly IMediator mediator;
     private readonly VnpayConfig vnpayConfig;
+    private IBeatSportsDbContext _dbContext;
 
     public PaymentController(IMediator mediator,
-            IOptions<VnpayConfig> vnpayConfigOptions)
+            IOptions<VnpayConfig> vnpayConfigOptions,
+            IBeatSportsDbContext dbContext
+        )
     {
         this.mediator = mediator;
         this.vnpayConfig = vnpayConfigOptions.Value;
+        _dbContext = dbContext;
     }
 
     /// <summary>
@@ -60,5 +67,52 @@ public class PaymentController : ControllerBase
         if (returnUrl.EndsWith("/"))
             returnUrl = returnUrl.Remove(returnUrl.Length - 1, 1);
         return Redirect($"{returnUrl}?{returnModel.ToQueryString()}");
+    }
+
+    [HttpPost("withdraw")]
+    public async Task<IActionResult> Withdraw([FromBody] CreateWithdrawRequestCommand request)
+    {
+        var wallet = await _dbContext.Wallets
+                .FirstOrDefaultAsync(w => w.AccountId == Guid.Parse(request.AccountId));
+
+        if (wallet == null)
+        {
+            return NotFound("Wallet not found.");
+        }
+
+        if (wallet.Balance < request.Amount)
+        {
+            return BadRequest("Insufficient balance.");
+        }
+
+        var withdrawRequest = mediator.Send(request);
+        var requestWithdrawResponse = new CreateWithdrawTransactionCommand
+        {
+            AccountId = request.AccountId,
+            vnp_Version = withdrawRequest.Result.vnp_Version,
+            vnp_Command = withdrawRequest.Result.vnp_Command,
+            vnp_TmnCode = withdrawRequest.Result.vnp_TmnCode,
+            vnp_Amount = withdrawRequest.Result.vnp_Amount,
+            vnp_OrderInfo = withdrawRequest.Result.vnp_OrderInfo,
+            vnp_TxnRef = withdrawRequest.Result.vnp_TxnRef,
+            vnp_IpAddr = withdrawRequest.Result.vnp_IpAddr,
+            vnp_CreateDate = withdrawRequest.Result.vnp_CreateDate,
+            vnp_SecureHash = withdrawRequest.Result.vnp_SecureHash,
+        };
+        var withdrawResponse = mediator.Send(requestWithdrawResponse);
+
+        if (withdrawResponse.Result.vnp_ResponseCode == "00")
+        {
+            
+            wallet.Balance -= request.Amount;
+            _dbContext.Wallets.Update(wallet);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(withdrawResponse);
+        }
+        else
+        {
+            return BadRequest(withdrawResponse.Result.vnp_Message);
+        }
     }
 }
