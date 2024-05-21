@@ -5,6 +5,7 @@ using BeatSportsAPI.Application.Features.Authentication.Queries;
 using BeatSportsAPI.Application.Models.Authentication;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace WebAPI.Controllers.Authentication;
 
@@ -33,6 +34,7 @@ public class AuthController : ApiControllerBase
 
     [HttpPost]
     [Route("register/customer")]
+    [SwaggerOperation("Create new customer with default wallet")]
     public async Task<IActionResult> RegisterCustomer([FromBody] RegisterCustomerModelRequest request, CancellationToken cancellationToken)
     {
         if(!ModelState.IsValid)
@@ -67,6 +69,7 @@ public class AuthController : ApiControllerBase
     }
     [HttpPost]
     [Route("register/owner")]
+    [SwaggerOperation("Create new owner with default wallet")]
     public async Task<IActionResult> RegisterOwner([FromBody] RegisterOwnerModelRequest request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
