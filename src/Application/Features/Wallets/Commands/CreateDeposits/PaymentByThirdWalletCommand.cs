@@ -30,7 +30,7 @@ public class PaymentByThirdWalletCommand : IRequest<PaymentLinkDtos>
     public string? PaymentDestinationId { get; set; } = string.Empty;
 
     //public CreatePaymentSignature CreatePaymentSignature { get; set; }
-    public TransactionWallet Transaction { get; set; }
+    public TransactionWallet Transaction { get; set; } = null!;
 }
 
 public class CreatePaymentSignature
@@ -45,7 +45,7 @@ public class TransactionWallet
     public string? PaymentMethodId { get; set; }
 
     // Type (Deposit or Withdrawls)
-    public string? TransactionType { get; set; }
+    public string TransactionType { get; set; } = null!;
 }
 
 public class PaymentByThirdWalletCommandHandler : IRequestHandler<PaymentByThirdWalletCommand, PaymentLinkDtos>
@@ -82,11 +82,12 @@ public class PaymentByThirdWalletCommandHandler : IRequestHandler<PaymentByThird
                 ExpireDate = DateTime.Now.AddMinutes(15),
                 /*PaymentStatus = "0",*/
                 PaymentLanguage = request.PaymentLanguage,
-                MerchantId = Guid.Parse(request.MerchantId),
-                PaymentDestinationId = Guid.Parse(request.PaymentDestinationId),
+                PaymentType = request.Transaction.TransactionType,
+                MerchantId = Guid.Parse(request.MerchantId!),
+                PaymentDestinationId = Guid.Parse(request.PaymentDestinationId!),
 
-                AccountId = Guid.Parse(request.Transaction.AccountId),
-                PaymentMethodId = Guid.Parse(request.Transaction.PaymentMethodId)
+                AccountId = Guid.Parse(request.Transaction.AccountId!),
+                PaymentMethodId = Guid.Parse(request.Transaction.PaymentMethodId!)
             };
             _dbContext.Payments.Add(payment);
 
@@ -106,7 +107,7 @@ public class PaymentByThirdWalletCommandHandler : IRequestHandler<PaymentByThird
             // check đích thanh toán
             var paymentUrl = string.Empty;
             var destinationExist = await _dbContext.PaymentsDestinations
-                .Where(d => d.Id == Guid.Parse(request.PaymentDestinationId))
+                .Where(d => d.Id == Guid.Parse(request.PaymentDestinationId!))
                 .Select(d => d.DesShortName)
                 .SingleOrDefaultAsync();
             switch (destinationExist)

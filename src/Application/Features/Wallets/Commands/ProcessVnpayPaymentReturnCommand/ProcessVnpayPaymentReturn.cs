@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -17,7 +18,7 @@ using Services.VnPay.Config;
 using Services.VnPay.Response;
 
 namespace BeatSportsAPI.Application.Features.Wallets.Commands.ProcessVnpayPaymentReturnCommand;
-public class ProcessVnpayPaymentReturn : VnpayPayResponse, 
+public class ProcessVnpayPaymentReturn : VnpayPayResponse,
     IRequest<(PaymentReturnDtos, string)>
 {
 }
@@ -28,7 +29,7 @@ public class ProcessVnpayPaymentReturnHandler : IRequestHandler<ProcessVnpayPaym
     private IBeatSportsDbContext _dbContext;
     private readonly IMediator mediator;
     private IMapper _mapper;
-    public ProcessVnpayPaymentReturnHandler(IBeatSportsDbContext dbContext, 
+    public ProcessVnpayPaymentReturnHandler(IBeatSportsDbContext dbContext,
         IOptions<VnpayConfig> vnpayConfigOptions,
         IMediator mediator,
         IMapper mapper)
@@ -73,47 +74,97 @@ public class ProcessVnpayPaymentReturnHandler : IRequestHandler<ProcessVnpayPaym
                             {
                                 status = "0";
                                 message = "Tran success";
+
+
+                                /// Update database
+                                var transaction = new PaymentTransaction
+                                {
+                                    TranMessage = message,
+                                    TranPayload = JsonConvert.SerializeObject(request),
+                                    TranStatus = status,
+                                    TranAmount = request.vnp_Amount,
+                                    TranDate = DateTime.Now,
+                                    PaymentId = Guid.Parse(request.vnp_TxnRef),
+                                    TranRefId = payment.PaymentRefId
+                                };
+                                _dbContext.PaymentTransactions.Add(transaction);
+                                await _dbContext.SaveChangesAsync();
+                                /// Confirm success
+                                var transactionExist = await _dbContext.PaymentTransactions
+                                    .Where(t => t.Id == transaction.Id).SingleOrDefaultAsync();
+                                if (transactionExist == null)
+                                {
+                                    throw new BadRequestException("04, Input required data");
+                                }
+                                /// after success update transaction for wallets
+                                var wallet = await _dbContext.Wallets.Where(w => w.AccountId == payment.AccountId).SingleOrDefaultAsync();
+                                var transactionWallet = new Transaction
+                                {
+                                    WalletId = wallet.Id,
+                                    TransactionMessage = transactionExist.TranMessage,
+                                    TransactionPayload = transactionExist.TranPayload,
+                                    TransactionStatus = transactionExist.TranStatus,
+                                    TransactionAmount = transactionExist.TranAmount,
+                                    TransactionDate = transactionExist.TranDate,
+                                    TransactionType = payment.PaymentType,
+                                };
+                                _dbContext.Transactions.Add(transactionWallet);
+                                await _dbContext.SaveChangesAsync();
+
+                                // After create transactionSuccess, update deposit for wallet
+                                var transactionSuccess = await _dbContext.Transactions.Where(t => t.Id == transactionWallet.Id).SingleOrDefaultAsync();
+                                if (transactionSuccess == null)
+                                {
+                                    throw new BadRequestException("04, Input required data");
+                                }
+
+                                wallet.Balance += (decimal)request.vnp_Amount!;
+                                _dbContext.Wallets.Update(wallet);
+                                await _dbContext.SaveChangesAsync();
                             }
                             else
                             {
                                 status = "-1";
                                 message = "Tran error";
-                            }
 
-                            /// Update database
-                            var transaction = new PaymentTransaction
-                            {
-                                TranMessage = message,
-                                TranPayload = JsonConvert.SerializeObject(request),
-                                TranStatus = status,
-                                TranAmount = request.vnp_Amount,
-                                TranDate = DateTime.Now,
-                                PaymentId = Guid.Parse(request.vnp_TxnRef),
-                                TranRefId = payment.PaymentRefId
-                            };
-                            _dbContext.PaymentTransactions.Add(transaction);
-                            await _dbContext.SaveChangesAsync();
-                            /// Confirm success
-                            var transactionExist = await _dbContext.PaymentTransactions
-                                .Where(t => t.Id == transaction.Id).SingleOrDefaultAsync();
-                            if (transactionExist == null)
-                            {
-                                throw new BadRequestException("04, Input required data");
+                                /// Update database
+                                var transaction = new PaymentTransaction
+                                {
+                                    TranMessage = message,
+                                    TranPayload = JsonConvert.SerializeObject(request),
+                                    TranStatus = status,
+                                    TranAmount = request.vnp_Amount,
+                                    TranDate = DateTime.Now,
+                                    PaymentId = Guid.Parse(request.vnp_TxnRef),
+                                    TranRefId = payment.PaymentRefId
+                                };
+                                _dbContext.PaymentTransactions.Add(transaction);
+                                await _dbContext.SaveChangesAsync();
+                                /// Confirm success
+                                var transactionExist = await _dbContext.PaymentTransactions
+                                    .Where(t => t.Id == transaction.Id).SingleOrDefaultAsync();
+                                if (transactionExist == null)
+                                {
+                                    throw new BadRequestException("04, Input required data");
+                                }
+                                /// after success update transaction for wallets
+                                var wallet = await _dbContext.Wallets.Where(w => w.AccountId == payment.AccountId).SingleOrDefaultAsync();
+                                var transactionWallet = new Transaction
+                                {
+                                    WalletId = wallet.Id,
+                                    TransactionMessage = transactionExist.TranMessage,
+                                    TransactionPayload = transactionExist.TranPayload,
+                                    TransactionStatus = transactionExist.TranStatus,
+                                    TransactionAmount = transactionExist.TranAmount,
+                                    TransactionDate = transactionExist.TranDate,
+                                    TransactionType = payment.PaymentType,
+                                };
+                                _dbContext.Transactions.Add(transactionWallet);
+                                await _dbContext.SaveChangesAsync();
+
+                                // After create transactionSuccess, update deposit for wallet
+                                // beacuse status error to not update wallet 
                             }
-                            /// after success update transaction for wallets
-                            var wallet = await _dbContext.Wallets.Where(w => w.AccountId == payment.AccountId).SingleOrDefaultAsync();
-                            var transactionWallet = new Transaction
-                            {
-                                WalletId = wallet.Id,
-                                TransactionMessage = transactionExist.TranMessage,
-                                TransactionPayload = transactionExist.TranPayload,
-                                TransactionStatus = transactionExist.TranStatus,
-                                TransactionAmount = transactionExist.TranAmount,
-                                TransactionDate = transactionExist.TranDate,
-                                TransactionType = request.vnp_OrderType,
-                            };
-                            _dbContext.Transactions.Add(transactionWallet);
-                            await _dbContext.SaveChangesAsync();
                         }
                         else
                         {

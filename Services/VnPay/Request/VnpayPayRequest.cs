@@ -64,10 +64,10 @@ public class VnpayPayRequest
             requestData.Add("vnp_IpAddr", vnp_IpAddr);
         if (vnp_Locale != null)
             requestData.Add("vnp_Locale", vnp_Locale);
-        if (vnp_OrderInfo != null)
-            requestData.Add("vnp_OrderInfo", vnp_OrderInfo);
         if (vnp_OrderType != null)
             requestData.Add("vnp_OrderType", vnp_OrderType);
+        if (vnp_OrderInfo != null)
+            requestData.Add("vnp_OrderInfo", vnp_OrderInfo);
         if (vnp_ReturnUrl != null)
             requestData.Add("vnp_ReturnUrl", vnp_ReturnUrl);
         if (vnp_TmnCode != null)
@@ -86,8 +86,8 @@ public class VnpayPayRequest
     public string? vnp_BankCode { get; set; }
     public string? vnp_IpAddr { get; set; }
     public string? vnp_Locale { get; set; }
-    public string? vnp_OrderInfo { get; set; }
     public string? vnp_OrderType { get; set; }
+    public string? vnp_OrderInfo { get; set; }
     public string? vnp_ReturnUrl { get; set; }
     public string? vnp_TmnCode { get; set; }
     public string? vnp_ExpireDate { get; set; }

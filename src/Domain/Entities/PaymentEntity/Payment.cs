@@ -24,6 +24,11 @@ public class Payment : BaseAuditableEntity
     public decimal? PaidAmount { get; set; }
     public string? PaymentStatus { get; set; } = string.Empty;
     public string? PaymentLastMessage { get; set; } = string.Empty;
+    /// <summary>
+    /// (deposit or withdrawls)
+    /// </summary>
+    public string? PaymentType { get; set; } = string.Empty; 
+
 
     //Relationship
     public virtual Account Account { get; set; } = null!;

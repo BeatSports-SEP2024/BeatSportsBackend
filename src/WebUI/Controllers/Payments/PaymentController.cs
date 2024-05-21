@@ -48,7 +48,8 @@ public class PaymentController : ControllerBase
     {
         string returnUrl = string.Empty;
         var returnModel = new PaymentReturnDtos();
-        var processResult = await mediator.Send(response.Adapt<ProcessVnpayPaymentReturn>());
+        var processRequest = response.Adapt<ProcessVnpayPaymentReturn>();
+        var processResult = await mediator.Send(processRequest);
 
         if (!processResult.Item2.IsNullOrEmpty())
         {
