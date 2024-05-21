@@ -370,6 +370,13 @@ public class IdentityService : IIdentityService
             Address = registerModelRequest.Address
         };
         await _beatSportsDbContext.Customers.AddAsync(newCustomer, cancellationToken);
+        var newWallet = new Wallet
+        {
+            AccountId = newUser.Id,
+            Balance = 0,
+            Created = DateTime.UtcNow
+        };
+        await _beatSportsDbContext.Wallets.AddAsync(newWallet, cancellationToken);
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
         return "Create new account successfully";
     }
@@ -419,6 +426,13 @@ public class IdentityService : IIdentityService
             Account = newUser,
         };
         await _beatSportsDbContext.Owners.AddAsync(newOwner, cancellationToken);
+        var newWallet = new Wallet
+        {
+            AccountId = newUser.Id,
+            Balance = 0,
+            Created = DateTime.UtcNow
+        };
+        await _beatSportsDbContext.Wallets.AddAsync(newWallet, cancellationToken);
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
         return "Create new account successfully";
     }
