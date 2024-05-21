@@ -12,18 +12,22 @@
         <PackageReference Include="AutoFilterer" Version="3.0.0" />
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="10.3.4" />
+        <PackageReference Include="Mapster" Version="7.4.0" />
         <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.9" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.9" />
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\Services\Services.csproj" />
         <ProjectReference Include="..\Domain\Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Features\Customers\Commands\" />
       <Folder Include="Features\Owners\Commands\" />
+      <Folder Include="Features\Wallets\Commands\CreateWithdrawls\" />
+      <Folder Include="Features\Wallets\Queries\" />
     </ItemGroup>
 
 </Project>
