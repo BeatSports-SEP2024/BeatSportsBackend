@@ -2,7 +2,7 @@
 using BeatSportsAPI.Domain.Entities.CourtEntity;
 
 namespace BeatSportsAPI.Domain.Entities;
-public class Owner :BaseAuditableEntity
+public class Owner : BaseAuditableEntity
 {
     [ForeignKey("Account")]
     public Guid AccountId { get; set; }

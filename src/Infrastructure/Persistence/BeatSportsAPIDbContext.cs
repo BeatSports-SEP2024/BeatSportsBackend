@@ -76,6 +76,7 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
             .OnDelete(DeleteBehavior.NoAction);
         });
         builder.Entity<Court>().HasIndex(x => x.PlaceId).IsUnique();
+
         builder.Entity<RoomMember>(entity =>
         {
             entity.HasKey(ss => new { ss.CustomerId, ss.RoomId });
@@ -90,6 +91,7 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
             .HasForeignKey(ss => ss.RoomId)
             .OnDelete(DeleteBehavior.NoAction);
         });
+
         builder.Entity<PaymentNotification>()
             .HasOne(pn => pn.Payment)
             .WithMany()

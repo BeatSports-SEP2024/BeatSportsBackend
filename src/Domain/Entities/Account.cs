@@ -22,5 +22,8 @@ public class Account : BaseAuditableEntity
     public string Role { get; set; } = null!;
 
     public virtual Wallet? Wallet { get; set; }
-    public virtual Payment? Payment { get; set; }
+    public virtual Customer? Customer { get; set; }
+    public virtual Owner? Owner { get; set; }
+
+    public virtual IList<Payment> Payment { get; set; }
 }

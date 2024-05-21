@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Features.Wallets.Dtos;
+using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Entities.PaymentEntity;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -39,8 +40,9 @@ public class CreatePaymentSignature
 }
 public class TransactionWallet
 {
-    public double? Price { get; set; }
+    //public double? Price { get; set; }
     public string? AccountId { get; set; }
+    public string? PaymentMethodId { get; set; }
 
     // Type (Deposit or Withdrawls)
     public string? TransactionType { get; set; }
@@ -83,9 +85,8 @@ public class PaymentByThirdWalletCommandHandler : IRequestHandler<PaymentByThird
                 MerchantId = Guid.Parse(request.MerchantId),
                 PaymentDestinationId = Guid.Parse(request.PaymentDestinationId),
 
-
-
-
+                AccountId = Guid.Parse(request.Transaction.AccountId),
+                PaymentMethodId = Guid.Parse(request.Transaction.PaymentMethodId)
             };
             _dbContext.Payments.Add(payment);
 
@@ -118,7 +119,7 @@ public class PaymentByThirdWalletCommandHandler : IRequestHandler<PaymentByThird
                         currentUserService.IpAddress ?? string.Empty,
                         request.RequiredAmount ?? 0,
                         request.PaymentCurrency ?? string.Empty,
-                        "other",
+                        request.Transaction.TransactionType, // (deposit or withdrawls)
                         request.PaymentContent ?? string.Empty,
                         vnpayConfig.ReturnUrl,
                         payment.Id.ToString() ?? string.Empty);

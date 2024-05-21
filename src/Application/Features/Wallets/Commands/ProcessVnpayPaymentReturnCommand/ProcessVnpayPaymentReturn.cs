@@ -110,7 +110,7 @@ public class ProcessVnpayPaymentReturnHandler : IRequestHandler<ProcessVnpayPaym
                                 TransactionStatus = transactionExist.TranStatus,
                                 TransactionAmount = transactionExist.TranAmount,
                                 TransactionDate = transactionExist.TranDate,
-                                TransactionType = "Deposit"
+                                TransactionType = request.vnp_OrderType,
                             };
                             _dbContext.Transactions.Add(transactionWallet);
                             await _dbContext.SaveChangesAsync();

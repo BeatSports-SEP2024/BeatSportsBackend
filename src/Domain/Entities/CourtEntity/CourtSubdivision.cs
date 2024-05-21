@@ -12,5 +12,5 @@ public class CourtSubdivision : BaseAuditableEntity
     public decimal BasePrice { get; set; }
 
     public virtual Court Court { get; set; }
-    public IList<Booking> Bookings { get; set; } = null!;
+    public virtual Booking Bookings { get; set; } = null!;
 }

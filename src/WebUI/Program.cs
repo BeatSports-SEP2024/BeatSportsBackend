@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Newtonsoft.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
+using Services.VnPay.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -46,6 +47,8 @@ builder.Services.AddHangfire(configuration => configuration
                 }));
 builder.Services.AddHangfireServer();
 builder.Services.AddHttpClient();
+builder.Services.Configure<VnpayConfig>(
+                builder.Configuration.GetSection(VnpayConfig.ConfigName));
 
 builder.Services.AddAuthentication(options =>
 {

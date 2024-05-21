@@ -16,7 +16,7 @@ public class Payment : BaseAuditableEntity
     /// <summary>
     /// Reference from order/booking to merchant
     /// </summary>
-    public string PaymentRefId { get; set; } = string.Empty;
+    public string? PaymentRefId { get; set; }
     public decimal? RequiredAmount { get; set; }
     public DateTime? PaymentDate { get; set; } = DateTime.Now;
     public DateTime? ExpireDate { get; set; }
@@ -26,7 +26,10 @@ public class Payment : BaseAuditableEntity
     public string? PaymentLastMessage { get; set; } = string.Empty;
 
     //Relationship
+    public virtual Account Account { get; set; } = null!;
     public virtual Merchant Merchant { get; set; } = null!;
     public virtual PaymentDestination PaymentDestination { get; set; } = null!;
     public virtual PaymentMethod PaymentMethod { get; set; }
+    public virtual IList<PaymentSignature> PaymentSignature { get; set; }
+    public virtual IList<PaymentTransaction> PaymentTransaction { get; set; }
 }

@@ -15,4 +15,5 @@ public class Campaign : BaseAuditableEntity
     public int QuantityOfCampaign { get; set; } 
 
     public virtual Court Court { get; set; } = null!;
+    public virtual Booking Booking { get; set; } = null!;
 }

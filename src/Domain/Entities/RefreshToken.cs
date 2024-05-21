@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BeatSportsAPI.Domain.Entities;
-public class RefreshToken: BaseAuditableEntity
+public class RefreshToken : BaseAuditableEntity
 {
     [ForeignKey("Account")]
     public Guid AccountId { get; set; }

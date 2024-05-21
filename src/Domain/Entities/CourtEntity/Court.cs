@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BeatSportsAPI.Domain.Entities.Room;
 
 namespace BeatSportsAPI.Domain.Entities.CourtEntity;
 public class Court : BaseAuditableEntity
@@ -20,8 +21,11 @@ public class Court : BaseAuditableEntity
     public string? PlaceId { get; set; }
 
     public virtual Owner Owner { get; set; } = null!;
+    public virtual RoomMatch RoomMatch { get; set; } = null!;
     public virtual IList<Campaign>? Campaigns { get; set; }
     public virtual IList<TimePeriod>? TimePeriods { get; set; }
     public virtual IList<Feedback>? Feedback { get; set; }
     public virtual IList<CourtSportCategory>? CourtCategories { get; set; }
+    public virtual IList<CourtSubdivision>? CourtSubdivision { get; set; }
+
 }
