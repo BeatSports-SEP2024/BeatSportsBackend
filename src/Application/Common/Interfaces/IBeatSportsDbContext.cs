@@ -33,6 +33,6 @@ public interface IBeatSportsDbContext
     public DbSet<CourtSubdivision> CourtSubdivisions { get; set; }
     public DbSet<Booking> Bookings { get; set; }
     public DbSet<RefreshToken> RefreshToken { get; set; }
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     void SaveChanges();
 }

@@ -1,14 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
 using BeatSportsAPI.Domain.Entities.PaymentEntity;
+using BeatSportsAPI.Domain.Entities.Room;
 
 namespace BeatSportsAPI.Domain.Entities;
 public class Booking : BaseAuditableEntity
 {
     [ForeignKey("Customer")]
     public Guid CustomerId { get; set; }
-    [ForeignKey("Room")]
-    public Guid RoomId { get; set; }
+    [ForeignKey("RoomMatch")]
+    public Guid RoomMatchId { get; set; }
     [ForeignKey("Campaign")]
     public Guid CampaignId { get; set; }
     [ForeignKey("CourtSubdivision")]
@@ -24,4 +25,6 @@ public class Booking : BaseAuditableEntity
     public virtual CourtSubdivision CourtSubdivision { get; set; } = null!;
     public virtual Customer Customer { get; set; } = null!;
     public virtual Campaign? Campaign { get; set; }
+    public virtual Feedback? Feedback { get; set; }
+    public virtual RoomMatch? RoomMatch { get; set; }
 }

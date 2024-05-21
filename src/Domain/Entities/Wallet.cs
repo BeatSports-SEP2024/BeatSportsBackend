@@ -8,4 +8,5 @@ public class Wallet : BaseAuditableEntity
     public decimal Balance { get; set; }    
 
     public virtual Account Account { get; set; } = null!;
+    public virtual IList<Transaction> Transaction { get; set; } = null!;
 }
