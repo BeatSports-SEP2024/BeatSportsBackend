@@ -3,6 +3,7 @@ using BeatSportsAPI.Application.Common.Base;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Features.Wallets.Commands.CreateDeposits;
 using BeatSportsAPI.Application.Features.Wallets.Commands.CreateWithdrawls;
+using BeatSportsAPI.Application.Features.Wallets.Commands.ProcessMomoPaymentReturnCommand;
 using BeatSportsAPI.Application.Features.Wallets.Commands.ProcessVnpayPaymentReturnCommand;
 using BeatSportsAPI.Application.Features.Wallets.Dtos;
 using Duende.IdentityServer.Extensions;
@@ -11,6 +12,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Services.Momo.Request;
 using Services.VnPay.Config;
 using Services.VnPay.Response;
 using Utils.Extensions;
@@ -44,7 +46,6 @@ public class PaymentController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<PaymentLinkDtos> Create([FromBody] PaymentByThirdWalletCommand request)
     {
-        /*var response = new PaymentLinkDtos();*/
         var response = await mediator.Send(request);
         return response;
     }
@@ -114,5 +115,24 @@ public class PaymentController : ControllerBase
         {
             return BadRequest(withdrawResponse.Result.vnp_Message);
         }
+    }
+
+    [HttpGet]
+    [Route("momo-return")]
+    public async Task<IActionResult> MomoReturn([FromQuery] MomoPaymentResultRequest response)
+    {
+        string returnUrl = string.Empty;
+        var returnModel = new PaymentReturnDtos();
+        var processResult = await mediator.Send(response.Adapt<ProcessMomoPaymentReturn>());
+
+        if (processResult.Success)
+        {
+            returnModel = processResult.Data.Item1 as PaymentReturnDtos;
+            returnUrl = processResult.Data.Item2 as string;
+        }
+
+        if (returnUrl.EndsWith("/"))
+            returnUrl = returnUrl.Remove(returnUrl.Length - 1, 1);
+        return Redirect($"{returnUrl}?{returnModel.ToQueryString()}");
     }
 }

@@ -12,6 +12,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Services.Momo.Config;
+using Services.Momo.Request;
 using Services.VnPay.Config;
 using Services.VnPay.Request;
 
@@ -21,7 +23,7 @@ public class PaymentByThirdWalletCommand : IRequest<PaymentLinkDtos>
     public string PaymentContent { get; set; } = string.Empty;
     public string PaymentCurrency { get; set; } = string.Empty;
     public string PaymentRefId { get; set; } = string.Empty;
-    public decimal? RequiredAmount { get; set; }
+    public long? RequiredAmount { get; set; }
     //public DateTime? PaymentDate { get; set; } = DateTime.Now;
     //public DateTime? ExpireDate { get; set; } = DateTime.Now.AddMinutes(15);
     public string? PaymentLanguage { get; set; } = string.Empty;
@@ -54,19 +56,20 @@ public class PaymentByThirdWalletCommandHandler : IRequestHandler<PaymentByThird
     private readonly ICurrentUserService currentUserService;
     private readonly IConfiguration _configuration;
     private readonly VnpayConfig vnpayConfig;
-    /*private readonly MomoConfig momoConfig;
-    private readonly ZaloPayConfig zaloPayConfig;*/
+    private readonly MomoConfig momoConfig;
 
     public PaymentByThirdWalletCommandHandler(IBeatSportsDbContext dbContext,
         ICurrentUserService currentUserService,
         IConfiguration configuration,
-        IOptions<VnpayConfig> vnpayConfigOptions
+        IOptions<VnpayConfig> vnpayConfigOptions,
+        IOptions<MomoConfig> momoConfigOptions
         )
     {
         _dbContext = dbContext;
         this.currentUserService = currentUserService;
         _configuration = configuration;
         this.vnpayConfig = vnpayConfigOptions.Value;
+        this.momoConfig = momoConfigOptions.Value;
     }
     public async Task<PaymentLinkDtos> Handle(PaymentByThirdWalletCommand request, CancellationToken cancellationToken)
     {
@@ -126,7 +129,23 @@ public class PaymentByThirdWalletCommandHandler : IRequestHandler<PaymentByThird
                         payment.Id.ToString() ?? string.Empty);
                     paymentUrl = vnpayPayRequest.GetLink(vnpayConfig.PaymentUrl, vnpayConfig.HashSecret);
                     break;
-                
+
+                case "MOMO":
+                    var momoOneTimePayRequest = new MomoPaymentRequest(momoConfig.PartnerCode,
+                        payment.Id.ToString() ?? string.Empty, request.RequiredAmount ?? 0, payment.Id.ToString() ?? string.Empty,
+                        request.PaymentContent ?? string.Empty, momoConfig.ReturnUrl, momoConfig.IpnUrl, "captureWallet",
+                        string.Empty);
+                    momoOneTimePayRequest.MakeSignature(momoConfig.AccessKey, momoConfig.SecretKey);
+                    (bool createMomoLinkResult, string? createMessage) = momoOneTimePayRequest.GetLink(momoConfig.PaymentUrl);
+                    if (createMomoLinkResult)
+                    {
+                        paymentUrl = createMessage;
+                    }
+                    else
+                    {
+                        throw new BadRequestException(createMessage);
+                    }
+                    break;
                 default:
                     break;
             }

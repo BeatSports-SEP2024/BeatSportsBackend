@@ -47,7 +47,7 @@ public class VnpayPayResponse
     public string vnp_SecureHash { get; set; } = string.Empty;
 
     [JsonProperty(PropertyName = "vnp_Amount")]
-    public int? vnp_Amount { get; set; }
+    public long? vnp_Amount { get; set; }
 
     [JsonProperty(PropertyName = "vnp_ResponseCode")]
     public string? vnp_ResponseCode { get; set; }

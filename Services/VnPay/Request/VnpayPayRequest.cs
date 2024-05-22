@@ -14,7 +14,7 @@ public class VnpayPayRequest
         = new SortedList<string, string>(new VnpayCompare());
     public VnpayPayRequest() { }
     public VnpayPayRequest(string version, string tmnCode, DateTime createDate, string ipAddress,
-        decimal amount, string currCode, string orderType, string orderInfo,
+        long amount, string currCode, string orderType, string orderInfo,
         string returnUrl, string txnRef)
     {
         this.vnp_Locale = "vn";
@@ -23,7 +23,7 @@ public class VnpayPayRequest
         this.vnp_CurrCode = currCode;
         this.vnp_CreateDate = createDate.ToString("yyyyMMddHHmmss");
         this.vnp_TmnCode = tmnCode;
-        this.vnp_Amount = (int)amount * 100;
+        this.vnp_Amount = amount * 100;
         this.vnp_Command = "pay";
         this.vnp_OrderType = orderType;
         this.vnp_OrderInfo = orderInfo;
@@ -79,7 +79,7 @@ public class VnpayPayRequest
         if (vnp_Version != null)
             requestData.Add("vnp_Version", vnp_Version);
     }
-    public decimal? vnp_Amount { get; set; }
+    public long? vnp_Amount { get; set; }
     public string? vnp_Command { get; set; }
     public string? vnp_CreateDate { get; set; }
     public string? vnp_CurrCode { get; set; }

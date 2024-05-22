@@ -82,7 +82,7 @@ public class ProcessVnpayPaymentReturnHandler : IRequestHandler<ProcessVnpayPaym
                                     TranMessage = message,
                                     TranPayload = JsonConvert.SerializeObject(request),
                                     TranStatus = status,
-                                    TranAmount = request.vnp_Amount,
+                                    TranAmount = request.vnp_Amount / 100,
                                     TranDate = DateTime.Now,
                                     PaymentId = Guid.Parse(request.vnp_TxnRef),
                                     TranRefId = payment.PaymentRefId
@@ -118,7 +118,7 @@ public class ProcessVnpayPaymentReturnHandler : IRequestHandler<ProcessVnpayPaym
                                     throw new BadRequestException("04, Input required data");
                                 }
 
-                                wallet.Balance += (decimal)request.vnp_Amount!;
+                                wallet.Balance += (decimal)(request.vnp_Amount / 100)!;
                                 _dbContext.Wallets.Update(wallet);
                                 await _dbContext.SaveChangesAsync();
                             }
