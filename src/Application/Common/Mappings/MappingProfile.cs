@@ -22,7 +22,8 @@ public class MappingProfile : Profile
 
         //Court Subdivision Mapping
         CreateMap<Court, CourtResponse>()
-            .ForMember(dest => dest.BasePrice, opt => opt.MapFrom(src => src.CourtSubdivision.FirstOrDefault().BasePrice));
+            .ForMember(dest => dest.BasePrice, opt => opt.MapFrom(src 
+            => src.CourtSubdivision.SingleOrDefault().BasePrice));
 
         //Sport Categories Mapping
         CreateMap<Court, CourtResponse>()
