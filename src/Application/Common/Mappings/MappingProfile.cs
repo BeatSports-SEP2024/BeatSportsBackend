@@ -1,7 +1,10 @@
 ﻿using System.Reflection;
 using AutoMapper;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Domain.Entities;
+using BeatSportsAPI.Domain.Entities.CourtEntity;
+using BeatSportsAPI.Domain.Enums;
 
 namespace BeatSportsAPI.Application.Common.Mappings;
 public class MappingProfile : Profile
@@ -9,6 +12,7 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         ApplyMappingsFromAssembly(Assembly.GetExecutingAssembly());
+        //Account Mapping
         CreateMap<Account, AccountResponse>()
             .ForMember(dest => dest.AccountId, opt => opt.MapFrom(src => src.Id));
         CreateMap<Customer, CustomerResponse>()
@@ -16,6 +20,15 @@ public class MappingProfile : Profile
         CreateMap<Owner, OwnerResponse>()
             .ForMember(dest => dest.OwnerId, opt => opt.MapFrom(src => src.Id));
 
+        //Court Subdivision Mapping
+        CreateMap<Court, CourtResponse>()
+            .ForMember(dest => dest.BasePrice, opt => opt.MapFrom(src => src.CourtSubdivision.FirstOrDefault().BasePrice));
+
+        //Sport Categories Mapping
+        CreateMap<Court, CourtResponse>()
+            .ForMember(dest => dest.SportCategoriesEnums, opt => opt.MapFrom(src => src.CourtCategories
+                .Select(cc => cc.SportCategory.Name) // Extract the names from the SportCategory
+                .Select(name => ParseEnumsExtension.ParseEnum<SportCategoriesEnums>(name))));
     }
 
     private void ApplyMappingsFromAssembly(Assembly assembly)
