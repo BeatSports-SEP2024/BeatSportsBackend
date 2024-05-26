@@ -31,7 +31,7 @@ public class GetAllCourtHandler : IRequestHandler<GetAllCourtCommand, PaginatedL
         }
 
         // Ensure the sport category name is valid and converted to a string only once
-        string sportCategoryName = request.Filterer.SportCategoriesEnums.ToString();
+        string sportCategoryName = request.SportCategoriesEnums.ToString();
 
         if (string.IsNullOrEmpty(sportCategoryName))
         {
