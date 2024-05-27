@@ -10,7 +10,7 @@ public class Feedback : BaseAuditableEntity
     public Guid CourtId { get; set; }
     public decimal FeedbackStar {  get; set; }
     public bool FeedbackAvailable { get; set; }
-    public bool FeedbackStatus { get; set; }
+    public string? FeedbackStatus { get; set; }
 
     public virtual Booking Booking { get; set; } = null!;
     public virtual Court Court { get; set; } = null!;
