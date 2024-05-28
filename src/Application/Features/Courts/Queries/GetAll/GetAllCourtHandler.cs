@@ -34,17 +34,6 @@ public class GetAllCourtHandler : IRequestHandler<GetAllCourtCommand, PaginatedL
         // Ensure the sport category name is valid and converted to a string only once
         string sportCategoryName = request.SportCategoriesEnums.ToString();
 
-        //IQueryable<Court> query = _dbContext.Courts
-        //    .Include(c => c.CourtCategories)
-        //        .ThenInclude(cc => cc.SportCategory)
-        //    .Include(c => c.CourtSubdivision);
-
-        //if (!string.IsNullOrEmpty(sportCategoryName))
-        //{
-        //    query = query.Where(c => c.CourtCategories
-        //        .Any(cc => cc.SportCategory.Name.Equals(sportCategoryName)));
-        //}
-
         IQueryable<Court> query = _dbContext.Courts
             .Include(c => c.CourtCategories)
                 .ThenInclude(cc => cc.SportCategory)
