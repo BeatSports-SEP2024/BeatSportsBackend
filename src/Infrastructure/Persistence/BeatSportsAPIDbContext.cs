@@ -538,77 +538,57 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
                 IsDelete = false,
             });
         #endregion
-        //#region Room_Member
-        //builder.Entity<RoomMember>()
-        //    .HasData(new RoomMember
-        //    {
-        //        Id = Guid.NewGuid(),
-        //        CustomerId = customer1Id,
-        //        RoomId = roomMatch1,
-        //        Created = DateTime.UtcNow,
-        //        LastModified = DateTime.UtcNow,
-        //        IsDelete = false,
-        //    },
-        //    new RoomMember
-        //    {
-        //        Id = Guid.NewGuid(),
-        //        CustomerId = customer2Id,
-        //        RoomId = roomMatch1,
-        //        Created = DateTime.UtcNow,
-        //        LastModified = DateTime.UtcNow,
-        //        IsDelete = false,
-        //    });
-        //#endregion
-        //var bookingId1 = Guid.NewGuid();
-        //var bookingId2 = Guid.NewGuid();
-        //var bookingId3 = Guid.NewGuid();
 
-        //builder.Entity<Booking>().HasData(
-        //    new Booking
-        //    {
-        //        Id = bookingId1,
-        //        CustomerId = customer1Id,
-        //        RoomMatchId = roomMatch1,
-        //        CampaignId = discount20,
-        //        CourtSubdivisionId = courtSubdivisionId1,
-        //        PlayingDate = DateTime.Today.AddDays(1),
-        //        StartTimePlaying = new TimeSpan(18, 0, 0), // 6 PM
-        //        EndTimePlaying = new TimeSpan(20, 0, 0), // 8 PM
-        //        BookingDate = DateTime.Today,
-        //        TotalAmount = 1000,
-        //        IsRoomBooking = false,
-        //        IsDeposit = true
-        //    },
-        //    new Booking
-        //    {
-        //        Id = bookingId2,
-        //        CustomerId = customer2Id,
-        //        RoomMatchId = roomMatch2,
-        //        CampaignId = christmas,
-        //        CourtSubdivisionId = courtSubdivisionId2,
-        //        PlayingDate = DateTime.Today.AddDays(2),
-        //        StartTimePlaying = new TimeSpan(17, 0, 0), // 5 PM
-        //        EndTimePlaying = new TimeSpan(19, 0, 0), // 7 PM
-        //        BookingDate = DateTime.Today,
-        //        TotalAmount = 1200,
-        //        IsRoomBooking = true,
-        //        IsDeposit = false
-        //    },
-        //    new Booking
-        //    {
-        //        Id = bookingId3,
-        //        CustomerId = customer3Id,
-        //        RoomMatchId = roomMatch3,
-        //        CampaignId = lunarnewyear,
-        //        CourtSubdivisionId = courtSubdivisionId3,
-        //        PlayingDate = DateTime.Today.AddDays(3),
-        //        StartTimePlaying = new TimeSpan(20, 0, 0), // 8 PM
-        //        EndTimePlaying = new TimeSpan(22, 0, 0), // 10 PM
-        //        BookingDate = DateTime.Today,
-        //        TotalAmount = 800,
-        //        IsRoomBooking = false,
-        //        IsDeposit = true
-        //    });
+        var bookingId1 = Guid.NewGuid();
+        var bookingId2 = Guid.NewGuid();
+        var bookingId3 = Guid.NewGuid();
+
+        builder.Entity<Booking>().HasData(
+            new Booking
+            {
+                Id = bookingId1,
+                CustomerId = customer1Id,
+                RoomMatchId = roomMatch1,
+                CampaignId = discount20,
+                CourtSubdivisionId = courtSubdivisionId1,
+                PlayingDate = DateTime.Today.AddDays(1),
+                StartTimePlaying = new TimeSpan(18, 0, 0), // 6 PM
+                EndTimePlaying = new TimeSpan(20, 0, 0), // 8 PM
+                BookingDate = DateTime.Today,
+                TotalAmount = 1000,
+                IsRoomBooking = false,
+                IsDeposit = true
+            },
+            new Booking
+            {
+                Id = bookingId2,
+                CustomerId = customer2Id,
+                RoomMatchId = roomMatch2,
+                CampaignId = christmas,
+                CourtSubdivisionId = courtSubdivisionId2,
+                PlayingDate = DateTime.Today.AddDays(2),
+                StartTimePlaying = new TimeSpan(17, 0, 0), // 5 PM
+                EndTimePlaying = new TimeSpan(19, 0, 0), // 7 PM
+                BookingDate = DateTime.Today,
+                TotalAmount = 1200,
+                IsRoomBooking = true,
+                IsDeposit = false
+            },
+            new Booking
+            {
+                Id = bookingId3,
+                CustomerId = customer3Id,
+                RoomMatchId = roomMatch3,
+                CampaignId = lunarnewyear,
+                CourtSubdivisionId = courtSubdivisionId3,
+                PlayingDate = DateTime.Today.AddDays(3),
+                StartTimePlaying = new TimeSpan(20, 0, 0), // 8 PM
+                EndTimePlaying = new TimeSpan(22, 0, 0), // 10 PM
+                BookingDate = DateTime.Today,
+                TotalAmount = 800,
+                IsRoomBooking = false,
+                IsDeposit = true
+            });
         var timePeriodId1 = Guid.NewGuid();
         var timePeriodId2 = Guid.NewGuid();
         var timePeriodId3 = Guid.NewGuid();
@@ -619,8 +599,8 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
                 Id = timePeriodId1,
                 CourtId = court1Id,
                 Description = "Giờ Cao Điểm",
-                StartTime = new TimeSpan(17, 0, 0), // 5 PM
-                EndTime = new TimeSpan(20, 0, 0), // 8 PM
+                StartTime = new TimeSpan(17, 0, 0),  
+                EndTime = new TimeSpan(20, 0, 0), 
                 RateMultiplier = 1.5M,
             },
             new TimePeriod
@@ -628,8 +608,8 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
                 Id = timePeriodId2,
                 CourtId = courtId,
                 Description = "Giờ Thấp Điểm",
-                StartTime = new TimeSpan(10, 0, 0), // 10 AM
-                EndTime = new TimeSpan(16, 0, 0), // 4 PM
+                StartTime = new TimeSpan(10, 0, 0), 
+                EndTime = new TimeSpan(16, 0, 0), 
                 RateMultiplier = 0.8M,
             },
             new TimePeriod
@@ -637,11 +617,33 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
                 Id = timePeriodId3,
                 CourtId = court1Id,
                 Description = "Giờ Bình Thường",
-                StartTime = new TimeSpan(20, 30, 0), // 8:30 PM
-                EndTime = new TimeSpan(23, 0, 0), // 11 PM
+                StartTime = new TimeSpan(20, 30, 0), 
+                EndTime = new TimeSpan(23, 0, 0), 
                 RateMultiplier = 1.0M,
-            }
-        );
+            });
+        #region Room_Member
+        builder.Entity<RoomMember>()
+            .HasData(new RoomMember
+            {
+                Id = Guid.NewGuid(),
+                CustomerId = customer1Id,
+                RoomMatchId = roomMatch1,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                RoleInRoom = "Master",
+                IsDelete = false,
+            },
+            new RoomMember
+            {
+                Id = Guid.NewGuid(),
+                CustomerId = customer2Id,
+                RoomMatchId = roomMatch1,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                RoleInRoom = "Member",
+                IsDelete = false,
+            });
+        #endregion
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
