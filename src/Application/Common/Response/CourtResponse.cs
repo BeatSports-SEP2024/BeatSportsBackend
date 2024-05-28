@@ -17,7 +17,7 @@ public class CourtResponse : IMapFrom<Court>
     public TimeSpan TimeStart { get; set; }
     public TimeSpan TimeEnd { get; set; }
     public string? PlaceId { get; set; }
-    public decimal? BasePrice { get; set; }
+    public List<decimal> BasePrice { get; set; } 
     [EnumDataType(typeof(SportCategoriesEnums))]
     public List<SportCategoriesEnums>? SportCategoriesEnums { get; set; }
 }

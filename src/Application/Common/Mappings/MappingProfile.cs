@@ -19,17 +19,6 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.Id));
         CreateMap<Owner, OwnerResponse>()
             .ForMember(dest => dest.OwnerId, opt => opt.MapFrom(src => src.Id));
-
-        //Court Subdivision Mapping
-        CreateMap<Court, CourtResponse>()
-            .ForMember(dest => dest.BasePrice, opt => opt.MapFrom(src 
-            => src.CourtSubdivision.SingleOrDefault().BasePrice));
-
-        //Sport Categories Mapping
-        CreateMap<Court, CourtResponse>()
-            .ForMember(dest => dest.SportCategoriesEnums, opt => opt.MapFrom(src => src.CourtCategories
-                .Select(cc => cc.SportCategory.Name) // Extract the names from the SportCategory
-                .Select(name => ParseEnumsExtension.ParseEnum<SportCategoriesEnums>(name))));
     }
 
     private void ApplyMappingsFromAssembly(Assembly assembly)
