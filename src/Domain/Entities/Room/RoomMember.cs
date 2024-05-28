@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BeatSportsAPI.Domain.Entities.Room;
-public class RoomMember
+public class RoomMember : BaseAuditableEntity
 {
+    [ForeignKey("CustomerId")]
     public Guid CustomerId { get; set; }
-    public Guid RoomId { get; set; }
+    [ForeignKey("RoomMatchId")]
+    public Guid RoomMatchId { get; set; }
     public string? RoleInRoom { get; set; }
 
     public virtual Customer Customer { get; set; } = null!;
