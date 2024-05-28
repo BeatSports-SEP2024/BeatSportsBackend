@@ -1,7 +1,10 @@
 ﻿using System.Reflection;
 using AutoMapper;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Domain.Entities;
+using BeatSportsAPI.Domain.Entities.CourtEntity;
+using BeatSportsAPI.Domain.Enums;
 
 namespace BeatSportsAPI.Application.Common.Mappings;
 public class MappingProfile : Profile
@@ -9,13 +12,13 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         ApplyMappingsFromAssembly(Assembly.GetExecutingAssembly());
+        //Account Mapping
         CreateMap<Account, AccountResponse>()
             .ForMember(dest => dest.AccountId, opt => opt.MapFrom(src => src.Id));
         CreateMap<Customer, CustomerResponse>()
             .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.Id));
         CreateMap<Owner, OwnerResponse>()
             .ForMember(dest => dest.OwnerId, opt => opt.MapFrom(src => src.Id));
-
     }
 
     private void ApplyMappingsFromAssembly(Assembly assembly)

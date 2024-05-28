@@ -35,7 +35,6 @@ public class CourtController : ApiControllerBase
         return await _mediator.Send(request);
     }
     [HttpGet]
-    [Route("all")]
     public async Task<PaginatedList<CourtResponse>> GetAll([FromQuery] GetAllCourtCommand request)
     {
         return await _mediator.Send(request);
