@@ -113,13 +113,25 @@ public class IdentityService : IIdentityService
         return result.ToApplicationResult();
     }
 
+    private static string CreatePasswordHash(string password)
+    {
+        PasswordHashingExtension.CreatePasswordHashing(
+            password,
+            out byte[] passwordSalt,
+            out byte[] passwordHash
+        );
+        var passwordSaltString = Convert.ToBase64String(passwordSalt);
+        var passwordHashString = Convert.ToBase64String(passwordHash);
+        // Combine them into one string separated by a special character (e.g., ':')
+        var combinedPassword = $"{passwordSaltString}:{passwordHashString}";
+        return combinedPassword;
+    }
+
     public async Task<TokenModel> GenerateToken(LoginModelRequest loginRequest)
     {
         var user = await _beatSportsDbContext.Accounts
             .FirstOrDefaultAsync(u => u.UserName == loginRequest.Username);
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
         var userRole = user.Role;
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
         JwtSecurityTokenHandler jwtHandler = new JwtSecurityTokenHandler();
         var secretKey = GetJsonInAppSettingsExtension.GetJson("Jwt:SecretKey");
         if (string.IsNullOrWhiteSpace(secretKey))
@@ -129,12 +141,8 @@ public class IdentityService : IIdentityService
 
         SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-        string issuer = GetJsonInAppSettingsExtension.GetJson("Jwt:Issuer");
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-        string audience = GetJsonInAppSettingsExtension.GetJson("Jwt:Audience");
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+        string? issuer = GetJsonInAppSettingsExtension.GetJson("Jwt:Issuer");
+        string? audience = GetJsonInAppSettingsExtension.GetJson("Jwt:Audience");
 
         var claims = new List<Claim>()
         {
@@ -158,15 +166,7 @@ public class IdentityService : IIdentityService
 
         return new TokenModel { AccessToken = tokenString };
     }
-    /// <summary>
-    /// Login Method and Generate AccessToken
-    /// </summary>
-    /// <param name="loginModelRequest"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    /// <exception cref="NotFoundException"></exception>
-    /// <exception cref="FormatException"></exception>
-    /// <exception cref="UnauthorizedAccessException"></exception>
+
     public async Task<LoginResponse> AuthenticateAsync(LoginModelRequest loginModelRequest)
     {
         if (string.IsNullOrWhiteSpace(loginModelRequest.Username) || string.IsNullOrWhiteSpace(loginModelRequest.Password))
@@ -189,8 +189,6 @@ public class IdentityService : IIdentityService
         var storedPasswordSalt = Convert.FromBase64String(passwordParts[0]);
         var storedPasswordHash = Convert.FromBase64String(passwordParts[1]);
         // Check password when login 
-        Console.WriteLine(storedPasswordSalt);
-        Console.WriteLine(storedPasswordHash);
         var isPasswordValid = PasswordHashingExtension.VerifyPasswordHash
             (
                 loginModelRequest.Password,
@@ -205,8 +203,6 @@ public class IdentityService : IIdentityService
         {
             Username = loginModelRequest.Username,
         });
-
-        
 
         //create new refeshToken and save to DB
         var refreshToken = GenerateRefreshToken();
@@ -283,9 +279,6 @@ public class IdentityService : IIdentityService
         {
             Username = loginModel.Username,
         });
-
-
-
         //create new refeshToken and save to DB
         var refreshToken = GenerateRefreshToken();
         SetRefreshToken(refreshToken, user, tokenModel);
@@ -324,13 +317,6 @@ public class IdentityService : IIdentityService
         return stringBuilder.ToString();
     }
 
-    /// <summary>
-    /// Register new account, hash password
-    /// </summary>
-    /// <param name="registerModelRequest"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    /// <exception cref="NotFoundException"></exception>
     public async Task<string> RegisterCustomerAccountAsync(RegisterCustomerModelRequest registerModelRequest, CancellationToken cancellationToken)
     {
         var existedUser = _beatSportsDbContext.Accounts
@@ -340,15 +326,7 @@ public class IdentityService : IIdentityService
         {
             throw new NotFoundException("This user is existed");
         }
-        PasswordHashingExtension.CreatePasswordHashing(
-            registerModelRequest.Password,
-            out byte[] passwordSalt,
-            out byte[] passwordHash
-        );
-        var passwordSaltString = Convert.ToBase64String(passwordSalt);
-        var passwordHashString = Convert.ToBase64String(passwordHash);
-        // Combine them into one string separated by a special character (e.g., ':')
-        var combinedPassword = $"{passwordSaltString}:{passwordHashString}";
+        var combinedPassword = CreatePasswordHash(registerModelRequest.Password);
         var newUser = new Account
         {
             UserName = registerModelRequest.UserName,
@@ -381,13 +359,6 @@ public class IdentityService : IIdentityService
         return "Create new account successfully";
     }
 
-    /// <summary>
-    /// Create account for owner
-    /// </summary>
-    /// <param name="registerModelRequest"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    /// <exception cref="NotFoundException"></exception>
     public async Task<string> RegisterOwnerAccountAsync(RegisterOwnerModelRequest registerModelRequest, CancellationToken cancellationToken)
     {
         var existedUser = _beatSportsDbContext.Accounts
@@ -397,15 +368,7 @@ public class IdentityService : IIdentityService
         {
             throw new NotFoundException("This user is existed");
         }
-        PasswordHashingExtension.CreatePasswordHashing(
-            registerModelRequest.Password,
-            out byte[] passwordSalt,
-            out byte[] passwordHash
-        );
-        var passwordSaltString = Convert.ToBase64String(passwordSalt);
-        var passwordHashString = Convert.ToBase64String(passwordHash);
-        // Combine them into one string separated by a special character (e.g., ':')
-        var combinedPassword = $"{passwordSaltString}:{passwordHashString}";
+        var combinedPassword = CreatePasswordHash(registerModelRequest.Password);
         var newUser = new Account
         {
             UserName = registerModelRequest.UserName,
