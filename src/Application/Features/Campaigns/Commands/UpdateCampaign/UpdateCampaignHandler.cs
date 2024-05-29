@@ -21,12 +21,6 @@ public class UpdateCampaignHandler : IRequestHandler<UpdateCampaignCommand, Beat
     }
     public Task<BeatSportsResponse> Handle(UpdateCampaignCommand request, CancellationToken cancellationToken)
     {
-        //check Court
-        var court = _dbContext.Courts.Where(x => x.Id == request.CourtId).SingleOrDefault();
-        if (court == null || court.IsDelete)
-        {
-            throw new BadRequestException($"Court with Court ID:{request.CourtId} does not exist or have been delele");
-        }
         // Check Campaign
         var campaign = _dbContext.Campaigns.Where(x => x.Id == request.CampaignId).SingleOrDefault();
         if (campaign == null || campaign.IsDelete)
@@ -34,7 +28,6 @@ public class UpdateCampaignHandler : IRequestHandler<UpdateCampaignCommand, Beat
             throw new BadRequestException($"Campaign with Campaign ID:{request.CampaignId} does not exist or have been delele");
         }
 
-        campaign.CourtId = request.CourtId;
         campaign.CampaignName = request.CampaignName;
         campaign.Description = request.Description;
         campaign.PercentDiscount = request.PercentDiscount;

@@ -10,8 +10,7 @@ using MediatR;
 namespace BeatSportsAPI.Application.Features.Campaigns.Commands.UpdateCampaign;
 public class UpdateCampaignCommand : IRequest<BeatSportsResponse>
 {
-    [Required]
-    public Guid CourtId { get; set; }
+    
     [Required]
     public Guid CampaignId { get; set; }
     public string? CampaignName { get; set; }
