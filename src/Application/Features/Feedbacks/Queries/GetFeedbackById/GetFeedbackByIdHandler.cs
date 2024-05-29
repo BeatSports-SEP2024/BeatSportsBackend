@@ -43,7 +43,8 @@ public class GetFeedbackByIdHandler : IRequestHandler<GetFeedbackByIdCommand, Fe
             CourtId = c.CourtId,
             FeedbackStar = c.FeedbackStar,
             FeedbackAvailable = c.FeedbackAvailable,
-            FeedbackStatus = c.FeedbackStatus
+            FeedbackStatus = c.FeedbackStatus,
+            FeedbackContent = c.FeedbackContent,
         }).SingleOrDefault();
 
         if (feedback1 == null)

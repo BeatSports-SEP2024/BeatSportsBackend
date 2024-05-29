@@ -18,4 +18,6 @@ public class CreateFeedbackCommand : IRequest<BeatSportsResponse>
     public decimal FeedbackStar { get; set; }
     public bool FeedbackAvailable { get; set; }
     public string? FeedbackStatus { get; set; }
+    public string FeedbackContent { get; set; } 
+
 }
