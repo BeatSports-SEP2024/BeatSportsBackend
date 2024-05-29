@@ -4,6 +4,7 @@ using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
+using BeatSportsAPI.Domain.Entities.Room;
 using BeatSportsAPI.Domain.Enums;
 
 namespace BeatSportsAPI.Application.Common.Mappings;
@@ -19,6 +20,10 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.Id));
         CreateMap<Owner, OwnerResponse>()
             .ForMember(dest => dest.OwnerId, opt => opt.MapFrom(src => src.Id));
+
+        //Level Mapping
+        CreateMap<Level, LevelResponse>()
+            .ForMember(dest => dest.LevelId, opt => opt.MapFrom(src => src.Id));
     }
 
     private void ApplyMappingsFromAssembly(Assembly assembly)
