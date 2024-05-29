@@ -261,6 +261,7 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
         #endregion
         var courtId = Guid.NewGuid();
         var court1Id = Guid.NewGuid();
+        var court2Id = Guid.NewGuid();
         #region Courts
         builder.Entity<Court>()
             .HasData(new Court
@@ -281,6 +282,21 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
             new Court
             {
                 Id = court1Id,
+                OwnerId = owner1Id,
+                Description = "Description Sample",
+                CourtName = "Court Name Sample",
+                Address = "Address Sample",
+                GoogleMapURLs = "Address Sample",
+                TimeStart = new TimeSpan(14, 30, 00),
+                TimeEnd = new TimeSpan(15, 30, 00),
+                PlaceId = "From Google Map",
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false,
+            },
+            new Court
+            {
+                Id = court2Id,
                 OwnerId = owner1Id,
                 Description = "Description Sample",
                 CourtName = "Court Name Sample",
@@ -513,7 +529,7 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
             {
                 Id = roomMatch2,
                 LevelId = medium,
-                CourtId = court1Id,
+                CourtId = court2Id,
                 StartTimeRoom = new TimeSpan(14, 30, 00),
                 EndTimeRoom = new TimeSpan(15, 30, 00),
                 MaximumMember = 20,
