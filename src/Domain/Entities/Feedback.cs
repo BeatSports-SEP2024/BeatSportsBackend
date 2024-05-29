@@ -11,6 +11,7 @@ public class Feedback : BaseAuditableEntity
     public decimal FeedbackStar {  get; set; }
     public bool FeedbackAvailable { get; set; }
     public string? FeedbackStatus { get; set; }
+    public string FeedbackContent { get; set; } = null!;
 
     public virtual Booking Booking { get; set; } = null!;
     public virtual Court Court { get; set; } = null!;
