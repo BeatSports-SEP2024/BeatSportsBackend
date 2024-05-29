@@ -9,22 +9,24 @@ using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Mappings;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
-using BeatSportsAPI.Application.Features.Campaigns.Queries.GetAllCampaigns;
+using BeatSportsAPI.Application.Features.Feedbacks.Queries.GetAllFeedbacks;
+using BeatSportsAPI.Application.Features.Feedbacks.Queries.GetFeedbackById;
 using BeatSportsAPI.Domain.Entities;
 using MediatR;
 
-namespace BeatSportsAPI.Application.Features.Feedbacks.Queries.GetAllFeedbacks;
-public class GetAllFeedbacksHandler : IRequestHandler<GetAllFeedbacksCommand, PaginatedList<FeedbackResponse>>
+namespace BeatSportsAPI.Application.Features.Feedbacks.Queries.GetAllFeedbacksByCourtId;
+public class GetAllFeedbackByCourtIdHandler : IRequestHandler<GetAllFeedbackByCourtIdCommand, PaginatedList<FeedbackResponse>>
 {
     private readonly IBeatSportsDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public GetAllFeedbacksHandler(IBeatSportsDbContext dbContext, IMapper mapper)
+    public GetAllFeedbackByCourtIdHandler(IBeatSportsDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
     }
-    public Task<PaginatedList<FeedbackResponse>> Handle(GetAllFeedbacksCommand request, CancellationToken cancellationToken)
+
+    public Task<PaginatedList<FeedbackResponse>> Handle(GetAllFeedbackByCourtIdCommand request, CancellationToken cancellationToken)
     {
         if (request.PageIndex <= 0 || request.PageSize <= 0)
         {
@@ -32,7 +34,8 @@ public class GetAllFeedbacksHandler : IRequestHandler<GetAllFeedbacksCommand, Pa
         }
 
         IQueryable<Feedback> query = _dbContext.Feedbacks
-            .Where(x => !x.IsDelete);
+            .Where(x => x.CourtId == request.CourtId && !x.IsDelete)
+            .OrderByDescending(x => x.Created);
 
         var list = query.Select(c => new FeedbackResponse
         {
