@@ -26,6 +26,10 @@
     <ItemGroup>
       <Folder Include="Features\Customers\Commands\" />
       <Folder Include="Features\Owners\Commands\" />
+      <Folder Include="Features\Rooms\RoomMatches\Commands\" />
+      <Folder Include="Features\Rooms\RoomMatches\Queries\" />
+      <Folder Include="Features\Rooms\RoomMembers\Commands\" />
+      <Folder Include="Features\Rooms\RoomMembers\Queries\" />
       <Folder Include="Features\Wallets\Commands\CreateWithdrawls\" />
       <Folder Include="Features\Wallets\Queries\" />
     </ItemGroup>
