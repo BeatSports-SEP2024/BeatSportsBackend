@@ -2,7 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
-using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Common.Response.CourtResponse;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Courts.Queries.GetById;
