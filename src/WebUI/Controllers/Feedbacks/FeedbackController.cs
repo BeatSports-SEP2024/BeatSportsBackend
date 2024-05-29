@@ -9,6 +9,7 @@ using BeatSportsAPI.Application.Features.Feedbacks.Commands.CreateFeedback;
 using BeatSportsAPI.Application.Features.Feedbacks.Commands.DeleteFeedback;
 using BeatSportsAPI.Application.Features.Feedbacks.Commands.UpdateFeedback;
 using BeatSportsAPI.Application.Features.Feedbacks.Queries.GetAllFeedbacks;
+using BeatSportsAPI.Application.Features.Feedbacks.Queries.GetAllFeedbacksByCourtId;
 using BeatSportsAPI.Application.Features.Feedbacks.Queries.GetFeedbackById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -47,7 +48,13 @@ public class FeedbackController : ApiControllerBase
     }
     [HttpGet]
     [Route("get-by-feedback-id")]
-    public async Task<FeedbackResponse> GetByCampaignId([FromQuery] GetFeedbackByIdCommand request)
+    public async Task<FeedbackResponse> GetByFeedbackId([FromQuery] GetFeedbackByIdCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+    [HttpGet]
+    [Route("get-by-court-id")]
+    public async Task<PaginatedList<FeedbackResponse>> GetByCourtId([FromQuery] GetAllFeedbackByCourtIdCommand request)
     {
         return await _mediator.Send(request);
     }
