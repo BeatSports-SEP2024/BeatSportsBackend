@@ -11,6 +11,8 @@ using BeatSportsAPI.Application.Common.Mappings;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAll;
+using BeatSportsAPI.Domain.Entities;
+using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Campaigns.Queries.GetAllCampaigns;
@@ -31,10 +33,24 @@ public class GetAllCampaignHandler : IRequestHandler<GetAllCampaignsCommand, Pag
         {
             throw new BadRequestException("Page index and page size cannot less than 0");
         }
-        var listCampaign = _dbContext.Campaigns
-            .Where(x => !x.IsDelete)
-            .ProjectTo<CampaignResponse>(_mapper.ConfigurationProvider)
-            .PaginatedListAsync(request.PageIndex, request.PageSize);
-        return listCampaign;
+
+        IQueryable<Campaign> query = _dbContext.Campaigns
+            .Where(x => !x.IsDelete);
+
+        var list = query.Select(c => new CampaignResponse
+        {
+            CampaignId = c.Id,
+            CourtId = c.CourtId,
+            CampaignName = c.CampaignName,
+            Description = c.Description,
+            PercentDiscount = c.PercentDiscount,
+            StartDateApplying = c.StartDateApplying,
+            EndDateApplying = c.EndDateApplying,
+            Status = c.Status,
+            QuantityOfCampaign = c.QuantityOfCampaign
+        })
+        .PaginatedListAsync(request.PageIndex, request.PageSize); 
+
+        return list;
     }
 }
