@@ -21,7 +21,7 @@ public class Court : BaseAuditableEntity
     public string? PlaceId { get; set; }
 
     public virtual Owner Owner { get; set; } = null!;
-    public virtual RoomMatch RoomMatch { get; set; } = null!;
+    public virtual IList<RoomMatch> RoomMatch { get; set; } = null!;
     public virtual IList<Campaign>? Campaigns { get; set; }
     public virtual IList<TimePeriod>? TimePeriods { get; set; }
     public virtual IList<Feedback>? Feedback { get; set; }
