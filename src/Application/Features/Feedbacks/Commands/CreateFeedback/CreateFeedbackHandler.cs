@@ -41,6 +41,7 @@ public class CreateFeedbackHandler : IRequestHandler<CreateFeedbackCommand, Beat
             FeedbackStar = request.FeedbackStar,
             FeedbackAvailable = request.FeedbackAvailable,
             FeedbackStatus = request.FeedbackStatus,
+            FeedbackContent = request.FeedbackContent,
         };
         _dbContext.Feedbacks.Add(feedback);
         _dbContext.SaveChanges();

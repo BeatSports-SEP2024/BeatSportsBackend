@@ -32,6 +32,7 @@ public class UpdateFeedbackHandler : IRequestHandler<UpdateFeedbackCommand, Beat
         feedback.FeedbackStar = request.FeedbackStar;
         feedback.FeedbackAvailable = request.FeedbackAvailable;
         feedback.FeedbackStatus = request.FeedbackStatus;
+        feedback.FeedbackContent = request.FeedbackContent;
 
         _dbContext.Feedbacks.Update(feedback);
         _dbContext.SaveChanges();

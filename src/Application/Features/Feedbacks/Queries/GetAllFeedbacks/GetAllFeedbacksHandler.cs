@@ -41,7 +41,8 @@ public class GetAllFeedbacksHandler : IRequestHandler<GetAllFeedbacksCommand, Pa
             CourtId = c.CourtId,
             FeedbackStar = c.FeedbackStar,
             FeedbackAvailable = c.FeedbackAvailable,
-            FeedbackStatus = c.FeedbackStatus
+            FeedbackStatus = c.FeedbackStatus,
+            FeedbackContent = c.FeedbackContent,
         })
         .PaginatedListAsync(request.PageIndex, request.PageSize);
 
