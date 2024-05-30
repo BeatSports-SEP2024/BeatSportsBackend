@@ -1,4 +1,4 @@
-﻿using BeatSportsAPI.Application.Common.Response;
+﻿using BeatSportsAPI.Application.Common.Response.CourtResponse;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Courts.Queries.GetById;

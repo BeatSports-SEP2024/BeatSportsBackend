@@ -4,7 +4,6 @@ using BeatSportsAPI.Domain.Entities.CourtEntity;
 namespace BeatSportsAPI.Domain.Entities.Room;
 public class RoomMatch : BaseAuditableEntity
 {
-    [ForeignKey("Court")]
     public Guid CourtId { get; set; }
     [ForeignKey("Level")]
     public Guid LevelId { get; set; }
