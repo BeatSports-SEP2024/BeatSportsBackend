@@ -10,7 +10,7 @@ using MediatR;
 namespace BeatSportsAPI.Application.Features.Courts.TimePeriod.Command;
 public class CreateTimePeriodCommand : IRequest<BeatSportsResponse>
 {
-    public Guid CourtId { get; set; }
+    public Guid CourtSubdivisionId { get; set; }
     public string Description { get; set; }
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
