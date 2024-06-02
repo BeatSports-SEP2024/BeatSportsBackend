@@ -21,7 +21,7 @@ public class Booking : BaseAuditableEntity
     public DateTime PlayingDate { get; set; }
     public TimeSpan StartTimePlaying { get; set; }
     public TimeSpan EndTimePlaying { get; set; }
-
+    public string BookingStatus { get; set; }
     public virtual CourtSubdivision CourtSubdivision { get; set; } = null!;
     public virtual Customer Customer { get; set; } = null!;
     public virtual Campaign? Campaign { get; set; }
