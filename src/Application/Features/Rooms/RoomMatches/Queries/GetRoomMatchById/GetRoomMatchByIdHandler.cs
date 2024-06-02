@@ -32,7 +32,7 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
         var room = query.Select(c => new RoomMatchesResponse
         {
             RoomMatchId = c.Id,
-            CourtId = c.CourtId,
+            CourtSubdivisionId = c.CourtSubdivisionId,
             LevelId = c.LevelId,
             StartTimeRoom = c.StartTimeRoom,
             EndTimeRoom = c.EndTimeRoom,

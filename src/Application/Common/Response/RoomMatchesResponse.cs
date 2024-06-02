@@ -8,7 +8,7 @@ namespace BeatSportsAPI.Application.Common.Response;
 public class RoomMatchesResponse
 {
     public Guid RoomMatchId { get; set; }
-    public Guid CourtId { get; set; }
+    public Guid CourtSubdivisionId { get; set; }
     public Guid LevelId { get; set; }
     public TimeSpan StartTimeRoom { get; set; }
     public TimeSpan EndTimeRoom { get; set; }
