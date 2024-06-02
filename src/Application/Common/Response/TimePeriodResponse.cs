@@ -11,7 +11,7 @@ namespace BeatSportsAPI.Application.Common.Response;
 //For Get All Response
 public class TimePeriodResponse : IMapFrom<TimePeriod>
 {
-    public Guid CourtId { get; set; }
+    public Guid CourtSubdivisionId { get; set; }
     public string Description { get; set; }
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
