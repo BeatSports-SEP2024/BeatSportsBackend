@@ -29,7 +29,7 @@ public class UpdateRoomMatchesHandler : IRequestHandler<UpdateRoomMatchesCommand
         {
             throw new BadRequestException($"RoomMatch with RoomMatch ID:{request.RoomMatchId} does not exist or have been delele");
         }
-
+        room.RoomName = request.RoomName;
         room.CourtSubdivisionId = request.CourtSubdivisionId;
         room.LevelId = request.LevelId;
         room.StartTimeRoom = request.StartTimeRoom;
