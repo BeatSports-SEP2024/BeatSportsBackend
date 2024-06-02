@@ -12,7 +12,7 @@ namespace BeatSportsAPI.Application.Features.Rooms.RoomMatches.Commands.CreateRo
 public class CreateRoomMatchesCommand : IRequest<BeatSportsResponse>
 {
     [Required]
-    public Guid CourtId { get; set; }
+    public Guid CourtSubdivisionId { get; set; }
     [Required]
     public Guid LevelId { get; set; }
     public TimeSpan StartTimeRoom { get; set; }
