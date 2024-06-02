@@ -25,10 +25,10 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
     public Task<BeatSportsResponse> Handle(CreateRoomMatchesCommand request, CancellationToken cancellationToken)
     {
         //check Court
-        var court = _dbContext.Courts.Where(x => x.Id == request.CourtId).SingleOrDefault();
+        var court = _dbContext.Courts.Where(x => x.Id == request.CourtSubdivisionId).SingleOrDefault();
         if (court == null || court.IsDelete)
         {
-            throw new BadRequestException($"Court with Court ID:{request.CourtId} does not exist or have been delele");
+            throw new BadRequestException($"Court with Court ID:{request.CourtSubdivisionId} does not exist or have been delele");
         }
 
         //check Level
@@ -40,7 +40,7 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
 
         var room = new RoomMatch()
         {
-            CourtId = request.CourtId,
+            CourtSubdivisionId = request.CourtSubdivisionId,
             LevelId = request.LevelId,
             StartTimeRoom = request.StartTimeRoom,
             EndTimeRoom = request.EndTimeRoom,
