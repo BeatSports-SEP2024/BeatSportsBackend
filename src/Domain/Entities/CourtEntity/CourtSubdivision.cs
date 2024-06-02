@@ -12,5 +12,7 @@ public class CourtSubdivision : BaseAuditableEntity
     public decimal BasePrice { get; set; }
 
     public virtual Court Court { get; set; }
+    public virtual IList<RoomMatch> RoomMatch { get; set; } = null!;
     public virtual Booking Bookings { get; set; } = null!;
+    public virtual IList<TimePeriod>? TimePeriods { get; set; }
 }

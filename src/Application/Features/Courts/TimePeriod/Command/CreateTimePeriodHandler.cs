@@ -16,7 +16,7 @@ public class CreateTimePeriodHandler : IRequestHandler<CreateTimePeriodCommand, 
     public async Task<BeatSportsResponse> Handle(CreateTimePeriodCommand request, CancellationToken cancellationToken)
     {
         var existedCourt = _beatSportsDbContext.Courts
-            .Where(c => c.Id == request.CourtId && !c.IsDelete)
+            .Where(c => c.Id == request.CourtSubdivisionId && !c.IsDelete)
             .FirstOrDefault();
         if (existedCourt == null)
         {
@@ -24,7 +24,7 @@ public class CreateTimePeriodHandler : IRequestHandler<CreateTimePeriodCommand, 
         }
         var newTimePeriod = new BeatSportsAPI.Domain.Entities.CourtEntity.TimePeriod
         {
-            CourtId = request.CourtId,
+            CourtSubdivisionId = request.CourtSubdivisionId,
             Description = request.Description,
             StartTime = request.StartTime,
             EndTime = request.EndTime,
