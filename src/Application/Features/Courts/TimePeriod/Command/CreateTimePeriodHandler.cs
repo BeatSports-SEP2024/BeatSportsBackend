@@ -15,12 +15,12 @@ public class CreateTimePeriodHandler : IRequestHandler<CreateTimePeriodCommand, 
 
     public async Task<BeatSportsResponse> Handle(CreateTimePeriodCommand request, CancellationToken cancellationToken)
     {
-        var existedCourt = _beatSportsDbContext.Courts
+        var existedCourt = _beatSportsDbContext.CourtSubdivisions
             .Where(c => c.Id == request.CourtSubdivisionId && !c.IsDelete)
             .FirstOrDefault();
         if (existedCourt == null)
         {
-            throw new NotFoundException("Cannot find courtId or court id does not exist");
+            throw new NotFoundException($"{request.CourtSubdivisionId} is not existed");
         }
         var newTimePeriod = new BeatSportsAPI.Domain.Entities.CourtEntity.TimePeriod
         {
