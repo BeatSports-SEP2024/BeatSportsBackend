@@ -1,6 +1,10 @@
 ﻿using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Customers.Queries;
+using BeatSportsAPI.Application.Features.Feedbacks.Commands.DeleteFeedback;
+using BeatSportsAPI.Application.Features.Feedbacks.Commands.UpdateFeedback;
+using BeatSportsAPI.Application.Features.Owners.Commands.DeleteOwner;
+using BeatSportsAPI.Application.Features.Owners.Commands.UpdateOwner;
 using BeatSportsAPI.Application.Features.Owners.Queries;
 using BeatSportsAPI.Application.Features.Sports.Queries;
 using CsvHelper.Configuration.Attributes;
@@ -19,6 +23,16 @@ public class OwnerController : ApiControllerBase
         _mediator = mediator;
     }
 
+    [HttpDelete]
+    public async Task<BeatSportsResponse> Delete(DeleteOwnerCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+    [HttpPut]
+    public async Task<BeatSportsResponse> Update(UpdateOwnerCommand request)
+    {
+        return await _mediator.Send(request);
+    }
     [HttpGet]
     [SwaggerOperation("Get list of owners")]
     public async Task<PaginatedList<OwnerResponse>> GetAll([FromQuery] GetAllOwnersCommand request)
