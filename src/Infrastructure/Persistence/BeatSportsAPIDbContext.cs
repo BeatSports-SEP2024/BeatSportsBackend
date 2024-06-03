@@ -515,7 +515,7 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
             {
                 Id = roomMatch1,
                 LevelId = beginner,
-                CourtId = court1Id,
+                CourtSubdivisionId = courtSubdivisionId1,
                 StartTimeRoom = new TimeSpan(14, 30, 00),
                 EndTimeRoom = new TimeSpan(15, 30, 00),
                 MaximumMember = 20,
@@ -529,7 +529,7 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
             {
                 Id = roomMatch2,
                 LevelId = medium,
-                CourtId = court2Id,
+                CourtSubdivisionId = courtSubdivisionId2,
                 StartTimeRoom = new TimeSpan(14, 30, 00),
                 EndTimeRoom = new TimeSpan(15, 30, 00),
                 MaximumMember = 20,
@@ -543,7 +543,7 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
             {
                 Id = roomMatch3,
                 LevelId = expert,
-                CourtId = courtId,
+                CourtSubdivisionId = courtSubdivisionId3,
                 StartTimeRoom = new TimeSpan(14, 30, 00),
                 EndTimeRoom = new TimeSpan(15, 30, 00),
                 MaximumMember = 20,
@@ -572,6 +572,7 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
                 EndTimePlaying = new TimeSpan(20, 0, 0), // 8 PM
                 BookingDate = DateTime.Today,
                 TotalAmount = 1000,
+                BookingStatus = "Approved",
                 IsRoomBooking = false,
                 IsDeposit = true
             },
@@ -587,6 +588,7 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
                 EndTimePlaying = new TimeSpan(19, 0, 0), // 7 PM
                 BookingDate = DateTime.Today,
                 TotalAmount = 1200,
+                BookingStatus = "Approved",
                 IsRoomBooking = true,
                 IsDeposit = false
             },
@@ -602,6 +604,7 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
                 EndTimePlaying = new TimeSpan(22, 0, 0), // 10 PM
                 BookingDate = DateTime.Today,
                 TotalAmount = 800,
+                BookingStatus = "Approved",
                 IsRoomBooking = false,
                 IsDeposit = true
             });
@@ -613,7 +616,7 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
             new TimePeriod
             {
                 Id = timePeriodId1,
-                CourtId = court1Id,
+                CourtSubdivisionId = courtSubdivisionId1,
                 Description = "Giờ Cao Điểm",
                 StartTime = new TimeSpan(17, 0, 0),  
                 EndTime = new TimeSpan(20, 0, 0), 
@@ -622,7 +625,7 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
             new TimePeriod
             {
                 Id = timePeriodId2,
-                CourtId = courtId,
+                CourtSubdivisionId = courtSubdivisionId2,
                 Description = "Giờ Thấp Điểm",
                 StartTime = new TimeSpan(10, 0, 0), 
                 EndTime = new TimeSpan(16, 0, 0), 
@@ -631,7 +634,7 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
             new TimePeriod
             {
                 Id = timePeriodId3,
-                CourtId = court1Id,
+                CourtSubdivisionId = courtSubdivisionId3,
                 Description = "Giờ Bình Thường",
                 StartTime = new TimeSpan(20, 30, 0), 
                 EndTime = new TimeSpan(23, 0, 0), 
