@@ -10,6 +10,7 @@ public class CourtSubdivision : BaseAuditableEntity
     public string? ImageURL { get; set; }
     public bool IsActive { get; set; }
     public decimal BasePrice { get; set; }
+    public string? CourtSubdivisionName { get; set; }
 
     public virtual Court Court { get; set; }
     public virtual IList<RoomMatch> RoomMatch { get; set; } = null!;
