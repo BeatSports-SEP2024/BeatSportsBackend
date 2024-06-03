@@ -4,6 +4,8 @@ using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Exceptions;
 using MediatR;
+using BeatSportsAPI.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Owners.Queries;
 public class GetOwnerByIdHandler : IRequestHandler<GetOwnerByIdCommand, OwnerResponse>
@@ -19,14 +21,30 @@ public class GetOwnerByIdHandler : IRequestHandler<GetOwnerByIdCommand, OwnerRes
 
     public Task<OwnerResponse> Handle(GetOwnerByIdCommand request, CancellationToken cancellationToken)
     {
-        var isExistedOwner = _beatSportsDbContext.Owners
-            .Where(o => o.Id == request.OwnerId && !o.IsDelete)
-            .ProjectTo<OwnerResponse>(_mapper.ConfigurationProvider)
-            .SingleOrDefault();
-        if(isExistedOwner == null) 
+        IQueryable<Owner> query = _beatSportsDbContext.Owners
+            .Where(x => x.Id == request.OwnerId && !x.IsDelete)
+            .Include(c => c.Account);
+
+        var owner = query.Select(c => new OwnerResponse
         {
-            throw new NotFoundException($"{request.OwnerId} is not existed");
+            AccountId = c.AccountId,
+            OwnerId = c.Id,
+            UserName = c.Account.UserName,
+            Email = c.Account.Email,
+            FirstName = c.Account.FirstName,
+            LastName = c.Account.LastName,
+            DateOfBirth = c.Account.DateOfBirth,
+            Gender = c.Account.Gender,
+            ProfilePictureURL = c.Account.ProfilePictureURL,
+            Bio = c.Account.Bio,
+            PhoneNumber = c.Account.PhoneNumber
+
+        }).SingleOrDefault();
+
+        if (owner == null)
+        {
+            throw new NotFoundException($"Do not find owner with owner ID: {request.OwnerId}");
         }
-        return Task.FromResult(isExistedOwner);
+        return Task.FromResult(owner);
     }
 }

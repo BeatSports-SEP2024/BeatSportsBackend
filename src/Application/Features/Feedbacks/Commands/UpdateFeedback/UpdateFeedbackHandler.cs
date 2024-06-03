@@ -22,7 +22,7 @@ public class UpdateFeedbackHandler : IRequestHandler<UpdateFeedbackCommand, Beat
 
     public Task<BeatSportsResponse> Handle(UpdateFeedbackCommand request, CancellationToken cancellationToken)
     {
-        // Check Campaign
+        // Check Feedback
         var feedback = _dbContext.Feedbacks.Where(x => x.Id == request.FeedbackId).SingleOrDefault();
         if (feedback == null || feedback.IsDelete)
         {

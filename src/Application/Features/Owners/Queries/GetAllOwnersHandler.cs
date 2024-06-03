@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -10,7 +11,9 @@ using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Mappings;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Owners.Queries;
 public class GetAllOwnersHandler : IRequestHandler<GetAllOwnersCommand, PaginatedList<OwnerResponse>>
@@ -28,10 +31,26 @@ public class GetAllOwnersHandler : IRequestHandler<GetAllOwnersCommand, Paginate
         {
             throw new BadRequestException("Page index and page size cannot less than 0");
         }
-        var response = await _beatSportsDbContext.Owners
-            .Where(c => !c.IsDelete)
-            .ProjectTo<OwnerResponse>(_mapper.ConfigurationProvider)
-            .PaginatedListAsync(request.PageIndex, request.PageSize);
-        return response;
+
+        IQueryable<Owner> query = _beatSportsDbContext.Owners
+            .Where(x => !x.IsDelete);
+        
+        var list = query.Select(c => new OwnerResponse
+        {
+            AccountId = c.AccountId,
+            OwnerId = c.Id,
+            UserName = c.Account.UserName,
+            Email = c.Account.Email,
+            FirstName = c.Account.FirstName,
+            LastName = c.Account.LastName,
+            DateOfBirth = c.Account.DateOfBirth,
+            Gender = c.Account.Gender,
+            ProfilePictureURL = c.Account.ProfilePictureURL,
+            Bio = c.Account.Bio,
+            PhoneNumber = c.Account.PhoneNumber
+        })
+        .PaginatedListAsync(request.PageIndex, request.PageSize);
+
+        return await list;
     }
 }
