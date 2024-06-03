@@ -57,7 +57,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSp
         {
             CustomerId = request.CustomerId,
             RoomMatchId = request.RoomMatchId,
-            CampaignId = request.CampaignId,
+            CampaignId = request.CampaignId ?? Guid.Empty,
             CourtSubdivisionId = request.CourtSubdivisionId,
             BookingDate = DateTime.UtcNow,
             TotalAmount = request.TotalAmount,
