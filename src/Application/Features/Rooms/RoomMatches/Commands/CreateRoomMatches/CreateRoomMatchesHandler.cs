@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BeatSportsAPI.Application.Common.Exceptions;
+﻿using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
-using BeatSportsAPI.Application.Features.Campaigns.Commands.CreateCampaign;
-using BeatSportsAPI.Domain.Entities;
-using BeatSportsAPI.Domain.Entities.CourtEntity;
 using BeatSportsAPI.Domain.Entities.Room;
 using MediatR;
 
@@ -25,7 +17,7 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
     public Task<BeatSportsResponse> Handle(CreateRoomMatchesCommand request, CancellationToken cancellationToken)
     {
         //check Court
-        var court = _dbContext.Courts.Where(x => x.Id == request.CourtSubdivisionId).SingleOrDefault();
+        var court = _dbContext.CourtSubdivisions.Where(x => x.Id == request.CourtSubdivisionId).SingleOrDefault();
         if (court == null || court.IsDelete)
         {
             throw new BadRequestException($"Court with Court ID:{request.CourtSubdivisionId} does not exist or have been delele");
