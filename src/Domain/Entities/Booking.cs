@@ -7,11 +7,11 @@ namespace BeatSportsAPI.Domain.Entities;
 public class Booking : BaseAuditableEntity
 {
     [ForeignKey("Customer")]
-    public Guid CustomerId { get; set; }
+    public Guid CustomerId { get; set; } 
     [ForeignKey("RoomMatch")]
-    public Guid RoomMatchId { get; set; }
+    public Guid? RoomMatchId { get; set; }
     [ForeignKey("Campaign")]
-    public Guid CampaignId { get; set; }
+    public Guid? CampaignId { get; set; }
     [ForeignKey("CourtSubdivision")]
     public Guid CourtSubdivisionId { get; set; }
     public DateTime BookingDate { get; set; }   
