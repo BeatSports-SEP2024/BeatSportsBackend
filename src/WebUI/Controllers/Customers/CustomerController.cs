@@ -1,7 +1,11 @@
 ﻿using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetAllCourtSubdivisionOfCourt;
+using BeatSportsAPI.Application.Features.Customers.Commands.DeleteCustomer;
+using BeatSportsAPI.Application.Features.Customers.Commands.UpdateCustomer;
 using BeatSportsAPI.Application.Features.Customers.Queries;
+using BeatSportsAPI.Application.Features.Owners.Commands.DeleteOwner;
+using BeatSportsAPI.Application.Features.Owners.Commands.UpdateOwner;
 using BeatSportsAPI.Application.Features.Sports.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +21,16 @@ public class CustomerController : ApiControllerBase
     {
         _mediator = mediator;
     }
-
+    [HttpDelete]
+    public async Task<BeatSportsResponse> Delete(DeleteCustomerCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+    [HttpPut]
+    public async Task<BeatSportsResponse> Update(UpdateCustomerCommand request)
+    {
+        return await _mediator.Send(request);
+    }
     [HttpGet]
     [SwaggerOperation("Get list of customers")]
     public async Task<PaginatedList<CustomerResponse>> GetAll([FromQuery] GetAllCustomersCommand request)
