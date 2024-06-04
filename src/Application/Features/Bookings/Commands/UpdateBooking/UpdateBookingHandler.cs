@@ -25,7 +25,6 @@ public class UpdateBookingHandler : IRequestHandler<UpdateBookingCommand, BeatSp
         }
 
         isValidBooking.CustomerId = request.CustomerId;
-        isValidBooking.RoomMatchId = request.RoomMatchId;
         isValidBooking.CampaignId = request.CampaignId;
         isValidBooking.CourtSubdivisionId = request.CourtSubdivisionId;
         isValidBooking.BookingDate = request.BookingDate;

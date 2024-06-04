@@ -29,6 +29,13 @@ public class UpdateRoomMatchesHandler : IRequestHandler<UpdateRoomMatchesCommand
         {
             throw new BadRequestException($"RoomMatch with RoomMatch ID:{request.RoomMatchId} does not exist or have been delele");
         }
+
+        //Check booking is valid or not deleted 
+        var booking = _dbContext.Bookings
+            .Where(x => x.Id == request.BookingId && !x.IsDelete)
+            .FirstOrDefault();
+
+        room.BookingId = request.BookingId;
         room.RoomName = request.RoomName;
         room.CourtSubdivisionId = request.CourtSubdivisionId;
         room.LevelId = request.LevelId;

@@ -30,10 +30,15 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
             throw new BadRequestException($"Level with Level ID:{request.LevelId} does not exist or have been delele");
         }
 
+        //check bookingn
+        var isValidBooking = _dbContext.Bookings
+            .Where(b => b.Id == request.BookingId && !b.IsDelete).FirstOrDefault();
+
         var room = new RoomMatch()
         {
             RoomName = request.RoomName,
             CourtSubdivisionId = request.CourtSubdivisionId,
+            BookingId = request.BookingId,
             LevelId = request.LevelId,
             StartTimeRoom = request.StartTimeRoom,
             EndTimeRoom = request.EndTimeRoom,
