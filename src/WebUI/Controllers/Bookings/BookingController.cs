@@ -4,10 +4,12 @@ using BeatSportsAPI.Application.Features.Bookings.Commands.CreateBooking;
 using BeatSportsAPI.Application.Features.Bookings.Commands.DeleteBooking;
 using BeatSportsAPI.Application.Features.Bookings.Commands.UpdateBooking;
 using BeatSportsAPI.Application.Features.Bookings.Queries;
+using BeatSportsAPI.Application.Features.Bookings.Queries.GetAllBookingsByCustomerId;
 using BeatSportsAPI.Application.Features.Campaigns.Commands.CreateCampaign;
 using BeatSportsAPI.Application.Features.Campaigns.Commands.DeleteCampaign;
 using BeatSportsAPI.Application.Features.Campaigns.Commands.UpdateCampaign;
 using BeatSportsAPI.Application.Features.Campaigns.Queries.GetAllCampaigns;
+using BeatSportsAPI.Application.Features.Feedbacks.Queries.GetAllFeedbacksByCourtId;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,6 +40,12 @@ public class BookingController : ApiControllerBase
     }
     [HttpPut]
     public async Task<BeatSportsResponse> Update(UpdateBookingCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+    [HttpGet]
+    [Route("get-by-customer-id")]
+    public async Task<PaginatedList<BookingResponse>> GetByCourtId([FromQuery] GetAllBookingsByCustomerIdCommand request)
     {
         return await _mediator.Send(request);
     }

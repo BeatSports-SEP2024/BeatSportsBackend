@@ -12,7 +12,7 @@ public class BookingResponse : IMapFrom<Booking>
 {   
     public Guid CustomerId { get; set; }
     //public Guid RoomMatchId { get; set; }
-    public Guid CampaignId { get; set; }
+    public Guid? CampaignId { get; set; }
     public Guid CourtSubdivisionId { get; set; }
     public DateTime BookingDate { get; set; }
     public decimal TotalAmount { get; set; }
