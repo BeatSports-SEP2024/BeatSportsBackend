@@ -10,6 +10,7 @@ using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Mappings;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Domain.Entities;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Customers.Queries;
@@ -28,10 +29,28 @@ public class GetAllCustomersHandler : IRequestHandler<GetAllCustomersCommand, Pa
         {
             throw new BadRequestException("Page index and page size cannot less than 0");
         }
-        var response = await _beatSportsDbContext.Customers
-            .Where(c => !c.IsDelete)
-            .ProjectTo<CustomerResponse>(_mapper.ConfigurationProvider)
-            .PaginatedListAsync(request.PageIndex, request.PageSize);
-        return response;
+
+        IQueryable<Customer> query = _beatSportsDbContext.Customers
+            .Where(x => !x.IsDelete);
+
+        var list = query.Select(c => new CustomerResponse
+        {
+            AccountId = c.AccountId,
+            CustomerId = c.Id,
+            UserName = c.Account.UserName,
+            Email = c.Account.Email,
+            FirstName = c.Account.FirstName,
+            LastName = c.Account.LastName,
+            DateOfBirth = c.Account.DateOfBirth,
+            Gender = c.Account.Gender,
+            ProfilePictureURL = c.Account.ProfilePictureURL,
+            Bio = c.Account.Bio,
+            PhoneNumber = c.Account.PhoneNumber,
+            Address = c.Address,
+            RewardPoints = c.RewardPoints
+        })
+        .PaginatedListAsync(request.PageIndex, request.PageSize);
+
+        return await list;
     }
 }

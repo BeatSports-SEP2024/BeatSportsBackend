@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper.QueryableExtensions;
 using AutoMapper;
+using BeatSportsAPI.Domain.Entities;
 
 namespace BeatSportsAPI.Application.Features.Customers.Queries;
 public class GetCustomerByIdHandler : IRequestHandler<GetCustomerByIdCommand, CustomerResponse>
@@ -20,14 +21,32 @@ public class GetCustomerByIdHandler : IRequestHandler<GetCustomerByIdCommand, Cu
 
     public Task<CustomerResponse> Handle(GetCustomerByIdCommand request, CancellationToken cancellationToken)
     {
-        var isExistedCustomer = _beatSportsDbContext.Customers
-            .Where(c => c.Id == request.CustomerId && !c.IsDelete)
-            .ProjectTo<CustomerResponse>(_mapper.ConfigurationProvider)
-            .SingleOrDefault();
-        if(isExistedCustomer == null)
+        IQueryable<Customer> query = _beatSportsDbContext.Customers
+             .Where(x => x.Id == request.CustomerId && !x.IsDelete)
+             .Include(c => c.Account);
+
+        var customer = query.Select(c => new CustomerResponse
         {
-            throw new NotFoundException($"{request.CustomerId} not existed");
+            AccountId = c.AccountId,
+            CustomerId = c.Id,
+            UserName = c.Account.UserName,
+            Email = c.Account.Email,
+            FirstName = c.Account.FirstName,
+            LastName = c.Account.LastName,
+            DateOfBirth = c.Account.DateOfBirth,
+            Gender = c.Account.Gender,
+            ProfilePictureURL = c.Account.ProfilePictureURL,
+            Bio = c.Account.Bio,
+            PhoneNumber = c.Account.PhoneNumber,
+            Address = c.Address,
+            RewardPoints = c.RewardPoints
+
+        }).SingleOrDefault();
+
+        if (customer == null)
+        {
+            throw new NotFoundException($"Do not find customer with customer ID: {request.CustomerId}");
         }
-        return Task.FromResult(isExistedCustomer);
+        return Task.FromResult(customer);
     }
 }
