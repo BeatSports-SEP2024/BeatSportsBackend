@@ -39,6 +39,7 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
         var list = query.Select(c => new RoomMatchesResponse
         {
             RoomMatchId = c.Id,
+            BookingId = c.BookingId,
             CourtSubdivisionId = c.CourtSubdivisionId,
             LevelId = c.LevelId,
             StartTimeRoom = c.StartTimeRoom,
