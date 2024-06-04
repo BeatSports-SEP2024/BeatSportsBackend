@@ -12,6 +12,7 @@ public class UpdateRoomMatchesCommand : IRequest<BeatSportsResponse>
     public Guid RoomMatchId { get; set; }
     public Guid CourtSubdivisionId { get; set; }
     public Guid LevelId { get; set; }
+    public Guid BookingId { get; set; }
     public string RoomName { get; set; }
     public TimeSpan StartTimeRoom { get; set; }
     public TimeSpan EndTimeRoom { get; set; }

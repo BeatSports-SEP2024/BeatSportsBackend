@@ -20,10 +20,6 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSp
         var isValidCustomer = _beatSportsDbContext.Customers
             .Where(c => c.Id == request.CustomerId && !c.IsDelete)
             .SingleOrDefault();
-
-        var isValidRoomMatch = _beatSportsDbContext.RoomMatches
-            .Where(rm => rm.Id == request.RoomMatchId && !rm.IsDelete)
-            .SingleOrDefault();
         
         var isValidCampaign = _beatSportsDbContext.Campaigns
             .Where(campaigns => campaigns.Id == request.CampaignId)
@@ -36,11 +32,6 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSp
         if (isValidCustomer == null)
         {
             throw new BadRequestException($"{request.CustomerId} is not existed");
-        }
-
-        if(isValidRoomMatch == null)
-        {
-            throw new BadRequestException($"{request.RoomMatchId} is not existed");
         }
 
         if (isValidCampaign == null)
@@ -56,7 +47,6 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSp
         var newBooking = new Booking
         {
             CustomerId = request.CustomerId,
-            RoomMatchId = request.RoomMatchId,
             CampaignId = request.CampaignId ?? Guid.Empty,
             CourtSubdivisionId = request.CourtSubdivisionId,
             BookingDate = DateTime.UtcNow,
