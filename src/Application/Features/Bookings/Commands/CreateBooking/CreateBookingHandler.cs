@@ -39,6 +39,11 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSp
             throw new BadRequestException($"{request.CampaignId} is not existed");
         }
 
+        if(isValidCampaign.QuantityOfCampaign < 1)
+        {
+            throw new BadRequestException($"{isValidCampaign.QuantityOfCampaign} is not enough");
+        }
+
         if(isValidCourtSub == null)
         {
             throw new BadRequestException($"{request.CourtSubdivisionId} is not existed");
