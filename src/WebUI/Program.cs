@@ -13,6 +13,8 @@ using System.Text;
 using Newtonsoft.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Services.VnPay.Config;
+using Microsoft.AspNetCore.SignalR;
+using WebAPI.Controllers.ChatHubs;
 using Services.Momo.Config;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -73,6 +75,9 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+//SignalR
+builder.Services.AddSignalR();
+
 builder.Services.AddSwaggerGen(config =>
 {
     config.SwaggerDoc("v1", new OpenApiInfo { Title = "BeatSportsAPI", Version = "v1" });
@@ -123,6 +128,9 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+//SignalR Hub
+app.MapHub<ChatHub>("chat-hub");
 
 app.UseCors(MyAllowSpecificOrigins);
 app.UseHealthChecks("/health");
