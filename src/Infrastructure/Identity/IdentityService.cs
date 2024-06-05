@@ -330,10 +330,7 @@ public class IdentityService : IIdentityService
             throw new NotFoundException("This user is existed");
         }
 
-        //Save temporary data of image
-        //Copy temporary data to memoryStream
-        //Convert byte to base64
-        //Call method UploadImage to upload firebase
+        
         string profileImageUrl = "";
         if (registerModelRequest.ProfilePicture != null)
         {
