@@ -11,6 +11,7 @@ using BeatSportsAPI.Domain.Common;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace BeatSportsAPI.Application.Models.Authentication;
 public class RegisterCustomerModelRequest : IRequest<BeatSportsResponse>
@@ -27,7 +28,8 @@ public class RegisterCustomerModelRequest : IRequest<BeatSportsResponse>
     public DateTime DateOfBirth { get; set; }
     [EnumDataType(typeof(GenderEnums))]
     public GenderEnums Gender { get; set; }
-    public string? ProfilePictureURL { get; set; }
+    //public string? ProfilePictureURL { get; set; }
+    public IFormFile? ProfilePicture { get; set; }
     public string? Bio { get; set; }
     public string PhoneNumber { get; set; } = null!;
     public string Address { get; set; } = null!;
