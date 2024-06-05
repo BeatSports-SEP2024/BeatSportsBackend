@@ -22,9 +22,9 @@ public class ImageUploadService : IImageUploadService
         Bucket = GetJsonInAppSettingsExtension.GetJson("Firebase:Bucket");
         AuthEmail = GetJsonInAppSettingsExtension.GetJson("Firebase:AuthEmail");
         AuthPassword = GetJsonInAppSettingsExtension.GetJson("Firebase:AuthPassword");
-        Console.WriteLine(ApiKey, Bucket, AuthEmail, AuthPassword);
     }
 
+    //check ảnh có hợp lệ hay không và có lớn hơn so với BR
     public bool ValidationImage(IFormFile file)
     {
         const int MAX_SIZE = 10 * 1024 * 1024; // 10MB
@@ -52,6 +52,9 @@ public class ImageUploadService : IImageUploadService
         return isValid;
     }
 
+    //Call Upload method to upload image
+    //Convert base64 to stream
+    //Create random name for image
     public async Task<string> UploadImage(string fileImg, string base64string)
     {
         if (string.IsNullOrWhiteSpace(base64string))
@@ -63,6 +66,9 @@ public class ImageUploadService : IImageUploadService
         return await Upload(fileImg, filename, stream);
     }
 
+    //Check account on firebase with authentication
+    //After login successfully, create folder with folder : /assets/{fileImg}/{filename}
+    //Return URL of file uploaded
     private async Task<string> Upload(string fileImg, Guid filename, Stream stream)
     {
         var auth = new FirebaseAuthProvider(new FirebaseConfig(ApiKey));
