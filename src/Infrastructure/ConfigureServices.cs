@@ -1,4 +1,5 @@
 ﻿using BeatSportsAPI.Application.Common.Interfaces;
+using BeatSportsAPI.Infrastructure.Files;
 using BeatSportsAPI.Infrastructure.Files.Maps;
 using BeatSportsAPI.Infrastructure.Identity;
 using BeatSportsAPI.Infrastructure.Persistence;
@@ -47,6 +48,7 @@ public static class ConfigureServices
         services.AddTransient<IDateTime, DateTimeService>();
         services.AddTransient<IIdentityService, IdentityService>();
         services.AddTransient<ICsvFileBuilder, CsvFileBuilder>();
+        services.AddTransient<IImageUploadService, ImageUploadService>();
 
         services.AddAuthentication()
             .AddIdentityServerJwt();

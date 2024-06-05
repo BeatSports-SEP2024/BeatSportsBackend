@@ -36,6 +36,7 @@ public class IdentityService : IIdentityService
     private readonly IConfiguration _configuration;
     private readonly IBeatSportsDbContext _beatSportsDbContext;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IImageUploadService _imageUploadService;
 
     public IdentityService(
         UserManager<ApplicationUser> userManager,
@@ -44,7 +45,8 @@ public class IdentityService : IIdentityService
         IConfiguration configuration,
         IOptions<JwtSettings> jwtSettings,
         IBeatSportsDbContext beatSportsDbContext,
-        IHttpClientFactory httpClientFactory
+        IHttpClientFactory httpClientFactory,
+        IImageUploadService imageUploadService
         )
     {
         _jwtSettings = jwtSettings.Value;
@@ -54,6 +56,7 @@ public class IdentityService : IIdentityService
         _authorizationService = authorizationService;
         _beatSportsDbContext = beatSportsDbContext;
         _httpClientFactory = httpClientFactory;
+        _imageUploadService = imageUploadService;
     }
 
     public async Task<string> GetUserNameAsync(string userId)
@@ -326,6 +329,20 @@ public class IdentityService : IIdentityService
         {
             throw new NotFoundException("This user is existed");
         }
+
+        
+        string profileImageUrl = "";
+        if (registerModelRequest.ProfilePicture != null)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                await registerModelRequest.ProfilePicture.CopyToAsync(memoryStream);
+                var fileBytes = memoryStream.ToArray();
+                string base64string = Convert.ToBase64String(fileBytes);
+                profileImageUrl = await _imageUploadService.UploadImage("profileImages", base64string);
+            }
+        }
+
         var combinedPassword = CreatePasswordHash(registerModelRequest.Password);
         var newUser = new Account
         {
@@ -336,7 +353,8 @@ public class IdentityService : IIdentityService
             LastName = registerModelRequest.LastName,
             DateOfBirth = registerModelRequest.DateOfBirth,
             Gender = registerModelRequest.Gender.ToString(),
-            ProfilePictureURL = registerModelRequest.ProfilePictureURL,
+            //ProfilePictureURL = registerModelRequest.ProfilePictureURL,
+            ProfilePictureURL = profileImageUrl,
             Bio = registerModelRequest.Bio,
             PhoneNumber = registerModelRequest.PhoneNumber,
             Role = RoleEnums.Customer.ToString(),
