@@ -35,7 +35,7 @@ public class AuthController : ApiControllerBase
     [HttpPost]
     [Route("register/customer")]
     [SwaggerOperation("Create new customer with default wallet")]
-    public async Task<IActionResult> RegisterCustomer([FromBody] RegisterCustomerModelRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> RegisterCustomer([FromForm] RegisterCustomerModelRequest request, CancellationToken cancellationToken)
     {
         if(!ModelState.IsValid)
         {
