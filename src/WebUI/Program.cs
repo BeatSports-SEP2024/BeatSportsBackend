@@ -15,6 +15,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Services.VnPay.Config;
 using Microsoft.AspNetCore.SignalR;
 using WebAPI.Controllers.ChatHubs;
+using Microsoft.EntityFrameworkCore.Storage;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -74,6 +76,11 @@ builder.Services.AddAuthentication(options =>
 
 //SignalR
 builder.Services.AddSignalR();
+
+// Configure Redis connection
+var redisConnectionString = "redis-10372.c256.us-east-1-2.ec2.redns.redis-cloud.com:10372,password=123456";
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
+builder.Services.AddScoped<StackExchange.Redis.IDatabase>(sp => sp.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
 
 builder.Services.AddSwaggerGen(config =>
 {
