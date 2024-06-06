@@ -10,4 +10,5 @@ public class CourtSubdivisionResponse : IMapFrom<CourtSubdivision>
     public string? ImageURL { get; set; }
     public bool IsActive { get; set; }
     public decimal BasePrice { get; set; }
+    public string? CourtSubdivisionName { get; set; }
 }
