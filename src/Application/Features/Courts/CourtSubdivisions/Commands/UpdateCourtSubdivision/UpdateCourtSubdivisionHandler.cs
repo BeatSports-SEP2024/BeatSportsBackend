@@ -24,6 +24,7 @@ public class UpdateCourtSubdivisionHandler : IRequestHandler<UpdateCourtSubdivis
         cs.Description = request.Description;
         cs.ImageURL = request.ImageURL;
         cs.BasePrice = request.BasePrice;
+        cs.CourtSubdivisionName = request.CourtSubdivisionName;
 
         _dbContext.CourtSubdivisions.Update(cs);
         _dbContext.SaveChanges();

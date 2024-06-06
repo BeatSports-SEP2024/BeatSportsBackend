@@ -8,4 +8,5 @@ public class CreateCourtSubdivisionCommand : IRequest<BeatSportsResponse>
     public string? Description { get; set; }
     public string? ImageURL { get; set; }
     public decimal BasePrice { get; set; }
+    public string? CourtSubdivisionName { get; set; }
 }
