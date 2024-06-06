@@ -29,6 +29,7 @@ public class CreateCourtSubdivisionHandler : IRequestHandler<CreateCourtSubdivis
             ImageURL = request.ImageURL,
             Description = request.Description,
             IsActive = true,
+            CourtSubdivisionName = request.CourtSubdivisionName,
         };
         _dbContext.CourtSubdivisions.Add(courtSubdivision);
         _dbContext.SaveChanges();
