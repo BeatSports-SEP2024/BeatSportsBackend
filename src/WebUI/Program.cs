@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.SignalR;
 using WebAPI.Controllers.ChatHubs;
 using Microsoft.EntityFrameworkCore.Storage;
 using StackExchange.Redis;
+using WebAPI.Controllers.Queries;
+using BeatSportsAPI.Domain.Entities;
 using Services.Momo.Config;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -79,6 +81,10 @@ builder.Services.AddAuthentication(options =>
 
 //SignalR
 builder.Services.AddSignalR();
+
+//GraphQl
+builder.Services.AddGraphQLServer()
+    .AddQueryType<QueryDatas>();
 
 // Configure Redis connection
 var redisConnectionString = "redis-10372.c256.us-east-1-2.ec2.redns.redis-cloud.com:10372,password=123456";
@@ -159,5 +165,9 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.MapFallbackToFile("index.html"); ;
+
+//Config Graphql
+app.MapControllers();
+app.MapGraphQL("/graphql");
 
 app.Run();
