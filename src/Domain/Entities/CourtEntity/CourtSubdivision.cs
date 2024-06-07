@@ -14,6 +14,6 @@ public class CourtSubdivision : BaseAuditableEntity
 
     public virtual Court Court { get; set; }
     public virtual IList<RoomMatch> RoomMatch { get; set; } = null!;
-    public virtual Booking Bookings { get; set; } = null!;
+    public virtual IList<Booking> Bookings { get; set; } = null!;
     public virtual IList<TimePeriod>? TimePeriods { get; set; }
 }
