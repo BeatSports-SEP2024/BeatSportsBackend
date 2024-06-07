@@ -85,6 +85,11 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSp
                         EndTimePlaying = request.EndTimePlaying,
                         BookingStatus = BookingEnums.Successfully.ToString(),
                     };
+
+                    if(newBooking != null)
+                    {
+                        isValidCampaign.QuantityOfCampaign -= 1;
+                    }
                     await _beatSportsDbContext.Bookings.AddAsync(newBooking);
                     await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
 
