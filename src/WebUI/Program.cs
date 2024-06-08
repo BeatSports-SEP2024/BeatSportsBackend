@@ -84,7 +84,8 @@ builder.Services.AddSignalR();
 
 //GraphQl
 builder.Services.AddGraphQLServer()
-    .AddQueryType<QueryDatas>();
+    .AddQueryType<QueryDatas>()
+    .AddType<Account>();
 
 // Configure Redis connection
 var redisConnectionString = "redis-10372.c256.us-east-1-2.ec2.redns.redis-cloud.com:10372,password=123456";
