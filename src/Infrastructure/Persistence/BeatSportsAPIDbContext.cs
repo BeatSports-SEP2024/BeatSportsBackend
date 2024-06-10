@@ -510,52 +510,55 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
     //    var bookingId2 = Guid.NewGuid();
     //    var bookingId3 = Guid.NewGuid();
 
-    //    builder.Entity<Booking>().HasData(
-    //        new Booking
-    //        {
-    //            Id = bookingId1,
-    //            CustomerId = customer1Id,
-    //            CampaignId = discount20,
-    //            CourtSubdivisionId = courtSubdivisionId1,
-    //            PlayingDate = DateTime.Today.AddDays(1),
-    //            StartTimePlaying = new TimeSpan(18, 0, 0), // 6 PM
-    //            EndTimePlaying = new TimeSpan(20, 0, 0), // 8 PM
-    //            BookingDate = DateTime.Today,
-    //            TotalAmount = 1000,
-    //            BookingStatus = "Approved",
-    //            IsRoomBooking = false,
-    //            IsDeposit = true
-    //        },
-    //        new Booking
-    //        {
-    //            Id = bookingId2,
-    //            CustomerId = customer2Id,
-    //            CampaignId = christmas,
-    //            CourtSubdivisionId = courtSubdivisionId2,
-    //            PlayingDate = DateTime.Today.AddDays(2),
-    //            StartTimePlaying = new TimeSpan(17, 0, 0), // 5 PM
-    //            EndTimePlaying = new TimeSpan(19, 0, 0), // 7 PM
-    //            BookingDate = DateTime.Today,
-    //            TotalAmount = 1200,
-    //            BookingStatus = "Approved",
-    //            IsRoomBooking = true,
-    //            IsDeposit = false
-    //        },
-    //        new Booking
-    //        {
-    //            Id = bookingId3,
-    //            CustomerId = customer3Id,
-    //            CampaignId = lunarnewyear,
-    //            CourtSubdivisionId = courtSubdivisionId3,
-    //            PlayingDate = DateTime.Today.AddDays(3),
-    //            StartTimePlaying = new TimeSpan(20, 0, 0), // 8 PM
-    //            EndTimePlaying = new TimeSpan(22, 0, 0), // 10 PM
-    //            BookingDate = DateTime.Today,
-    //            TotalAmount = 800,
-    //            BookingStatus = "Approved",
-    //            IsRoomBooking = false,
-    //            IsDeposit = true
-    //        });
+        builder.Entity<Booking>().HasData(
+            new Booking
+            {
+                Id = bookingId1,
+                CustomerId = customer1Id,
+                CampaignId = discount20,
+                CourtSubdivisionId = courtSubdivisionId1,
+                PlayingDate = DateTime.Today.AddDays(1),
+                StartTimePlaying = new TimeSpan(18, 0, 0), // 6 PM
+                EndTimePlaying = new TimeSpan(20, 0, 0), // 8 PM
+                BookingDate = DateTime.Today,
+                TotalAmount = 1000,
+                BookingStatus = "Approved",
+                IsRoomBooking = false,
+                IsDeposit = true
+            },
+            new Booking
+            {
+                Id = bookingId2,
+                CustomerId = customer2Id,
+                CampaignId = christmas,
+                CourtSubdivisionId = courtSubdivisionId2,
+                PlayingDate = DateTime.Today.AddDays(2),
+                StartTimePlaying = new TimeSpan(17, 0, 0), // 5 PM
+                EndTimePlaying = new TimeSpan(19, 0, 0), // 7 PM
+                BookingDate = DateTime.Today,
+                TotalAmount = 1200,
+                BookingStatus = "Approved",
+                IsRoomBooking = true,
+                IsDeposit = false
+            },
+            new Booking
+            {
+                Id = bookingId3,
+                CustomerId = customer3Id,
+                CampaignId = lunarnewyear,
+                CourtSubdivisionId = courtSubdivisionId3,
+                PlayingDate = DateTime.Today.AddDays(3),
+                StartTimePlaying = new TimeSpan(20, 0, 0), // 8 PM
+                EndTimePlaying = new TimeSpan(22, 0, 0), // 10 PM
+                BookingDate = DateTime.Today,
+                TotalAmount = 800,
+                BookingStatus = "Approved",
+                IsRoomBooking = false,
+                IsDeposit = true
+            });
+        var timePeriodId1 = Guid.NewGuid();
+        var timePeriodId2 = Guid.NewGuid();
+        var timePeriodId3 = Guid.NewGuid();
 
     //    var roomMatch1 = Guid.NewGuid();
     //    var roomMatch2 = Guid.NewGuid();
