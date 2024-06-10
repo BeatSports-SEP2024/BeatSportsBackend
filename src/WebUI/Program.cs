@@ -1,4 +1,4 @@
-using BeatSportsAPI.Infrastructure.Persistence;
+using BeatSportsAPI.Infrastructure.Common;
 using WebAPI;
 using Hangfire;
 using Microsoft.OpenApi.Models;
@@ -85,7 +85,7 @@ builder.Services.AddGraphQLServer()
     .AddType<Account>();
 
 // Configure Redis connection
-var redisConnectionString = "redis-10372.c256.us-east-1-2.ec2.redns.redis-cloud.com:10372,password=123456";
+var redisConnectionString = GetJsonInAppSettingsExtension.GetJson("Redis:RedisConnectionStrings");
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
 builder.Services.AddScoped<StackExchange.Redis.IDatabase>(sp => sp.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
 
