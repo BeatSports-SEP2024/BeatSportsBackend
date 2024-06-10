@@ -564,7 +564,6 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
             {
                 Id = bookingId1,
                 CustomerId = customer1Id,
-                RoomMatchId = roomMatch1,
                 CampaignId = discount20,
                 CourtSubdivisionId = courtSubdivisionId1,
                 PlayingDate = DateTime.Today.AddDays(1),
@@ -580,7 +579,6 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
             {
                 Id = bookingId2,
                 CustomerId = customer2Id,
-                RoomMatchId = roomMatch2,
                 CampaignId = christmas,
                 CourtSubdivisionId = courtSubdivisionId2,
                 PlayingDate = DateTime.Today.AddDays(2),
@@ -596,7 +594,6 @@ public class BeatSportsAPIDbContext : ApiAuthorizationDbContext<ApplicationUser>
             {
                 Id = bookingId3,
                 CustomerId = customer3Id,
-                RoomMatchId = roomMatch3,
                 CampaignId = lunarnewyear,
                 CourtSubdivisionId = courtSubdivisionId3,
                 PlayingDate = DateTime.Today.AddDays(3),
