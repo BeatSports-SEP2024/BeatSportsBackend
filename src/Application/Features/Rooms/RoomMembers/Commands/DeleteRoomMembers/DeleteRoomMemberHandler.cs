@@ -15,18 +15,18 @@ public class DeleteRoomMemberHandler : IRequestHandler<DeleteRoomMemberCommand, 
 
     public async Task<BeatSportsResponse> Handle(DeleteRoomMemberCommand request, CancellationToken cancellationToken)
     {
-        var roomMembers = _beatSportsDbContext.RoomMembers
-            .Where(rm => rm.Id == request.RoomMemberId)
-            .SingleOrDefault();
-        if (roomMembers == null)
+        var isValidRoomMember = _beatSportsDbContext.RoomMembers
+            .FirstOrDefault(rm => rm.CustomerId == request.CustomerId 
+            && rm.RoomMatchId == request.RoomMatchId);
+        if (isValidRoomMember == null)
         {
-            throw new NotFoundException($"{request.RoomMemberId} does not existed");
+            throw new NotFoundException($"{request.CustomerId} or {request.RoomMatchId} does not existed");
         }
-        _beatSportsDbContext.RoomMembers.Remove(roomMembers);
+        _beatSportsDbContext.RoomMembers.Remove(isValidRoomMember);
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
         return new BeatSportsResponse
         {
-            Message = $"Delete {request.RoomMemberId} successfully"
+            Message = $"Delete room member successfully"
         };
     }
 }
