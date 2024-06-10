@@ -243,19 +243,23 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         var courtId = Guid.NewGuid();
         var court1Id = Guid.NewGuid();
         var court2Id = Guid.NewGuid();
+        var court3Id = Guid.NewGuid();
+        var court4Id = Guid.NewGuid();
+        var court5Id = Guid.NewGuid();
+        var court6Id = Guid.NewGuid();
         #region Courts
         builder.Entity<Court>()
             .HasData(new Court
             {
                 Id = courtId,
                 OwnerId = ownerId,
-                Description = "Description Sample",
-                CourtName = "Court Name Sample",
-                Address = "Address Sample",
-                GoogleMapURLs = "Address Sample",
-                TimeStart = new TimeSpan(14, 30, 00),
-                TimeEnd = new TimeSpan(15, 30, 00),
-                PlaceId = "From Google Map",
+                Description = "Sân bóng mini tiêu chuẩn cao (chuẩn FiFa) với hệ thống phụ trợ (nhà thay đồ, nhà tắm, nhà vệ sinh) sạch sẽ thoáng mát duy nhất.",
+                CourtName = "Sân bóng đá mini Long Trường Quận 9",
+                Address = "Số 45 Bùi Xương Trạch, phường Long Trường, Quận 9, Thành phố, Thủ Đức, Thành phố Hồ Chí Minh",
+                GoogleMapURLs = "https://maps.app.goo.gl/s6yWXEpDYU1DNjuF6",
+                TimeStart = new TimeSpan(04, 00, 00),
+                TimeEnd = new TimeSpan(23, 59, 59),
+                PlaceId = "10.805515145695411, 106.81088572205702",
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
@@ -264,13 +268,13 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = court1Id,
                 OwnerId = owner1Id,
-                Description = "Description Sample",
-                CourtName = "Court Name Sample",
-                Address = "Address Sample",
-                GoogleMapURLs = "Address Sample",
-                TimeStart = new TimeSpan(14, 30, 00),
-                TimeEnd = new TimeSpan(15, 30, 00),
-                PlaceId = "From Google Map 1",
+                Description = "Sân cầu lông trang bị tiện nghi đầy đủ, giữ xe an ninh",
+                CourtName = "Sân cầu lông B-ZONE 11",
+                Address = "40 Đ. Số 11, Trường Thọ, Thủ Đức, Thành phố Hồ Chí Minh, Vietnam",
+                GoogleMapURLs = "https://maps.app.goo.gl/cwrHGkHsM4769eSE7",
+                TimeStart = new TimeSpan(05, 00, 00),
+                TimeEnd = new TimeSpan(22, 00, 00),
+                PlaceId = "10.845057917596483, 106.75295823555061",
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
@@ -279,16 +283,59 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = court2Id,
                 OwnerId = owner1Id,
-                Description = "Description Sample",
-                CourtName = "Court Name Sample",
-                Address = "Address Sample",
-                GoogleMapURLs = "Address Sample",
+                Description = "Sân đẹp, cỏ xịn, đèn sáng, có chỗ để xe oto, bóng xịn",
+                CourtName = "Sân bóng đá VNV",
+                Address = "Đ. Số 11/Hẻm 52 Tổ 1, Khu phố 9, Thủ Đức, Thành phố Hồ Chí Minh, Vietnam",
+                GoogleMapURLs = "https://maps.app.goo.gl/UUCSZm1p9ngEx7k79",
                 TimeStart = new TimeSpan(14, 30, 00),
                 TimeEnd = new TimeSpan(15, 30, 00),
-                PlaceId = "From Google Map 2",
+                PlaceId = "10.844905847478088, 106.75213708986735",
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
+            },
+            new Court
+            {
+                Id = court3Id,
+                OwnerId = owner1Id,
+                Description = "Sân cầu lông hiện đại với sàn gỗ, thuận tiện cho các hoạt động thi đấu và tập luyện.",
+                CourtName = "Sân cầu lông Marie Curie",
+                Address = "26 Lê Quý Đôn, Phường Võ Thị Sáu, Quận 3, Thành phố Hồ Chí Minh",
+                GoogleMapURLs = "https://maps.google.com/?q=26+Le+Quy+Don",
+                TimeStart = new TimeSpan(05, 00, 00),
+                TimeEnd = new TimeSpan(22, 00, 00),
+                PlaceId = "10.786887, 106.690193",
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false
+            }, new Court
+            {
+                Id = court4Id,
+                OwnerId = ownerId,
+                Description = "Sân bóng chuyền ngoài trời với không gian rộng rãi, phù hợp cho cả tập luyện và thi đấu.",
+                CourtName = "Sân bóng chuyền Tân Bình",
+                Address = "36/5 Luy Bán Bích, Phường Tân Thới Hòa, Quận Tân Phú, Thành phố Hồ Chí Minh",
+                GoogleMapURLs = "https://maps.google.com/?q=36/5+Luy+Bán+Bích",
+                TimeStart = new TimeSpan(06, 00, 00),
+                TimeEnd = new TimeSpan(21, 00, 00),
+                PlaceId = "10.768199, 106.628938",
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false
+            }, new Court
+            {
+                Id = court5Id,
+                OwnerId = Guid.NewGuid(),
+                Description = "Sân bóng đá lớn với cỏ nhân tạo chất lượng cao, có khán đài và hệ thống chiếu sáng tốt.",
+                CourtName = "Sân bóng đá Phú Thọ",
+                Address = "219 Lý Thường Kiệt, Phường 15, Quận 11, Thành phố Hồ Chí Minh",
+                GoogleMapURLs = "https://maps.google.com/?q=219+Lý+Thường+Kiệt",
+                TimeStart = new TimeSpan(04, 00, 00),
+                TimeEnd = new TimeSpan(23, 30, 00),
+                PlaceId = "10.769555, 106.663338",
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false
             });
         #endregion
         var courtSubdivisionId1 = Guid.NewGuid();
@@ -376,30 +423,18 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         builder.Entity<CourtSportCategory>()
             .HasData(new CourtSportCategory
             {
-                Id = Guid.NewGuid(),
                 CourtId = court1Id,
                 SportCategoryId = soccerId,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
             },
             new CourtSportCategory
             {
-                Id = Guid.NewGuid(),
                 CourtId = court1Id,
                 SportCategoryId = badmintionId,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
             },
             new CourtSportCategory
             {
-                Id = Guid.NewGuid(),
                 CourtId = court2Id,
                 SportCategoryId = badmintionId,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
             }
             );
         #endregion
@@ -617,23 +652,15 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         builder.Entity<RoomMember>()
             .HasData(new RoomMember
             {
-                Id = Guid.NewGuid(),
                 CustomerId = customer1Id,
                 RoomMatchId = roomMatch1,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
                 RoleInRoom = "Master",
-                IsDelete = false,
             },
             new RoomMember
             {
-                Id = Guid.NewGuid(),
                 CustomerId = customer2Id,
                 RoomMatchId = roomMatch1,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
                 RoleInRoom = "Member",
-                IsDelete = false,
             });
         #endregion
     }

@@ -25,14 +25,6 @@ public class MappingProfile : Profile
         //Level Mapping
         CreateMap<Level, LevelResponse>()
             .ForMember(dest => dest.LevelId, opt => opt.MapFrom(src => src.Id));
-
-        //Room Member Mapping
-        CreateMap<RoomMember, RoomMemberResponse>()
-            .ForMember(dest => dest.RoomMemberId, opt => opt.MapFrom(src => src.Id));
-
-        //Room Member Mapping
-        CreateMap<RoomMember, RoomMemberWithDetailsResponse>()
-            .ForMember(dest => dest.RoomMemberId, opt => opt.MapFrom(src => src.Id));
     }
 
     private void ApplyMappingsFromAssembly(Assembly assembly)

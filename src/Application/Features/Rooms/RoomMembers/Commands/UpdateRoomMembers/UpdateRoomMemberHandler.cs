@@ -15,21 +15,21 @@ public class UpdateRoomMemberHandler : IRequestHandler<UpdateRoomMemberCommand, 
 
     public async Task<BeatSportsResponse> Handle(UpdateRoomMemberCommand request, CancellationToken cancellationToken)
     {
-        var isRoomMemberExisted = _beatSportsDbContext.RoomMembers
-            .Where(rm => rm.Id == request.RoomMemberId)
-            .SingleOrDefault();
+        var isValidRoomMember = _beatSportsDbContext.RoomMembers
+             .FirstOrDefault(rm => rm.CustomerId == request.CustomerId
+             && rm.RoomMatchId == request.RoomMatchId);
 
-        if (isRoomMemberExisted == null)
+        if (isValidRoomMember == null)
         {
             throw new NotFoundException($"{request.RoomMemberId} does not found");
         }
         else
         {
-            isRoomMemberExisted.CustomerId = request.CustomerId;
-            isRoomMemberExisted.RoomMatchId = request.RoomMatchId;
-            isRoomMemberExisted.RoleInRoom = request.RoleInRoom.ToString();
+            isValidRoomMember.CustomerId = request.CustomerId;
+            isValidRoomMember.RoomMatchId = request.RoomMatchId;
+            isValidRoomMember.RoleInRoom = request.RoleInRoom.ToString();
 
-            _beatSportsDbContext.RoomMembers.Update(isRoomMemberExisted);
+            _beatSportsDbContext.RoomMembers.Update(isValidRoomMember);
             await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
         }
 

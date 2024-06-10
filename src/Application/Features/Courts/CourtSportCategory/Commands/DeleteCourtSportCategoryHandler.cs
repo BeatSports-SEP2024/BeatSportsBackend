@@ -14,13 +14,14 @@ public class DeleteCourtSportCategoryHandler : IRequestHandler<DeleteCourtSportC
     public async Task<BeatSportsResponse> Handle(DeleteCourtSportCategoryCommand request, CancellationToken cancellationToken)
     {
         var updateCourtSport = _beatSportsDbContext.CourtSportCategories
-            .Where(t => t.Id == request.CourtSportCategoryId && !t.IsDelete)
+            .Where(t => t.CourtId == request.CourtId 
+            && t.SportCategoryId == request.SportCategoriesId)
             .FirstOrDefault();
         if(updateCourtSport == null)
         {
             throw new NotFoundException("Object not existed");
         }
-        updateCourtSport.IsDelete = true;
+        _beatSportsDbContext.CourtSportCategories.Remove(updateCourtSport);
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
         return new BeatSportsResponse
         {

@@ -11,5 +11,7 @@ namespace BeatSportsAPI.Application.Features.Rooms.RoomMembers.Commands.DeleteRo
 public class DeleteRoomMemberCommand : IRequest<BeatSportsResponse>
 {
     [Required]
-    public Guid RoomMemberId { get; set; }
+    public Guid CustomerId { get; set; }
+    [Required]
+    public Guid RoomMatchId { get; set; }
 }

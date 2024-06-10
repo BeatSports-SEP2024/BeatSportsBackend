@@ -24,7 +24,6 @@ public class GetCourtSportCategoryHandler : IRequestHandler<GetCourtSportCategor
             throw new BadRequestException("Page index and page size cannot less than 0");
         }
         var response = await _beatSportsDbContext.CourtSportCategories
-            .Where(tp => !tp.IsDelete)
             .ProjectTo<CourtSportCategoryResponse>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(request.PageIndex, request.PageSize);
         return response;
