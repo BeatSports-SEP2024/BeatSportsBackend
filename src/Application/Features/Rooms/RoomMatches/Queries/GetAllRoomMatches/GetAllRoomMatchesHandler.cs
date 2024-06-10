@@ -40,7 +40,6 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
         {
             RoomMatchId = c.Id,
             BookingId = c.BookingId,
-            CourtSubdivisionId = c.CourtSubdivisionId,
             LevelId = c.LevelId,
             StartTimeRoom = c.StartTimeRoom,
             EndTimeRoom = c.EndTimeRoom,

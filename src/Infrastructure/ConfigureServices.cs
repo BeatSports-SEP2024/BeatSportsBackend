@@ -42,8 +42,8 @@ public static class ConfigureServices
         //    .AddEntityFrameworkStores<BeatSportsAPIDbContext>()
         //    .AddDefaultTokenProviders();
 
-        services.AddIdentityServer()
-            .AddApiAuthorization<ApplicationUser, BeatSportsAPIDbContext>();
+        //services.AddIdentityServer()
+        //    .AddApiAuthorization<ApplicationUser, BeatSportsAPIDbContext>();
 
         services.AddTransient<IDateTime, DateTimeService>();
         services.AddTransient<IIdentityService, IdentityService>();
