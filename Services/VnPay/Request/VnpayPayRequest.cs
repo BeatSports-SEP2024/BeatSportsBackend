@@ -14,7 +14,7 @@ public class VnpayPayRequest
         = new SortedList<string, string>(new VnpayCompare());
     public VnpayPayRequest() { }
     public VnpayPayRequest(string version, string tmnCode, DateTime createDate, string ipAddress,
-        decimal amount, string currCode, string orderType, string orderInfo,
+        long amount, string currCode, string orderType, string orderInfo,
         string returnUrl, string txnRef)
     {
         this.vnp_Locale = "vn";
@@ -23,7 +23,7 @@ public class VnpayPayRequest
         this.vnp_CurrCode = currCode;
         this.vnp_CreateDate = createDate.ToString("yyyyMMddHHmmss");
         this.vnp_TmnCode = tmnCode;
-        this.vnp_Amount = (int)amount * 100;
+        this.vnp_Amount = amount * 100;
         this.vnp_Command = "pay";
         this.vnp_OrderType = orderType;
         this.vnp_OrderInfo = orderInfo;
@@ -64,10 +64,10 @@ public class VnpayPayRequest
             requestData.Add("vnp_IpAddr", vnp_IpAddr);
         if (vnp_Locale != null)
             requestData.Add("vnp_Locale", vnp_Locale);
-        if (vnp_OrderInfo != null)
-            requestData.Add("vnp_OrderInfo", vnp_OrderInfo);
         if (vnp_OrderType != null)
             requestData.Add("vnp_OrderType", vnp_OrderType);
+        if (vnp_OrderInfo != null)
+            requestData.Add("vnp_OrderInfo", vnp_OrderInfo);
         if (vnp_ReturnUrl != null)
             requestData.Add("vnp_ReturnUrl", vnp_ReturnUrl);
         if (vnp_TmnCode != null)
@@ -79,15 +79,15 @@ public class VnpayPayRequest
         if (vnp_Version != null)
             requestData.Add("vnp_Version", vnp_Version);
     }
-    public decimal? vnp_Amount { get; set; }
+    public long? vnp_Amount { get; set; }
     public string? vnp_Command { get; set; }
     public string? vnp_CreateDate { get; set; }
     public string? vnp_CurrCode { get; set; }
     public string? vnp_BankCode { get; set; }
     public string? vnp_IpAddr { get; set; }
     public string? vnp_Locale { get; set; }
-    public string? vnp_OrderInfo { get; set; }
     public string? vnp_OrderType { get; set; }
+    public string? vnp_OrderInfo { get; set; }
     public string? vnp_ReturnUrl { get; set; }
     public string? vnp_TmnCode { get; set; }
     public string? vnp_ExpireDate { get; set; }

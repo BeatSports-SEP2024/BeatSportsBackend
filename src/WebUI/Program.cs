@@ -19,6 +19,13 @@ using Microsoft.EntityFrameworkCore.Storage;
 using StackExchange.Redis;
 using WebAPI.Controllers.Queries;
 using BeatSportsAPI.Domain.Entities;
+using Microsoft.AspNetCore.SignalR;
+using WebAPI.Controllers.ChatHubs;
+using Microsoft.EntityFrameworkCore.Storage;
+using StackExchange.Redis;
+using WebAPI.Controllers.Queries;
+using BeatSportsAPI.Domain.Entities;
+using Services.Momo.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -55,6 +62,8 @@ builder.Services.AddHangfireServer();
 builder.Services.AddHttpClient();
 builder.Services.Configure<VnpayConfig>(
                 builder.Configuration.GetSection(VnpayConfig.ConfigName));
+builder.Services.Configure<MomoConfig>(
+                builder.Configuration.GetSection(MomoConfig.ConfigName));
 
 builder.Services.AddAuthentication(options =>
 {

@@ -25,11 +25,11 @@ public class VnpayPayResponse
     [JsonProperty(PropertyName = "vnp_CardType")]
     public string vnp_CardType { get; set; } = string.Empty;
 
-    [JsonProperty(PropertyName = "vnp_OrderInfo")]
-    public string vnp_OrderInfo { get; set; } = string.Empty;
-
     [JsonProperty(PropertyName = "vnp_OrderType")]
     public string vnp_OrderType { get; set; } = string.Empty;
+
+    [JsonProperty(PropertyName = "vnp_OrderInfo")]
+    public string vnp_OrderInfo { get; set; } = string.Empty;
 
     [JsonProperty(PropertyName = "vnp_TransactionNo")]
     public string vnp_TransactionNo { get; set; } = string.Empty;
@@ -47,7 +47,7 @@ public class VnpayPayResponse
     public string vnp_SecureHash { get; set; } = string.Empty;
 
     [JsonProperty(PropertyName = "vnp_Amount")]
-    public int? vnp_Amount { get; set; }
+    public long? vnp_Amount { get; set; }
 
     [JsonProperty(PropertyName = "vnp_ResponseCode")]
     public string? vnp_ResponseCode { get; set; }
@@ -83,10 +83,10 @@ public class VnpayPayResponse
             responseData.Add("vnp_BankTranNo", vnp_BankTranNo.ToString() ?? string.Empty);
         if (!string.IsNullOrEmpty(vnp_CardType))
             responseData.Add("vnp_CardType", vnp_CardType.ToString() ?? string.Empty);
-        if (!string.IsNullOrEmpty(vnp_OrderInfo))
-            responseData.Add("vnp_OrderInfo", vnp_OrderInfo.ToString() ?? string.Empty);
         if (!string.IsNullOrEmpty(vnp_OrderType))
             responseData.Add("vnp_OrderType", vnp_OrderType.ToString() ?? string.Empty);
+        if (!string.IsNullOrEmpty(vnp_OrderInfo))
+            responseData.Add("vnp_OrderInfo", vnp_OrderInfo.ToString() ?? string.Empty);
         if (!string.IsNullOrEmpty(vnp_TransactionNo))
             responseData.Add("vnp_TransactionNo", vnp_TransactionNo.ToString() ?? string.Empty);
         if (!string.IsNullOrEmpty(vnp_TransactionStatus))
