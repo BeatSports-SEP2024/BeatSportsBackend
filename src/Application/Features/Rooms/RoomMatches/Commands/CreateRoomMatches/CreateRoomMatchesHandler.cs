@@ -41,7 +41,6 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
         var room = new RoomMatch()
         {
             RoomName = request.RoomName,
-            CourtSubdivisionId = request.CourtSubdivisionId,
             BookingId = request.BookingId,
             LevelId = request.LevelId,
             StartTimeRoom = request.StartTimeRoom,

@@ -37,7 +37,6 @@ public class UpdateRoomMatchesHandler : IRequestHandler<UpdateRoomMatchesCommand
 
         room.BookingId = request.BookingId;
         room.RoomName = request.RoomName;
-        room.CourtSubdivisionId = request.CourtSubdivisionId;
         room.LevelId = request.LevelId;
         room.StartTimeRoom = request.StartTimeRoom;
         room.EndTimeRoom = request.EndTimeRoom;
