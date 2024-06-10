@@ -341,16 +341,20 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         var courtSubdivisionId1 = Guid.NewGuid();
         var courtSubdivisionId2 = Guid.NewGuid();
         var courtSubdivisionId3 = Guid.NewGuid();
+        var courtSubdivisionId4 = Guid.NewGuid();
+        var courtSubdivisionId5 = Guid.NewGuid();
+        var courtSubdivisionId6 = Guid.NewGuid();
+        var courtSubdivisionId7 = Guid.NewGuid();
         #region CourtSubdivision
         builder.Entity<CourtSubdivision>()
             .HasData(new CourtSubdivision
             {
                 Id = courtSubdivisionId1,
                 CourtId = court1Id,
-                Description = "Sample Description",
-                ImageURL = "Sample Image",
+                Description = "Sân cầu lông B-ZONE 11, phân cấp 1",
+                ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fsieuthicaulong.vn%2Fsan-cau-long%2Fho-chi-minh%2Fclb-san-cau-long-b-zone-11-thu-duc-hcm&psig=AOvVaw0HN4hzDZNEFb3Qak2ZKR0A&ust=1718126663044000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOib5tzG0YYDFQAAAAAdAAAAABAE",
                 IsActive = true,
-                BasePrice = 120000,
+                BasePrice = 60000,
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
@@ -359,10 +363,10 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = courtSubdivisionId2,
                 CourtId = court1Id,
-                Description = "Sample Description",
-                ImageURL = "Sample Image",
+                Description = "Sân cầu lông B-ZONE 11, phân cấp 2",
+                ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fsieuthicaulong.vn%2Fsan-cau-long%2Fho-chi-minh%2Fclb-san-cau-long-b-zone-11-thu-duc-hcm&psig=AOvVaw0HN4hzDZNEFb3Qak2ZKR0A&ust=1718126663044000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOib5tzG0YYDFQAAAAAdAAAAABAQ",
                 IsActive = true,
-                BasePrice = 120000,
+                BasePrice = 110000,
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
@@ -371,8 +375,56 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = courtSubdivisionId3,
                 CourtId = court1Id,
-                Description = "Sample Description",
-                ImageURL = "Sample Image",
+                Description = "Sân cầu lông B-ZONE 11, phân cấp 3",
+                ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fsieuthicaulong.vn%2Fsan-cau-long%2Fho-chi-minh%2Fclb-san-cau-long-b-zone-11-thu-duc-hcm&psig=AOvVaw0HN4hzDZNEFb3Qak2ZKR0A&ust=1718126663044000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOib5tzG0YYDFQAAAAAdAAAAABB4",
+                IsActive = true,
+                BasePrice = 110000,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false,
+            },
+            new CourtSubdivision
+            {
+                Id = courtSubdivisionId4,
+                CourtId = court5Id,
+                Description = "Sân bóng đá Phú Thọ , sân 1",
+                ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2F797348309003119598%2F&psig=AOvVaw3O8jui3j21qnIivkSvD8yP&ust=1718127217945000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCIDC_eXI0YYDFQAAAAAdAAAAABAJ",
+                IsActive = true,
+                BasePrice = 110000,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false,
+            },
+            new CourtSubdivision
+            {
+                Id = courtSubdivisionId5,
+                CourtId = court5Id,
+                Description = "Sân bóng đá Phú Thọ , sân 2",
+                ImageURL = "https://duongminhfc.com/images/banners/san-bong-da-phu-tho-quan-11.jpg",
+                IsActive = true,
+                BasePrice = 120000,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false,
+            },
+            new CourtSubdivision
+            {
+                Id = courtSubdivisionId6,
+                CourtId = court4Id,
+                Description = "Sân chuyền Tân Bình , sân 1",
+                ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.myuc.vn%2Fson-san-bong-chuyen-tren-be-tong-xi-mang-voi-6-lop-son-co-hat-cao-su-nhu-san-us-open-chong-nut-polyurethane-va-decoturf-usa-84p.html&psig=AOvVaw0Tdhs_letBnUYzuVpHLEY2&ust=1718127751147000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCMDc_ePK0YYDFQAAAAAdAAAAABAJ",
+                IsActive = true,
+                BasePrice = 120000,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false,
+            },
+            new CourtSubdivision
+            {
+                Id = courtSubdivisionId7,
+                CourtId = court4Id,
+                Description = "Sân chuyền Tân Bình , sân 2",
+                ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.myuc.vn%2Fson-san-bong-chuyen-tren-be-tong-xi-mang-voi-6-lop-son-co-hat-cao-su-nhu-san-us-open-chong-nut-polyurethane-va-decoturf-usa-84p.html&psig=AOvVaw0Tdhs_letBnUYzuVpHLEY2&ust=1718127751147000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCMDc_ePK0YYDFQAAAAAdAAAAABAJ",
                 IsActive = true,
                 BasePrice = 120000,
                 Created = DateTime.UtcNow,
@@ -440,6 +492,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         #endregion
         var discount20 = Guid.NewGuid();
         var christmas = Guid.NewGuid();
+        var birthday = Guid.NewGuid();
         var lunarnewyear = Guid.NewGuid();
         #region Campaign
         builder.Entity<Campaign>()
@@ -459,7 +512,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             new Campaign
             {
                 Id = christmas,
-                CourtId = court1Id,
+                CourtId = court4Id,
                 CampaignName = "Christmas Discount!!!",
                 PercentDiscount = 25,
                 StartDateApplying = DateTime.UtcNow,
@@ -475,6 +528,19 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 CourtId = court1Id,
                 CampaignName = "Lunar New Year Discount!!!",
                 PercentDiscount = 30,
+                StartDateApplying = DateTime.UtcNow,
+                EndDateApplying = DateTime.UtcNow,
+                QuantityOfCampaign = 10,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false,
+            },
+            new Campaign
+            {
+                Id = birthday,
+                CourtId = court2Id,
+                CampaignName = "Birthday Discount!!!",
+                PercentDiscount = 25,
                 StartDateApplying = DateTime.UtcNow,
                 EndDateApplying = DateTime.UtcNow,
                 QuantityOfCampaign = 10,
@@ -518,6 +584,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         var bookingId1 = Guid.NewGuid();
         var bookingId2 = Guid.NewGuid();
         var bookingId3 = Guid.NewGuid();
+        var bookingId4 = Guid.NewGuid();
 
         builder.Entity<Booking>().HasData(
             new Booking
@@ -564,6 +631,21 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 BookingStatus = "Approved",
                 IsRoomBooking = false,
                 IsDeposit = true
+            },
+            new Booking
+            {
+                Id = bookingId4,
+                CustomerId = customer1Id,
+                CampaignId = lunarnewyear,
+                CourtSubdivisionId = courtSubdivisionId7,
+                PlayingDate = DateTime.Today.AddDays(1),
+                StartTimePlaying = new TimeSpan(18, 0, 0), // 6 PM
+                EndTimePlaying = new TimeSpan(20, 0, 0), // 8 PM
+                BookingDate = DateTime.Today,
+                TotalAmount = 1000,
+                BookingStatus = "Approved",
+                IsRoomBooking = false,
+                IsDeposit = true
             });
         var timePeriodId1 = Guid.NewGuid();
         var timePeriodId2 = Guid.NewGuid();
@@ -572,6 +654,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         var roomMatch1 = Guid.NewGuid();
         var roomMatch2 = Guid.NewGuid();
         var roomMatch3 = Guid.NewGuid();
+        var roomMatch4 = Guid.NewGuid();
         #region Room_Matches
         builder.Entity<RoomMatch>()
             .HasData(new RoomMatch
@@ -607,8 +690,22 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Id = roomMatch3,
                 BookingId = bookingId3,
                 LevelId = expert,
-                StartTimeRoom = new TimeSpan(14, 30, 00),
-                EndTimeRoom = new TimeSpan(15, 30, 00),
+                StartTimeRoom = new TimeSpan(15, 30, 00),
+                EndTimeRoom = new TimeSpan(16, 30, 00),
+                MaximumMember = 20,
+                RuleRoom = "Rule Room Sample",
+                Note = "Note Sample",
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false,
+            },
+            new RoomMatch
+            {
+                Id = roomMatch4,
+                BookingId = bookingId4,
+                LevelId = expert,
+                StartTimeRoom = new TimeSpan(09, 30, 00),
+                EndTimeRoom = new TimeSpan(10, 30, 00),
                 MaximumMember = 20,
                 RuleRoom = "Rule Room Sample",
                 Note = "Note Sample",
@@ -659,6 +756,12 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             new RoomMember
             {
                 CustomerId = customer2Id,
+                RoomMatchId = roomMatch1,
+                RoleInRoom = "Member",
+            },
+            new RoomMember
+            {
+                CustomerId = customer3Id,
                 RoomMatchId = roomMatch1,
                 RoleInRoom = "Member",
             });
