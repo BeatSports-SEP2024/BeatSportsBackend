@@ -17,7 +17,7 @@ public interface IIdentityService
     Task<Result> DeleteUserAsync(string userId);
     public RefreshToken GetRefreshToken(string token);
     Task<LoginResponse> SetNewRefreshTokenAsync(string userId);
-
+    public string GetUserIdFromToken(string token);
     Task<GoogleLoginResponse> GoogleLoginAuthAsync(GoogleLoginRequest request, CancellationToken cancellationToken);
 }
     

@@ -133,7 +133,11 @@ public class IdentityService : IIdentityService
     public async Task<TokenModel> GenerateToken(LoginModelRequest loginRequest)
     {
         var user = await _beatSportsDbContext.Accounts
-            .FirstOrDefaultAsync(u => u.UserName == loginRequest.Username);
+            .Where(u => u.UserName == loginRequest.Username)
+            .Include(x => x.Customer)
+            .Include(x => x.Owner)
+            .FirstOrDefaultAsync();
+
         var userRole = user.Role;
         JwtSecurityTokenHandler jwtHandler = new JwtSecurityTokenHandler();
         var secretKey = GetJsonInAppSettingsExtension.GetJson("Jwt:SecretKey");
@@ -264,11 +268,26 @@ public class IdentityService : IIdentityService
         
     }
 
-    public async Task<LoginResponse> SetNewRefreshTokenAsync(string userId)
+    public async Task<LoginResponse> SetNewRefreshTokenAsync(string username)
     {
         var user = _beatSportsDbContext.Accounts
-            .Where(u => u.UserName == userId)
+            .Where(u => u.UserName == username)
+            .Include(x => x.Customer)
+            .Include(x => x.Owner)
             .FirstOrDefault();
+
+
+        var id = Guid.NewGuid();
+
+        if (user.Customer == null)
+        {
+            id = user.Owner.Id;
+        }
+        else
+        {
+            id = user.Customer.Id;
+        }
+
         var loginModel = new LoginModelRequest
         {
             Username = user.UserName
@@ -287,9 +306,15 @@ public class IdentityService : IIdentityService
         SetRefreshToken(refreshToken, user, tokenModel);
         var loginResponse = new LoginResponse
         {
-            Message = "Login Successfully",
+            Message = "Successfully",
             AccessToken = tokenModel.AccessToken,
-            RefreshToken = refreshToken.Token
+            RefreshToken = refreshToken.Token,
+            UserInfo = new AccountResponseForLogin
+            {
+                Id = id,
+                FullName = user.FirstName + user.LastName,
+                Email = user.Email
+            }
         };
         
         return loginResponse;
@@ -563,6 +588,15 @@ public class IdentityService : IIdentityService
             throw new Exception($"Failed to deserialize token response: {payload}");
         }
         return tokenResponse;
+    }
+
+    public string GetUserIdFromToken(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+        var userIdClaim = jsonToken?.Claims.FirstOrDefault(claim => claim.Type == "sub");
+
+        return userIdClaim?.Value;
     }
     #endregion
 
