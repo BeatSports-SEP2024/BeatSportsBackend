@@ -47,7 +47,8 @@ public class GetAllCampaignHandler : IRequestHandler<GetAllCampaignsCommand, Pag
             StartDateApplying = c.StartDateApplying,
             EndDateApplying = c.EndDateApplying,
             Status = c.Status,
-            QuantityOfCampaign = c.QuantityOfCampaign
+            QuantityOfCampaign = c.QuantityOfCampaign,
+            CampaignImageUrl = c.CampaignImageURL
         })
         .PaginatedListAsync(request.PageIndex, request.PageSize); 
 

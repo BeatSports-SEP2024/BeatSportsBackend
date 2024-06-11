@@ -19,4 +19,5 @@ public class CampaignResponse : IMapFrom<Campaign>
     public DateTime EndDateApplying { get; set; }
     public bool Status { get; set; }
     public int QuantityOfCampaign { get; set; }
+    public string CampaignImageUrl { get; set; }
 }
