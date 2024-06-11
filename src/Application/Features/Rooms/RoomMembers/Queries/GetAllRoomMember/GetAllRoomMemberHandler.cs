@@ -21,7 +21,6 @@ public class GetAllRoomMemberHandler : IRequestHandler<GetAllRoomMemberCommand, 
     public Task<PaginatedList<RoomMemberResponse>> Handle(GetAllRoomMemberCommand request, CancellationToken cancellationToken)
     {
         var roomMember = _beatSportsDbContext.RoomMembers
-            .Where(rm => !rm.IsDelete)
             .ProjectTo<RoomMemberResponse>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(request.PageIndex, request.PageSize);
         return roomMember;

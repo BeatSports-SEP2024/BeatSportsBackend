@@ -25,20 +25,12 @@ public class UpdateCustomerHandler : IRequestHandler<UpdateCustomerCommand, Beat
         var customer = _dbContext.Customers.Where(x => x.Id == request.CustomerId)
                                      .Include(x => x.Account)
                                      .SingleOrDefault();
-        // Check duplicate
-        var customer2 = _dbContext.Customers.Where(x => x.Account.UserName == request.UserName)
-                                         .Include(x => x.Account).SingleOrDefault();
 
         if (customer == null || customer.IsDelete)
         {
             throw new BadRequestException($"Customer with Customer ID:{request.CustomerId} does not exist or have been delele");
         }
-        else if (customer2 != null)
-        {
-            throw new BadRequestException($"Customer with username:{request.UserName} is duplicate!!");
-        }
 
-        customer.Account.UserName = request.UserName;
         customer.Account.Email = request.Email;
         customer.Account.FirstName = request.FirstName;
         customer.Account.LastName = request.LastName;

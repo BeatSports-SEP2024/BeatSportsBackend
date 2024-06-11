@@ -24,19 +24,12 @@ public class UpdateOwnerHandler : IRequestHandler<UpdateOwnerCommand, BeatSports
         // Check Owner
         var owner = _dbContext.Owners.Where(x => x.Id == request.OwnerId)
                                      .Include(x => x.Account).SingleOrDefault();
-        // Check duplicate
-        var ownerList = _dbContext.Owners.Where(x => x.Account.UserName == request.UserName )
-                                         .Include(x => x.Account).SingleOrDefault();
 
         if (owner == null || owner.IsDelete)
         {
             throw new BadRequestException($"Owner with Owner ID:{request.OwnerId} does not exist or have been delele");
-        }else if(ownerList != null)
-        {
-            throw new BadRequestException($"Owner with username:{request.UserName} is duplicate!!");
         }
 
-        owner.Account.UserName = request.UserName;
         owner.Account.Email = request.Email;
         owner.Account.FirstName = request.FirstName;
         owner.Account.LastName = request.LastName;
@@ -45,7 +38,6 @@ public class UpdateOwnerHandler : IRequestHandler<UpdateOwnerCommand, BeatSports
         owner.Account.PhoneNumber = request.PhoneNumber;
         owner.Account.ProfilePictureURL = request.ProfilePictureURL;
         owner.Account.Bio = request.Bio;
-
 
         _dbContext.Owners.Update(owner);
         _dbContext.SaveChanges();
