@@ -11,6 +11,8 @@ public class Court : BaseAuditableEntity
     public string? Description { get; set; }
     public string? CourtName { get; set; }
     public string? Address { get; set; }
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
     public string? GoogleMapURLs { get; set; }
     public TimeSpan TimeStart { get; set; }
     public TimeSpan TimeEnd { get; set; }
