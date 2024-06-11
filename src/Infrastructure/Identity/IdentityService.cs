@@ -213,7 +213,7 @@ public class IdentityService : IIdentityService
         var loginResponse = new LoginResponse
         {
             AccessToken = tokenModel.AccessToken,
-            RefreshToken = refreshToken
+            RefreshToken = refreshToken.Token
         };
         return loginResponse;
     }
@@ -289,7 +289,7 @@ public class IdentityService : IIdentityService
         {
             Message = "Login Successfully",
             AccessToken = tokenModel.AccessToken,
-            RefreshToken = refreshToken
+            RefreshToken = refreshToken.Token
         };
         
         return loginResponse;

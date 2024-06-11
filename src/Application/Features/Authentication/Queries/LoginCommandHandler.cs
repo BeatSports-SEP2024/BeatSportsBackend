@@ -34,10 +34,34 @@ public class LoginCommandHandler : IRequestHandler<LoginModelRequest, LoginRespo
         {
             throw new BadRequestException("An error occur when process");
         }
+
+        var user = _beatSportsDbContext.Accounts
+                        .Where(x => x.UserName == request.Username)
+                        .Include(x => x.Customer)
+                        .Include(x => x.Owner)
+                        .FirstOrDefault();
+        
+        var id = Guid.NewGuid();
+        
+        if(user.Customer == null)
+        {
+            id = user.Owner.Id;
+        }
+        else
+        {
+            id = user.Customer.Id;
+        }
+
         return new LoginResponse {
             Message = "Login Successfully",
             AccessToken = loginResponse.AccessToken,
             RefreshToken = loginResponse.RefreshToken,
+            UserInfo = new AccountResponseForLogin
+            {
+                Id = id,
+                FullName = user.FirstName + user.LastName,
+                Email = user.Email
+            }
         };
     }
 }
