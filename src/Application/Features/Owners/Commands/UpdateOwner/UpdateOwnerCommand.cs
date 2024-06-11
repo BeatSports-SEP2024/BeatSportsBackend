@@ -12,11 +12,8 @@ namespace BeatSportsAPI.Application.Features.Owners.Commands.UpdateOwner;
 public class UpdateOwnerCommand : IRequest<BeatSportsResponse>
 {
     public Guid OwnerId { get; set; }
-    public string UserName { get; set; } = null!;
     [EmailAddress]
     public string? Email { get; set; }
-    public string? FirstName { get; set; }
-    public string? LastName { get; set; }
     public DateTime DateOfBirth { get; set; }
     [EnumDataType(typeof(GenderEnums))]
     public GenderEnums Gender { get; set; }
