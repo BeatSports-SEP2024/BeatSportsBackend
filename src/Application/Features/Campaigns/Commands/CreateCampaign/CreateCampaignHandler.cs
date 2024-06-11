@@ -39,6 +39,7 @@ public class CreateCampaignHandler : IRequestHandler<CreateCampaignCommand, Beat
             EndDateApplying = request.EndDateApplying,
             Status = true,
             QuantityOfCampaign = request.QuantityOfCampaign,
+            CampaignImageURL = request.CampaignImageUrl
         };
         _dbContext.Campaigns.Add(campaign);
         _dbContext.SaveChanges();

@@ -18,4 +18,5 @@ public class CreateCampaignCommand : IRequest<BeatSportsResponse>
     public DateTime StartDateApplying { get; set; }
     public DateTime EndDateApplying { get; set; }
     public int QuantityOfCampaign { get; set; }
+    public string CampaignImageUrl { get; set; }
 }

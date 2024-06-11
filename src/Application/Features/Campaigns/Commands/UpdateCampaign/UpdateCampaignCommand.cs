@@ -20,4 +20,5 @@ public class UpdateCampaignCommand : IRequest<BeatSportsResponse>
     public DateTime EndDateApplying { get; set; }
     public bool Status { get; set; }
     public int QuantityOfCampaign { get; set; }
+    public string CampaignImageUrl { get; set; }
 }

@@ -35,6 +35,7 @@ public class UpdateCampaignHandler : IRequestHandler<UpdateCampaignCommand, Beat
         campaign.EndDateApplying = request.EndDateApplying;
         campaign.Status = request.Status;
         campaign.QuantityOfCampaign = request.QuantityOfCampaign;
+        campaign.CampaignImageURL = request.CampaignImageUrl;
 
         _dbContext.Campaigns.Update(campaign);
         _dbContext.SaveChanges();

@@ -5,6 +5,7 @@ using BeatSportsAPI.Application.Features.Authentication.Queries;
 using BeatSportsAPI.Application.Models.Authentication;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace WebAPI.Controllers.Authentication;
@@ -48,7 +49,7 @@ public class AuthController : ApiControllerBase
 
     [HttpPost]
     [Route("refresh-token")]
-    public async Task<IActionResult> RefreshToken(string username, string accessToken, string token)
+    public async Task<IActionResult> RefreshToken(string accessToken, string token)
     {
         var response = new BeatSportsResponse();
         
@@ -62,7 +63,7 @@ public class AuthController : ApiControllerBase
             response.Message = "Token expired.";
             return Ok(response);
         }
-
+        var username = _identityService.GetUserIdFromToken(accessToken);
         var re = await _identityService.SetNewRefreshTokenAsync(username);
         
         return Ok(re);
