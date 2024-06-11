@@ -5,6 +5,7 @@ using BeatSportsAPI.Application.Features.Courts.Commands.CreateCourt;
 using BeatSportsAPI.Application.Features.Courts.Commands.DeleteCourt;
 using BeatSportsAPI.Application.Features.Courts.Commands.UpdateCourt;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAll;
+using BeatSportsAPI.Application.Features.Courts.Queries.GetAllCourtsByOwnerId;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -49,6 +50,12 @@ public class CourtController : ApiControllerBase
     [HttpGet]
     [Route("get-by-court-id")]
     public async Task<CourtResponse> GetByCourtId([FromQuery] GetCourtByIdCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+    [HttpGet]
+    [Route("get-by-owner-id")]
+    public async Task<PaginatedList<CourtResponse>> GetByOwnerId([FromQuery] GetAllCourtsByOwnerIdCommand request)
     {
         return await _mediator.Send(request);
     }
