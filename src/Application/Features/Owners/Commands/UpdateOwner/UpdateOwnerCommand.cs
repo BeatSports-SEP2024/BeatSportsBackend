@@ -12,7 +12,6 @@ namespace BeatSportsAPI.Application.Features.Owners.Commands.UpdateOwner;
 public class UpdateOwnerCommand : IRequest<BeatSportsResponse>
 {
     public Guid OwnerId { get; set; }
-    public string UserName { get; set; } = null!;
     [EmailAddress]
     public string? Email { get; set; }
     public string? FirstName { get; set; }

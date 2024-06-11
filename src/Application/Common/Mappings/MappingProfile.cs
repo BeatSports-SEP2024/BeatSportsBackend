@@ -25,6 +25,10 @@ public class MappingProfile : Profile
         //Level Mapping
         CreateMap<Level, LevelResponse>()
             .ForMember(dest => dest.LevelId, opt => opt.MapFrom(src => src.Id));
+
+        //Wallet mapping
+        CreateMap<Wallet, WalletResponse>()
+            .ForMember(dest => dest.WalletId, opt => opt.MapFrom(src => src.Id));
     }
 
     private void ApplyMappingsFromAssembly(Assembly assembly)

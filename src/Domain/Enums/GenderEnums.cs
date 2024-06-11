@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace BeatSportsAPI.Domain.Enums;
 public enum GenderEnums
 {
-    Male,
-    Female,
-    Others
+    Nam,
+    Nữ,
+    Khác
 }

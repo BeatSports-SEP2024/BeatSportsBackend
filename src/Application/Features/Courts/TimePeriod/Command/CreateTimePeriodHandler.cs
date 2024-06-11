@@ -1,6 +1,7 @@
 ﻿using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
 
@@ -22,15 +23,18 @@ public class CreateTimePeriodHandler : IRequestHandler<CreateTimePeriodCommand, 
         {
             throw new NotFoundException($"{request.CourtSubdivisionId} is not existed");
         }
-        var newTimePeriod = new BeatSportsAPI.Domain.Entities.CourtEntity.TimePeriod
+        foreach (var (start, end) in TimeUtils.GenerateTimeSlots(request.StartTime, request.EndTime))
         {
-            CourtSubdivisionId = request.CourtSubdivisionId,
-            Description = request.Description,
-            StartTime = request.StartTime,
-            EndTime = request.EndTime,
-            RateMultiplier = request.RateMultiplier,
-        };
-        await _beatSportsDbContext.TimePeriods.AddAsync(newTimePeriod, cancellationToken);
+            var newTimePeriod = new BeatSportsAPI.Domain.Entities.CourtEntity.TimePeriod
+            {
+                CourtSubdivisionId = request.CourtSubdivisionId,
+                Description = request.Description,
+                StartTime = start,
+                EndTime = end,
+                RateMultiplier = request.RateMultiplier
+            };
+            await _beatSportsDbContext.TimePeriods.AddAsync(newTimePeriod, cancellationToken);
+        }        
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
 
         return new BeatSportsResponse 

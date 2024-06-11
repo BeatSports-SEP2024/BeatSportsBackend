@@ -30,7 +30,6 @@
       <Folder Include="Features\Rooms\RoomMatches\Commands\" />
       <Folder Include="Features\Rooms\RoomMatches\Queries\" />
       <Folder Include="Features\Wallets\Commands\CreateWithdrawls\" />
-      <Folder Include="Features\Wallets\Queries\" />
     </ItemGroup>
 
 </Project>
