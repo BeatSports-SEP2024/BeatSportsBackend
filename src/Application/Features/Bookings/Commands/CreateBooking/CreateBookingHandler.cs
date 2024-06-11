@@ -6,17 +6,21 @@ using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Enums;
 using Services.Redis;
 using StackExchange.Redis;
+using BeatSportsAPI.Application.Common.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Commands.CreateBooking;
 public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSportsResponse>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
     private readonly IDatabase _database;
+    private readonly INotificationService _notificationService;
 
-    public CreateBookingHandler(IBeatSportsDbContext beatSportsDbContext, IDatabase database)
+    public CreateBookingHandler(IBeatSportsDbContext beatSportsDbContext, IDatabase database, INotificationService notificationService)
     {
         _beatSportsDbContext = beatSportsDbContext;
         _database = database;
+        _notificationService = notificationService;
     }
 
     public async Task<BeatSportsResponse> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
@@ -92,7 +96,14 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSp
                     }
                     await _beatSportsDbContext.Bookings.AddAsync(newBooking);
                     await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
-
+                    // Send notification after successful booking
+                    //await _notificationService.SendNotificationAsync( 
+                    //    new NotificationModels
+                    //    {
+                    //        UserId = request.CustomerId,
+                    //        Title = "Booking thành công",
+                    //        Body = "Đơn của bạn đang được xử lý"
+                    //    });
                     //test console
                     Console.WriteLine($"Booking {request.CustomerId} is complete.");
                     return new BeatSportsResponse
