@@ -48,6 +48,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
     public DbSet<Wallet> Wallets { get; set; }
     public DbSet<TimePeriod> TimePeriods { get; set; }
     public DbSet<RefreshToken> RefreshToken { get; set; }
+    public DbSet<DeviceToken> DeviceTokens { get ; set; }
 
     public BeatSportsAPIDbContext(
         DbContextOptions<BeatSportsAPIDbContext> options,
@@ -62,6 +63,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
         builder.Entity<CourtSportCategory>(entity =>
         {
             entity.HasKey(ss => new { ss.CourtId, ss.SportCategoryId });
@@ -325,7 +327,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             }, new Court
             {
                 Id = court5Id,
-                OwnerId = Guid.NewGuid(),
+                OwnerId = owner1Id,
                 Description = "Sân bóng đá lớn với cỏ nhân tạo chất lượng cao, có khán đài và hệ thống chiếu sáng tốt.",
                 CourtName = "Sân bóng đá Phú Thọ",
                 Address = "219 Lý Thường Kiệt, Phường 15, Quận 11, Thành phố Hồ Chí Minh",
