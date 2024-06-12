@@ -29,7 +29,6 @@ public class TransactionController : ApiControllerBase
 
     [HttpGet]
     [Route("accountId")]
-    [HttpGet]
     public async Task<IActionResult> GetAllTransactionsById([FromQuery] GetAllTransactionByAccountCommand request)
     {
         if (!ModelState.IsValid)
