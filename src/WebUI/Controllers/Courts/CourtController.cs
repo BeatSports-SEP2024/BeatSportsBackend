@@ -1,4 +1,5 @@
-﻿using BeatSportsAPI.Application.Common.Models;
+﻿using Azure.Core;
+using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Response.CourtResponse;
 using BeatSportsAPI.Application.Features.Courts.Commands.CreateCourt;
@@ -7,8 +8,10 @@ using BeatSportsAPI.Application.Features.Courts.Commands.UpdateCourt;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAll;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAllCourtsByOwnerId;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetById;
+using BeatSportsAPI.Application.Features.Courts.Queries.GetListCourtsNearBy;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Services.MapBox;
 
 namespace WebAPI.Controllers.Courts;
 
@@ -58,5 +61,12 @@ public class CourtController : ApiControllerBase
     public async Task<PaginatedList<CourtResponse>> GetByOwnerId([FromQuery] GetAllCourtsByOwnerIdCommand request)
     {
         return await _mediator.Send(request);
+    }
+    [HttpPost]
+    [Route("get-list-court-nearby")]
+    public async Task<List<CourtResponse>> GetCourtNearBya([FromQuery] GetListCourtsNearByCommand request)
+    {
+        return await _mediator.Send(request);
+
     }
 }
