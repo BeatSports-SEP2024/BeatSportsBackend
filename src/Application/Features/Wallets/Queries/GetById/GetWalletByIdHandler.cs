@@ -3,7 +3,9 @@ using AutoMapper.QueryableExtensions;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Wallets.Queries.GetById;
 public class GetWalletByIdHandler : IRequestHandler<GetWalletByIdCommand, WalletResponse>
@@ -17,16 +19,23 @@ public class GetWalletByIdHandler : IRequestHandler<GetWalletByIdCommand, Wallet
         _mapper = mapper;
     }
 
-    public Task<WalletResponse> Handle(GetWalletByIdCommand request, CancellationToken cancellationToken)
+    public async Task<WalletResponse> Handle(GetWalletByIdCommand request, CancellationToken cancellationToken)
     {
-        var wallet = _beatSportsDbContext.Wallets
-            .Where(w => w.Id == request.WalletId && !w.IsDelete)
-            .ProjectTo<WalletResponse>(_mapper.ConfigurationProvider)
-            .SingleOrDefault();
-        if(wallet == null)
+        var wallet = await _beatSportsDbContext.Wallets
+            .Where(a => a.AccountId == request.AccountId && !a.IsDelete)
+            .Select(c => new WalletResponse
+            {
+                AccountId = c.AccountId,
+                Balance = c.Balance,
+                WalletId = c.Id,
+            })
+            .SingleOrDefaultAsync(cancellationToken);
+
+        if (wallet == null)
         {
-            throw new NotFoundException($"{request.WalletId} does not existed");
+            throw new NotFoundException($"{request.AccountId} does not have any wallet");
         }
-        return Task.FromResult(wallet);
+
+        return wallet;
     }
 }
