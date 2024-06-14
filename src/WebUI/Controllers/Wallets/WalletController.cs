@@ -27,7 +27,7 @@ public class WalletController : ApiControllerBase
         return Ok(response);
     }
     [HttpGet]
-    [Route("walletId")]
+    [Route("accountId")]
     public async Task<IActionResult> GetWalletById([FromQuery] GetWalletByIdCommand request)
     {
         if (!ModelState.IsValid)

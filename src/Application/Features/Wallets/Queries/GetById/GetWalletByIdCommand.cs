@@ -9,5 +9,5 @@ using MediatR;
 namespace BeatSportsAPI.Application.Features.Wallets.Queries.GetById;
 public class GetWalletByIdCommand : IRequest<WalletResponse>
 {
-    public Guid WalletId { get; set; }
+    public Guid AccountId { get; set; }
 }
