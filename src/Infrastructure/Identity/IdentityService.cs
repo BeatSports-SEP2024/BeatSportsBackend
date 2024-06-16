@@ -385,7 +385,7 @@ public class IdentityService : IIdentityService
             //Gender = registerModelRequest.Gender.ToString(),
             //ProfilePictureURL = profileImageUrl,
             //Bio = registerModelRequest.Bio,
-            //PhoneNumber = registerModelRequest.PhoneNumber,
+            PhoneNumber = registerModelRequest.PhoneNumber,
             Role = RoleEnums.Customer.ToString(),
         };
         await _beatSportsDbContext.Accounts.AddAsync(newUser, cancellationToken);
