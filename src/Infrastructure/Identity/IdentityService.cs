@@ -173,7 +173,7 @@ public class IdentityService : IIdentityService
 
         return new TokenModel { AccessToken = tokenString };
     }
-
+    #region Login
     //Login 
     public async Task<LoginResponse> AuthenticateAsync(LoginModelRequest loginModelRequest)
     {
@@ -222,6 +222,7 @@ public class IdentityService : IIdentityService
         };
         return loginResponse;
     }
+    #endregion
 
     private RefreshTokenModel GenerateRefreshToken()
     {
@@ -379,8 +380,8 @@ public class IdentityService : IIdentityService
             UserName = registerModelRequest.UserName,
             Password = combinedPassword,
             Email = registerModelRequest.Email,
-            //FirstName = registerModelRequest.FirstName,
-            //LastName = registerModelRequest.LastName,
+            FirstName = registerModelRequest.FirstName,
+            LastName = registerModelRequest.LastName,
             //DateOfBirth = registerModelRequest.DateOfBirth,
             //Gender = registerModelRequest.Gender.ToString(),
             //ProfilePictureURL = profileImageUrl,
