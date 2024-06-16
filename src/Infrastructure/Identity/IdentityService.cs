@@ -174,6 +174,7 @@ public class IdentityService : IIdentityService
         return new TokenModel { AccessToken = tokenString };
     }
 
+    //Login 
     public async Task<LoginResponse> AuthenticateAsync(LoginModelRequest loginModelRequest)
     {
         if (string.IsNullOrWhiteSpace(loginModelRequest.Username) || string.IsNullOrWhiteSpace(loginModelRequest.Password))
@@ -359,17 +360,18 @@ public class IdentityService : IIdentityService
         //Copy temporary data to memoryStream
         //Convert byte to base64
         //Call method UploadImage to upload firebase
-        string profileImageUrl = "";
-        if (registerModelRequest.ProfilePicture != null)
-        {
-            using (var memoryStream = new MemoryStream())
-            {
-                await registerModelRequest.ProfilePicture.CopyToAsync(memoryStream);
-                var fileBytes = memoryStream.ToArray();
-                string base64string = Convert.ToBase64String(fileBytes);
-                profileImageUrl = await _imageUploadService.UploadImage("profileImages", base64string);
-            }
-        }
+
+        //string profileImageUrl = "";
+        //if (registerModelRequest.ProfilePicture != null)
+        //{
+        //    using (var memoryStream = new MemoryStream())
+        //    {
+        //        await registerModelRequest.ProfilePicture.CopyToAsync(memoryStream);
+        //        var fileBytes = memoryStream.ToArray();
+        //        string base64string = Convert.ToBase64String(fileBytes);
+        //        profileImageUrl = await _imageUploadService.UploadImage("profileImages", base64string);
+        //    }
+        //}
 
         var combinedPassword = CreatePasswordHash(registerModelRequest.Password);
         var newUser = new Account
@@ -377,21 +379,20 @@ public class IdentityService : IIdentityService
             UserName = registerModelRequest.UserName,
             Password = combinedPassword,
             Email = registerModelRequest.Email,
-            FirstName = registerModelRequest.FirstName,
-            LastName = registerModelRequest.LastName,
-            DateOfBirth = registerModelRequest.DateOfBirth,
-            Gender = registerModelRequest.Gender.ToString(),
-            //ProfilePictureURL = registerModelRequest.ProfilePictureURL,
-            ProfilePictureURL = profileImageUrl,
-            Bio = registerModelRequest.Bio,
-            PhoneNumber = registerModelRequest.PhoneNumber,
+            //FirstName = registerModelRequest.FirstName,
+            //LastName = registerModelRequest.LastName,
+            //DateOfBirth = registerModelRequest.DateOfBirth,
+            //Gender = registerModelRequest.Gender.ToString(),
+            //ProfilePictureURL = profileImageUrl,
+            //Bio = registerModelRequest.Bio,
+            //PhoneNumber = registerModelRequest.PhoneNumber,
             Role = RoleEnums.Customer.ToString(),
         };
         await _beatSportsDbContext.Accounts.AddAsync(newUser, cancellationToken);
         var newCustomer = new Customer
         {
             Account = newUser,
-            Address = registerModelRequest.Address
+            //Address = registerModelRequest.Address
         };
         await _beatSportsDbContext.Customers.AddAsync(newCustomer, cancellationToken);
         var newWallet = new Wallet
