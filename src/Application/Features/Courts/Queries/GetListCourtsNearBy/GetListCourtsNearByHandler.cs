@@ -59,17 +59,14 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
             if(c.Feedback.Count != 0)
             {
                 starAvg = (double)c.Feedback.Average(x => x.FeedbackStar);
-                
             }
 
             if(c.CourtSubdivision.Count != 0)
             {
                 price = c.CourtSubdivision.MinBy(c => c.BasePrice).BasePrice;
                 rentalNumber = c.CourtSubdivision.Sum(x => x.Bookings.Where(c => c.BookingStatus.Equals("Approved")).Count());
-
             }
 
-            
             list.Add(new CourtResponse
             {
                 Id = c.Id,
@@ -101,10 +98,10 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
             });
 
             list = list.OrderBy(c => c.DistanceInKm).ToList();
+
             return Task.FromResult(list);
         }
 
         return Task.FromResult(list);
-
     }
 }
