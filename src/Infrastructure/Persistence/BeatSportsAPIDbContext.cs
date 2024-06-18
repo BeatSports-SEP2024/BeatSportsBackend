@@ -66,11 +66,11 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
 
         builder.Entity<CourtSportCategory>(entity =>
         {
-            entity.HasKey(ss => new { ss.CourtId, ss.SportCategoryId });
+            entity.HasKey(ss => new { ss.CourtSubdivisionId, ss.SportCategoryId });
 
-            entity.HasOne(ss => ss.Court)
-            .WithMany(ss => ss.CourtCategories)
-            .HasForeignKey(ss => ss.CourtId)
+            entity.HasOne(ss => ss.CourtSubdivision)
+            .WithMany(ss => ss.CourtSportCategories)
+            .HasForeignKey(ss => ss.CourtSubdivisionId)
             .OnDelete(DeleteBehavior.NoAction);
 
             entity.HasOne(ss => ss.SportCategory)
@@ -489,17 +489,17 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         builder.Entity<CourtSportCategory>()
             .HasData(new CourtSportCategory
             {
-                CourtId = court1Id,
+                CourtSubdivisionId = courtSubdivisionId1,
                 SportCategoryId = soccerId,
             },
             new CourtSportCategory
             {
-                CourtId = court1Id,
+                CourtSubdivisionId = courtSubdivisionId2,
                 SportCategoryId = badmintionId,
             },
             new CourtSportCategory
             {
-                CourtId = court2Id,
+                CourtSubdivisionId = courtSubdivisionId3,
                 SportCategoryId = badmintionId,
             }
             );
@@ -602,7 +602,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         var bookingId2 = Guid.NewGuid();
         var bookingId3 = Guid.NewGuid();
         var bookingId4 = Guid.NewGuid();
-
+        #region Booking
         builder.Entity<Booking>().HasData(
             new Booking
             {
@@ -664,6 +664,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 IsRoomBooking = false,
                 IsDeposit = true
             });
+        #endregion
         var timePeriodId1 = Guid.NewGuid();
         var timePeriodId2 = Guid.NewGuid();
         var timePeriodId3 = Guid.NewGuid();

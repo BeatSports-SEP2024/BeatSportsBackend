@@ -27,7 +27,7 @@ public class Court : BaseAuditableEntity
     public virtual IList<Campaign>? Campaigns { get; set; }
     //public virtual IList<TimePeriod>? TimePeriods { get; set; }
     public virtual IList<Feedback>? Feedback { get; set; }
-    public virtual IList<CourtSportCategory>? CourtCategories { get; set; }
+    //public virtual IList<CourtSportCategory>? CourtCategories { get; set; }
     public virtual IList<CourtSubdivision>? CourtSubdivision { get; set; }
 
 }

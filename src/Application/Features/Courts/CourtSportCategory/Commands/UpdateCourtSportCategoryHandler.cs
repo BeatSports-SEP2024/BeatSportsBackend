@@ -22,7 +22,7 @@ public class UpdateCourtSportCategoryHandler : IRequestHandler<UpdateCourtSportC
     public async Task<BeatSportsResponse> Handle(UpdateCourtSportCategoryCommand request, CancellationToken cancellationToken)
     {
         var updateCourtSport = _beatSportsDbContext.CourtSportCategories
-            .Where(t => t.CourtId == request.CourtId && t.SportCategoryId == request.SportCategoryId)
+            .Where(t => t.CourtSubdivisionId == request.CourtSubdivisionId && t.SportCategoryId == request.SportCategoryId)
             .FirstOrDefault();
         if (updateCourtSport == null)
         {
