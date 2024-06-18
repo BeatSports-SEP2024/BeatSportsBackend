@@ -14,8 +14,8 @@ public class CreateCourtSportCategoryHandler : IRequestHandler<CreateCourtSportC
     }
     public async Task<BeatSportsResponse> Handle(CreateCourtSportCategoryCommand request, CancellationToken cancellationToken)
     {
-        var isValidCourt = _beatSportsDbContext.Courts
-            .Where(c => c.Id == request.CourtId && !c.IsDelete)
+        var isValidCourt = _beatSportsDbContext.CourtSubdivisions
+            .Where(c => c.Id == request.CourtSubdivionId && !c.IsDelete)
             .FirstOrDefault();
         var isValidCategory = _beatSportsDbContext.SportsCategories
             .Where(sc => sc.Id == request.SportCategoryId && !sc.IsDelete)
@@ -26,7 +26,7 @@ public class CreateCourtSportCategoryHandler : IRequestHandler<CreateCourtSportC
         }
         var response = new BeatSportsAPI.Domain.Entities.CourtEntity.CourtSportCategory
         {
-            CourtId = request.CourtId,
+            CourtSubdivisionId = request.CourtSubdivionId,
             SportCategoryId = request.SportCategoryId,
         };
         _beatSportsDbContext.CourtSportCategories.Add(response);

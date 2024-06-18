@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BeatSportsAPI.Application.Features.Courts.TimePeriod.Command;
+using BeatSportsAPI.Application.Features.Courts.TimePeriod.Command.CreateTimePeriod;
 using FluentValidation;
 
 namespace BeatSportsAPI.Application.Validators.TimePeriod;

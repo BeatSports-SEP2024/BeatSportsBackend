@@ -9,6 +9,6 @@ using MediatR;
 namespace BeatSportsAPI.Application.Features.Courts.CourtSportCategory.Commands;
 public class UpdateCourtSportCategoryCommand : IRequest<BeatSportsResponse>
 {
-    public Guid CourtId { get; set; }
+    public Guid CourtSubdivisionId { get; set; }
     public Guid SportCategoryId { get; set; }
 }

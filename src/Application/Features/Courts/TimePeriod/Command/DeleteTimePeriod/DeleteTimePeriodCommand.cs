@@ -7,8 +7,8 @@ using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Domain.Common;
 using MediatR;
 
-namespace BeatSportsAPI.Application.Features.Courts.TimePeriod.Command;
+namespace BeatSportsAPI.Application.Features.Courts.TimePeriod.Command.DeleteTimePeriod;
 public class DeleteTimePeriodCommand : IRequest<BeatSportsResponse>
 {
-    public Guid TimePeriodId {  get; set; }
+    public Guid TimePeriodId { get; set; }
 }

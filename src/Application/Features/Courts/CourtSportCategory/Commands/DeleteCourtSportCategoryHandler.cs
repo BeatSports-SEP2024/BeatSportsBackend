@@ -14,7 +14,7 @@ public class DeleteCourtSportCategoryHandler : IRequestHandler<DeleteCourtSportC
     public async Task<BeatSportsResponse> Handle(DeleteCourtSportCategoryCommand request, CancellationToken cancellationToken)
     {
         var updateCourtSport = _beatSportsDbContext.CourtSportCategories
-            .Where(t => t.CourtId == request.CourtId 
+            .Where(t => t.CourtSubdivisionId == request.CourtId 
             && t.SportCategoryId == request.SportCategoriesId)
             .FirstOrDefault();
         if(updateCourtSport == null)

@@ -29,6 +29,14 @@ public class MappingProfile : Profile
         //Wallet mapping
         CreateMap<Wallet, WalletResponse>()
             .ForMember(dest => dest.WalletId, opt => opt.MapFrom(src => src.Id));
+
+        //CourtSport Mapping
+        CreateMap<CourtSubdivision, CourtSportCategoryResponse>()
+            .ForMember(dest => dest.CourtSubdivisionId, opt => opt.MapFrom(src => src.Id));
+
+        //Time Period Mapping
+        CreateMap<TimePeriod, TimePeriodResponse>()
+            .ForMember(dest => dest.TimePeriodId, opt => opt.MapFrom(src => src.Id));
     }
 
     private void ApplyMappingsFromAssembly(Assembly assembly)

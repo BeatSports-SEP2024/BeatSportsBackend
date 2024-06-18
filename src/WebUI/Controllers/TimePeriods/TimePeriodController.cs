@@ -1,5 +1,7 @@
 ﻿using BeatSportsAPI.Application.Common.Response;
-using BeatSportsAPI.Application.Features.Courts.TimePeriod.Command;
+using BeatSportsAPI.Application.Features.Courts.TimePeriod.Command.CreateTimePeriod;
+using BeatSportsAPI.Application.Features.Courts.TimePeriod.Command.DeleteTimePeriod;
+using BeatSportsAPI.Application.Features.Courts.TimePeriod.Command.UpdateTimePeriod;
 using BeatSportsAPI.Application.Features.Courts.TimePeriod.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

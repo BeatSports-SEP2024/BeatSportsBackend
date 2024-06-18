@@ -10,5 +10,5 @@ namespace BeatSportsAPI.Application.Common.Response;
 public class CourtSportCategoryResponse : IMapFrom<CourtSportCategory>
 {
     public Guid SportCategoryId { get; set; }
-    public Guid CourtId { get; set; }
+    public Guid CourtSubdivisionId { get; set; }
 }
