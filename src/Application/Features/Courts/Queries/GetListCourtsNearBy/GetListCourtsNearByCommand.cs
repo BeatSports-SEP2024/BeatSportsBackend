@@ -12,9 +12,8 @@ using Services.MapBox;
 namespace BeatSportsAPI.Application.Features.Courts.Queries.GetListCourtsNearBy;
 public class GetListCourtsNearByCommand : IRequest<List<CourtResponse>>
 {
-    [Required]
-    public string Latitude { get; set; }
-    [Required]
-    public string Longitude { get; set; }
+    public double Latitude { get; set; }
+    public double Longitude { get; set; }
+    public Guid CourtId { get; set; }
 
 }

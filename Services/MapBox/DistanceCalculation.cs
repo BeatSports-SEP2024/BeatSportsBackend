@@ -10,7 +10,7 @@ using RestSharp;
 namespace Services.MapBox;
 public class DistanceCalculation
 {
-    public async Task<List<LocationDistance>> GetDistancesAsync(double latitude, double longtitude, IQueryable<Court> destinations)
+    public async Task<List<LocationDistance>> GetDistancesAsync(double latitude, double longtitude, List<Court> destinations)
     {
         
         var locationList = destinations.ToList();
@@ -32,6 +32,7 @@ public class DistanceCalculation
             var distancesArray = jsonResponse.RootElement.GetProperty("distances").EnumerateArray().First().EnumerateArray();
             
             int index = 0;
+            
             foreach (var distanceElement in distancesArray)
             {
                 var distanceMeters = distanceElement.GetDouble();
