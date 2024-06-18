@@ -29,11 +29,17 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
     {
         var distanceCal = new DistanceCalculation();
 
+        if(request.KeyWords == null)
+        {
+            request.KeyWords = "";
+        }
+
         var query = new List<Court>();
+
         if (request.CourtId != Guid.Empty)
         {
              query = _dbContext.Courts
-            .Where(x => !x.IsDelete && x.Id == request.CourtId)
+            .Where(x => !x.IsDelete && x.Id == request.CourtId && x.CourtName.Contains(request.KeyWords) || x.Address.Contains(request.KeyWords))
             .Include(x => x.Feedback)
             .Include(x => x.CourtSubdivision)
             .ThenInclude(x => x.Bookings)
@@ -42,7 +48,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
         else
         {
             query = _dbContext.Courts
-            .Where(x => !x.IsDelete)
+            .Where(x => !x.IsDelete && x.CourtName.Contains(request.KeyWords) || x.Address.Contains(request.KeyWords))
             .Include(x => x.Feedback)
             .Include(x => x.CourtSubdivision)
             .ThenInclude(x => x.Bookings)
