@@ -18,5 +18,9 @@ public class CourtResponse : IMapFrom<Court>
     public TimeSpan TimeEnd { get; set; }
     public string? PlaceId { get; set; }
     public double DistanceInKm { get; set; }
-    public virtual IList<CourtSubdivision>? CourtSubdivision { get; set; }
+    public double FbStar { get; set; }
+    public int CourtSubCount { get; set; }
+    public int RentalNumber { get; set; }
+    public decimal Price { get;set; }
+    //public virtual IList<CourtSubdivision>? CourtSubdivision { get; set; }
 }

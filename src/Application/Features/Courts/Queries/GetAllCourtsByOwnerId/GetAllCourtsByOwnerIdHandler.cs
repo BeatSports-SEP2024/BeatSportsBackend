@@ -49,7 +49,6 @@ public class GetAllCourtsByOwnerIdHandler : IRequestHandler<GetAllCourtsByOwnerI
             TimeStart = c.TimeStart,
             TimeEnd = c.TimeEnd,
             PlaceId = c.PlaceId,
-            CourtSubdivision = c.CourtSubdivision
         })
         .PaginatedListAsync(request.PageIndex, request.PageSize);
 
