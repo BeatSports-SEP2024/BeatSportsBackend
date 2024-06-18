@@ -5,10 +5,10 @@ public class TimePeriod : BaseAuditableEntity
 {
     [ForeignKey("CourtSubdivision")]
     public Guid CourtSubdivisionId { get; set; }
-    public string Description { get; set; }
+    public string? Description { get; set; }
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
-    public decimal RateMultiplier { get; set; }
+    public decimal? RateMultiplier { get; set; }
 
     public virtual CourtSubdivision CourtSubdivision { get; set; }
 }

@@ -23,14 +23,20 @@ public class GetTimePeriodHandler : IRequestHandler<GetTimePeriodCommand, Pagina
 
     public async Task<PaginatedList<TimePeriodResponse>> Handle(GetTimePeriodCommand request, CancellationToken cancellationToken)
     {
-        if(request.PageIndex <= 0 || request.PageSize <=0)
+        if (request.PageIndex <= 0 || request.PageSize <= 0)
         {
-            throw new BadRequestException("Page index and page size cannot less than 0");
+            throw new BadRequestException("Page index and page size cannot be less than 0");
         }
-        var response = await _beatSportsDbContext.TimePeriods
-            .Where(tp => !tp.IsDelete)
+
+        var query = _beatSportsDbContext.TimePeriods
+            .Where(tp => !tp.IsDelete);
+
+        query = query.OrderBy(tp => tp.StartTime);
+
+        var response = await query
             .ProjectTo<TimePeriodResponse>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(request.PageIndex, request.PageSize);
+
         return response;
     }
 }

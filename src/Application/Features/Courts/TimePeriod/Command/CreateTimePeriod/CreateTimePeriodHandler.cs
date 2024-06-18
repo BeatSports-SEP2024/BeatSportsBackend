@@ -5,7 +5,7 @@ using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
 
-namespace BeatSportsAPI.Application.Features.Courts.TimePeriod.Command;
+namespace BeatSportsAPI.Application.Features.Courts.TimePeriod.Command.CreateTimePeriod;
 public class CreateTimePeriodHandler : IRequestHandler<CreateTimePeriodCommand, BeatSportsResponse>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
@@ -25,19 +25,19 @@ public class CreateTimePeriodHandler : IRequestHandler<CreateTimePeriodCommand, 
         }
         foreach (var (start, end) in TimeUtils.GenerateTimeSlots(request.StartTime, request.EndTime))
         {
-            var newTimePeriod = new BeatSportsAPI.Domain.Entities.CourtEntity.TimePeriod
+            var newTimePeriod = new Domain.Entities.CourtEntity.TimePeriod
             {
                 CourtSubdivisionId = request.CourtSubdivisionId,
-                Description = request.Description,
+                //Description = request.Description,
                 StartTime = start,
                 EndTime = end,
-                RateMultiplier = request.RateMultiplier
+                //RateMultiplier = request.RateMultiplier
             };
             await _beatSportsDbContext.TimePeriods.AddAsync(newTimePeriod, cancellationToken);
-        }        
+        }
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
 
-        return new BeatSportsResponse 
+        return new BeatSportsResponse
         {
             Message = "Create Time Period Successfully"
         };

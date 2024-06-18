@@ -1,9 +1,9 @@
 ﻿using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
-using BeatSportsAPI.Application.Common.Exceptions; 
+using BeatSportsAPI.Application.Common.Exceptions;
 using MediatR;
 
-namespace BeatSportsAPI.Application.Features.Courts.TimePeriod.Command;
+namespace BeatSportsAPI.Application.Features.Courts.TimePeriod.Command.DeleteTimePeriod;
 public class DeleteTimePeriodHandler : IRequestHandler<DeleteTimePeriodCommand, BeatSportsResponse>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
@@ -18,7 +18,7 @@ public class DeleteTimePeriodHandler : IRequestHandler<DeleteTimePeriodCommand, 
         var response = _beatSportsDbContext.TimePeriods
             .Where(tp => tp.Id == request.TimePeriodId && !tp.IsDelete)
             .FirstOrDefault();
-        if(response == null)
+        if (response == null)
         {
             throw new BadRequestException("Time Period does not existed");
         }

@@ -4,7 +4,7 @@ using MediatR;
 using BeatSportsAPI.Application.Common.Exceptions;
 using System.Reflection;
 
-namespace BeatSportsAPI.Application.Features.Courts.TimePeriod.Command;
+namespace BeatSportsAPI.Application.Features.Courts.TimePeriod.Command.UpdateTimePeriod;
 public class UpdateTimePeriodHandler : IRequestHandler<UpdateTimePeriodCommand, BeatSportsResponse>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
@@ -23,13 +23,13 @@ public class UpdateTimePeriodHandler : IRequestHandler<UpdateTimePeriodCommand, 
         {
             throw new NotFoundException("Time Period does not existed");
         }
-        foreach(PropertyInfo property in request.GetType().GetProperties())
+        foreach (PropertyInfo property in request.GetType().GetProperties())
         {
             var value = property.GetValue(request, null);
             if (value != null)
             {
                 PropertyInfo propertyInfo = updateTimePeriod.GetType().GetProperty(property.Name);
-                if(propertyInfo != null && propertyInfo.CanWrite)
+                if (propertyInfo != null && propertyInfo.CanWrite)
                 {
                     propertyInfo.SetValue(updateTimePeriod, value, null);
                 }
