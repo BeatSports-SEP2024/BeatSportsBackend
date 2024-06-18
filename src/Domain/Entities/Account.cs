@@ -26,5 +26,6 @@ public class Account : BaseAuditableEntity
     public virtual Owner? Owner { get; set; }
 
     public virtual IList<Payment> Payment { get; set; }
+    public virtual IList<Notification> Notifications { get; set; }
     public virtual IList<DeviceToken>? DeviceToken { get; set; }
 }
