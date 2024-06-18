@@ -1,11 +1,11 @@
 ﻿using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Response.RoomMemberResponse;
+using BeatSportsAPI.Application.Features.Rooms.RoomMatches.Queries.GetAllMembersById;
+using BeatSportsAPI.Application.Features.Rooms.RoomMatches.Queries.GetAllRoomMatches;
 using BeatSportsAPI.Application.Features.Rooms.RoomMembers.Commands.CreateRoomMembers;
 using BeatSportsAPI.Application.Features.Rooms.RoomMembers.Commands.DeleteRoomMembers;
 using BeatSportsAPI.Application.Features.Rooms.RoomMembers.Commands.UpdateRoomMembers;
-using BeatSportsAPI.Application.Features.Rooms.RoomMembers.Queries.GetAllRoomMember;
-using BeatSportsAPI.Application.Features.Rooms.RoomMembers.Queries.GetAllRoomMemberDetails;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,15 +19,9 @@ public class RoomMemberController : ApiControllerBase
     {
         _mediator = mediator;
     }
-
     [HttpGet]
-    public async Task<PaginatedList<RoomMemberResponse>> GetAllRoomMember([FromQuery] GetAllRoomMemberCommand request)
-    {
-        return await _mediator.Send(request);
-    }
-    [HttpGet]
-    [Route("details")]
-    public async Task<PaginatedList<RoomMemberWithDetailsResponse>> GetAllRoomMemberWithDetails([FromQuery] GetAllRoomMemberWithDetailCommand request)
+    [Route("customers")]
+    public async Task<PaginatedList<RoomMemberResponse>> GetAll([FromQuery] GetAllMemberByIdCommand request)
     {
         return await _mediator.Send(request);
     }
