@@ -37,7 +37,7 @@ public class CheckTimeJob
             //    _beatSportsDbContext.Courts.Update(course);
             //    _beatSportsDbContext.SaveChanges();
             //    Console.WriteLine($"Recurring job executed end for Court ${course.CourtName}");
-            }
+            //}
 
         }
     }
