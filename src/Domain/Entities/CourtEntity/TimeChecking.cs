@@ -10,8 +10,8 @@ public class TimeChecking : BaseAuditableEntity
 {
     [ForeignKey("CourtSubdivision")]
     public Guid CourtSubdivisionId { get; set; }
-    public TimeSpan StartTime { get; set; }
-    public TimeSpan EndTime { get; set; }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
     public bool IsLock { get; set; }
     public virtual CourtSubdivision CourtSubdivision { get; set; }
 }

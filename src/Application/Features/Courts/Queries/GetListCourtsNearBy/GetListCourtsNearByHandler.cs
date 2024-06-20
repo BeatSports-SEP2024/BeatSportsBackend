@@ -29,11 +29,17 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
     {
         var distanceCal = new DistanceCalculation();
 
+        if(request.KeyWords == null)
+        {
+            request.KeyWords = "";
+        }
+
         var query = new List<Court>();
+
         if (request.CourtId != Guid.Empty)
         {
              query = _dbContext.Courts
-            .Where(x => !x.IsDelete && x.Id == request.CourtId)
+            .Where(x => !x.IsDelete && x.Id == request.CourtId && x.CourtName.Contains(request.KeyWords) || x.Address.Contains(request.KeyWords))
             .Include(x => x.Feedback)
             .Include(x => x.CourtSubdivision)
             .ThenInclude(x => x.Bookings)
@@ -42,7 +48,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
         else
         {
             query = _dbContext.Courts
-            .Where(x => !x.IsDelete)
+            .Where(x => !x.IsDelete && x.CourtName.Contains(request.KeyWords) || x.Address.Contains(request.KeyWords))
             .Include(x => x.Feedback)
             .Include(x => x.CourtSubdivision)
             .ThenInclude(x => x.Bookings)
@@ -59,17 +65,14 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
             if(c.Feedback.Count != 0)
             {
                 starAvg = (double)c.Feedback.Average(x => x.FeedbackStar);
-                
             }
 
             if(c.CourtSubdivision.Count != 0)
             {
                 price = c.CourtSubdivision.MinBy(c => c.BasePrice).BasePrice;
                 rentalNumber = c.CourtSubdivision.Sum(x => x.Bookings.Where(c => c.BookingStatus.Equals("Approved")).Count());
-
             }
 
-            
             list.Add(new CourtResponse
             {
                 Id = c.Id,
@@ -101,10 +104,10 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
             });
 
             list = list.OrderBy(c => c.DistanceInKm).ToList();
+
             return Task.FromResult(list);
         }
 
         return Task.FromResult(list);
-
     }
 }
