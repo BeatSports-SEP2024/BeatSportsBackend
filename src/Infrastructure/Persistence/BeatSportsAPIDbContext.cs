@@ -49,6 +49,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
     public DbSet<TimePeriod> TimePeriods { get; set; }
     public DbSet<RefreshToken> RefreshToken { get; set; }
     public DbSet<DeviceToken> DeviceTokens { get ; set; }
+    public DbSet<TimeChecking> TimeChecking { get; set; }
 
     public BeatSportsAPIDbContext(
         DbContextOptions<BeatSportsAPIDbContext> options,

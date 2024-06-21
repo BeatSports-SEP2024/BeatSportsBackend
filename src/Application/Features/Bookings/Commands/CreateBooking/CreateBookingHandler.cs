@@ -8,6 +8,7 @@ using Services.Redis;
 using StackExchange.Redis;
 using BeatSportsAPI.Application.Common.Models;
 using Microsoft.EntityFrameworkCore;
+using BeatSportsAPI.Domain.Entities.CourtEntity;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Commands.CreateBooking;
 public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSportsResponse>
@@ -96,6 +97,19 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSp
                     }
                     await _beatSportsDbContext.Bookings.AddAsync(newBooking);
                     await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
+
+                    DateTime startTime = newBooking.PlayingDate.Date.Add(newBooking.StartTimePlaying);
+                    DateTime endTime = newBooking.PlayingDate.Date.Add(newBooking.EndTimePlaying);
+                    var courtSubLock = new TimeChecking
+                    {
+                        CourtSubdivisionId = newBooking.CourtSubdivisionId,
+                        StartTime = startTime,
+                        EndTime = endTime,
+                        IsLock = true
+                    };
+                    await _beatSportsDbContext.TimeChecking.AddAsync(courtSubLock);
+                    await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
+
                     // Send notification after successful booking
                     //await _notificationService.SendNotificationAsync( 
                     //    new NotificationModels

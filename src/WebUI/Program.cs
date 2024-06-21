@@ -28,6 +28,7 @@ using BeatSportsAPI.Domain.Entities;
 using Services.Momo.Config;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using BeatSportsAPI.Application.Features.Jobs;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -58,9 +59,15 @@ builder.Services.AddHangfire(configuration => configuration
                 .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"),
                 new Hangfire.SqlServer.SqlServerStorageOptions()
                 {
-                    //TODO: Change hangfire sql server option
+                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                    QueuePollInterval = TimeSpan.Zero,
+                    UseRecommendedIsolationLevel = true,
+                    UsePageLocksOnDequeue = true,
+                    DisableGlobalLocks = true
                 }));
 builder.Services.AddHangfireServer();
+
 builder.Services.AddHttpClient();
 builder.Services.Configure<VnpayConfig>(
                 builder.Configuration.GetSection(VnpayConfig.ConfigName));
@@ -184,5 +191,11 @@ app.MapFallbackToFile("index.html"); ;
 //Config Graphql
 app.MapControllers();
 app.MapGraphQL("/graphql");
+
+//Hangfire Dashboard
+app.UseHangfireDashboard();
+
+// Schedule a recurring job
+RecurringJob.AddOrUpdate<CheckTimeJob>("my-recurring-job", job => job.CheckTimeOfCourt(), Cron.Minutely);
 
 app.Run();
