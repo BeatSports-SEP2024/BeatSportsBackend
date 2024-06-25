@@ -1,6 +1,8 @@
 ﻿using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Authentication.Command.AuthGoogle;
+using BeatSportsAPI.Application.Features.Authentication.Command.ResetPassword.ResetPasswordByOTP;
+using BeatSportsAPI.Application.Features.Authentication.Command.ResetPassword.SendOTPToEmail;
 using BeatSportsAPI.Application.Features.Authentication.Queries;
 using BeatSportsAPI.Application.Models.Authentication;
 using MediatR;
@@ -44,6 +46,34 @@ public class AuthController : ApiControllerBase
         }
         var response = await _mediator.Send(request);
         
+        return Ok(response);
+    }
+
+    [HttpPost]
+    [Route("reset-password")]
+    [SwaggerOperation("Recovery password by OTP")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordByOTPCommand request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var response = await _mediator.Send(request);
+
+        return Ok(response);
+    }
+
+    [HttpPost]
+    [Route("otp")]
+    [SwaggerOperation("Send OTP to user gmail")]
+    public async Task<IActionResult> SendOTP([FromForm] SendOTPToEmailRequest request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var response = await _mediator.Send(request);
+
         return Ok(response);
     }
 
