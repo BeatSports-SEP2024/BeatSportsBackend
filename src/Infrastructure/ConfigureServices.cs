@@ -51,6 +51,7 @@ public static class ConfigureServices
         services.AddTransient<ICsvFileBuilder, CsvFileBuilder>();
         services.AddTransient<IImageUploadService, ImageUploadService>();
         services.AddTransient<INotificationService, NotificationService>();
+        services.AddTransient<IEmailService, EmailService>();
 
         services.AddAuthentication()
             .AddIdentityServerJwt();
