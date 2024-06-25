@@ -41,12 +41,6 @@ public class FeedbackController : ApiControllerBase
         return await _mediator.Send(request);
     }
     [HttpGet]
-    [Route("all")]
-    public async Task<PaginatedList<FeedbackResponse>> GetAll([FromQuery] GetAllFeedbacksCommand request)
-    {
-        return await _mediator.Send(request);
-    }
-    [HttpGet]
     [Route("get-by-feedback-id")]
     public async Task<FeedbackResponse> GetByFeedbackId([FromQuery] GetFeedbackByIdCommand request)
     {
