@@ -2,6 +2,7 @@
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Domain.Entities.Room;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Rooms.RoomMatches.Commands.CreateRoomMatches;
@@ -50,6 +51,15 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
             Note = request.Note 
         };
         _dbContext.RoomMatches.Add(room);
+        _dbContext.SaveChanges();
+        var roomMember = new RoomMember()
+        {
+            CustomerId = isValidBooking.CustomerId,
+            RoomMatchId = room.Id,
+            RoleInRoom = RoleInRoomEnums.Master.ToString()
+        };
+
+        _dbContext.RoomMembers.Add(roomMember);
         _dbContext.SaveChanges();
         return Task.FromResult(new BeatSportsResponse
         {
