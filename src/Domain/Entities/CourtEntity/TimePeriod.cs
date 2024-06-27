@@ -9,6 +9,8 @@ public class TimePeriod : BaseAuditableEntity
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
     public decimal? RateMultiplier { get; set; }
+    public bool IsRefundDeposit { get; set; }
+    public decimal? PercentDeposit { get; set; }
 
     public virtual CourtSubdivision CourtSubdivision { get; set; }
 }

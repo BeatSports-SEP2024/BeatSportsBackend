@@ -13,5 +13,6 @@ public class TimeChecking : BaseAuditableEntity
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public bool IsLock { get; set; }
+    public DateTime DateBooking { get; set; }
     public virtual CourtSubdivision CourtSubdivision { get; set; }
 }
