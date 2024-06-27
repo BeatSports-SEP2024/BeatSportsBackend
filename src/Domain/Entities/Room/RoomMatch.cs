@@ -18,4 +18,5 @@ public class RoomMatch : BaseAuditableEntity
     public virtual Booking Booking { get; set; } = null!;
     public virtual Level Level { get; set; } = null!;
     public virtual IList<RoomMember> RoomMembers { get; set; } = null!;
+    public virtual IList<RoomRequest> RoomRequests { get; set; } = null!;   
 }

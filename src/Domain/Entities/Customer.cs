@@ -13,4 +13,5 @@ public class Customer : BaseAuditableEntity
     public virtual Account Account { get; set; } = null!;
     public virtual IList<Booking>? Bookings { get; set; }
     public virtual IList<RoomMember>? RoomMembers { get; set; }
+    public virtual IList<RoomRequest>? RoomRequest { get; set; }
 }
