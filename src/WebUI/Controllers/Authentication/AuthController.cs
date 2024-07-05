@@ -31,7 +31,7 @@ public class AuthController : ApiControllerBase
             return BadRequest(ModelState);
         }
         var response = await _mediator.Send(request);
-        
+
         return Ok(response);
     }
 
@@ -40,12 +40,12 @@ public class AuthController : ApiControllerBase
     [SwaggerOperation("Create new customer with default wallet")]
     public async Task<IActionResult> RegisterCustomer([FromForm] RegisterCustomerModelRequest request, CancellationToken cancellationToken)
     {
-        if(!ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
         var response = await _mediator.Send(request);
-        
+
         return Ok(response);
     }
 
@@ -82,20 +82,21 @@ public class AuthController : ApiControllerBase
     public async Task<IActionResult> RefreshToken(string accessToken, string token)
     {
         var response = new BeatSportsResponse();
-        
+
         var refreshToken = _identityService.GetRefreshToken(token);
         if (refreshToken == null || accessToken != refreshToken.AccessToken)
         {
             response.Message = "Invalid Refresh Token";
             return Ok(response);
-        }else if(refreshToken.TokenExpires < DateTime.Now || accessToken != refreshToken.AccessToken)
+        }
+        else if (refreshToken.TokenExpires < DateTime.Now || accessToken != refreshToken.AccessToken)
         {
             response.Message = "Token expired.";
             return Ok(response);
         }
         var username = _identityService.GetUserIdFromToken(accessToken);
         var re = await _identityService.SetNewRefreshTokenAsync(username);
-        
+
         return Ok(re);
     }
     [HttpPost]

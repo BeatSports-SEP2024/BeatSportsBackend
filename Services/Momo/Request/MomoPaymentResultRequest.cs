@@ -48,6 +48,17 @@ public class MomoPaymentResultRequest
     [JsonProperty("signature")]
     public string signature { get; set; } = string.Empty;
 
+    //https://test-payment.momo.vn/v2/gateway/redirect?
+          //amount=50000&
+          //message=Successful.&
+          //orderId=9c71bf23-5c42-479f-b8ee-c6b23e8d255d&
+          //partnerCode=MOMOBKUN20180529&
+          //requestType=captureWallet&
+          //resultCode=0&
+          //sid=NUr8WQmTmnX4CoryXORxFso9&
+          //subscriptionInfo=&
+          //subscriptionName=
+
     public bool IsValidSignature(string accessKey, string secretKey)
     {
         var rawHash = $"accessKey={accessKey}" +

@@ -1,33 +1,32 @@
-using BeatSportsAPI.Infrastructure.Common;
-using WebAPI;
-using Hangfire;
-using Microsoft.OpenApi.Models;
-using BeatSportsAPI.Application.Common.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using BeatSportsAPI.Application;
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Newtonsoft.Json.Serialization;
-using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json.Serialization;
+using BeatSportsAPI.Application;
+using BeatSportsAPI.Domain.Entities;
+using BeatSportsAPI.Infrastructure.Common;
+using Hangfire;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Services.Momo.Config;
 using Services.VnPay.Config;
-using Microsoft.AspNetCore.SignalR;
-using WebAPI.Controllers.ChatHubs;
-using Microsoft.EntityFrameworkCore.Storage;
+using Services.ZaloPay.Config;
 using StackExchange.Redis;
 using WebAPI.Controllers.Queries;
 using BeatSportsAPI.Domain.Entities;
 using Services.Momo.Config;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using WebAPI;
+using WebAPI.Controllers.ChatHubs;
+using WebAPI.Controllers.Queries;
 using BeatSportsAPI.Application.Features.Jobs;
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
@@ -67,6 +66,8 @@ builder.Services.Configure<VnpayConfig>(
                 builder.Configuration.GetSection(VnpayConfig.ConfigName));
 builder.Services.Configure<MomoConfig>(
                 builder.Configuration.GetSection(MomoConfig.ConfigName));
+builder.Services.Configure<ZaloPayConfig>(
+                builder.Configuration.GetSection(ZaloPayConfig.ConfigName));
 
 builder.Services.AddAuthentication(options =>
 {
@@ -137,6 +138,8 @@ builder.Services.AddSwaggerGen(config =>
     });
 });
 
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -161,10 +164,14 @@ else
 //SignalR Hub
 app.MapHub<ChatHub>("chat-hub");
 
+//app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 app.UseCors(MyAllowSpecificOrigins);
-app.UseHealthChecks("/health");
+app.UseDefaultFiles();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseCookiePolicy();
+
+app.UseHealthChecks("/health");
 app.UseSwagger();
 app.UseSwaggerUI();
 
