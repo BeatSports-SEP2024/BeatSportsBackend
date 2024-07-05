@@ -16,6 +16,9 @@ using Services.Momo.Config;
 using Services.Momo.Request;
 using Services.VnPay.Config;
 using Services.VnPay.Request;
+using Services.ZaloPay.Config;
+using Services.ZaloPay.Request;
+using Utils.Extensions;
 
 namespace BeatSportsAPI.Application.Features.Wallets.Commands.CreateDeposits;
 public class PaymentByThirdWalletCommand : IRequest<PaymentLinkDtos>
@@ -50,6 +53,11 @@ public class TransactionWallet
     public string TransactionType { get; set; } = null!;
 }
 
+public class EmbedData
+{
+    public string? RedirectUrl { get; set; }
+}
+
 public class PaymentByThirdWalletCommandHandler : IRequestHandler<PaymentByThirdWalletCommand, PaymentLinkDtos>
 {
     private IBeatSportsDbContext _dbContext;
@@ -57,12 +65,14 @@ public class PaymentByThirdWalletCommandHandler : IRequestHandler<PaymentByThird
     private readonly IConfiguration _configuration;
     private readonly VnpayConfig vnpayConfig;
     private readonly MomoConfig momoConfig;
+    private readonly ZaloPayConfig zaloPayConfig;
 
     public PaymentByThirdWalletCommandHandler(IBeatSportsDbContext dbContext,
         ICurrentUserService currentUserService,
         IConfiguration configuration,
         IOptions<VnpayConfig> vnpayConfigOptions,
-        IOptions<MomoConfig> momoConfigOptions
+        IOptions<MomoConfig> momoConfigOptions,
+        IOptions<ZaloPayConfig> zaloPayConfigOptions
         )
     {
         _dbContext = dbContext;
@@ -70,6 +80,7 @@ public class PaymentByThirdWalletCommandHandler : IRequestHandler<PaymentByThird
         _configuration = configuration;
         this.vnpayConfig = vnpayConfigOptions.Value;
         this.momoConfig = momoConfigOptions.Value;
+        this.zaloPayConfig = zaloPayConfigOptions.Value;
     }
     public async Task<PaymentLinkDtos> Handle(PaymentByThirdWalletCommand request, CancellationToken cancellationToken)
     {
@@ -144,6 +155,27 @@ public class PaymentByThirdWalletCommandHandler : IRequestHandler<PaymentByThird
                     else
                     {
                         throw new BadRequestException(createMessage);
+                    }
+                    break;
+                case "ZALOPAY":
+                    var embed_data = new {
+                        RedirectUrl = "https://localhost:5001/api/v1/payment/zalopay-return",
+                    };
+                    var callback_url = "https://localhost:5001/api/v1/payment/callback";
+                    var item = "";
+                    var items = new[] { item };
+                    var zalopayPayRequest = new CreateZalopayPayRequest(zaloPayConfig.AppId, zaloPayConfig.AppUser,
+                        DateTime.Now.GetTimeStamp(), (long)request.RequiredAmount!, DateTime.Now.ToString("yyMMdd") + "_" + payment.Id.ToString() ?? string.Empty,
+                        "zalopayapp", request.PaymentContent ?? string.Empty, embed_data /*, items*/, callback_url);
+                    zalopayPayRequest.MakeSignature(zaloPayConfig.Key1);
+                    (bool createZaloPayLinkResult, string? createZaloPayMessage) = zalopayPayRequest.GetLink(zaloPayConfig.PaymentUrl);
+                    if (createZaloPayLinkResult)
+                    {
+                        paymentUrl = createZaloPayMessage;
+                    }
+                    else
+                    {
+                        throw new BadRequestException(createZaloPayMessage);
                     }
                     break;
                 default:

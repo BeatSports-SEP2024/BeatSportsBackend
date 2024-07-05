@@ -15,53 +15,51 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Services.Momo.Config;
-using Services.Momo.Request;
-using Services.VnPay.Config;
+using Services.ZaloPay.Config;
+using Services.ZaloPay.Request;
 
-namespace BeatSportsAPI.Application.Features.Wallets.Commands.ProcessMomoPaymentReturnCommand;
-public class ProcessMomoPaymentReturn : MomoPaymentResultRequest,
-        IRequest<BaseResultWithData<(PaymentReturnDtos, string)>>
+namespace BeatSportsAPI.Application.Features.Wallets.Commands.ProcessZalopayPaymentReturnCommand;
+public class ProcessZaloPaymentReturn : ZalopayPaymentResultRequest, IRequest<BaseResultWithData<(PaymentReturnDtos, string)>>
 {
 }
 
-public class ProcessMomoPaymentReturnHandler : IRequestHandler<ProcessMomoPaymentReturn, BaseResultWithData<(PaymentReturnDtos, string)>>
+public class ProcessZaloPaymentReturnHandler : IRequestHandler<ProcessZaloPaymentReturn, BaseResultWithData<(PaymentReturnDtos, string)>>
 {
-    
-    private readonly MomoConfig momoConfig;
+    private readonly ZaloPayConfig zalopayConfig;
     private IBeatSportsDbContext _dbContext;
     private readonly IMediator mediator;
     private IMapper _mapper;
-    public ProcessMomoPaymentReturnHandler(IBeatSportsDbContext dbContext,
-        IOptions<MomoConfig> momoConfigOptions,
+    public ProcessZaloPaymentReturnHandler(IBeatSportsDbContext dbContext,
+        IOptions<ZaloPayConfig> zalopayConfigOptions,
         IMediator mediator,
         IMapper mapper)
     {
         this._dbContext = dbContext;
-        this.momoConfig = momoConfigOptions.Value;
+        this.zalopayConfig = zalopayConfigOptions.Value;
         this.mediator = mediator;
         _mapper = mapper;
     }
 
-    public async Task<BaseResultWithData<(PaymentReturnDtos, string)>> Handle(ProcessMomoPaymentReturn request, CancellationToken cancellationToken)
+    public async Task<BaseResultWithData<(PaymentReturnDtos, string)>> Handle(ProcessZaloPaymentReturn request, CancellationToken cancellationToken)
     {
         string returnUrl = "https://www.facebook.com/";
         var result = new BaseResultWithData<(PaymentReturnDtos, string)>();
         try
         {
             var resultData = new PaymentReturnDtos();
-            var isValidSignature = request.IsValidSignature(momoConfig.AccessKey, momoConfig.SecretKey);
-
+            var isValidSignature = request.IsValidSignature(zalopayConfig.Key2);
             if (isValidSignature)
             {
+                string[] parts = request.apptransid.Split('_');
+                string paymentId = parts[1];
                 var payment = await _dbContext.Payments
-                    .Where(p => p.Id == Guid.Parse(request.orderId)).SingleOrDefaultAsync();
-                if(payment != null)
+                    .Where(p => p.Id == Guid.Parse(paymentId)).SingleOrDefaultAsync();
+                if (payment != null)
                 {
                     var merchant = await _dbContext.Merchants
-                        .Where(m => m.Id == payment.MerchantId)
-                        .SingleOrDefaultAsync();
-
-                    if (request.resultCode == 0)
+                            .Where(m => m.Id == payment.MerchantId)
+                            .SingleOrDefaultAsync();
+                    if (request.status == 1)
                     {
                         resultData.PaymentStatus = "00";
 
@@ -75,7 +73,7 @@ public class ProcessMomoPaymentReturnHandler : IRequestHandler<ProcessMomoPaymen
                             TranStatus = "0",
                             TranAmount = request.amount,
                             TranDate = DateTime.Now,
-                            PaymentId = Guid.Parse(request.orderId),
+                            PaymentId = Guid.Parse(paymentId),
                             TranRefId = payment.PaymentRefId
                         };
                         _dbContext.PaymentTransactions.Add(transaction);
@@ -135,8 +133,9 @@ public class ProcessMomoPaymentReturnHandler : IRequestHandler<ProcessMomoPaymen
                 resultData.PaymentStatus = "99";
                 resultData.PaymentMessage = "Invalid signature in response";
             }
+
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             result.Set(false, MessageContants.Error);
             result.Errors.Add(new BaseError()
