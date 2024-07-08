@@ -6,6 +6,7 @@ using BeatSportsAPI.Infrastructure.Notification;
 using BeatSportsAPI.Infrastructure.Persistence;
 using BeatSportsAPI.Infrastructure.Persistence.Interceptors;
 using BeatSportsAPI.Infrastructure.Services;
+using BeatSportsAPI.Infrastructure.Services.SendEmail;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

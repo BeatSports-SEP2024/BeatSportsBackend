@@ -4,9 +4,6 @@ using FirebaseAdmin;
 using FluentValidation.AspNetCore;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Models;
-using NSwag;
-using NSwag.Generation.Processors.Security;
 using WebAPI.Filters;
 using WebAPI.Services;
 

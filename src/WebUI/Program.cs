@@ -14,13 +14,8 @@ using Services.VnPay.Config;
 using Services.ZaloPay.Config;
 using StackExchange.Redis;
 using WebAPI.Controllers.Queries;
-using BeatSportsAPI.Domain.Entities;
-using Services.Momo.Config;
-using FirebaseAdmin;
-using Google.Apis.Auth.OAuth2;
 using WebAPI;
 using WebAPI.Controllers.ChatHubs;
-using WebAPI.Controllers.Queries;
 using BeatSportsAPI.Application.Features.Jobs;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
