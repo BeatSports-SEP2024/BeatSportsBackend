@@ -141,8 +141,14 @@ public class IdentityService : IIdentityService
             .Include(x => x.Owner)
             .FirstOrDefaultAsync();
 
+        if (user == null)
+        {
+            throw new InvalidOperationException("User not found.");
+        }
+
         var userRole = user.Role;
-        var userId = user.Id;
+        var accountId = user.Id;
+
         JwtSecurityTokenHandler jwtHandler = new JwtSecurityTokenHandler();
         var secretKey = GetJsonInAppSettingsExtension.GetJson("Jwt:SecretKey");
         if (string.IsNullOrWhiteSpace(secretKey))
@@ -156,12 +162,22 @@ public class IdentityService : IIdentityService
         string? audience = GetJsonInAppSettingsExtension.GetJson("Jwt:Audience");
 
         var claims = new List<Claim>()
-        {
+    {
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         new Claim(JwtRegisteredClaimNames.Sub, loginRequest.Username),
         new Claim(ClaimTypes.Role, userRole),
-        new Claim("UserId", userId.ToString())
-        };
+        new Claim("AccountId", accountId.ToString())
+    };
+
+        // Check the role of the user and add corresponding Id
+        if (userRole == "Owner" && user.Owner != null)
+        {
+            claims.Add(new Claim("OwnerId", user.Owner.Id.ToString()));
+        }
+        else if (userRole == "Customer" && user.Customer != null)
+        {
+            claims.Add(new Claim("CustomerId", user.Customer.Id.ToString()));
+        }
 
         var expiry = DateTime.UtcNow.AddMinutes(30);
         var tokenDescriptor = new SecurityTokenDescriptor
