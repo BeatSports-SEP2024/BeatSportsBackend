@@ -142,6 +142,7 @@ public class IdentityService : IIdentityService
             .FirstOrDefaultAsync();
 
         var userRole = user.Role;
+        var userId = user.Id;
         JwtSecurityTokenHandler jwtHandler = new JwtSecurityTokenHandler();
         var secretKey = GetJsonInAppSettingsExtension.GetJson("Jwt:SecretKey");
         if (string.IsNullOrWhiteSpace(secretKey))
@@ -158,7 +159,8 @@ public class IdentityService : IIdentityService
         {
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         new Claim(JwtRegisteredClaimNames.Sub, loginRequest.Username),
-        new Claim(ClaimTypes.Role, userRole)
+        new Claim(ClaimTypes.Role, userRole),
+        new Claim("UserId", userId.ToString())
         };
 
         var expiry = DateTime.UtcNow.AddMinutes(30);
