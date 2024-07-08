@@ -97,12 +97,6 @@ builder.Services.AddGraphQLServer()
     .AddQueryType<QueryDatas>()
     .AddType<Account>();
 
-// Initialize Firebase Admin
-FirebaseApp.Create(new AppOptions()
-{
-    Credential = GoogleCredential.FromFile("D:\\FPTU - MINH\\Semester 9\\BeatSports\\sep490-demo-firebase-adminsdk-x94qp-c859860ea6.json")
-});
-
 // Configure Redis connection
 var redisConnectionString = GetJsonInAppSettingsExtension.GetJson("Redis:RedisConnectionStrings");
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
