@@ -37,6 +37,7 @@ public class IdentityService : IIdentityService
     private readonly IBeatSportsDbContext _beatSportsDbContext;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IImageUploadService _imageUploadService;
+    private readonly IEmailService _emailService;
 
     public IdentityService(
         UserManager<ApplicationUser> userManager,
@@ -46,7 +47,8 @@ public class IdentityService : IIdentityService
         IOptions<JwtSettings> jwtSettings,
         IBeatSportsDbContext beatSportsDbContext,
         IHttpClientFactory httpClientFactory,
-        IImageUploadService imageUploadService
+        IImageUploadService imageUploadService,
+        IEmailService emailService
         )
     {
         _jwtSettings = jwtSettings.Value;
@@ -57,6 +59,7 @@ public class IdentityService : IIdentityService
         _beatSportsDbContext = beatSportsDbContext;
         _httpClientFactory = httpClientFactory;
         _imageUploadService = imageUploadService;
+        _emailService = emailService;
     }
 
     public async Task<string> GetUserNameAsync(string userId)
@@ -129,7 +132,7 @@ public class IdentityService : IIdentityService
         var combinedPassword = $"{passwordSaltString}:{passwordHashString}";
         return combinedPassword;
     }
-
+    #region Generate JWT
     public async Task<TokenModel> GenerateToken(LoginModelRequest loginRequest)
     {
         var user = await _beatSportsDbContext.Accounts
@@ -173,6 +176,7 @@ public class IdentityService : IIdentityService
 
         return new TokenModel { AccessToken = tokenString };
     }
+    #endregion
     #region Login
     //Login 
     public async Task<LoginResponse> AuthenticateAsync(LoginModelRequest loginModelRequest)
@@ -223,18 +227,19 @@ public class IdentityService : IIdentityService
         return loginResponse;
     }
     #endregion
-
+    #region GenerateRefreshToken
     private RefreshTokenModel GenerateRefreshToken()
     {
         var refreshToken = new RefreshTokenModel
         {
-            Token = GenerateRandomAlphanumericString(16),
+            Token = GenerateRandomAlphanumericExtensions.GenerateRandomAlphanumeric(16),
             Expires = DateTime.Now.AddDays(1)
         };
 
         return refreshToken;
     }
-
+    #endregion
+    #region SetRefreshToken
     private void SetRefreshToken(RefreshTokenModel newRefreshToken, Account user, TokenModel accessToken)
     {
         var cookieOptions = new CookieOptions
@@ -267,9 +272,9 @@ public class IdentityService : IIdentityService
             _beatSportsDbContext.RefreshToken.Add(newRef);
             _beatSportsDbContext.SaveChanges(); 
         }
-        
     }
-
+    #endregion
+    #region SetNewRefreshToken
     public async Task<LoginResponse> SetNewRefreshTokenAsync(string username)
     {
         var user = _beatSportsDbContext.Accounts
@@ -318,33 +323,14 @@ public class IdentityService : IIdentityService
                 Email = user.Email
             }
         };
-        
         return loginResponse;
     }
-   
+    #endregion
 
     public RefreshToken GetRefreshToken (string token)
     {
         var refreshToken = _beatSportsDbContext.RefreshToken.Where(x => x.Token.Equals(token)).FirstOrDefault();
         return refreshToken;
-    }
-
-    public static string GenerateRandomAlphanumericString(int length)
-    {
-        const string validCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        var stringBuilder = new StringBuilder();
-        using (var rng = RandomNumberGenerator.Create())
-        {
-            var byteBuffer = new byte[sizeof(uint)];
-
-            while (length-- > 0)
-            {
-                rng.GetBytes(byteBuffer);
-                var num = BitConverter.ToUInt32(byteBuffer, 0);
-                stringBuilder.Append(validCharacters[(int)(num % (uint)validCharacters.Length)]);
-            }
-        }
-        return stringBuilder.ToString();
     }
 
     public async Task<string> RegisterCustomerAccountAsync(RegisterCustomerModelRequest registerModelRequest, CancellationToken cancellationToken)
@@ -416,22 +402,32 @@ public class IdentityService : IIdentityService
         {
             throw new NotFoundException("This user is existed");
         }
-        var combinedPassword = CreatePasswordHash(registerModelRequest.Password);
+        string password = GenerateRandomAlphanumericExtensions.GenerateRandomAlphanumeric(10);
+        var combinedPassword = CreatePasswordHash(password);
         var newUser = new Account
         {
             UserName = registerModelRequest.UserName,
             Password = combinedPassword,
             Email = registerModelRequest.Email,
-            FirstName = registerModelRequest.FirstName,
-            LastName = registerModelRequest.LastName,
             DateOfBirth = registerModelRequest.DateOfBirth,
             Gender = registerModelRequest.Gender.ToString(),
-            ProfilePictureURL = registerModelRequest.ProfilePictureURL,
-            Bio = registerModelRequest.Bio,
             PhoneNumber = registerModelRequest.PhoneNumber,
             Role = RoleEnums.Owner.ToString(),
         };
+        await _emailService.SendEmailAsync(registerModelRequest.Email, 
+            $"Tài khoản mặc định của chủ sân", 
+            $"<p>" +
+            $"Đây là tài khoản chủ sân của bạn, vui lòng đổi mật khẩu sau khi nhận đưọc email" +
+            $"</p>" +
+            $"<p>" +
+            $"<strong>TÀI KHOẢN:</strong> {registerModelRequest.UserName}" +
+            $"</p>" +
+            $"<p>" +
+            $"<strong>MẬT KHẨU:</strong> {password}" +
+            $"</p>");
+
         await _beatSportsDbContext.Accounts.AddAsync(newUser, cancellationToken);
+        
         var newOwner = new Owner
         {
             Account = newUser,

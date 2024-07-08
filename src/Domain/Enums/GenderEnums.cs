@@ -8,6 +8,5 @@ namespace BeatSportsAPI.Domain.Enums;
 public enum GenderEnums
 {
     Nam,
-    Nữ,
-    Khác
+    Nữ
 }
