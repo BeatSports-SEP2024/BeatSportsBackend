@@ -16,6 +16,7 @@ public class RegisterOwnerModelRequest : IRequest<BeatSportsResponse>
     public string UserName { get; set; } = null!;
     [EmailAddress]
     public string? Email { get; set; }
+    public string? Address { get; set; }
     public DateTime DateOfBirth { get; set; }
     [EnumDataType(typeof(GenderEnums))]
     public GenderEnums Gender { get; set; }
