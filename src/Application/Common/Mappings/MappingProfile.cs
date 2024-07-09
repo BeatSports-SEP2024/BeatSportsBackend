@@ -16,7 +16,8 @@ public class MappingProfile : Profile
         ApplyMappingsFromAssembly(Assembly.GetExecutingAssembly());
         //Account Mapping
         CreateMap<Account, AccountResponse>()
-            .ForMember(dest => dest.AccountId, opt => opt.MapFrom(src => src.Id));
+            .ForMember(dest => dest.AccountId, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.Created, opt => opt.MapFrom(src => src.Created));
         CreateMap<Customer, CustomerResponse>()
             .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.Id));
         CreateMap<Owner, OwnerResponse>()
@@ -26,8 +27,11 @@ public class MappingProfile : Profile
         CreateMap<Level, LevelResponse>()
             .ForMember(dest => dest.LevelId, opt => opt.MapFrom(src => src.Id));
 
-        //Wallet mapping
+        //Wallet mapping for Wallet Response
         CreateMap<Wallet, WalletResponse>()
+            .ForMember(dest => dest.WalletId, opt => opt.MapFrom(src => src.Id));
+
+        CreateMap<Wallet, CustomerResponse>()
             .ForMember(dest => dest.WalletId, opt => opt.MapFrom(src => src.Id));
 
         //CourtSport Mapping

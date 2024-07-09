@@ -12,6 +12,7 @@ using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Customers.Queries;
 public class GetAllCustomersHandler : IRequestHandler<GetAllCustomersCommand, PaginatedList<CustomerResponse>>
@@ -31,11 +32,14 @@ public class GetAllCustomersHandler : IRequestHandler<GetAllCustomersCommand, Pa
         }
 
         IQueryable<Customer> query = _beatSportsDbContext.Customers
-            .Where(x => !x.IsDelete);
+            .Where(x => !x.IsDelete)
+            .Include(c => c.Account)
+                .ThenInclude(a => a.Wallet);
 
         var list = query.Select(c => new CustomerResponse
         {
             AccountId = c.AccountId,
+            WalletId = c.Account.Wallet.Id,
             CustomerId = c.Id,
             UserName = c.Account.UserName,
             Email = c.Account.Email,
@@ -47,7 +51,8 @@ public class GetAllCustomersHandler : IRequestHandler<GetAllCustomersCommand, Pa
             Bio = c.Account.Bio,
             PhoneNumber = c.Account.PhoneNumber,
             Address = c.Address,
-            RewardPoints = c.RewardPoints
+            RewardPoints = c.RewardPoints,
+            Created = c.Created
         })
         .PaginatedListAsync(request.PageIndex, request.PageSize);
 
