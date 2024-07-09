@@ -22,4 +22,5 @@ public class OwnerResponse : IMapFrom<Owner>
     public string? ProfilePictureURL { get; set; }
     public string? Bio { get; set; }
     public string PhoneNumber { get; set; } 
+    public string Address { get; set; }
 }
