@@ -1,6 +1,7 @@
 ﻿using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Authentication.Command.AuthGoogle;
+using BeatSportsAPI.Application.Features.Authentication.Command.ResetPassword.ChangePassword;
 using BeatSportsAPI.Application.Features.Authentication.Command.ResetPassword.ResetPasswordByOTP;
 using BeatSportsAPI.Application.Features.Authentication.Command.ResetPassword.SendOTPToEmail;
 using BeatSportsAPI.Application.Features.Authentication.Queries;
@@ -39,6 +40,19 @@ public class AuthController : ApiControllerBase
     [Route("register/customer")]
     [SwaggerOperation("Create new customer with default wallet")]
     public async Task<IActionResult> RegisterCustomer([FromForm] RegisterCustomerModelRequest request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var response = await _mediator.Send(request);
+
+        return Ok(response);
+    }
+    [HttpPost]
+    [Route("change-password")]
+    [SwaggerOperation("Change password")]
+    public async Task<IActionResult> ChangePassword([FromQuery] ChangePasswordCommand request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
