@@ -22,4 +22,5 @@ public class UpdateOwnerCommand : IRequest<BeatSportsResponse>
     public string? ProfilePictureURL { get; set; }
     public string? Bio { get; set; }
     public string PhoneNumber { get; set; } = null!;
+    public string Address { get; set; }
 }
