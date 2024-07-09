@@ -3,9 +3,11 @@ using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Commands.CreateCourtSubdivision;
-public class CreateCourtSubdivisionHandler : IRequestHandler<CreateCourtSubdivisionCommand, BeatSportsResponse>
+public class CreateCourtSubdivisionHandler : IRequestHandler<CreateListCourtSubdivisionCommand, BeatSportsResponse>
 {
     private readonly IBeatSportsDbContext _dbContext;
 
@@ -14,28 +16,35 @@ public class CreateCourtSubdivisionHandler : IRequestHandler<CreateCourtSubdivis
         _dbContext = dbContext;
     }
 
-    public Task<BeatSportsResponse> Handle(CreateCourtSubdivisionCommand request, CancellationToken cancellationToken)
+    public async Task<BeatSportsResponse> Handle(CreateListCourtSubdivisionCommand request, CancellationToken cancellationToken)
     {
-        //check court
-        var court = _dbContext.Courts.Where(x => x.Id == request.CourtId).SingleOrDefault();
-        if (court == null || court.IsDelete)
+        foreach(var command in request.CreateListCourtSubCommands)
         {
-            throw new BadRequestException($"Court with court ID:{request.CourtId} does not exist or have been delele");
+            //Check court is valid
+            var court = _dbContext.Courts
+                .Where(c => c.Id == command.CourtId && !c.IsDelete)
+                .SingleOrDefault();
+
+            if( court == null ) 
+            {
+                throw new BadRequestException("This sport court does not exist");
+            }
+
+            var courtSubdivision = new CourtSubdivision
+            {
+                CourtId = command.CourtId,
+                BasePrice = command.BasePrice,
+                ImageURL = command.ImageURL,
+                Description = command.Description,
+                IsActive = true,
+                CourtSubdivisionName = command.CourtSubdivisionName,
+            };
+            _dbContext.CourtSubdivisions.Add(courtSubdivision);
         }
-        var courtSubdivision = new CourtSubdivision
-        {
-            CourtId = request.CourtId,
-            BasePrice = request.BasePrice,
-            ImageURL = request.ImageURL,
-            Description = request.Description,
-            IsActive = true,
-            CourtSubdivisionName = request.CourtSubdivisionName,
-        };
-        _dbContext.CourtSubdivisions.Add(courtSubdivision);
-        _dbContext.SaveChanges();
-        return Task.FromResult(new BeatSportsResponse
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return new BeatSportsResponse
         {
             Message = "Create successfully"
-        });
+        };
     }
 }
