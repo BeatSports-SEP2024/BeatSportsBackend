@@ -26,10 +26,29 @@ public class GetAllCourtHandler : IRequestHandler<GetAllCourtCommand, PaginatedL
 
     public Task<PaginatedList<CourtResponse>> Handle(GetAllCourtCommand request, CancellationToken cancellationToken)
     {
-        var courtDetails = _dbContext.Courts
-            .Where(c => !c.IsDelete)
-            .ProjectTo<CourtResponse>(_mapper.ConfigurationProvider)
-            .PaginatedListAsync(request.PageIndex, request.PageSize);
-        return courtDetails;
+        if (request.PageIndex <= 0 || request.PageSize <= 0)
+        {
+            throw new BadRequestException("Page index and page size cannot less than 0");
+        }
+
+        IQueryable<Court> query = _dbContext.Courts
+            .Where(x => !x.IsDelete)
+            .Include(x => x.CourtSubdivision);
+
+        var list = query.Select(c => new CourtResponse
+        {
+            Id = c.Id,
+            OwnerId = c.OwnerId,
+            Description = c.Description,
+            CourtName = c.CourtName,
+            Address = c.Address,
+            GoogleMapURLs = c.GoogleMapURLs,
+            TimeStart = c.TimeStart,
+            TimeEnd = c.TimeEnd,
+            PlaceId = c.PlaceId,
+        })
+        .PaginatedListAsync(request.PageIndex, request.PageSize);
+
+        return list;
     }
 }

@@ -57,6 +57,12 @@ public class CourtController : ApiControllerBase
     //    return await _mediator.Send(request);
     //}
     [HttpGet]
+    [Route("all")]
+    public async Task<PaginatedList<CourtResponse>> GetAllCourt([FromQuery] GetAllCourtCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+    [HttpGet]
     [Route("get-by-owner-id")]
     public async Task<PaginatedList<CourtResponse>> GetByOwnerId([FromQuery] GetAllCourtsByOwnerIdCommand request)
     {
