@@ -15,7 +15,7 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, BeatSports
         _dbContext = dbContext;
     }
 
-    public Task<BeatSportsResponse> Handle(CreateCourtCommand request, CancellationToken cancellationToken)
+    public async Task<BeatSportsResponse> Handle(CreateCourtCommand request, CancellationToken cancellationToken)
     {
         // Check Owner
         var owner = _dbContext.Owners.Where(x => x.Id == request.OwnerId).SingleOrDefault();
@@ -33,12 +33,31 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, BeatSports
             TimeStart = request.TimeStart,
             TimeEnd = request.TimeEnd,
             PlaceId = request.PlaceId,
+            CourtSubdivision = new List<CourtSubdivision>()
         };
+
+        if (request.CourtSubdivision != null && request.CourtSubdivision.Any())
+        {
+            foreach (var subdivision in request.CourtSubdivision)
+            {
+                court.CourtSubdivision.Add(new CourtSubdivision
+                {
+                    CourtId = court.Id,
+                    Description = subdivision.Description,
+                    ImageURL = subdivision.ImageURL,
+                    IsActive = true,
+                    BasePrice = subdivision.BasePrice,
+                    CourtSubdivisionName = subdivision.CourtSubdivisionName,
+                });
+            }
+        }
+
         _dbContext.Courts.Add(court);
         _dbContext.SaveChanges();
-        return Task.FromResult(new BeatSportsResponse
+
+        return new BeatSportsResponse
         {
             Message = "Create successfully!"
-        });
+        };
     }
 }

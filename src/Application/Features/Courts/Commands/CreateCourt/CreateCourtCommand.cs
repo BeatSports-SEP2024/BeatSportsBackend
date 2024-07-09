@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Courts.Commands.CreateCourt;
@@ -14,4 +15,14 @@ public class CreateCourtCommand : IRequest<BeatSportsResponse>
     public TimeSpan TimeEnd { get; set; }
     [Required]
     public string PlaceId { get; set; } = null!;
+    public ICollection<CourtSubdivisionDto>? CourtSubdivision { get; set; }
+
+    public class CourtSubdivisionDto
+    {
+        public string Description { get; set; } = string.Empty;
+        public string ImageURL { get; set; } = string.Empty;
+        public bool IsActive { get; set; }
+        public decimal BasePrice { get; set; }
+        public string CourtSubdivisionName { get; set; } = string.Empty;
+    }
 }
