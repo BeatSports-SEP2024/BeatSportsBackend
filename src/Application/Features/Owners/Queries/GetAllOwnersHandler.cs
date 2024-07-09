@@ -47,7 +47,8 @@ public class GetAllOwnersHandler : IRequestHandler<GetAllOwnersCommand, Paginate
             Gender = c.Account.Gender,
             ProfilePictureURL = c.Account.ProfilePictureURL,
             Bio = c.Account.Bio,
-            PhoneNumber = c.Account.PhoneNumber
+            PhoneNumber = c.Account.PhoneNumber,
+            Address = c.Address
         })
         .PaginatedListAsync(request.PageIndex, request.PageSize);
 

@@ -37,8 +37,8 @@ public class GetOwnerByIdHandler : IRequestHandler<GetOwnerByIdCommand, OwnerRes
             Gender = c.Account.Gender,
             ProfilePictureURL = c.Account.ProfilePictureURL,
             Bio = c.Account.Bio,
-            PhoneNumber = c.Account.PhoneNumber
-
+            PhoneNumber = c.Account.PhoneNumber,
+            Address = c.Address,
         }).SingleOrDefault();
 
         if (owner == null)
