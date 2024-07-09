@@ -205,6 +205,55 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 IsDelete = false,
             });
         #endregion
+        #region Wallet
+        builder.Entity<Wallet>()
+            .HasData(
+            new Wallet
+            {
+                Id = Guid.NewGuid(),
+                AccountId = ownerAccountId,
+                Balance = 18000000,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false,
+            },
+            new Wallet
+            {
+                Id = Guid.NewGuid(),
+                AccountId = owner1AccountId,
+                Balance = 182000000,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false,
+            },
+            new Wallet
+            {
+                Id = Guid.NewGuid(),
+                AccountId = customer1AccountId,
+                Balance = 12000000,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false,
+            },
+            new Wallet
+            {
+                Id = Guid.NewGuid(),
+                AccountId = customer2AccountId,
+                Balance = 13000000,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false,
+            },
+            new Wallet
+            {
+                Id = Guid.NewGuid(),
+                AccountId = customer3AccountId,
+                Balance = 13000000,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false,
+            });
+        #endregion
         var customer1Id = Guid.NewGuid();
         var customer2Id = Guid.NewGuid();
         var customer3Id = Guid.NewGuid();
@@ -786,6 +835,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 RoleInRoom = "Member",
             });
         #endregion
+
     }
 
     private static string CreatePasswordHash(string password)
