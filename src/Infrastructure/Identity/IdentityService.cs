@@ -432,26 +432,17 @@ public class IdentityService : IIdentityService
             PhoneNumber = registerModelRequest.PhoneNumber,            
             Role = RoleEnums.Owner.ToString(),
         };
-        await _emailService.SendEmailAsync(registerModelRequest.Email, 
-            $"Tài khoản mặc định của chủ sân", 
-            $"<p>" +
-            $"Đây là tài khoản chủ sân của bạn, vui lòng đổi mật khẩu sau khi nhận đưọc email" +
-            $"</p>" +
-            $"<p>" +
-            $"<strong>TÀI KHOẢN:</strong> {registerModelRequest.UserName}" +
-            $"</p>" +
-            $"<p>" +
-            $"<strong>MẬT KHẨU:</strong> {password}" +
-            $"</p>");
 
         await _beatSportsDbContext.Accounts.AddAsync(newUser, cancellationToken);
-        
+        await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
+
         var newOwner = new Owner
         {
             Account = newUser,
             Address = registerModelRequest.Address
         };
         await _beatSportsDbContext.Owners.AddAsync(newOwner, cancellationToken);
+        await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
         var newWallet = new Wallet
         {
             AccountId = newUser.Id,
@@ -460,6 +451,68 @@ public class IdentityService : IIdentityService
         };
         await _beatSportsDbContext.Wallets.AddAsync(newWallet, cancellationToken);
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
+
+        await _emailService.SendEmailAsync(
+            registerModelRequest.Email,
+            "Tài khoản mặc định của chủ sân",
+            $@"
+            <html>
+            <head>
+                <style>
+                    body {{
+                        font-family: Montserrat, sans-serif;
+                        margin: 0;
+                        padding: 0;
+                        background-color: #f4f4f4;
+                    }}
+                    .container {{
+                        width: 100%;
+                        max-width: 600px;
+                        margin: 0 auto;
+                        background-color: #ffffff;
+                        padding: 20px;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    }}
+                    .header {{
+                        background-color: #007bff;
+                        color: #ffffff;
+                        padding: 10px 0;
+                        text-align: center;
+                        font-size: 24px;
+                    }}
+                    .content {{
+                        margin: 20px 0;
+                        line-height: 1.6;
+                    }}
+                    .content p {{
+                        margin: 10px 0;
+                    }}
+                    .footer {{
+                        margin: 20px 0;
+                        text-align: center;
+                        color: #777;
+                        font-size: 12px;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <div class='header'>
+                        Thông tin tài khoản chủ sân
+                    </div>
+                    <div class='content'>
+                        <p>Chào bạn,</p>
+                        <p>Đây là tài khoản chủ sân của bạn, vui lòng đổi mật khẩu sau khi nhận được email này.</p>
+                        <p><strong>TÀI KHOẢN:</strong> {registerModelRequest.UserName}</p>
+                        <p><strong>MẬT KHẨU:</strong> {password}</p>
+                    </div>
+                    <div class='footer'>
+                        <p>© 2024 BeatSports. All rights reserved.</p>
+                    </div>
+                </div>
+            </body>
+            </html>"
+        );
         return "Create new account successfully";
     }
 
