@@ -7,7 +7,7 @@ using BeatSportsAPI.Domain.Enums;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Courts.Queries.GetAll;
-public class GetAllCourtCommand : IRequest<PaginatedList<CourtResponse>>
+public class GetAllCourtCommand : IRequest<PaginatedList<CourtResponseV2>>
 {
     [Required]
     public int PageIndex { get; set; }
