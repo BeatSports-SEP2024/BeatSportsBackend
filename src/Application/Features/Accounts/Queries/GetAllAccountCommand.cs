@@ -19,6 +19,6 @@ public class GetAllAccountCommand : IRequest<PaginatedList<AccountResponse>>
     public string? Username { get; set; }
     public Guid? WalletId { get; set; }
     public string? PhoneNumber { get; set; }
-    //public DateTime? StartDate { get; set; }
-    //public DateTime? EndDate { get; set; }
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
 }
