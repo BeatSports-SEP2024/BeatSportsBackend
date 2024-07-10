@@ -52,6 +52,7 @@ public class GetAllCourtHandler : IRequestHandler<GetAllCourtCommand, PaginatedL
             TimeStart = c.TimeStart,
             TimeEnd = c.TimeEnd,
             Created = c.Created,
+            IsDelete = c.IsDelete,
         })
         .PaginatedListAsync(request.PageIndex, request.PageSize);
 

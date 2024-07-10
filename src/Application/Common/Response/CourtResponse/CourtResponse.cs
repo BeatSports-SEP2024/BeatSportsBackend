@@ -34,6 +34,7 @@ public class CourtResponseV2 : IMapFrom<Court>
     public TimeSpan TimeStart { get; set; }
     public TimeSpan TimeEnd { get; set; }
     public DateTime Created { get; set; }
+    public bool IsDelete { get; set; }
     //public virtual IList<CourtSubdivision>? CourtSubdivision { get; set; }
 }
 
