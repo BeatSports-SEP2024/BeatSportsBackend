@@ -31,10 +31,10 @@ public class UpdateOwnerHandler : IRequestHandler<UpdateOwnerCommand, BeatSports
         }
 
         owner.Account.Email = request.Email;
-        owner.Account.FirstName = request.FirstName;
-        owner.Account.LastName = request.LastName;
+        //owner.Account.FirstName = request.FirstName;
+        //owner.Account.LastName = request.LastName;
         owner.Account.DateOfBirth = request.DateOfBirth;
-        owner.Account.Gender = request.Gender.ToString();
+        //owner.Account.Gender = request.Gender.ToString();
         owner.Account.PhoneNumber = request.PhoneNumber;
         owner.Account.ProfilePictureURL = request.ProfilePictureURL;
         owner.Account.Bio = request.Bio;
