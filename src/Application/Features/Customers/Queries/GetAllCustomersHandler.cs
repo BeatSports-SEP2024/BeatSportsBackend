@@ -33,6 +33,7 @@ public class GetAllCustomersHandler : IRequestHandler<GetAllCustomersCommand, Pa
 
         IQueryable<Customer> query = _beatSportsDbContext.Customers
             .Where(x => !x.IsDelete)
+            .OrderByDescending(b => b.Created)
             .Include(c => c.Account)
                 .ThenInclude(a => a.Wallet);
 

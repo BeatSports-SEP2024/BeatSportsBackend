@@ -22,6 +22,7 @@ public class GetAllBookingHandler : IRequestHandler<GetAllBookingCommand, Pagina
     {
         var bookingList = _beatSportsDbContext.Bookings
             .Where(b => !b.IsDelete)
+            .OrderByDescending(b => b.Created)
             .ProjectTo<BookingResponse>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(request.PageIndex, request.PageSize); 
 

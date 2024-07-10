@@ -27,7 +27,8 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
     public Task<PaginatedList<TransactionResponse>> Handle(GetAllTransactionsCommand request, CancellationToken cancellationToken)
     {
         IQueryable<Transaction> query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete);
+            .Where(t => !t.IsDelete)
+            .OrderByDescending(b => b.Created);
 
         var list = query.Select(q => new TransactionResponse
         {

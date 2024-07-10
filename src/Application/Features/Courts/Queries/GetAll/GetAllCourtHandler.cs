@@ -33,6 +33,7 @@ public class GetAllCourtHandler : IRequestHandler<GetAllCourtCommand, PaginatedL
 
         IQueryable<Court> query = _dbContext.Courts
             .Where(x => !x.IsDelete)
+            .OrderByDescending(b => b.Created)
             .Include(x => x.CourtSubdivision);
 
         var list = query.Select(c => new CourtResponse

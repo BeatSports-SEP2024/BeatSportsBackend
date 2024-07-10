@@ -32,7 +32,8 @@ public class GetAllFeedbacksHandler : IRequestHandler<GetAllFeedbacksCommand, Pa
         }
 
         IQueryable<Feedback> query = _dbContext.Feedbacks
-            .Where(x => !x.IsDelete);
+            .Where(x => !x.IsDelete)
+            .OrderByDescending(b => b.Created);
 
         var list = query.Select(c => new FeedbackResponse
         {
