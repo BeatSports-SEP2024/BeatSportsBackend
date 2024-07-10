@@ -33,17 +33,18 @@ public class GetAllAccountHandler : IRequestHandler<GetAllAccountCommand, Pagina
             throw new BadRequestException("Page index and page size cannot be less than 0");
         }
 
-        // Tạo bộ lọc
-        var filter = new AccountFilter
-        {
-            //Role = request.Role,
-            Username = request.Username,
-            PhoneNumber = request.PhoneNumber,
-        };
-
         var query = _beatSportsDbContext.Accounts
             .Where(tp => !tp.IsDelete);
 
+        if (!string.IsNullOrEmpty(request.Username))
+        {
+            query = query.Where(tp => tp.UserName.ToLower().Contains(request.Username.ToLower()));
+        }
+
+        if (!string.IsNullOrEmpty(request.PhoneNumber))
+        {
+            query = query.Where(tp => tp.PhoneNumber.Contains(request.PhoneNumber));
+        }
         if (request.Role != RoleEnums.All)
         {
             query = query.Where(tp => tp.Role.Equals(request.Role.ToString()));
@@ -67,8 +68,7 @@ public class GetAllAccountHandler : IRequestHandler<GetAllAccountCommand, Pagina
             query = query.Where(tp => tp.Created.Date <= request.EndDate.Value.Date);
         }
 
-        query = query.OrderByDescending(tp => tp.Created)
-                     .ApplyFilter(filter);
+        query = query.OrderByDescending(tp => tp.Created);
 
         // Thực hiện truy vấn với ProjectTo và PaginatedListAsync
         var response = await query
