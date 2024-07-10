@@ -36,11 +36,11 @@ public class GetAllAccountHandler : IRequestHandler<GetAllAccountCommand, Pagina
         var query = _beatSportsDbContext.Accounts
             .Where(tp => !tp.IsDelete);
 
-        if (!string.IsNullOrEmpty(request.Search))
+        if (!string.IsNullOrEmpty(request.Query))
         {
-            query = query.Where(tp => tp.UserName.ToLower().Contains(request.Search.ToLower()) 
-                || tp.PhoneNumber.Contains(request.Search)
-                || tp.Wallet.Id.ToString().Contains(request.Search));
+            query = query.Where(tp => tp.UserName.ToLower().Contains(request.Query.ToLower()) 
+                || tp.PhoneNumber.Contains(request.Query)
+                || tp.Wallet.Id.ToString().Contains(request.Query));
         }
 
         if (request.Role != RoleEnums.All)
