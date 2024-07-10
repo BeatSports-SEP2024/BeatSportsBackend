@@ -9,5 +9,6 @@ public enum RoleEnums
 {
     Admin,
     Owner,
-    Customer
+    Customer,
+    All
 }
