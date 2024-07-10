@@ -50,12 +50,12 @@ public class CourtController : ApiControllerBase
     //{
     //    return await _mediator.Send(request);
     //}
-    //[HttpGet]
-    //[Route("get-by-court-id")]
-    //public async Task<CourtResponse> GetByCourtId([FromQuery] GetCourtByIdCommand request)
-    //{
-    //    return await _mediator.Send(request);
-    //}
+    [HttpGet]
+    [Route("get-by-court-id")]
+    public async Task<CourtResponseV3> GetByCourtId([FromQuery] GetCourtByIdCommand request)
+    {
+        return await _mediator.Send(request);
+    }
     [HttpGet]
     [Route("all")]
     public async Task<PaginatedList<CourtResponseV2>> GetAllCourt([FromQuery] GetAllCourtCommand request)

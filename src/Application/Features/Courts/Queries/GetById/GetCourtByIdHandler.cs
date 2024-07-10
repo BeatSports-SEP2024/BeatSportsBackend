@@ -2,11 +2,14 @@
 using AutoMapper.QueryableExtensions;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
+using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Response.CourtResponse;
+using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Courts.Queries.GetById;
-public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtResponse>
+public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtResponseV3>
 {
     private readonly IBeatSportsDbContext _dbContext;
     private readonly IMapper _mapper;
@@ -17,15 +20,38 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
         _mapper = mapper;
     }
 
-    public Task<CourtResponse> Handle(GetCourtByIdCommand request, CancellationToken cancellationToken)
+    public Task<CourtResponseV3> Handle(GetCourtByIdCommand request, CancellationToken cancellationToken)
     {
-        var court = _dbContext.Courts
-            .Where(x => x.Id == request.CourtId && !x.IsDelete)
-            .ProjectTo<CourtResponse>(_mapper.ConfigurationProvider).SingleOrDefault();
-        if (court == null)
+       
+
+        var query = _dbContext.Courts
+            .Where(x => !x.IsDelete && x.Id == request.CourtId)
+            .OrderByDescending(b => b.Created)
+            .Include(x => x.Owner).ThenInclude(x => x.Account)
+            .Include(x => x.CourtSubdivision)
+            .FirstOrDefault();
+
+        var listCourtSub = query.CourtSubdivision.Select(b => new CourtSubdivisionResponse
         {
-            throw new NotFoundException($"Do not find court with court ID: {request.CourtId}");
-        }
+            Id = b.Id,
+            CourtId = b.CourtId,
+            CourtSubdivisionName = b.CourtSubdivisionName,
+            BasePrice = b.BasePrice,
+            IsActive = b.IsActive,
+        }).ToList();
+
+        var court = new CourtResponseV3
+        {
+            Id = query.Id,
+            OwnerName = query.Owner.Account.FirstName + " " + query.Owner.Account.LastName,
+            CourtName = query.CourtName,
+            Address = query.Address,
+            GoogleMapURLs = query.GoogleMapURLs,
+            TimeStart = query.TimeStart,
+            TimeEnd = query.TimeEnd,
+            CourtSubdivision = listCourtSub,
+        };
+
         return Task.FromResult(court);
     }
 }
