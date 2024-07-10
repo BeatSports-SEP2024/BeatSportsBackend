@@ -31,8 +31,13 @@ public class GetAllCourtHandler : IRequestHandler<GetAllCourtCommand, PaginatedL
             throw new BadRequestException("Page index and page size cannot less than 0");
         }
 
+        if (request.KeyWords == null)
+        {
+            request.KeyWords = "";
+        }
+
         IQueryable<Court> query = _dbContext.Courts
-            .Where(x => !x.IsDelete)
+            .Where(x => !x.IsDelete && (x.CourtName.Contains(request.KeyWords) || x.Address.Contains(request.KeyWords)))
             .OrderByDescending(b => b.Created)
             .Include(x => x.Owner).ThenInclude(x => x.Account)
             .Include(x => x.CourtSubdivision);

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Models;
+using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Response.CourtResponse;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAllCourtsByOwnerId;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
@@ -15,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using Services.MapBox;
 
 namespace BeatSportsAPI.Application.Features.Courts.Queries.GetListCourtsNearBy;
-public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCommand, List<CourtResponse>>
+public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCommand, List<CourtResponseV3>>
 {
     private readonly IBeatSportsDbContext _dbContext;
     private readonly IMapper _mapper;
@@ -25,7 +27,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
         _dbContext = dbContext;
         _mapper = mapper;
     }
-    public Task<List<CourtResponse>> Handle(GetListCourtsNearByCommand request, CancellationToken cancellationToken)
+    public Task<List<CourtResponseV3>> Handle(GetListCourtsNearByCommand request, CancellationToken cancellationToken)
     {
         var distanceCal = new DistanceCalculation();
 
@@ -39,7 +41,8 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
         if (request.CourtId != Guid.Empty)
         {
              query = _dbContext.Courts
-            .Where(x => !x.IsDelete && x.Id == request.CourtId && x.CourtName.Contains(request.KeyWords) || x.Address.Contains(request.KeyWords))
+            .Where(x => !x.IsDelete && x.Id == request.CourtId && (x.CourtName.Contains(request.KeyWords) || x.Address.Contains(request.KeyWords)))
+            .Include(x => x.Owner)
             .Include(x => x.Feedback)
             .Include(x => x.CourtSubdivision)
             .ThenInclude(x => x.Bookings)
@@ -48,14 +51,15 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
         else
         {
             query = _dbContext.Courts
-            .Where(x => !x.IsDelete && x.CourtName.Contains(request.KeyWords) || x.Address.Contains(request.KeyWords))
+            .Where(x => !x.IsDelete && (x.CourtName.Contains(request.KeyWords) || x.Address.Contains(request.KeyWords)))
+            .Include(x => x.Owner)
             .Include(x => x.Feedback)
             .Include(x => x.CourtSubdivision)
             .ThenInclude(x => x.Bookings)
             .ToList();
         }
 
-        var list = new List<CourtResponse>();
+        var list = new List<CourtResponseV3>();
 
         foreach (var c in query)
         {
@@ -73,10 +77,23 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
                 rentalNumber = c.CourtSubdivision.Sum(x => x.Bookings.Where(c => c.BookingStatus.Equals("Approved")).Count());
             }
 
-            list.Add(new CourtResponse
+            var listCourtSub = c.CourtSubdivision.Select(b => new CourtSubdivisionResponse
+            {
+                Id = b.Id,
+                CourtId = b.CourtId,
+                CourtSubdivisionName = b.CourtSubdivisionName,
+                BasePrice = b.BasePrice,
+                IsActive = b.IsActive,
+            }).ToList();
+
+            var name = _dbContext.Accounts
+                .Where(x => x.Id == c.Owner.AccountId)
+                .FirstOrDefault();
+
+            list.Add(new CourtResponseV3
             {
                 Id = c.Id,
-                OwnerName = c.Owner.Account.FirstName + " " + c.Owner.Account.LastName,
+                OwnerName = name.FirstName + " " + name.LastName,
                 Description = c.Description,
                 CourtName = c.CourtName,
                 Address = c.Address,
@@ -87,7 +104,8 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
                 FbStar = starAvg,
                 CourtSubCount = c.CourtSubdivision.Count,
                 Price = price,
-                RentalNumber = rentalNumber
+                RentalNumber = rentalNumber,
+                CourtSubdivision = listCourtSub,
             });
         }
 

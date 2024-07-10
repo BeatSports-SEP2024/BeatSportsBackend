@@ -97,6 +97,10 @@ var redisConnectionString = GetJsonInAppSettingsExtension.GetJson("Redis:RedisCo
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
 builder.Services.AddScoped<StackExchange.Redis.IDatabase>(sp => sp.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
 
+builder.Services.AddControllers().AddJsonOptions(x =>
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
+
 builder.Services.AddSwaggerGen(config =>
 {
     config.SwaggerDoc("v1", new OpenApiInfo { Title = "BeatSportsAPI", Version = "v1" });

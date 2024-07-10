@@ -13,4 +13,5 @@ public class GetAllCourtCommand : IRequest<PaginatedList<CourtResponseV2>>
     public int PageIndex { get; set; }
     [Required]
     public int PageSize { get; set; }
+    public string KeyWords { get; set; }
 }
