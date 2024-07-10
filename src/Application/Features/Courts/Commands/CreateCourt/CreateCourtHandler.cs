@@ -58,7 +58,7 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, BeatSports
             TimeEnd = request.TimeEnd,
             Latitude = latitude,
             Longitude = longitude,
-            ImageUrls = request.ImageUrls,
+            ImageUrls = String.Join(",", request.ImageUrls),
             PlaceId = $"{latitude}, {longitude}",
             CourtSubdivision = new List<CourtSubdivision>()
         };
