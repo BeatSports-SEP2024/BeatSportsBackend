@@ -41,7 +41,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
         if (request.CourtId != Guid.Empty)
         {
              query = _dbContext.Courts
-            .Where(x => !x.IsDelete && x.Id == request.CourtId && x.CourtName.Contains(request.KeyWords) && x.Address.Contains(request.KeyWords))
+            .Where(x => !x.IsDelete && x.Id == request.CourtId && (x.CourtName.Contains(request.KeyWords) || x.Address.Contains(request.KeyWords)))
             .Include(x => x.Owner)
             .Include(x => x.Feedback)
             .Include(x => x.CourtSubdivision)
@@ -51,7 +51,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
         else
         {
             query = _dbContext.Courts
-            .Where(x => !x.IsDelete && x.CourtName.Contains(request.KeyWords) && x.Address.Contains(request.KeyWords))
+            .Where(x => !x.IsDelete && (x.CourtName.Contains(request.KeyWords) || x.Address.Contains(request.KeyWords)))
             .Include(x => x.Owner)
             .Include(x => x.Feedback)
             .Include(x => x.CourtSubdivision)
@@ -86,10 +86,14 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
                 IsActive = b.IsActive,
             }).ToList();
 
+            var name = _dbContext.Accounts
+                .Where(x => x.Id == c.Owner.AccountId)
+                .FirstOrDefault();
+
             list.Add(new CourtResponseV3
             {
                 Id = c.Id,
-                OwnerName = "Hi lko",
+                OwnerName = name.FirstName + " " + name.LastName,
                 Description = c.Description,
                 CourtName = c.CourtName,
                 Address = c.Address,
