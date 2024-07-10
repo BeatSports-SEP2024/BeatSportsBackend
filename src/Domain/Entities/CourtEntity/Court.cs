@@ -16,6 +16,7 @@ public class Court : BaseAuditableEntity
     public string? GoogleMapURLs { get; set; }
     public TimeSpan TimeStart { get; set; }
     public TimeSpan TimeEnd { get; set; }
+    public string? ImageUrls { get; set; }
     /// <summary>
     /// Unique key
     /// </summary>

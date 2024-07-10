@@ -21,8 +21,8 @@ public class UpdateCourtSubdivisionHandler : IRequestHandler<UpdateCourtSubdivis
         {
             throw new NotFoundException($"Do not find court subdivision have ID: {request.CourtSubdivisionId}");
         }
-        cs.Description = request.Description;
-        cs.ImageURL = request.ImageURL;
+        //cs.Description = request.Description;
+        //cs.ImageURL = request.ImageURL;
         cs.BasePrice = request.BasePrice;
         cs.CourtSubdivisionName = request.CourtSubdivisionName;
 

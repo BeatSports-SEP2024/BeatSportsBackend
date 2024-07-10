@@ -13,16 +13,16 @@ public class CreateCourtCommand : IRequest<BeatSportsResponse>
     public string GoogleMapURLs { get; set; } = null!;
     public TimeSpan TimeStart { get; set; }
     public TimeSpan TimeEnd { get; set; }
-    [Required]
-    public string PlaceId { get; set; } = null!;
+    public string ImageUrls { get; set; }
+  
+    
     public ICollection<CourtSubdivisionDto>? CourtSubdivision { get; set; }
 
     public class CourtSubdivisionDto
     {
-        public string Description { get; set; } = string.Empty;
-        public string ImageURL { get; set; } = string.Empty;
         public bool IsActive { get; set; }
         public decimal BasePrice { get; set; }
         public string CourtSubdivisionName { get; set; } = string.Empty;
+        public string CategorySportName { get; set; }
     }
 }

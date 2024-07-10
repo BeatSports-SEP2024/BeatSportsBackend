@@ -38,6 +38,7 @@ public class UpdateOwnerHandler : IRequestHandler<UpdateOwnerCommand, BeatSports
         owner.Account.PhoneNumber = request.PhoneNumber;
         owner.Account.ProfilePictureURL = request.ProfilePictureURL;
         owner.Account.Bio = request.Bio;
+        owner.Address = request.Address;
 
         _dbContext.Owners.Update(owner);
         _dbContext.SaveChanges();

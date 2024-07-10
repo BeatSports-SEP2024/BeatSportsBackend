@@ -34,8 +34,8 @@ public class CreateCourtSubdivisionHandler : IRequestHandler<CreateListCourtSubd
             {
                 CourtId = command.CourtId,
                 BasePrice = command.BasePrice,
-                ImageURL = command.ImageURL,
-                Description = command.Description,
+                //ImageURL = command.ImageURL,
+                //Description = command.Description,
                 IsActive = true,
                 CourtSubdivisionName = command.CourtSubdivisionName,
             };
