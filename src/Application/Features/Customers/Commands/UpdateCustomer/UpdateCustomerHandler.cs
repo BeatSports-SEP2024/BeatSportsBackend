@@ -32,10 +32,10 @@ public class UpdateCustomerHandler : IRequestHandler<UpdateCustomerCommand, Beat
         }
 
         customer.Account.Email = request.Email;
-        customer.Account.FirstName = request.FirstName;
-        customer.Account.LastName = request.LastName;
+        //customer.Account.FirstName = request.FirstName;
+        //customer.Account.LastName = request.LastName;
         customer.Account.DateOfBirth = request.DateOfBirth;
-        customer.Account.Gender = request.Gender.ToString();
+        //customer.Account.Gender = request.Gender.ToString();
         customer.Account.PhoneNumber = request.PhoneNumber;
         customer.Account.ProfilePictureURL = request.ProfilePictureURL;
         customer.Account.Bio = request.Bio;
