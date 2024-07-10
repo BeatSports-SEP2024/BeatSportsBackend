@@ -20,7 +20,6 @@ public class CreateCourtCommand : IRequest<BeatSportsResponse>
 
     public class CourtSubdivisionDto
     {
-        public bool IsActive { get; set; }
         public decimal BasePrice { get; set; }
         public string CourtSubdivisionName { get; set; } = string.Empty;
         public string CategorySportName { get; set; }
