@@ -54,6 +54,19 @@ public class GetAllAccountHandler : IRequestHandler<GetAllAccountCommand, Pagina
             query = query.Where(tp => tp.Wallet.Id == request.WalletId);
         }
 
+        if (request.StartDate.HasValue && request.EndDate.HasValue)
+        {
+            query = query.Where(tp => tp.Created.Date >= request.StartDate.Value.Date && tp.Created.Date <= request.EndDate.Value.Date);
+        }
+        else if (request.StartDate.HasValue)
+        {
+            query = query.Where(tp => tp.Created.Date >= request.StartDate.Value.Date);
+        }
+        else if (request.EndDate.HasValue)
+        {
+            query = query.Where(tp => tp.Created.Date <= request.EndDate.Value.Date);
+        }
+
         query = query.OrderByDescending(tp => tp.Created)
                      .ApplyFilter(filter);
 
