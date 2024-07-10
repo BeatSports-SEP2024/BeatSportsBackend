@@ -36,23 +36,16 @@ public class GetAllAccountHandler : IRequestHandler<GetAllAccountCommand, Pagina
         var query = _beatSportsDbContext.Accounts
             .Where(tp => !tp.IsDelete);
 
-        if (!string.IsNullOrEmpty(request.Username))
+        if (!string.IsNullOrEmpty(request.Search))
         {
-            query = query.Where(tp => tp.UserName.ToLower().Contains(request.Username.ToLower()));
+            query = query.Where(tp => tp.UserName.ToLower().Contains(request.Search.ToLower()) 
+                || tp.PhoneNumber.Contains(request.Search)
+                || tp.Wallet.Id.ToString().Contains(request.Search));
         }
 
-        if (!string.IsNullOrEmpty(request.PhoneNumber))
-        {
-            query = query.Where(tp => tp.PhoneNumber.Contains(request.PhoneNumber));
-        }
         if (request.Role != RoleEnums.All)
         {
             query = query.Where(tp => tp.Role.Equals(request.Role.ToString()));
-        }
-
-        if (request.WalletId.HasValue)
-        {
-            query = query.Where(tp => tp.Wallet.Id == request.WalletId);
         }
 
         if (request.StartDate.HasValue && request.EndDate.HasValue)
