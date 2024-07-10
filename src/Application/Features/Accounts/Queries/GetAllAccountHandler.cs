@@ -38,9 +38,18 @@ public class GetAllAccountHandler : IRequestHandler<GetAllAccountCommand, Pagina
 
         if (!string.IsNullOrEmpty(request.Query))
         {
-            query = query.Where(tp => tp.UserName.ToLower().Contains(request.Query.ToLower()) 
-                || tp.PhoneNumber.Contains(request.Query)
-                || tp.Wallet.Id.ToString().Contains(request.Query));
+            if (Guid.TryParse(request.Query, out Guid guidOutput))
+            {
+                query = query.Where(tp => tp.Wallet.Id == guidOutput);
+            }
+            else if (char.IsDigit(request.Query[0]))
+            {
+                query = query.Where(tp => tp.PhoneNumber.Contains(request.Query));
+            }
+            else
+            {
+                query = query.Where(tp => tp.UserName.ToLower().Contains(request.Query.ToLower()));
+            }
         }
 
         if (request.Role != RoleEnums.All)
