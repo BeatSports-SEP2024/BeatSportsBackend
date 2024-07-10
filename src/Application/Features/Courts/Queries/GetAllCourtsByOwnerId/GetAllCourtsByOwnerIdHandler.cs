@@ -41,7 +41,7 @@ public class GetAllCourtsByOwnerIdHandler : IRequestHandler<GetAllCourtsByOwnerI
         var list = query.Select(c => new CourtResponse
         {
             Id = c.Id,
-            OwnerId = c.OwnerId,
+            OwnerName = c.Owner.Account.FirstName + " " + c.Owner.Account.LastName,
             Description = c.Description,
             CourtName = c.CourtName,
             Address = c.Address,

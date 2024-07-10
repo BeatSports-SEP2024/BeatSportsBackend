@@ -35,7 +35,8 @@ public class GetAllCampaignHandler : IRequestHandler<GetAllCampaignsCommand, Pag
         }
 
         IQueryable<Campaign> query = _dbContext.Campaigns
-            .Where(x => !x.IsDelete);
+            .Where(x => !x.IsDelete)
+            .OrderByDescending(b => b.Created);
 
         var list = query.Select(c => new CampaignResponse
         {

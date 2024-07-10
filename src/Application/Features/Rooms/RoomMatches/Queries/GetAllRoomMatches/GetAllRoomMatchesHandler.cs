@@ -34,7 +34,8 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
         }
 
         IQueryable<RoomMatch> query = _dbContext.RoomMatches
-            .Where(x => !x.IsDelete);
+            .Where(x => !x.IsDelete)
+            .OrderByDescending(b => b.Created);
 
         var list = query.Select(c => new RoomMatchesResponse
         {

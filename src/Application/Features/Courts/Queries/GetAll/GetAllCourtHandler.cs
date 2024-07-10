@@ -13,7 +13,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Courts.Queries.GetAll;
-public class GetAllCourtHandler : IRequestHandler<GetAllCourtCommand, PaginatedList<CourtResponse>>
+public class GetAllCourtHandler : IRequestHandler<GetAllCourtCommand, PaginatedList<CourtResponseV2>>
 {
     private readonly IBeatSportsDbContext _dbContext;
     private readonly IMapper _mapper;
@@ -24,7 +24,7 @@ public class GetAllCourtHandler : IRequestHandler<GetAllCourtCommand, PaginatedL
         _mapper = mapper;
     }
 
-    public Task<PaginatedList<CourtResponse>> Handle(GetAllCourtCommand request, CancellationToken cancellationToken)
+    public Task<PaginatedList<CourtResponseV2>> Handle(GetAllCourtCommand request, CancellationToken cancellationToken)
     {
         if (request.PageIndex <= 0 || request.PageSize <= 0)
         {
@@ -33,19 +33,20 @@ public class GetAllCourtHandler : IRequestHandler<GetAllCourtCommand, PaginatedL
 
         IQueryable<Court> query = _dbContext.Courts
             .Where(x => !x.IsDelete)
+            .OrderByDescending(b => b.Created)
+            .Include(x => x.Owner).ThenInclude(x => x.Account)
             .Include(x => x.CourtSubdivision);
 
-        var list = query.Select(c => new CourtResponse
+        var list = query.Select(c => new CourtResponseV2
         {
             Id = c.Id,
-            OwnerId = c.OwnerId,
-            Description = c.Description,
+            OwnerName = c.Owner.Account.FirstName + " " + c.Owner.Account.LastName,
             CourtName = c.CourtName,
             Address = c.Address,
             GoogleMapURLs = c.GoogleMapURLs,
             TimeStart = c.TimeStart,
             TimeEnd = c.TimeEnd,
-            PlaceId = c.PlaceId,
+            Created = c.Created,
         })
         .PaginatedListAsync(request.PageIndex, request.PageSize);
 

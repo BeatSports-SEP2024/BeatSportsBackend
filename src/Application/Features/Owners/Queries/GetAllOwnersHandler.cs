@@ -33,7 +33,8 @@ public class GetAllOwnersHandler : IRequestHandler<GetAllOwnersCommand, Paginate
         }
 
         IQueryable<Owner> query = _beatSportsDbContext.Owners
-            .Where(x => !x.IsDelete);
+            .Where(x => !x.IsDelete)
+            .OrderByDescending(b => b.Created);
         
         var list = query.Select(c => new OwnerResponse
         {

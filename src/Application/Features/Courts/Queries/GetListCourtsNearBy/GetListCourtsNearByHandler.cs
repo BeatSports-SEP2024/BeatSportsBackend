@@ -76,7 +76,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
             list.Add(new CourtResponse
             {
                 Id = c.Id,
-                OwnerId = c.OwnerId,
+                OwnerName = c.Owner.Account.FirstName + " " + c.Owner.Account.LastName,
                 Description = c.Description,
                 CourtName = c.CourtName,
                 Address = c.Address,
