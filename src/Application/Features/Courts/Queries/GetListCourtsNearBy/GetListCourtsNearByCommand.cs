@@ -10,7 +10,7 @@ using MediatR;
 using Services.MapBox;
 
 namespace BeatSportsAPI.Application.Features.Courts.Queries.GetListCourtsNearBy;
-public class GetListCourtsNearByCommand : IRequest<List<CourtResponse>>
+public class GetListCourtsNearByCommand : IRequest<List<CourtResponseV3>>
 {
     public double Latitude { get; set; }
     public double Longitude { get; set; }

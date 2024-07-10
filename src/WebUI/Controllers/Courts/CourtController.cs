@@ -70,7 +70,7 @@ public class CourtController : ApiControllerBase
     }
     [HttpGet]
     [Route("get-list-court-nearby")]
-    public async Task<List<CourtResponse>> GetCourtNearBya([FromQuery] GetListCourtsNearByCommand request)
+    public async Task<List<CourtResponseV3>> GetCourtNearBya([FromQuery] GetListCourtsNearByCommand request)
     {
         return await _mediator.Send(request);
 
