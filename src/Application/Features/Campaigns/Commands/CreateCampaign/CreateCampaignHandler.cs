@@ -30,6 +30,7 @@ public class CreateCampaignHandler : IRequestHandler<CreateCampaignCommand, Beat
         {
             throw new BadRequestException($"Court with Court ID:{request.CourtId} does not exist or have been delele");
         }
+        var sportTypes = String.Join(",", request.SportTypeApply.Select(e => e.ToString()).ToArray());
         var campaign = new Campaign()
         {
             CourtId = request.CourtId,
@@ -38,7 +39,7 @@ public class CreateCampaignHandler : IRequestHandler<CreateCampaignCommand, Beat
             PercentDiscount = request.PercentDiscount,
             StartDateApplying = request.StartDateApplying,
             EndDateApplying = request.EndDateApplying,
-            SportTypeApply = request.SportTypeApply.ToString(),
+            SportTypeApply = sportTypes,
             MinValueApply = request.MinValueApply,
             MaxValueDiscount = request.MaxValueDiscount,
             Status = StatusEnums.Pending,

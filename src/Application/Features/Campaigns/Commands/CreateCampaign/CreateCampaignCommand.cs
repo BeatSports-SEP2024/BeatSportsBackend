@@ -20,7 +20,7 @@ public class CreateCampaignCommand : IRequest<BeatSportsResponse>
     public DateTime EndDateApplying { get; set; }
     public int QuantityOfCampaign { get; set; }
     [EnumDataType(typeof(SportCategoriesEnums))]
-    public SportCategoriesEnums SportTypeApply { get; set; }
+    public List<SportCategoriesEnums> SportTypeApply { get; set; }
     public decimal MinValueApply { get; set; }
     public decimal MaxValueDiscount { get; set; }
     public string CampaignImageUrl { get; set; }
