@@ -7,7 +7,7 @@ using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignById;
-public class GetCampaignByIdCommand : IRequest<CampaignResponse>
+public class GetCampaignByIdCommand : IRequest<CampaignResponseV3>
 {
     public Guid CampaignId { get; set; }
 }

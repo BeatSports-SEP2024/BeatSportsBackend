@@ -47,7 +47,7 @@ public class CampaignController : ApiControllerBase
     }
     [HttpGet]
     [Route("get-by-campaign-id")]
-    public async Task<CampaignResponse> GetByCampaignId([FromQuery] GetCampaignByIdCommand request)
+    public async Task<CampaignResponseV3> GetByCampaignId([FromQuery] GetCampaignByIdCommand request)
     {
         return await _mediator.Send(request);
     }
