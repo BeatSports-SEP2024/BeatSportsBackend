@@ -15,7 +15,7 @@ using BeatSportsAPI.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace BeatSportsAPI.Application.Features.Owners.Queries;
+namespace BeatSportsAPI.Application.Features.Owners.Queries.GetAllOwners;
 public class GetAllOwnersHandler : IRequestHandler<GetAllOwnersCommand, PaginatedList<OwnerResponse>>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
@@ -35,7 +35,7 @@ public class GetAllOwnersHandler : IRequestHandler<GetAllOwnersCommand, Paginate
         IQueryable<Owner> query = _beatSportsDbContext.Owners
             .Where(x => !x.IsDelete)
             .OrderByDescending(b => b.Created);
-        
+
         var list = query.Select(c => new OwnerResponse
         {
             AccountId = c.AccountId,

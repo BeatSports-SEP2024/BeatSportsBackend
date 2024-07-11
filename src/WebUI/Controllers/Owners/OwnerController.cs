@@ -5,7 +5,9 @@ using BeatSportsAPI.Application.Features.Feedbacks.Commands.DeleteFeedback;
 using BeatSportsAPI.Application.Features.Feedbacks.Commands.UpdateFeedback;
 using BeatSportsAPI.Application.Features.Owners.Commands.DeleteOwner;
 using BeatSportsAPI.Application.Features.Owners.Commands.UpdateOwner;
-using BeatSportsAPI.Application.Features.Owners.Queries;
+using BeatSportsAPI.Application.Features.Owners.Queries.GetAllOwners;
+using BeatSportsAPI.Application.Features.Owners.Queries.GetownerByIdWithCourt;
+using BeatSportsAPI.Application.Features.Owners.Queries.GetOwnerId;
 using BeatSportsAPI.Application.Features.Sports.Queries;
 using CsvHelper.Configuration.Attributes;
 using MediatR;
@@ -42,6 +44,14 @@ public class OwnerController : ApiControllerBase
     [HttpGet("id")]
     [SwaggerOperation("Get customer by Id")]
     public async Task<IActionResult> GetOwnerById([FromQuery] GetOwnerByIdCommand request)
+    {
+        var response = await _mediator.Send(request);
+
+        return Ok(response);
+    }
+    [HttpGet("owner-id")]
+    [SwaggerOperation("Get owner with relative court by Id")]
+    public async Task<IActionResult> GetCourtRelativeOwner([FromQuery] GetOwnerByIdWithCourtCommand request)
     {
         var response = await _mediator.Send(request);
 
