@@ -14,4 +14,6 @@ public class GetAllCourtCommand : IRequest<PaginatedList<CourtResponseV2>>
     [Required]
     public int PageSize { get; set; }
     public string KeyWords { get; set; }
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
 }
