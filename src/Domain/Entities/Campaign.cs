@@ -9,6 +9,12 @@ public class Campaign : BaseAuditableEntity
     public string? CampaignName { get; set; }
     public string? Description { get; set; }
     public decimal PercentDiscount { get; set; }
+    //Ap dung campaign cho loai hinh the thao nao
+    public string? SportTypeApply { get; set; }
+    //Gia tri toi thieu de ap dung campaign
+    public decimal MinValueApply { get; set; }
+    //Gia tri toi da duoc giam gia
+    public decimal MaxValueDiscount { get; set; }
     public DateTime StartDateApplying { get; set; }
     public DateTime EndDateApplying { get;set; }
     public bool Status { get; set; }

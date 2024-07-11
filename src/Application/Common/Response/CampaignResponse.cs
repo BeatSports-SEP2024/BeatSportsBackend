@@ -17,6 +17,9 @@ public class CampaignResponse : IMapFrom<Campaign>
     public decimal PercentDiscount { get; set; }
     public DateTime StartDateApplying { get; set; }
     public DateTime EndDateApplying { get; set; }
+    public string SportTypeApply { get; set; }
+    public decimal MinValueApply { get; set; }
+    public decimal MaxValueDiscount { get; set; }
     public bool Status { get; set; }
     public int QuantityOfCampaign { get; set; }
     public string CampaignImageUrl { get; set; }

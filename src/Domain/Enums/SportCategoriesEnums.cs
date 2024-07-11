@@ -9,5 +9,6 @@ public enum SportCategoriesEnums
 {
     Soccer,
     Badminton,
-    Volleyball
+    Volleyball,
+    All
 }
