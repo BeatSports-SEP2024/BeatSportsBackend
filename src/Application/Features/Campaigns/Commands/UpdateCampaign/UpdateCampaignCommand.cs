@@ -23,7 +23,8 @@ public class UpdateCampaignCommand : IRequest<BeatSportsResponse>
     public SportCategoriesEnums SportTypeApply { get; set; }
     public decimal MinValueApply { get; set; }
     public decimal MaxValueDiscount { get; set; }
-    public bool Status { get; set; }
+    public StatusEnums Status { get; set; }
     public int QuantityOfCampaign { get; set; }
     public string CampaignImageUrl { get; set; }
+    public string ReasonOfReject { get; set; }
 }

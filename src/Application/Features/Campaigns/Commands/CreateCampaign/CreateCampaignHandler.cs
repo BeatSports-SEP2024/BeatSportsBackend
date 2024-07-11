@@ -9,6 +9,7 @@ using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Courts.Commands.CreateCourt;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Campaigns.Commands.CreateCampaign;
@@ -40,9 +41,10 @@ public class CreateCampaignHandler : IRequestHandler<CreateCampaignCommand, Beat
             SportTypeApply = request.SportTypeApply.ToString(),
             MinValueApply = request.MinValueApply,
             MaxValueDiscount = request.MaxValueDiscount,
-            Status = true,
+            Status = StatusEnums.Pending,
             QuantityOfCampaign = request.QuantityOfCampaign,
-            CampaignImageURL = request.CampaignImageUrl
+            CampaignImageURL = request.CampaignImageUrl,
+            ReasonOfReject = ""
         };
         _dbContext.Campaigns.Add(campaign);
         _dbContext.SaveChanges();

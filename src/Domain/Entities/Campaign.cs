@@ -17,9 +17,10 @@ public class Campaign : BaseAuditableEntity
     public decimal MaxValueDiscount { get; set; }
     public DateTime StartDateApplying { get; set; }
     public DateTime EndDateApplying { get;set; }
-    public bool Status { get; set; }
+    public StatusEnums Status { get; set; }
     public int QuantityOfCampaign { get; set; }
     public string? CampaignImageURL { get; set; }
+    public string? ReasonOfReject { get; set; }
     public virtual Court Court { get; set; } = null!;
     public virtual IList<Booking> Booking { get; set; } = null!;
 }

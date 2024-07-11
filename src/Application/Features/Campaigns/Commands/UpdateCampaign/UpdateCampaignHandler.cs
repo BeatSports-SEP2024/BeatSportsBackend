@@ -39,6 +39,7 @@ public class UpdateCampaignHandler : IRequestHandler<UpdateCampaignCommand, Beat
         campaign.Status = request.Status;
         campaign.QuantityOfCampaign = request.QuantityOfCampaign;
         campaign.CampaignImageURL = request.CampaignImageUrl;
+        campaign.ReasonOfReject = request.ReasonOfReject;
 
         _dbContext.Campaigns.Update(campaign);
         _dbContext.SaveChanges();

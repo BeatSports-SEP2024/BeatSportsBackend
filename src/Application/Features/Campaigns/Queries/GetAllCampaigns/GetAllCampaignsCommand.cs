@@ -8,7 +8,7 @@ using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Campaigns.Queries.GetAllCampaigns;
-public class GetAllCampaignsCommand : IRequest<PaginatedList<CampaignResponse>>
+public class GetAllCampaignsCommand : IRequest<PaginatedList<CampaignResponseV2>>
 {
     public int PageIndex { get; set; }
     public int PageSize { get; set; }
