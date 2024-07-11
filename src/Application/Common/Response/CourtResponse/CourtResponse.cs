@@ -28,6 +28,7 @@ public class CourtResponseV2 : IMapFrom<Court>
 {
     public Guid Id { get; set; }
     public string OwnerName { get; set; }
+    public string? Description { get; set; }
     public string? CourtName { get; set; }
     public string? Address { get; set; }
     public string? GoogleMapURLs { get; set; }

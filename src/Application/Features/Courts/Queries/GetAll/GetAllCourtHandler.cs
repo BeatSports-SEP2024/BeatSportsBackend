@@ -42,11 +42,27 @@ public class GetAllCourtHandler : IRequestHandler<GetAllCourtCommand, PaginatedL
             .Include(x => x.Owner).ThenInclude(x => x.Account)
             .Include(x => x.CourtSubdivision);
 
+        if (request.StartDate.HasValue && request.EndDate.HasValue)
+        {
+            query = query.Where(tp => tp.Created.Date >= request.StartDate.Value.Date && tp.Created.Date <= request.EndDate.Value.Date);
+        }
+        else if (request.StartDate.HasValue)
+        {
+            query = query.Where(tp => tp.Created.Date >= request.StartDate.Value.Date);
+        }
+        else if (request.EndDate.HasValue)
+        {
+            query = query.Where(tp => tp.Created.Date <= request.EndDate.Value.Date);
+        }
+
+        query = query.OrderByDescending(tp => tp.Created);
+
         var list = query.Select(c => new CourtResponseV2
         {
             Id = c.Id,
             OwnerName = c.Owner.Account.FirstName + " " + c.Owner.Account.LastName,
             CourtName = c.CourtName,
+            Description = c.Description,
             Address = c.Address,
             GoogleMapURLs = c.GoogleMapURLs,
             TimeStart = c.TimeStart,
