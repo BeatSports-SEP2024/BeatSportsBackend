@@ -7,7 +7,7 @@ using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 
-namespace BeatSportsAPI.Application.Features.Owners.Queries;
+namespace BeatSportsAPI.Application.Features.Owners.Queries.GetAllOwners;
 public class GetAllOwnersCommand : IRequest<PaginatedList<OwnerResponse>>
 {
     public int PageIndex { get; set; }

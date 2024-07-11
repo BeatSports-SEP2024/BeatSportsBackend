@@ -57,3 +57,11 @@ public class CourtResponseV3 : IMapFrom<Court>
     public decimal Price { get; set; }
     public List<CourtSubdivisionResponse>? CourtSubdivision { get; set; }
 }
+
+public class CourtResponseV4 : IMapFrom<Court>
+{
+    public string? CourtName { get; set; }
+    public string? Address { get; set; }
+    public string? Description { get; set; }
+    public List<CourtSubdivisionV2>? CourtSubdivision { get; set; }
+}

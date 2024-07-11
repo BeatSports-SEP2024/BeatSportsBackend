@@ -6,6 +6,7 @@ using BeatSportsAPI.Application.Common.Exceptions;
 using MediatR;
 using BeatSportsAPI.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using BeatSportsAPI.Application.Features.Owners.Queries.GetOwnerId;
 
 namespace BeatSportsAPI.Application.Features.Owners.Queries;
 public class GetOwnerByIdHandler : IRequestHandler<GetOwnerByIdCommand, OwnerResponse>

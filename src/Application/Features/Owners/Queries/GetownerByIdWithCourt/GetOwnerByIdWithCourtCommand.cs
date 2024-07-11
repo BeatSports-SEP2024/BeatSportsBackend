@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 
-namespace BeatSportsAPI.Application.Features.Owners.Queries;
-public class GetOwnerByIdCommand : IRequest<OwnerResponse>
+namespace BeatSportsAPI.Application.Features.Owners.Queries.GetownerByIdWithCourt;
+public class GetOwnerByIdWithCourtCommand : IRequest<OwnerResponseV2>
 {
-    [Required]
     public Guid OwnerId { get; set; }
 }
