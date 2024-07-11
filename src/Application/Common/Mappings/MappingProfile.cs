@@ -18,9 +18,15 @@ public class MappingProfile : Profile
         CreateMap<Account, AccountResponse>()
             .ForMember(dest => dest.AccountId, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Created, opt => opt.MapFrom(src => src.Created));
+
         CreateMap<Customer, CustomerResponse>()
             .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.Id));
+        CreateMap<Customer, AccountResponse>()
+            .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.Id));
+
         CreateMap<Owner, OwnerResponse>()
+            .ForMember(dest => dest.OwnerId, opt => opt.MapFrom(src => src.Id));
+        CreateMap<Owner, AccountResponse>()
             .ForMember(dest => dest.OwnerId, opt => opt.MapFrom(src => src.Id));
 
         //Level Mapping

@@ -11,6 +11,8 @@ public class AccountResponse : IMapFrom<Account>
 {
     public Guid AccountId {  get; set; }
     public Guid? WalletId { get; set; }
+    public Guid? OwnerId { get; set; }
+    public Guid? CustomerId { get; set; }
     public string UserName { get; set; }
     public string? Email { get; set; }
     public string? FirstName { get; set; }
