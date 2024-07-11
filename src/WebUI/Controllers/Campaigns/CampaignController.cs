@@ -41,7 +41,7 @@ public class CampaignController : ApiControllerBase
     }
     [HttpGet]
     [Route("all")]
-    public async Task<PaginatedList<CampaignResponse>> GetAll([FromQuery] GetAllCampaignsCommand request)
+    public async Task<PaginatedList<CampaignResponseV2>> GetAll([FromQuery] GetAllCampaignsCommand request)
     {
         return await _mediator.Send(request);
     }

@@ -16,7 +16,7 @@ using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Campaigns.Queries.GetAllCampaigns;
-public class GetAllCampaignHandler : IRequestHandler<GetAllCampaignsCommand, PaginatedList<CampaignResponse>>
+public class GetAllCampaignHandler : IRequestHandler<GetAllCampaignsCommand, PaginatedList<CampaignResponseV2>>
 {
     private readonly IBeatSportsDbContext _dbContext;
     private readonly IMapper _mapper;
@@ -27,7 +27,7 @@ public class GetAllCampaignHandler : IRequestHandler<GetAllCampaignsCommand, Pag
         _mapper = mapper;
     }
     
-    public Task<PaginatedList<CampaignResponse>> Handle(GetAllCampaignsCommand request, CancellationToken cancellationToken)
+    public Task<PaginatedList<CampaignResponseV2>> Handle(GetAllCampaignsCommand request, CancellationToken cancellationToken)
     {
         if (request.PageIndex <= 0 || request.PageSize <= 0)
         {
@@ -51,21 +51,16 @@ public class GetAllCampaignHandler : IRequestHandler<GetAllCampaignsCommand, Pag
             query = query.Where(tp => tp.EndDateApplying.Date <= request.EndDate.Value.Date);
         }
         query = query.OrderByDescending(tp => tp.Created);
-        var list = query.Select(c => new CampaignResponse
+        var list = query.Select(c => new CampaignResponseV2
         {
             CampaignId = c.Id,
             CourtId = c.CourtId,
             CampaignName = c.CampaignName,
-            Description = c.Description,
-            PercentDiscount = c.PercentDiscount,
             StartDateApplying = c.StartDateApplying,
             EndDateApplying = c.EndDateApplying,
             SportTypeApply = c.SportTypeApply,
-            MinValueApply = c.MinValueApply,
-            MaxValueDiscount = c.MaxValueDiscount,
+            Created = c.Created,
             Status = c.Status,
-            QuantityOfCampaign = c.QuantityOfCampaign,
-            CampaignImageUrl = c.CampaignImageURL
         })
         .PaginatedListAsync(request.PageIndex, request.PageSize); 
 

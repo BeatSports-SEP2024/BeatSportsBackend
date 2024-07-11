@@ -45,6 +45,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
             Id = query.Id,
             OwnerName = query.Owner.Account.FirstName + " " + query.Owner.Account.LastName,
             CourtName = query.CourtName,
+            Description = query.Description,
             Address = query.Address,
             GoogleMapURLs = query.GoogleMapURLs,
             TimeStart = query.TimeStart,

@@ -10,6 +10,7 @@ using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetById;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignById;
 public class GetCampaignByIdHandler : IRequestHandler<GetCampaignByIdCommand, CampaignResponse>
@@ -26,6 +27,7 @@ public class GetCampaignByIdHandler : IRequestHandler<GetCampaignByIdCommand, Ca
     {
         var campaign = _dbContext.Campaigns
             .Where(x => x.Id == request.CampaignId && !x.IsDelete)
+            .Include(x => x.Court)
             .ProjectTo<CampaignResponse>(_mapper.ConfigurationProvider).SingleOrDefault();
         if (campaign == null)
         {
