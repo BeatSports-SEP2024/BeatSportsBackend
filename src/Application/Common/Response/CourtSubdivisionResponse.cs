@@ -19,5 +19,6 @@ public class CourtSubdivisionV2 : IMapFrom<CourtSubdivision>
     public string? CourtSubdivisionName { get; set; }
     public string? Description { get; set; }
     public decimal BasePrice { get; set; }
-    public string OpeningTime { get; set; }
+    public TimeSpan StartTime { get; set; }
+    public TimeSpan EndTime { get; set; }
 }
