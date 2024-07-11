@@ -25,6 +25,7 @@ public class CampaignResponse : IMapFrom<Campaign>
     public int QuantityOfCampaign { get; set; }
     public string CampaignImageUrl { get; set; }
     public string ReasonOfReject { get; set; }
+    public DateTime Created { get; set; }
     public Court Court { get; set; } = null!;
 }
 
