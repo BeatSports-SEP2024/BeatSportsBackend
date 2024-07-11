@@ -40,6 +40,7 @@ public class GetOwnerByIdWithCourtHandler : IRequestHandler<GetOwnerByIdWithCour
                 CourtSubdivisionName = subCourt.CourtSubdivisionName,
                 Description = subCourt.Court.Description,
                 BasePrice = subCourt.BasePrice,
+                OpeningTime = c.TimeStart + "-" + c.TimeEnd
             }).ToList(),
         }).ToList();
 
