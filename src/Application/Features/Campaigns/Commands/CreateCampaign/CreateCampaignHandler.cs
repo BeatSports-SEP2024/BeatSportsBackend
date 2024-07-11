@@ -37,6 +37,9 @@ public class CreateCampaignHandler : IRequestHandler<CreateCampaignCommand, Beat
             PercentDiscount = request.PercentDiscount,
             StartDateApplying = request.StartDateApplying,
             EndDateApplying = request.EndDateApplying,
+            SportTypeApply = request.SportTypeApply.ToString(),
+            MinValueApply = request.MinValueApply,
+            MaxValueDiscount = request.MaxValueDiscount,
             Status = true,
             QuantityOfCampaign = request.QuantityOfCampaign,
             CampaignImageURL = request.CampaignImageUrl

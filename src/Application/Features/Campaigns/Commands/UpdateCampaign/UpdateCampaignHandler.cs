@@ -33,6 +33,9 @@ public class UpdateCampaignHandler : IRequestHandler<UpdateCampaignCommand, Beat
         campaign.PercentDiscount = request.PercentDiscount;
         campaign.StartDateApplying = request.StartDateApplying;
         campaign.EndDateApplying = request.EndDateApplying;
+        campaign.SportTypeApply = request.SportTypeApply.ToString();
+        campaign.MinValueApply = request.MinValueApply;
+        campaign.MaxValueDiscount = request.MaxValueDiscount;
         campaign.Status = request.Status;
         campaign.QuantityOfCampaign = request.QuantityOfCampaign;
         campaign.CampaignImageURL = request.CampaignImageUrl;

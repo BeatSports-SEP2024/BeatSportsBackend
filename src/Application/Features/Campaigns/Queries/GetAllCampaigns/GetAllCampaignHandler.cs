@@ -34,10 +34,23 @@ public class GetAllCampaignHandler : IRequestHandler<GetAllCampaignsCommand, Pag
             throw new BadRequestException("Page index and page size cannot less than 0");
         }
 
-        IQueryable<Campaign> query = _dbContext.Campaigns
-            .Where(x => !x.IsDelete)
-            .OrderByDescending(b => b.Created);
+        var query = _dbContext.Campaigns
+            .Where(x => !x.IsDelete);
 
+        if (request.StartDate.HasValue && request.EndDate.HasValue)
+        {
+            query = query.Where(tp => tp.StartDateApplying.Date >= request.StartDate.Value.Date
+                    && tp.EndDateApplying.Date <= request.EndDate.Value.Date);
+        }
+        else if (request.StartDate.HasValue)
+        {
+            query = query.Where(tp => tp.StartDateApplying.Date >= request.StartDate.Value.Date);
+        }
+        else if (request.EndDate.HasValue)
+        {
+            query = query.Where(tp => tp.EndDateApplying.Date <= request.EndDate.Value.Date);
+        }
+        query = query.OrderByDescending(tp => tp.Created);
         var list = query.Select(c => new CampaignResponse
         {
             CampaignId = c.Id,
@@ -47,6 +60,9 @@ public class GetAllCampaignHandler : IRequestHandler<GetAllCampaignsCommand, Pag
             PercentDiscount = c.PercentDiscount,
             StartDateApplying = c.StartDateApplying,
             EndDateApplying = c.EndDateApplying,
+            SportTypeApply = c.SportTypeApply,
+            MinValueApply = c.MinValueApply,
+            MaxValueDiscount = c.MaxValueDiscount,
             Status = c.Status,
             QuantityOfCampaign = c.QuantityOfCampaign,
             CampaignImageUrl = c.CampaignImageURL
