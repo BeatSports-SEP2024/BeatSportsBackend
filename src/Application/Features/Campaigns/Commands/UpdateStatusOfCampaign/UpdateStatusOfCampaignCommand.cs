@@ -13,4 +13,6 @@ public class UpdateStatusOfCampaignCommand : IRequest<BeatSportsResponse>
 {
     [Required]
     public Guid CampaignId { get; set; }
+    public StatusEnums Status { get; set; }
+    public string ReasonOfReject { get; set; }
 }
