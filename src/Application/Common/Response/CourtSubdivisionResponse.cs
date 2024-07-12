@@ -16,6 +16,7 @@ public class CourtSubdivisionResponse : IMapFrom<CourtSubdivision>
 
 public class CourtSubdivisionV2 : IMapFrom<CourtSubdivision>
 {
+    public Guid CourtSubdivisionId { get; set; }
     public string? CourtSubdivisionName { get; set; }
     public string? Description { get; set; }
     public decimal BasePrice { get; set; }

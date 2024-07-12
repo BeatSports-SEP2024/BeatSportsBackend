@@ -32,11 +32,13 @@ public class GetOwnerByIdWithCourtHandler : IRequestHandler<GetOwnerByIdWithCour
 
         var listCourt = query.ListCourt.Select(c => new CourtResponseV4
         {
+            CourtId = c.Id,
             Address = c.Address,
             CourtName = c.CourtName,
             Description = c.Description,
             CourtSubdivision = c.CourtSubdivision.Select(subCourt => new CourtSubdivisionV2 
             {
+                CourtSubdivisionId = subCourt.Id,
                 CourtSubdivisionName = subCourt.CourtSubdivisionName,
                 Description = subCourt.Court.Description,
                 BasePrice = subCourt.BasePrice,
