@@ -60,6 +60,7 @@ public class CourtResponseV3 : IMapFrom<Court>
 
 public class CourtResponseV4 : IMapFrom<Court>
 {
+    public Guid CourtId { get; set; }
     public string? CourtName { get; set; }
     public string? Address { get; set; }
     public string? Description { get; set; }
