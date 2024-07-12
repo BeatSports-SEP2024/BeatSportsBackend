@@ -28,7 +28,8 @@ public class UpdateStatusOfCampaignHandler : IRequestHandler<UpdateStatusOfCampa
             throw new BadRequestException($"Campaign with Campaign ID:{request.CampaignId} does not exist or have been delele");
         }
 
-        campaign.Status = StatusEnums.Accepted;
+        campaign.Status = request.Status;
+        campaign.ReasonOfReject = request.ReasonOfReject;
        
         _dbContext.Campaigns.Update(campaign);
         _dbContext.SaveChanges();
