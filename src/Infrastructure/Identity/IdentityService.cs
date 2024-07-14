@@ -179,7 +179,7 @@ public class IdentityService : IIdentityService
             claims.Add(new Claim("CustomerId", user.Customer.Id.ToString()));
         }
 
-        var expiry = DateTime.UtcNow.AddMinutes(30);
+        var expiry = DateTime.UtcNow.AddSeconds(5);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Issuer = issuer,
@@ -251,7 +251,7 @@ public class IdentityService : IIdentityService
         var refreshToken = new RefreshTokenModel
         {
             Token = GenerateRandomAlphanumericExtensions.GenerateRandomAlphanumeric(16),
-            Expires = DateTime.Now.AddDays(1)
+            Expires = DateTime.Now.AddMinutes(1)
         };
 
         return refreshToken;
