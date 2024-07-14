@@ -52,6 +52,8 @@ public class CourtResponseV3 : IMapFrom<Court>
     public string? PlaceId { get; set; }
     public double DistanceInKm { get; set; }
     public double FbStar { get; set; }
+    public double? LatitudeDelta { get; set; }
+    public double? LongitudeDelta { get; set; }  
     public int CourtSubCount { get; set; }
     public int RentalNumber { get; set; }
     public decimal Price { get; set; }
