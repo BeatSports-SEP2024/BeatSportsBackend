@@ -69,3 +69,9 @@ public class CampaignResponseV3
     public string ReasonOfReject { get; set; }
     public DateTime Created { get; set; }
 }
+
+public class CampaignResponseV4
+{
+    public Guid CampaignId { get; set; }
+    public string CampaignImageUrl { get; set; }
+}

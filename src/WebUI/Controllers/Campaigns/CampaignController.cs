@@ -7,6 +7,7 @@ using BeatSportsAPI.Application.Features.Campaigns.Commands.UpdateStatusOfCampai
 using BeatSportsAPI.Application.Features.Campaigns.Queries.GetAllCampaigns;
 using BeatSportsAPI.Application.Features.Campaigns.Queries.GetAllCampaignWithPending;
 using BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignById;
+using BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignFilter;
 using BeatSportsAPI.Application.Features.Courts.Commands.CreateCourt;
 using BeatSportsAPI.Application.Features.Courts.Commands.DeleteCourt;
 using BeatSportsAPI.Application.Features.Courts.Commands.UpdateCourt;
@@ -56,6 +57,12 @@ public class CampaignController : ApiControllerBase
     [HttpGet]
     [Route("list-pending")]
     public async Task<PaginatedList<CampaignResponseV2>> GetCampaignListPending([FromQuery] GetAllCampaignWithPendingCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+    [HttpGet]
+    [Route("list-of-3")]
+    public async Task<List<CampaignResponseV4>> GetCampaignListFilter([FromQuery] GetCampaignFilterCommand request)
     {
         return await _mediator.Send(request);
     }
