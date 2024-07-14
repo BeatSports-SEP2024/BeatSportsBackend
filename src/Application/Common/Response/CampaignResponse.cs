@@ -75,3 +75,13 @@ public class CampaignResponseV4
     public Guid CampaignId { get; set; }
     public string CampaignImageUrl { get; set; }
 }
+
+public class CampaignResponseV5
+{
+    public Guid CampaignId { get; set; }
+    public StatusEnums Status { get; set; }
+    public DateTime StartDateApplying { get; set; }
+    public DateTime EndDateApplying { get; set; }
+    public decimal MinValueApply { get; set; }
+    public decimal MaxValueDiscount { get; set; }
+}
