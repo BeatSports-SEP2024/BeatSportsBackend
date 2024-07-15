@@ -21,7 +21,7 @@ public class GetCampaignFilterHandler : IRequestHandler<GetCampaignFilterCommand
         var query = _beatSportsDbContext.Campaigns
             .Where(c => !c.IsDelete);
 
-        var topCampaigns = query.Where(c => c.Status == 0)
+        var pendingCampaigns = query.Where(c => c.Status == 0 && c.Court.Id == request.CourtId)
             .Select(c => new CampaignResponseV4
             {
                 CampaignId = c.Id,
@@ -47,7 +47,7 @@ public class GetCampaignFilterHandler : IRequestHandler<GetCampaignFilterCommand
 
         var result = new CampaignResult
         {
-            TopCampaigns = topCampaigns,
+            PendingCampaigns = pendingCampaigns,
             HistoryCampaigns = historyCampaigns,
             MyCampaigns = myCampaigns
         };

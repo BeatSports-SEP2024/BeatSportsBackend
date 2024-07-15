@@ -88,7 +88,7 @@ public class CampaignResponseV5
 
 public class CampaignResult
 {
-    public List<CampaignResponseV4> TopCampaigns { get; set; }
+    public List<CampaignResponseV4> PendingCampaigns { get; set; }
     public List<CampaignResponseV4> HistoryCampaigns { get; set; }
     public List<CampaignResponseV4> MyCampaigns { get; set; }
 }
