@@ -28,8 +28,7 @@ public class GetCampaignFilterHandler : IRequestHandler<GetCampaignFilterCommand
                 CampaignImageUrl = c.CampaignImageURL,
             }).Take(3).ToList();
 
-        var historyCampaigns = query.Where(c => c.EndDateApplying < DateTime.UtcNow)
-            .OrderByDescending(c => c.EndDateApplying)
+        var historyCampaigns = query.Where(c => (int)c.Status == 3)
             .Select(c => new CampaignResponseV4
             {
                 CampaignId = c.Id,

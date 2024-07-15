@@ -9,5 +9,6 @@ public enum StatusEnums
 {
     Pending,
     Accepted,
-    Rejected
+    Rejected,
+    Closed
 }
