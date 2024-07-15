@@ -65,7 +65,7 @@ public class CampaignController : ApiControllerBase
     [HttpGet]
     [Route("list-of-3")]
     [SwaggerOperation("Get top 3 of each campaign with filter: Danh sach ma khuyen mai yeu cau, ma khuyen mai lich su")]
-    public async Task<List<CampaignResponseV4>> GetCampaignListFilterTop3([FromQuery] GetCampaignFilterCommand request)
+    public async Task<CampaignResult> GetCampaignListFilterTop3([FromQuery] GetCampaignFilterCommand request)
     {
         return await _mediator.Send(request);
     }

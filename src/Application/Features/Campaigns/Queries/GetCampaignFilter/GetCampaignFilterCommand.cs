@@ -10,8 +10,8 @@ using BeatSportsAPI.Domain.Enums;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignFilter;
-public class GetCampaignFilterCommand : IRequest<List<CampaignResponseV4>>
+public class GetCampaignFilterCommand : IRequest<CampaignResult>
 {
-    [EnumDataType(typeof(CampaignFilterEnum))]
-    public CampaignFilterEnum CampaignFilter { get; set; }
+    public Guid OwnerId { get; set; }
+    public Guid CourtId { get; set; }
 }

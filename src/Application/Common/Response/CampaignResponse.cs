@@ -85,3 +85,10 @@ public class CampaignResponseV5
     public decimal MinValueApply { get; set; }
     public decimal MaxValueDiscount { get; set; }
 }
+
+public class CampaignResult
+{
+    public List<CampaignResponseV4> PendingCampaigns { get; set; }
+    public List<CampaignResponseV4> HistoryCampaigns { get; set; }
+    public List<CampaignResponseV4> MyCampaigns { get; set; }
+}
