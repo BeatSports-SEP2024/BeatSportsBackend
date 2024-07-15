@@ -79,6 +79,8 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"])),
         ValidateIssuer = true,
         ValidateAudience = true,
+        ClockSkew = TimeSpan.Zero,
+        ValidateLifetime = true,
         ValidIssuer = configuration["JWT:Issuer"],
         ValidAudience = configuration["JWT:Audience"]
     };
