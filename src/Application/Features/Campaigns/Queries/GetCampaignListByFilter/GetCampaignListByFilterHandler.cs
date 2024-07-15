@@ -50,6 +50,7 @@ public class GetCampaignListByFilterHandler : IRequestHandler<GetCampaignListByF
         var list = query.Select(q => new CampaignResponseV5
         {
             CampaignId = q.Id,
+            CampaignName = q.CampaignName,
             StartDateApplying = q.StartDateApplying,
             EndDateApplying = q.EndDateApplying,
             ExpireCampaign = (q.EndDateApplying - DateTime.Now).Days.ToString(),
