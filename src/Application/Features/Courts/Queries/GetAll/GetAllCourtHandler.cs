@@ -64,6 +64,8 @@ public class GetAllCourtHandler : IRequestHandler<GetAllCourtCommand, PaginatedL
             CourtName = c.CourtName,
             Description = c.Description,
             Address = c.Address,
+            LatitudeDelta = c.LatitudeDelta,
+            LongitudeDelta = c.LongitudeDelta,
             GoogleMapURLs = c.GoogleMapURLs,
             TimeStart = c.TimeStart,
             TimeEnd = c.TimeEnd,
