@@ -8,6 +8,7 @@ using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Mappings;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,7 +52,8 @@ public class GetCampaignListByFilterHandler : IRequestHandler<GetCampaignListByF
             CampaignId = q.Id,
             StartDateApplying = q.StartDateApplying,
             EndDateApplying = q.EndDateApplying,
-            Status = q.Status,
+            ExpireCampaign = (q.EndDateApplying - DateTime.Now).Days.ToString(),
+            Status = q.EndDateApplying < DateTime.Now ? StatusEnums.Expired : q.Status,
             MinValueApply = q.MinValueApply,
             MaxValueDiscount = q.MaxValueDiscount,            
         }).PaginatedListAsync(request.PageIndex, request.PageSize);

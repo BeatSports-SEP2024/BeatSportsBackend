@@ -82,6 +82,7 @@ public class CampaignResponseV5
     public StatusEnums Status { get; set; }
     public DateTime StartDateApplying { get; set; }
     public DateTime EndDateApplying { get; set; }
+    public string? ExpireCampaign { get; set; }
     public decimal MinValueApply { get; set; }
     public decimal MaxValueDiscount { get; set; }
 }
