@@ -15,6 +15,7 @@ using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Services.MapBox;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace WebAPI.Controllers.Courts;
 
@@ -82,6 +83,7 @@ public class CourtController : ApiControllerBase
     }
     [HttpGet]
     [Route("get-court-feedback")]
+    [SwaggerOperation("Get Court Detail with List of feedback")]
     public async Task<CourtResponseV5> GetCourtWithFeedback([FromQuery] GetCourtByIdWithFeedbackCommand request)
     {
         return await _mediator.Send(request);
