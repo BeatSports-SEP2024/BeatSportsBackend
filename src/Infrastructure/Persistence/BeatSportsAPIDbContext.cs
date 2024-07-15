@@ -422,7 +422,8 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = courtSubdivisionId1,
                 CourtId = court1Id,
-                //Description = "Sân cầu lông B-ZONE 11, phân cấp 1",
+                CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 1",
+                CourtSubdivisionDescription = "Sân đa dụng cho chơi cầu lông",
                 //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fsieuthicaulong.vn%2Fsan-cau-long%2Fho-chi-minh%2Fclb-san-cau-long-b-zone-11-thu-duc-hcm&psig=AOvVaw0HN4hzDZNEFb3Qak2ZKR0A&ust=1718126663044000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOib5tzG0YYDFQAAAAAdAAAAABAE",
                 IsActive = true,
                 BasePrice = 60000,
@@ -434,7 +435,8 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = courtSubdivisionId2,
                 CourtId = court1Id,
-                //Description = "Sân cầu lông B-ZONE 11, phân cấp 2",
+                CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 2",
+                CourtSubdivisionDescription = "Sân có sẵn vợt carbon cho thuê để chơi cầu lông",
                 //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fsieuthicaulong.vn%2Fsan-cau-long%2Fho-chi-minh%2Fclb-san-cau-long-b-zone-11-thu-duc-hcm&psig=AOvVaw0HN4hzDZNEFb3Qak2ZKR0A&ust=1718126663044000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOib5tzG0YYDFQAAAAAdAAAAABAQ",
                 IsActive = true,
                 BasePrice = 110000,
@@ -446,7 +448,8 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = courtSubdivisionId3,
                 CourtId = court1Id,
-                //Description = "Sân cầu lông B-ZONE 11, phân cấp 3",
+                CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 3",
+                CourtSubdivisionDescription = "Sân có sẵn vợt carbon cho thuê để chơi cầu lông",
                 //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fsieuthicaulong.vn%2Fsan-cau-long%2Fho-chi-minh%2Fclb-san-cau-long-b-zone-11-thu-duc-hcm&psig=AOvVaw0HN4hzDZNEFb3Qak2ZKR0A&ust=1718126663044000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOib5tzG0YYDFQAAAAAdAAAAABB4",
                 IsActive = true,
                 BasePrice = 110000,
@@ -458,7 +461,8 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = courtSubdivisionId4,
                 CourtId = court5Id,
-                //Description = "Sân bóng đá Phú Thọ , sân 1",
+                CourtSubdivisionName = "Sân bóng đá Phú Thọ, phân cấp 1",
+                CourtSubdivisionDescription = "Sân cỏ nhân tạo",
                 //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2F797348309003119598%2F&psig=AOvVaw3O8jui3j21qnIivkSvD8yP&ust=1718127217945000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCIDC_eXI0YYDFQAAAAAdAAAAABAJ",
                 IsActive = true,
                 BasePrice = 110000,
@@ -470,7 +474,8 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = courtSubdivisionId5,
                 CourtId = court5Id,
-                //Description = "Sân bóng đá Phú Thọ , sân 2",
+                CourtSubdivisionName = "Sân bóng đá Phú Thọ, phân cấp 2",
+                CourtSubdivisionDescription = "Sân cỏ tự nhiên",
                 //ImageURL = "https://duongminhfc.com/images/banners/san-bong-da-phu-tho-quan-11.jpg",
                 IsActive = true,
                 BasePrice = 120000,
@@ -482,7 +487,8 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = courtSubdivisionId6,
                 CourtId = court4Id,
-                //Description = "Sân chuyền Tân Bình , sân 1",
+                CourtSubdivisionName = "Sân bóng chuyền Tân Bình, phân cấp 1",
+                CourtSubdivisionDescription = "Sân lưới nhân tạo",
                 //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.myuc.vn%2Fson-san-bong-chuyen-tren-be-tong-xi-mang-voi-6-lop-son-co-hat-cao-su-nhu-san-us-open-chong-nut-polyurethane-va-decoturf-usa-84p.html&psig=AOvVaw0Tdhs_letBnUYzuVpHLEY2&ust=1718127751147000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCMDc_ePK0YYDFQAAAAAdAAAAABAJ",
                 IsActive = true,
                 BasePrice = 120000,
@@ -494,7 +500,8 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = courtSubdivisionId7,
                 CourtId = court4Id,
-                //Description = "Sân chuyền Tân Bình , sân 2",
+                CourtSubdivisionName = "Sân bóng chuyền Tân Bình, phân cấp 2",
+                CourtSubdivisionDescription = "Sân lưới nhân tạo",
                 //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.myuc.vn%2Fson-san-bong-chuyen-tren-be-tong-xi-mang-voi-6-lop-son-co-hat-cao-su-nhu-san-us-open-chong-nut-polyurethane-va-decoturf-usa-84p.html&psig=AOvVaw0Tdhs_letBnUYzuVpHLEY2&ust=1718127751147000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCMDc_ePK0YYDFQAAAAAdAAAAABAJ",
                 IsActive = true,
                 BasePrice = 120000,

@@ -426,6 +426,8 @@ public class IdentityService : IIdentityService
         {
             UserName = registerModelRequest.UserName,
             Password = combinedPassword,
+            FirstName = registerModelRequest.FirstName,
+            LastName = registerModelRequest.LastName,
             Email = registerModelRequest.Email,
             DateOfBirth = registerModelRequest.DateOfBirth,
             Gender = registerModelRequest.Gender.ToString(),

@@ -38,7 +38,7 @@ public class GetAllCourtSubdivisionOfCourtHandler : IRequestHandler<GetAllCourtS
             Id = c.Id,
             CourtId = c.CourtId,
             CourtName = c.Court.CourtName,
-            //Description = c.Description,
+            Description = c.CourtSubdivisionDescription,
             //ImageURL = c.ImageURL,
             IsActive = c.IsActive,
             BasePrice = c.BasePrice,

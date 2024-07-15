@@ -40,7 +40,7 @@ public class GetOwnerByIdWithCourtHandler : IRequestHandler<GetOwnerByIdWithCour
             {
                 CourtSubdivisionId = subCourt.Id,
                 CourtSubdivisionName = subCourt.CourtSubdivisionName,
-                Description = subCourt.Court.Description,
+                Description = subCourt.CourtSubdivisionDescription,
                 BasePrice = subCourt.BasePrice,
                 StartTime = c.TimeStart,
                 EndTime = c.TimeEnd
