@@ -38,6 +38,8 @@ public class CourtResponseV2 : IMapFrom<Court>
     public bool IsDelete { get; set; }
     public double? LatitudeDelta { get; set; }
     public double? LongitudeDelta { get; set; }
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
     //public virtual IList<CourtSubdivision>? CourtSubdivision { get; set; }
 }
 
