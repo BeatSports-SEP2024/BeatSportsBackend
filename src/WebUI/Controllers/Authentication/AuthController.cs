@@ -93,22 +93,22 @@ public class AuthController : ApiControllerBase
 
     [HttpPost]
     [Route("refresh-token")]
-    public async Task<IActionResult> RefreshToken(string accessToken, string token)
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
     {
         var response = new BeatSportsResponse();
 
-        var refreshToken = _identityService.GetRefreshToken(token);
-        if (refreshToken == null || accessToken != refreshToken.AccessToken)
+        var refreshToken = _identityService.GetRefreshToken(request.RefreshToken); //refreshToken
+        if (refreshToken == null || request.AccessToken != refreshToken.AccessToken)
         {
             response.Message = "Invalid Refresh Token";
-            return Ok(response);
+            return BadRequest(response);
         }
-        else if (refreshToken.TokenExpires < DateTime.Now || accessToken != refreshToken.AccessToken)
+        else if (refreshToken.TokenExpires < DateTime.Now || request.AccessToken != refreshToken.AccessToken)
         {
             response.Message = "Token expired.";
-            return Ok(response);
+            return BadRequest(response);
         }
-        var username = _identityService.GetUserIdFromToken(accessToken);
+        var username = _identityService.GetUserIdFromToken(request.AccessToken);
         var re = await _identityService.SetNewRefreshTokenAsync(username);
 
         return Ok(re);
