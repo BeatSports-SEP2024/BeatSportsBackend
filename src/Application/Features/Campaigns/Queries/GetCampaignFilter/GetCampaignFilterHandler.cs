@@ -7,7 +7,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignFilter;
-public class GetCampaignFilterHandler : IRequestHandler<GetCampaignFilterCommand, List<CampaignResponseV4>>
+public class GetCampaignFilterHandler : IRequestHandler<GetCampaignFilterCommand, CampaignResult>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
 
@@ -16,31 +16,43 @@ public class GetCampaignFilterHandler : IRequestHandler<GetCampaignFilterCommand
         _beatSportsDbContext = beatSportsDbContext;
     }
 
-    public Task<List<CampaignResponseV4>> Handle(GetCampaignFilterCommand request, CancellationToken cancellationToken)
+    public Task<CampaignResult> Handle(GetCampaignFilterCommand request, CancellationToken cancellationToken)
     {
         var query = _beatSportsDbContext.Campaigns
             .Where(c => !c.IsDelete);
 
-        switch (request.CampaignFilter.ToString()) 
+        var topCampaigns = query.Where(c => c.Status == 0)
+            .Select(c => new CampaignResponseV4
+            {
+                CampaignId = c.Id,
+                CampaignImageUrl = c.CampaignImageURL,
+            }).Take(3).ToList();
+
+        var historyCampaigns = query.Where(c => c.EndDateApplying < DateTime.UtcNow)
+            .OrderByDescending(c => c.EndDateApplying)
+            .Select(c => new CampaignResponseV4
+            {
+                CampaignId = c.Id,
+                CampaignImageUrl = c.CampaignImageURL,
+            }).Take(3).ToList();
+
+        var myCampaigns = _beatSportsDbContext.Campaigns
+            .Include(c => c.Court)
+            .ThenInclude(court => court.Owner)
+            .Where(c => !c.IsDelete && c.Court.Id == request.CourtId && c.Court.Owner.Id == request.OwnerId)
+            .Select(c => new CampaignResponseV4
+            {
+                CampaignId = c.Id,
+                CampaignImageUrl = c.CampaignImageURL,
+            }).Take(3).ToList();
+
+        var result = new CampaignResult
         {
-            case "Pending":
-                query = query.Where(tp => tp.Status == 0);
-            break;
+            TopCampaigns = topCampaigns,
+            HistoryCampaigns = historyCampaigns,
+            MyCampaigns = myCampaigns
+        };
 
-            case "History":
-                query = query.Where(tp => tp.EndDateApplying <= DateTime.UtcNow);
-            break;
-
-            default:
-                throw new BadRequestException("Invalid filter");
-        }
-
-        var list = query.Select(q => new CampaignResponseV4
-        {
-            CampaignId = q.Id,
-            CampaignImageUrl = q.CampaignImageURL
-        }).Take(3).ToList();
-
-        return Task.FromResult(list);
+        return Task.FromResult(result);
     }
 }
