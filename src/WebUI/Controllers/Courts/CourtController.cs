@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using BeatSportsAPI.Application.Common.Middlewares;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Response.CourtResponse;
@@ -9,6 +10,7 @@ using BeatSportsAPI.Application.Features.Courts.Queries.GetAll;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAllCourtsByOwnerId;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetById;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetListCourtsNearBy;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Services.MapBox;
@@ -25,6 +27,7 @@ public class CourtController : ApiControllerBase
     }
 
     [HttpPost]
+    [CustomAuthorize(RoleEnums.Owner)]
     public async Task<BeatSportsResponse> Create(CreateCourtCommand request)
     {
         return await _mediator.Send(request);
@@ -58,6 +61,7 @@ public class CourtController : ApiControllerBase
     }
     [HttpGet]
     [Route("all")]
+    [CustomAuthorize(RoleEnums.Owner)]
     public async Task<PaginatedList<CourtResponseV2>> GetAllCourt([FromQuery] GetAllCourtCommand request)
     {
         return await _mediator.Send(request);
