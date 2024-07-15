@@ -9,6 +9,7 @@ using BeatSportsAPI.Application.Common.Mappings;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignListByFilter;
 public class GetCampaignListByFilterHandler : IRequestHandler<GetCampaignListByFilterCommand, PaginatedList<CampaignResponseV5>>
@@ -31,8 +32,14 @@ public class GetCampaignListByFilterHandler : IRequestHandler<GetCampaignListByF
                 query = query.Where(tp => tp.Status == 0);
                 break;
 
-            case "History":
-                query = query.Where(tp => tp.EndDateApplying <= DateTime.UtcNow);
+            case "Closed":
+                query = query.Where(tp => (int)tp.Status == 3);
+                break;
+
+            case "MyCampaign":
+                query = query.Include(c => c.Court)
+                    .ThenInclude(court => court.Owner)
+                    .Where(c => !c.IsDelete && c.Court.Id == request.CourtId && c.Court.Owner.Id == request.OwnerId);
                 break;
 
             default:

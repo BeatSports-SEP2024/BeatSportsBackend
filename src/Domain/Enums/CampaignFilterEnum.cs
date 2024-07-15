@@ -8,5 +8,6 @@ namespace BeatSportsAPI.Domain.Enums;
 public enum CampaignFilterEnum
 {
     Pending, 
-    History
+    Closed,
+    MyCampaign
 }

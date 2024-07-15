@@ -18,4 +18,6 @@ public class GetCampaignListByFilterCommand : IRequest<PaginatedList<CampaignRes
     public int PageSize { get; set; }
     [EnumDataType(typeof(CampaignFilterEnum))]
     public CampaignFilterEnum CampaignFilter { get; set; }
+    public Guid OwnerId { get; set; }
+    public Guid CourtId { get; set; }
 }
