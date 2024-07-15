@@ -101,6 +101,8 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
                 TimeStart = c.TimeStart,
                 TimeEnd = c.TimeEnd,
                 PlaceId = c.PlaceId,
+                LatitudeDelta = c.LatitudeDelta,
+                LongitudeDelta = c.LongitudeDelta,
                 FbStar = starAvg,
                 CourtSubCount = c.CourtSubdivision.Count,
                 Price = price,

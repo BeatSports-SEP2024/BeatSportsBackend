@@ -58,6 +58,8 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, BeatSports
             TimeEnd = request.TimeEnd,
             Latitude = latitude,
             Longitude = longitude,
+            LatitudeDelta = 0.01,
+            LongitudeDelta = 0.01,
             ImageUrls = String.Join(",", request.ImageUrls),
             PlaceId = $"{latitude}, {longitude}",
             CourtSubdivision = new List<CourtSubdivision>()

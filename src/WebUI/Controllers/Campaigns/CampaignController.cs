@@ -7,6 +7,8 @@ using BeatSportsAPI.Application.Features.Campaigns.Commands.UpdateStatusOfCampai
 using BeatSportsAPI.Application.Features.Campaigns.Queries.GetAllCampaigns;
 using BeatSportsAPI.Application.Features.Campaigns.Queries.GetAllCampaignWithPending;
 using BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignById;
+using BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignFilter;
+using BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignListByFilter;
 using BeatSportsAPI.Application.Features.Courts.Commands.CreateCourt;
 using BeatSportsAPI.Application.Features.Courts.Commands.DeleteCourt;
 using BeatSportsAPI.Application.Features.Courts.Commands.UpdateCourt;
@@ -14,6 +16,7 @@ using BeatSportsAPI.Application.Features.Courts.Queries.GetAll;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace WebAPI.Controllers.Campaigns;
 
@@ -56,6 +59,20 @@ public class CampaignController : ApiControllerBase
     [HttpGet]
     [Route("list-pending")]
     public async Task<PaginatedList<CampaignResponseV2>> GetCampaignListPending([FromQuery] GetAllCampaignWithPendingCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+    [HttpGet]
+    [Route("list-of-3")]
+    [SwaggerOperation("Get top 3 of each campaign with filter: Danh sach ma khuyen mai yeu cau, ma khuyen mai lich su")]
+    public async Task<List<CampaignResponseV4>> GetCampaignListFilterTop3([FromQuery] GetCampaignFilterCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+    [HttpGet]
+    [Route("list-campaign-filter")]
+    [SwaggerOperation("Get all of each campaign with filter: Danh sach ma khuyen mai yeu cau, ma khuyen mai lich su")]
+    public async Task<PaginatedList<CampaignResponseV5>> GetListOfCampaignInFilter([FromQuery] GetCampaignListByFilterCommand request)
     {
         return await _mediator.Send(request);
     }

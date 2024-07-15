@@ -162,12 +162,12 @@ public class IdentityService : IIdentityService
         string? audience = GetJsonInAppSettingsExtension.GetJson("Jwt:Audience");
 
         var claims = new List<Claim>()
-    {
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        new Claim(JwtRegisteredClaimNames.Sub, loginRequest.Username),
-        new Claim(ClaimTypes.Role, userRole),
-        new Claim("AccountId", accountId.ToString())
-    };
+        {
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Sub, loginRequest.Username),
+            new Claim(ClaimTypes.Role, userRole),
+            new Claim("AccountId", accountId.ToString())
+        };
 
         // Check the role of the user and add corresponding Id
         if (userRole == "Owner" && user.Owner != null)
@@ -179,7 +179,7 @@ public class IdentityService : IIdentityService
             claims.Add(new Claim("CustomerId", user.Customer.Id.ToString()));
         }
 
-        var expiry = DateTime.UtcNow.AddMinutes(30);
+        var expiry = DateTime.UtcNow.AddMinutes(5);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Issuer = issuer,
@@ -251,7 +251,7 @@ public class IdentityService : IIdentityService
         var refreshToken = new RefreshTokenModel
         {
             Token = GenerateRandomAlphanumericExtensions.GenerateRandomAlphanumeric(16),
-            Expires = DateTime.Now.AddDays(1)
+            Expires = DateTime.Now.AddMinutes(1)
         };
 
         return refreshToken;
