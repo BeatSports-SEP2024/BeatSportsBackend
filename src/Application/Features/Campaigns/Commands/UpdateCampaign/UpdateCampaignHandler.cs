@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Application.Features.Courts.Commands.UpdateCourt;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
@@ -27,13 +28,13 @@ public class UpdateCampaignHandler : IRequestHandler<UpdateCampaignCommand, Beat
         {
             throw new BadRequestException($"Campaign with Campaign ID:{request.CampaignId} does not exist or have been delele");
         }
-
+        var sportTypes = String.Join(",", request.SportTypeApply.Select(e => e.GetDescriptionFromEnum()).ToArray());
         campaign.CampaignName = request.CampaignName;
         campaign.Description = request.Description;
         campaign.PercentDiscount = request.PercentDiscount;
         campaign.StartDateApplying = request.StartDateApplying;
         campaign.EndDateApplying = request.EndDateApplying;
-        campaign.SportTypeApply = request.SportTypeApply.ToString();
+        campaign.SportTypeApply = sportTypes;
         campaign.MinValueApply = request.MinValueApply;
         campaign.MaxValueDiscount = request.MaxValueDiscount;
         campaign.Status = request.Status;

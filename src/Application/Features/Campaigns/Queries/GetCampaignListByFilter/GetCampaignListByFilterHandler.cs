@@ -30,11 +30,11 @@ public class GetCampaignListByFilterHandler : IRequestHandler<GetCampaignListByF
         switch (request.CampaignFilter.ToString())
         {
             case "Pending":
-                query = query.Where(tp => tp.Status == 0);
+                query = query.Where(tp => tp.Status == 0 && tp.Court.Id == request.CourtId && tp.Court.Owner.Id == request.OwnerId);
                 break;
 
             case "Closed":
-                query = query.Where(tp => (int)tp.Status == 3);
+                query = query.Where(tp => (int)tp.Status == 3 && tp.Court.Id == request.CourtId && tp.Court.Owner.Id == request.OwnerId);
                 break;
 
             case "MyCampaign":
