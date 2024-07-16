@@ -103,11 +103,12 @@ public class AuthController : ApiControllerBase
             response.Message = "Invalid Refresh Token";
             return BadRequest(response);
         }
-        else if (refreshToken.TokenExpires < DateTime.Now || request.AccessToken != refreshToken.AccessToken)
-        {
-            response.Message = "Token expired.";
-            return BadRequest(response);
-        }
+        //else if (refreshToken.TokenExpires < DateTime.Now || request.AccessToken != refreshToken.AccessToken)
+        //{
+        //    response.Message = "Token expired.";
+        //    return BadRequest(response);
+        //}
+
         var username = _identityService.GetUserIdFromToken(request.AccessToken);
         var re = await _identityService.SetNewRefreshTokenAsync(username);
 
