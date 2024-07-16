@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Application.Features.Courts.Commands.CreateCourt;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
@@ -34,7 +35,7 @@ public class CreateCampaignHandler : IRequestHandler<CreateCampaignCommand, Beat
         var endDate = request.EndDateApplying.Date
                         .AddHours(23).AddMinutes(59).AddSeconds(59).AddMilliseconds(999);
 
-        var sportTypes = String.Join(",", request.SportTypeApply.Select(e => e.ToString()).ToArray());
+        var sportTypes = String.Join(",", request.SportTypeApply.Select(e => e.GetDescriptionFromEnum()).ToArray());
         var campaign = new Campaign()
         {
             CourtId = request.CourtId,

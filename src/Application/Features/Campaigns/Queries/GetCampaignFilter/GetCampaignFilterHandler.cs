@@ -21,14 +21,14 @@ public class GetCampaignFilterHandler : IRequestHandler<GetCampaignFilterCommand
         var query = _beatSportsDbContext.Campaigns
             .Where(c => !c.IsDelete);
 
-        var pendingCampaigns = query.Where(c => c.Status == 0 && c.Court.Id == request.CourtId)
+        var pendingCampaigns = query.Where(c => c.Status == 0 && c.Court.Id == request.CourtId && c.Court.Owner.Id == request.OwnerId)
             .Select(c => new CampaignResponseV4
             {
                 CampaignId = c.Id,
                 CampaignImageUrl = c.CampaignImageURL,
             }).Take(3).ToList();
 
-        var historyCampaigns = query.Where(c => (int)c.Status == 3)
+        var historyCampaigns = query.Where(c => (int)c.Status == 3 && c.Court.Id == request.CourtId && c.Court.Owner.Id == request.OwnerId)
             .Select(c => new CampaignResponseV4
             {
                 CampaignId = c.Id,
@@ -38,7 +38,7 @@ public class GetCampaignFilterHandler : IRequestHandler<GetCampaignFilterCommand
         var myCampaigns = _beatSportsDbContext.Campaigns
             .Include(c => c.Court)
             .ThenInclude(court => court.Owner)
-            .Where(c => !c.IsDelete && c.Court.Id == request.CourtId && c.Court.Owner.Id == request.OwnerId)
+            .Where(c => !c.IsDelete && (int)c.Status == 1 && c.Court.Id == request.CourtId && c.Court.Owner.Id == request.OwnerId)
             .Select(c => new CampaignResponseV4
             {
                 CampaignId = c.Id,

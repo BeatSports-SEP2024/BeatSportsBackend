@@ -61,6 +61,7 @@ public class CampaignResponseV3
     public DateTime StartDateApplying { get; set; }
     public DateTime EndDateApplying { get; set; }
     public string SportTypeApply { get; set; }
+    public string? ExpireCampaign { get; set; }
     public decimal MinValueApply { get; set; }
     public decimal MaxValueDiscount { get; set; }
     public StatusEnums Status { get; set; }

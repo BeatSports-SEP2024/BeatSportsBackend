@@ -54,6 +54,7 @@ public class GetCampaignByIdHandler : IRequestHandler<GetCampaignByIdCommand, Ca
             StartDateApplying = c.StartDateApplying,
             EndDateApplying = c.EndDateApplying,
             SportTypeApply = c.SportTypeApply,
+            ExpireCampaign = (c.EndDateApplying - DateTime.Now).Days.ToString(),
             MinValueApply = c.MinValueApply,
             MaxValueDiscount = c.MaxValueDiscount,
             Created = c.Created,
