@@ -38,7 +38,7 @@ public class GetCampaignFilterHandler : IRequestHandler<GetCampaignFilterCommand
         var myCampaigns = _beatSportsDbContext.Campaigns
             .Include(c => c.Court)
             .ThenInclude(court => court.Owner)
-            .Where(c => !c.IsDelete && c.Court.Id == request.CourtId && c.Court.Id == request.CourtId && c.Court.Owner.Id == request.OwnerId)
+            .Where(c => !c.IsDelete && (int)c.Status == 1 && c.Court.Id == request.CourtId && c.Court.Owner.Id == request.OwnerId)
             .Select(c => new CampaignResponseV4
             {
                 CampaignId = c.Id,
