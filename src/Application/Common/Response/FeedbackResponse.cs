@@ -24,4 +24,5 @@ public class FeedbackResponseV2
     public decimal? FeedbackStar { get; set; }
     public string? FeedbackContent { get; set; }
     public string? ProfilePictureUrl { get; set; }
+    public string? FullName { get; set; }
 }

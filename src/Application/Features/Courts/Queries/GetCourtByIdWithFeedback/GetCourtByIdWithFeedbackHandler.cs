@@ -35,6 +35,8 @@ public class GetCourtByIdWithFeedbackHandler : IRequestHandler<GetCourtByIdWithF
                 Description = c.Description,
                 Address = c.Address,
                 PlaceId = c.PlaceId,
+                ImagesList = c.ImageUrls,
+                RentingCount = c.Feedback.Select(f => f.Booking).Distinct().Count(),
                 FeedbackCount = c.Feedback.Count(),
                 FeedbackStarAvg = c.Feedback.Any() ? c.Feedback.Average(x => x.FeedbackStar) : (decimal?)null,
                 Price = c.CourtSubdivision.FirstOrDefault() != null ? c.CourtSubdivision.FirstOrDefault().BasePrice : (decimal?)null,
@@ -45,8 +47,9 @@ public class GetCourtByIdWithFeedbackHandler : IRequestHandler<GetCourtByIdWithF
                         CourtId = c.Id,
                         FeedbackStar = c.FeedbackStar,
                         FeedbackContent = c.FeedbackContent,
-                        ProfilePictureUrl = c.Booking.Customer.Account.ProfilePictureURL
-                    }).ToList()
+                        ProfilePictureUrl = c.Booking.Customer.Account.ProfilePictureURL,
+                        FullName = c.Booking.Customer.Account.FirstName + " " + c.Booking.Customer.Account.LastName
+                    }).ToList(),
             })
             .FirstOrDefault();
         return Task.FromResult(courtDetails);
