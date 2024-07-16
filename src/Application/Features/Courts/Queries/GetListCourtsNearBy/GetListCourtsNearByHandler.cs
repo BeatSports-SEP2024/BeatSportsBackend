@@ -31,7 +31,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
     {
         var distanceCal = new DistanceCalculation();
 
-        if(request.KeyWords == null)
+        if (request.KeyWords == null)
         {
             request.KeyWords = "";
         }
@@ -40,13 +40,13 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
 
         if (request.CourtId != Guid.Empty)
         {
-             query = _dbContext.Courts
-            .Where(x => !x.IsDelete && x.Id == request.CourtId && (x.CourtName.Contains(request.KeyWords) || x.Address.Contains(request.KeyWords)))
-            .Include(x => x.Owner)
-            .Include(x => x.Feedback)
-            .Include(x => x.CourtSubdivision)
-            .ThenInclude(x => x.Bookings)
-            .ToList();
+            query = _dbContext.Courts
+           .Where(x => !x.IsDelete && x.Id == request.CourtId && (x.CourtName.Contains(request.KeyWords) || x.Address.Contains(request.KeyWords)))
+           .Include(x => x.Owner)
+           .Include(x => x.Feedback)
+           .Include(x => x.CourtSubdivision)
+           .ThenInclude(x => x.Bookings)
+           .ToList();
         }
         else
         {
@@ -66,12 +66,12 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
             double starAvg = 0;
             decimal price = 0;
             int rentalNumber = 0;
-            if(c.Feedback.Count != 0)
+            if (c.Feedback.Count != 0)
             {
                 starAvg = (double)c.Feedback.Average(x => x.FeedbackStar);
             }
 
-            if(c.CourtSubdivision.Count != 0)
+            if (c.CourtSubdivision.Count != 0)
             {
                 price = c.CourtSubdivision.MinBy(c => c.BasePrice).BasePrice;
                 rentalNumber = c.CourtSubdivision.Sum(x => x.Bookings.Where(c => c.BookingStatus.Equals("Approved")).Count());
@@ -85,11 +85,14 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
                 BasePrice = b.BasePrice,
                 IsActive = b.IsActive,
             }).ToList();
-
+            var imageUrls = c.ImageUrls?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                         .Select(url => url.Trim())
+                         .Where(url => !string.IsNullOrEmpty(url))
+                         .ToArray();
+            Console.WriteLine(imageUrls);
             var name = _dbContext.Accounts
                 .Where(x => x.Id == c.Owner.AccountId)
                 .FirstOrDefault();
-
             list.Add(new CourtResponseV3
             {
                 Id = c.Id,
@@ -98,6 +101,9 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
                 CourtName = c.CourtName,
                 Address = c.Address,
                 GoogleMapURLs = c.GoogleMapURLs,
+                WallpaperUrls = imageUrls.FirstOrDefault(), // Lấy ảnh đầu tiên
+                CoverImgUrls = imageUrls.FirstOrDefault(), // Chuỗi gốc cho ảnh bìa
+                CourtImgsList = imageUrls.ToList(), // Danh sách tất cả ảnh
                 TimeStart = c.TimeStart,
                 TimeEnd = c.TimeEnd,
                 PlaceId = c.PlaceId,

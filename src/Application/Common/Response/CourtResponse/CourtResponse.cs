@@ -51,6 +51,9 @@ public class CourtResponseV3 : IMapFrom<Court>
     public string? CourtName { get; set; }
     public string? Address { get; set; }
     public string? GoogleMapURLs { get; set; }
+    public string? WallpaperUrls { get; set; }
+    public string? CoverImgUrls { get; set; }
+    public List<string>? CourtImgsList { get; set; }
     public TimeSpan TimeStart { get; set; }
     public TimeSpan TimeEnd { get; set; }
     public string? PlaceId { get; set; }
