@@ -72,3 +72,18 @@ public class CourtResponseV4 : IMapFrom<Court>
     public string? Description { get; set; }
     public List<CourtSubdivisionV2>? CourtSubdivision { get; set; }
 }
+
+//For screen detail court
+public class CourtResponseV5
+{
+    public Guid Id { get; set; }
+    public string OwnerName { get; set; }
+    public string? Description { get; set; }
+    public string? CourtName { get; set; }
+    public string? Address { get; set; }
+    public string? PlaceId { get; set; }
+    public decimal Price { get; set; }
+    public decimal? FeedbackStarAvg { get; set; }
+    public int? FeedbackCount { get; set; }
+    public List<FeedbackResponseV2>? Feedbacks { get; set; }
+}

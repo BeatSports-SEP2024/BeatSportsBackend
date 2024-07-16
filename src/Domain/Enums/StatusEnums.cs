@@ -10,5 +10,7 @@ public enum StatusEnums
     Pending,
     Accepted,
     Rejected,
-    Closed
+    Closed,
+    //This field is only view
+    Expired
 }

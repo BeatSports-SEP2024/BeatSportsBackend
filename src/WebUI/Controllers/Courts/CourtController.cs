@@ -9,11 +9,13 @@ using BeatSportsAPI.Application.Features.Courts.Commands.UpdateCourt;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAll;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAllCourtsByOwnerId;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetById;
+using BeatSportsAPI.Application.Features.Courts.Queries.GetCourtByIdWithFeedback;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetListCourtsNearBy;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Services.MapBox;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace WebAPI.Controllers.Courts;
 
@@ -75,6 +77,14 @@ public class CourtController : ApiControllerBase
     [HttpGet]
     [Route("get-list-court-nearby")]
     public async Task<List<CourtResponseV3>> GetCourtNearBya([FromQuery] GetListCourtsNearByCommand request)
+    {
+        return await _mediator.Send(request);
+
+    }
+    [HttpGet]
+    [Route("get-court-feedback")]
+    [SwaggerOperation("Get Court Detail with List of feedback")]
+    public async Task<CourtResponseV5> GetCourtWithFeedback([FromQuery] GetCourtByIdWithFeedbackCommand request)
     {
         return await _mediator.Send(request);
 

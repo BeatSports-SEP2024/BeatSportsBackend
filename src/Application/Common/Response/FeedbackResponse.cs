@@ -16,3 +16,12 @@ public class FeedbackResponse
     public string? FeedbackStatus { get; set; }
     public string FeedbackContent { get; set; } 
 }
+
+//For Detail Court screen
+public class FeedbackResponseV2
+{
+    public Guid CourtId { get; set; }
+    public decimal FeedbackStar { get; set; }
+    public string? FeedbackContent { get; set; }
+    public string? ProfilePictureUrl { get; set; }
+}
