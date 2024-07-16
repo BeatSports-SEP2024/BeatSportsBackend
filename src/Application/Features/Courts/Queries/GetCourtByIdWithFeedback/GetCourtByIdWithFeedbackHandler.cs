@@ -36,8 +36,8 @@ public class GetCourtByIdWithFeedbackHandler : IRequestHandler<GetCourtByIdWithF
                 Address = c.Address,
                 PlaceId = c.PlaceId,
                 FeedbackCount = c.Feedback.Count(),
-                FeedbackStarAvg = c.Feedback.Average(x => x.FeedbackStar),
-                Price = c.CourtSubdivision.FirstOrDefault().BasePrice,
+                FeedbackStarAvg = c.Feedback.Any() ? c.Feedback.Average(x => x.FeedbackStar) : (decimal?)null,
+                Price = c.CourtSubdivision.FirstOrDefault() != null ? c.CourtSubdivision.FirstOrDefault().BasePrice : (decimal?)null,
                 Feedbacks = c.Feedback
                     .Where(c => !c.IsDelete)
                     .Select(c => new FeedbackResponseV2
