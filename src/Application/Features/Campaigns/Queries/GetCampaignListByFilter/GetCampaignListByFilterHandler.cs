@@ -40,7 +40,7 @@ public class GetCampaignListByFilterHandler : IRequestHandler<GetCampaignListByF
             case "MyCampaign":
                 query = query.Include(c => c.Court)
                     .ThenInclude(court => court.Owner)
-                    .Where(c => !c.IsDelete && c.Court.Id == request.CourtId && c.Court.Owner.Id == request.OwnerId);
+                    .Where(c => !c.IsDelete && (int)c.Status == 1 && c.Court.Owner.Id == request.OwnerId);
                 break;
 
             default:
