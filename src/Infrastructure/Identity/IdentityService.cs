@@ -240,7 +240,7 @@ public class IdentityService : IIdentityService
         var loginResponse = new LoginResponse
         {
             AccessToken = tokenModel.AccessToken,
-            RefreshToken = refreshToken.Token
+            RefreshToken = refreshToken.Token,
         };
         return loginResponse;
     }
@@ -337,7 +337,7 @@ public class IdentityService : IIdentityService
             UserInfo = new AccountResponseForLogin
             {
                 Id = id,
-                FullName = user.FirstName + user.LastName,
+                FullName = user.FirstName +" "+ user.LastName,
                 Email = user.Email
             }
         };
