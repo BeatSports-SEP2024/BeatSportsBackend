@@ -29,7 +29,8 @@ public interface IBeatSportsDbContext
     public DbSet<Merchant> Merchants { get; set; }
     public DbSet<SportCategory> SportsCategories { get; set; }
     public DbSet<Court> Courts { get; set; }
-    public DbSet<CourtSportCategory> CourtSportCategories { get; set; }
+    //public DbSet<CourtSportCategory> CourtSportCategories { get; set; }
+    public DbSet<CourtSubdivisionSetting> CourtSubdivisionSettings { get; set; }
     public DbSet<CourtSubdivision> CourtSubdivisions { get; set; }
     public DbSet<Booking> Bookings { get; set; }
     public DbSet<RefreshToken> RefreshToken { get; set; }

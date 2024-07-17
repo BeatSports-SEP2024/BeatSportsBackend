@@ -8,5 +8,5 @@ public class SportCategory : BaseAuditableEntity
     public string? ImageURL { get; set; }
     public bool IsActive { get; set; } = true;
 
-    public virtual IList<CourtSportCategory>? CourtSportCategories { get; set; }
+    public virtual IList<CourtSubdivisionSetting>? CourtSubdivisionSettings { get; set; }
 }

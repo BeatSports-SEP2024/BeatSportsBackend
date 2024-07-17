@@ -35,7 +35,8 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
     public DbSet<Merchant> Merchants { get; set; }
     public DbSet<SportCategory> SportsCategories { get; set; }
     public DbSet<Court> Courts { get; set; }
-    public DbSet<CourtSportCategory> CourtSportCategories { get; set; }
+    //public DbSet<CourtSportCategory> CourtSportCategories { get; set; }
+    public DbSet<CourtSubdivisionSetting> CourtSubdivisionSettings { get; set; }
     public DbSet<CourtSubdivision> CourtSubdivisions { get; set; }
     public DbSet<Booking> Bookings { get; set; }
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
@@ -66,20 +67,20 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-        builder.Entity<CourtSportCategory>(entity =>
-        {
-            entity.HasKey(ss => new { ss.CourtSubdivisionId, ss.SportCategoryId });
+        //builder.Entity<CourtSportCategory>(entity =>
+        //{
+        //    entity.HasKey(ss => new { ss.CourtSubdivisionId, ss.SportCategoryId });
 
-            entity.HasOne(ss => ss.CourtSubdivision)
-            .WithMany(ss => ss.CourtSportCategories)
-            .HasForeignKey(ss => ss.CourtSubdivisionId)
-            .OnDelete(DeleteBehavior.NoAction);
+        //    entity.HasOne(ss => ss.CourtSubdivision)
+        //    .WithMany(ss => ss.CourtSportCategories)
+        //    .HasForeignKey(ss => ss.CourtSubdivisionId)
+        //    .OnDelete(DeleteBehavior.NoAction);
 
-            entity.HasOne(ss => ss.SportCategory)
-            .WithMany(ss => ss.CourtSportCategories)
-            .HasForeignKey(ss => ss.SportCategoryId)
-            .OnDelete(DeleteBehavior.NoAction);
-        });
+        //    entity.HasOne(ss => ss.SportCategory)
+        //    .WithMany(ss => ss.CourtSportCategories)
+        //    .HasForeignKey(ss => ss.SportCategoryId)
+        //    .OnDelete(DeleteBehavior.NoAction);
+        //});
         builder.Entity<Court>().HasIndex(x => x.PlaceId).IsUnique();
 
         builder.Entity<RoomMember>(entity =>
@@ -549,25 +550,25 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 IsDelete = false,
             });
         #endregion
-        #region Court_Sport_Categories_Mapping
-        builder.Entity<CourtSportCategory>()
-            .HasData(new CourtSportCategory
-            {
-                CourtSubdivisionId = courtSubdivisionId1,
-                SportCategoryId = soccerId,
-            },
-            new CourtSportCategory
-            {
-                CourtSubdivisionId = courtSubdivisionId2,
-                SportCategoryId = badmintionId,
-            },
-            new CourtSportCategory
-            {
-                CourtSubdivisionId = courtSubdivisionId3,
-                SportCategoryId = badmintionId,
-            }
-            );
-        #endregion
+        //#region Court_Sport_Categories_Mapping
+        //builder.Entity<CourtSportCategory>()
+        //    .HasData(new CourtSportCategory
+        //    {
+        //        CourtSubdivisionId = courtSubdivisionId1,
+        //        SportCategoryId = soccerId,
+        //    },
+        //    new CourtSportCategory
+        //    {
+        //        CourtSubdivisionId = courtSubdivisionId2,
+        //        SportCategoryId = badmintionId,
+        //    },
+        //    new CourtSportCategory
+        //    {
+        //        CourtSubdivisionId = courtSubdivisionId3,
+        //        SportCategoryId = badmintionId,
+        //    }
+        //    );
+        //#endregion
         var discount20 = Guid.NewGuid();
         var christmas = Guid.NewGuid();
         var birthday = Guid.NewGuid();

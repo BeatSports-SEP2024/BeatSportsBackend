@@ -69,36 +69,36 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
                                      RemoveDiacritics(x.Address).ToLower().Contains(request.KeyWords.ToLower()))
                          .ToList();
 
-            if (request.SportCategory != null)
-            {
-                var sportCategory = _dbContext.SportsCategories
-                                .Where(x => x.Name.Contains(request.SportCategory))
-                                .FirstOrDefault();
+            //if (request.SportCategory != null)
+            //{
+            //    var sportCategory = _dbContext.SportsCategories
+            //                    .Where(x => x.Name.Contains(request.SportCategory))
+            //                    .FirstOrDefault();
 
-                var courtSubList = _dbContext.CourtSportCategories
-                                .Where(x => x.SportCategoryId == sportCategory.Id)
-                                .ToList();
-                var tmp = query.ToList();
+            //    var courtSubList = _dbContext.CourtSportCategories
+            //                    .Where(x => x.SportCategoryId == sportCategory.Id)
+            //                    .ToList();
+            //    var tmp = query.ToList();
 
-                foreach (var court in query)
-                {
-                    var flag = 0;
-                    foreach (var courtSub in court.CourtSubdivision)
-                    {
-                        if (courtSubList.Any(x => x.CourtSubdivisionId == courtSub.Id))
-                        {
-                            flag++;
-                            break;
-                        }
-                    }
+            //    foreach (var court in query)
+            //    {
+            //        var flag = 0;
+            //        foreach (var courtSub in court.CourtSubdivision)
+            //        {
+            //            if (courtSubList.Any(x => x.CourtSubdivisionId == courtSub.Id))
+            //            {
+            //                flag++;
+            //                break;
+            //            }
+            //        }
 
-                    if (flag == 0)
-                    {
-                        tmp.Remove(court);
-                    }
-                }
-                query = tmp;
-            }
+            //        if (flag == 0)
+            //        {
+            //            tmp.Remove(court);
+            //        }
+            //    }
+            //    query = tmp;
+            //}
 
             if (request.Criteria.Equals("Đã thuê") && request.CustomerId != null)
             {

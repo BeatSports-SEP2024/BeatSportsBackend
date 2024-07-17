@@ -1,5 +1,5 @@
 ﻿using BeatSportsAPI.Application.Features.Courts.CourtSportCategory.Commands;
-using BeatSportsAPI.Application.Features.Courts.CourtSportCategory.Queries;
+//using BeatSportsAPI.Application.Features.Courts.CourtSportCategory.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,17 +14,17 @@ public class CourtSportCategoryController : ApiControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetCourtSportCategory([FromQuery] GetCourtSportCategoryCommand request) 
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-        var response = await _mediator.Send(request);
+    //[HttpGet]
+    //public async Task<IActionResult> GetCourtSportCategory([FromQuery] GetCourtSportCategoryCommand request) 
+    //{
+    //    if (!ModelState.IsValid)
+    //    {
+    //        return BadRequest(ModelState);
+    //    }
+    //    var response = await _mediator.Send(request);
 
-        return Ok(response);
-    }
+    //    return Ok(response);
+    //}
     [HttpPost]
     public async Task<IActionResult> CreateCourtSportCategory(CreateCourtSportCategoryCommand request)
     {
