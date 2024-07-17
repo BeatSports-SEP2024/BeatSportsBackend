@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Commands.CreateCourtSubdivision;
-public class CreateCourtSubdivisionHandler : IRequestHandler<CreateListCourtSubdivisionCommand, BeatSportsResponse>
+public class CreateCourtSubdivisionHandler : IRequestHandler<CreateCourtSubdivisionCommand, BeatSportsResponse>
 {
     private readonly IBeatSportsDbContext _dbContext;
 
@@ -16,13 +16,11 @@ public class CreateCourtSubdivisionHandler : IRequestHandler<CreateListCourtSubd
         _dbContext = dbContext;
     }
 
-    public async Task<BeatSportsResponse> Handle(CreateListCourtSubdivisionCommand request, CancellationToken cancellationToken)
+    public async Task<BeatSportsResponse> Handle(CreateCourtSubdivisionCommand request, CancellationToken cancellationToken)
     {
-        foreach(var command in request.CreateListCourtSubCommands)
-        {
             //Check court is valid
             var court = _dbContext.Courts
-                .Where(c => c.Id == command.CourtId && !c.IsDelete)
+                .Where(c => c.Id == request.CourtId && !c.IsDelete)
                 .SingleOrDefault();
 
             if( court == null ) 
@@ -32,15 +30,16 @@ public class CreateCourtSubdivisionHandler : IRequestHandler<CreateListCourtSubd
 
             var courtSubdivision = new CourtSubdivision
             {
-                CourtId = command.CourtId,
-                BasePrice = command.BasePrice,
+                CourtId = request.CourtId,
+                BasePrice = request.BasePrice,
                 //ImageURL = command.ImageURL,
                 //Description = command.Description,
+                CourtSubdivisionDescription = request.CourtSubDescription,
                 IsActive = true,
-                CourtSubdivisionName = command.CourtSubdivisionName,
+                CourtSubdivisionName = request.CourtSubdivisionName,
             };
             _dbContext.CourtSubdivisions.Add(courtSubdivision);
-        }
+
         await _dbContext.SaveChangesAsync(cancellationToken);
         return new BeatSportsResponse
         {

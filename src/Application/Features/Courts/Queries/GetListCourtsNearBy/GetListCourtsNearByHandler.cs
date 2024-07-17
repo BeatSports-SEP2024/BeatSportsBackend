@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -10,6 +11,7 @@ using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Response.CourtResponse;
+using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAllCourtsByOwnerId;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
@@ -31,32 +33,95 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
     {
         var distanceCal = new DistanceCalculation();
 
-        if(request.KeyWords == null)
+        if (request.KeyWords == null)
         {
             request.KeyWords = "";
+        }
+
+        if (request.Criteria == null)
+        {
+            request.Criteria = "";
         }
 
         var query = new List<Court>();
 
         if (request.CourtId != Guid.Empty)
         {
-             query = _dbContext.Courts
-            .Where(x => !x.IsDelete && x.Id == request.CourtId && (x.CourtName.Contains(request.KeyWords) || x.Address.Contains(request.KeyWords)))
-            .Include(x => x.Owner)
-            .Include(x => x.Feedback)
-            .Include(x => x.CourtSubdivision)
-            .ThenInclude(x => x.Bookings)
-            .ToList();
+            query = _dbContext.Courts
+           .Where(x => !x.IsDelete && x.Id == request.CourtId && (x.CourtName.Contains(request.KeyWords) || x.Address.Contains(request.KeyWords)))
+           .Include(x => x.Owner)
+           .Include(x => x.Feedback)
+           .Include(x => x.CourtSubdivision)
+           .ThenInclude(x => x.Bookings)
+           .ToList();
         }
         else
         {
             query = _dbContext.Courts
-            .Where(x => !x.IsDelete && (x.CourtName.Contains(request.KeyWords) || x.Address.Contains(request.KeyWords)))
+            .Where(x => !x.IsDelete)
             .Include(x => x.Owner)
             .Include(x => x.Feedback)
             .Include(x => x.CourtSubdivision)
             .ThenInclude(x => x.Bookings)
             .ToList();
+
+            query = query.Where(x => RemoveDiacritics(x.CourtName).ToLower().Contains(request.KeyWords.ToLower()) || 
+                                     RemoveDiacritics(x.Address).ToLower().Contains(request.KeyWords.ToLower()))
+                         .ToList();
+
+            if (request.SportCategory != null)
+            {
+                var sportCategory = _dbContext.SportsCategories
+                                .Where(x => x.Name.Contains(request.SportCategory))
+                                .FirstOrDefault();
+
+                var courtSubList = _dbContext.CourtSportCategories
+                                .Where(x => x.SportCategoryId == sportCategory.Id)
+                                .ToList();
+                var tmp = query.ToList();
+
+                foreach (var court in query)
+                {
+                    var flag = 0;
+                    foreach (var courtSub in court.CourtSubdivision)
+                    {
+                        if (courtSubList.Any(x => x.CourtSubdivisionId == courtSub.Id))
+                        {
+                            flag++;
+                            break;
+                        }
+                    }
+
+                    if (flag == 0)
+                    {
+                        tmp.Remove(court);
+                    }
+                }
+                query = tmp;
+            }
+
+            if (request.Criteria.Equals("Đã thuê") && request.CustomerId != null)
+            {
+                var tmp = query.ToList();
+                foreach (var court in query)
+                {
+                    var flag = 0;
+                    foreach (var c in court.CourtSubdivision)
+                    {
+                        if (c.Bookings.Any(x => x.CustomerId == request.CustomerId))
+                        {
+                            flag++;
+                            break;
+                        }
+                    }
+
+                    if (flag == 0)
+                    {
+                        tmp.Remove(court);
+                    }
+                }
+                query = tmp;
+            }
         }
 
         var list = new List<CourtResponseV3>();
@@ -66,12 +131,12 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
             double starAvg = 0;
             decimal price = 0;
             int rentalNumber = 0;
-            if(c.Feedback.Count != 0)
+            if (c.Feedback.Count != 0)
             {
                 starAvg = (double)c.Feedback.Average(x => x.FeedbackStar);
             }
 
-            if(c.CourtSubdivision.Count != 0)
+            if (c.CourtSubdivision.Count != 0)
             {
                 price = c.CourtSubdivision.MinBy(c => c.BasePrice).BasePrice;
                 rentalNumber = c.CourtSubdivision.Sum(x => x.Bookings.Where(c => c.BookingStatus.Equals("Approved")).Count());
@@ -85,11 +150,14 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
                 BasePrice = b.BasePrice,
                 IsActive = b.IsActive,
             }).ToList();
+            var imageUrls = c.ImageUrls?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                         .Select(url => url.Trim())
+                         .Where(url => !string.IsNullOrEmpty(url))
+                         .ToArray();
 
             var name = _dbContext.Accounts
                 .Where(x => x.Id == c.Owner.AccountId)
                 .FirstOrDefault();
-
             list.Add(new CourtResponseV3
             {
                 Id = c.Id,
@@ -98,6 +166,9 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
                 CourtName = c.CourtName,
                 Address = c.Address,
                 GoogleMapURLs = c.GoogleMapURLs,
+                WallpaperUrls = "https://res.cloudinary.com/dcbkmwm3v/image/upload/v1721128187/ygodonohp6lac35vjydl.png?fbclid=IwZXh0bgNhZW0CMTEAAR3Ve_wvlx0OYcbc-8MZtCNCcyqyzNa0IUsgtWOHqYExNIvN4XCnxTLcWCQ_aem_z5vVNkzROC3aMrbL8s2-Mg", // Lấy ảnh đầu tiên
+                CoverImgUrls = ImageUrlSplitter.SplitAndGetFirstImageUrls(c.ImageUrls), // Chuỗi gốc cho ảnh bìa
+                CourtImgsList = ImageUrlSplitter.SplitImageUrls(c.ImageUrls), // Danh sách tất cả ảnh
                 TimeStart = c.TimeStart,
                 TimeEnd = c.TimeEnd,
                 PlaceId = c.PlaceId,
@@ -111,7 +182,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
             });
         }
 
-        if (request.Latitude != 0 && request.Longitude != 0)
+        if (request.Latitude != 0 && request.Longitude != 0 && list.Count > 0)
         {
             //Goi service tinh khoang cach
             var result = distanceCal.GetDistancesAsync(request.Latitude, request.Longitude, query);
@@ -125,9 +196,33 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
 
             list = list.OrderBy(c => c.DistanceInKm).ToList();
 
-            return Task.FromResult(list);
+        }
+
+        if(request.Criteria.Equals("Nổi bật"))
+        {
+            list = list.OrderByDescending(c => c.FbStar).ToList();
+        }else if(request.Criteria.Equals("Thuê nhiều"))
+        {
+            list = list.OrderByDescending(c => c.RentalNumber).ToList();
         }
 
         return Task.FromResult(list);
+    }
+
+    private static string RemoveDiacritics(string text)
+    {
+        var normalizedString = text.Normalize(NormalizationForm.FormD);
+        var stringBuilder = new StringBuilder();
+
+        foreach (var c in normalizedString)
+        {
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            {
+                stringBuilder.Append(c);
+            }
+        }
+
+        return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
     }
 }

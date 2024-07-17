@@ -16,4 +16,7 @@ public class GetListCourtsNearByCommand : IRequest<List<CourtResponseV3>>
     public double Longitude { get; set; }
     public Guid CourtId { get; set; }
     public string? KeyWords { get; set; }
+    public string? SportCategory { get; set; }
+    public string? Criteria { get; set; }
+    public Guid? CustomerId { get; set; }
 }

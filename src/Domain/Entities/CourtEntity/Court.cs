@@ -13,6 +13,10 @@ public class Court : BaseAuditableEntity
     public string? Address { get; set; }
     public double? Latitude { get; set; }
     public double? Longitude { get; set; }
+    //Anh bia
+    public string? WallpaperUrls { get; set; }
+    //Anh Dai dien cua san
+    public string? CourtAvatarImgUrls { get; set; }
     //Zoom in, out google map
     public double? LatitudeDelta { get; set; }
     public double? LongitudeDelta { get; set; }

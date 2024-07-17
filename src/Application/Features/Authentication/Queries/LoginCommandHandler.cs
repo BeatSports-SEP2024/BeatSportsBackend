@@ -59,7 +59,7 @@ public class LoginCommandHandler : IRequestHandler<LoginModelRequest, LoginRespo
             UserInfo = new AccountResponseForLogin
             {
                 Id = id,
-                FullName = user.FirstName + user.LastName,
+                FullName = user.FirstName +" "+ user.LastName,
                 Email = user.Email
             }
         };

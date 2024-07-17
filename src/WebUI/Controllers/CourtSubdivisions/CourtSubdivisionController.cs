@@ -20,7 +20,7 @@ public class CourtSubdivisionController : ApiControllerBase
         _mediator = mediator;
     }
     [HttpPost]
-    public async Task<BeatSportsResponse> Create(CreateListCourtSubdivisionCommand request)
+    public async Task<BeatSportsResponse> Create(CreateCourtSubdivisionCommand request)
     {
         return await _mediator.Send(request);
     }
@@ -41,7 +41,7 @@ public class CourtSubdivisionController : ApiControllerBase
         return await _mediator.Send(request);
     }
     [HttpGet]
-    public async Task<PaginatedList<CourtSubdivisionResponse>> GetAll([FromQuery]GetAllCourtSubdivisionOfCourtQuery request)
+    public async Task<PaginatedList<CourtSubdivisionResponseV3>> GetAll([FromQuery]GetAllCourtSubdivisionOfCourtQuery request)
     {
         return await _mediator.Send(request);
     }

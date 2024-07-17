@@ -1,17 +1,19 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Mappings;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetAllCourtSubdivisionOfCourt;
-public class GetAllCourtSubdivisionOfCourtHandler : IRequestHandler<GetAllCourtSubdivisionOfCourtQuery, PaginatedList<CourtSubdivisionResponse>>
+public class GetAllCourtSubdivisionOfCourtHandler : IRequestHandler<GetAllCourtSubdivisionOfCourtQuery, PaginatedList<CourtSubdivisionResponseV3>>
 {
     private readonly IBeatSportsDbContext _dbContext;
     private readonly IMapper _mapper;
@@ -22,30 +24,41 @@ public class GetAllCourtSubdivisionOfCourtHandler : IRequestHandler<GetAllCourtS
         _mapper = mapper;
     }
 
-    public async Task<PaginatedList<CourtSubdivisionResponse>> Handle(GetAllCourtSubdivisionOfCourtQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<CourtSubdivisionResponseV3>> Handle(GetAllCourtSubdivisionOfCourtQuery request, CancellationToken cancellationToken)
     {
-        if (request.PageIndex <= 0 || request.PageSize <= 0)
-        {
-            throw new BadRequestException("Page index and page size cannot less than 0");
-        }
+        var currentDate = DateTime.Now;
 
-        IQueryable<CourtSubdivision> query = _dbContext.CourtSubdivisions
-            .Where(x => !x.IsDelete)
-            .Include(x => x.Court);
+        // Prepare the IQueryable query
+        var query = _dbContext.Courts
+            .Where(c => !c.IsDelete && c.Id == request.CourtId)
+            .SelectMany(c => c.CourtSubdivision)
+            .Select(cs => new {
+                Subdivision = cs,
+                Court = cs.Court,
+                TimeCheckings = cs.TimeCheckings
+                    .Where(tc => tc.StartTime.Date == currentDate.Date && tc.EndTime <= currentDate)
+                    .OrderByDescending(tc => tc.StartTime)
+                    .FirstOrDefault()
+            })
+            .Select(x => new CourtSubdivisionResponseV3
+            {
+                Id = x.Subdivision.Id,
+                CourtId = x.Court.Id,
+                CourtName = x.Court.CourtName,
+                Description = x.Subdivision.CourtSubdivisionDescription,
+                ImageURL = ImageUrlSplitter.SplitAndGetFirstImageUrls(x.Court.ImageUrls),
+                IsActive = x.Subdivision.IsActive,
+                BasePrice = x.Subdivision.BasePrice,
+                CourtSubdivisionName = x.Subdivision.CourtSubdivisionName,
+                Status = !x.Subdivision.IsActive ? "Đang bảo trì" :
+                    x.TimeCheckings == null ? "Chưa có lịch" :
+                    (x.TimeCheckings.StartTime <= currentDate && x.TimeCheckings.EndTime >= currentDate ? "Đang cho thuê" :
+                    (x.TimeCheckings.StartTime > currentDate ? "Đã đặt" : "Không có sử dụng"))
+            });
 
-        var list = query.Select(c => new CourtSubdivisionResponse
-        {
-            Id = c.Id,
-            CourtId = c.CourtId,
-            CourtName = c.Court.CourtName,
-            Description = c.CourtSubdivisionDescription,
-            //ImageURL = c.ImageURL,
-            IsActive = c.IsActive,
-            BasePrice = c.BasePrice,
-            CourtSubdivisionName = c.CourtSubdivisionName
-        })
-        .PaginatedListAsync(request.PageIndex, request.PageSize);
+        // Now use CreateAsync to paginate results
+        var paginatedResult = await PaginatedList<CourtSubdivisionResponseV3>.CreateAsync(query, request.PageIndex, request.PageSize);
 
-        return await list;
+        return paginatedResult;
     }
 }

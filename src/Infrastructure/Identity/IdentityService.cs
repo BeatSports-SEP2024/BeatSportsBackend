@@ -240,7 +240,7 @@ public class IdentityService : IIdentityService
         var loginResponse = new LoginResponse
         {
             AccessToken = tokenModel.AccessToken,
-            RefreshToken = refreshToken.Token
+            RefreshToken = refreshToken.Token,
         };
         return loginResponse;
     }
@@ -337,7 +337,7 @@ public class IdentityService : IIdentityService
             UserInfo = new AccountResponseForLogin
             {
                 Id = id,
-                FullName = user.FirstName + user.LastName,
+                FullName = user.FirstName +" "+ user.LastName,
                 Email = user.Email
             }
         };
@@ -388,7 +388,7 @@ public class IdentityService : IIdentityService
             LastName = registerModelRequest.LastName,
             //DateOfBirth = registerModelRequest.DateOfBirth,
             //Gender = registerModelRequest.Gender.ToString(),
-            //ProfilePictureURL = profileImageUrl,
+            ProfilePictureURL = "https://res.cloudinary.com/dcbkmwm3v/image/upload/v1721128315/id6u4ckwjcayygtqgyze.png?fbclid=IwZXh0bgNhZW0CMTEAAR0sI4xkWU65yNpDq6FB6YHHK2qZVN_rlVuc8WkVxMkhKLfi8d7AgJGxDrc_aem_IqIxPGsb5bgLhTkZ_mkvEQ",
             //Bio = registerModelRequest.Bio,
             PhoneNumber = registerModelRequest.PhoneNumber,
             Role = RoleEnums.Customer.ToString(),
