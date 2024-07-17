@@ -48,6 +48,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                 GoogleMapURLs = c.GoogleMapURLs,
                 TimeStart = c.TimeStart,
                 TimeEnd = c.TimeEnd,                
+                CourtSubCount = c.CourtSubdivision.Count(),
                 CoverImgUrls = c.CourtAvatarImgUrls, // Chuỗi gốc cho ảnh bìa
                 CourtImgsList = ImageUrlSplitter.SplitImageUrls(c.ImageUrls),
                 RentingCount = c.Feedback.Select(f => f.Booking).Distinct().Count(),
