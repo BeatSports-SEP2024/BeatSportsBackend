@@ -89,6 +89,9 @@ public class CourtResponseV5
     public decimal? FeedbackStarAvg { get; set; }
     public string? WallpaperUrls { get; set; }
     public string? CoverImgUrls { get; set; }
+    public string? GoogleMapURLs { get; set; }
+    public TimeSpan? TimeStart { get; set; }
+    public TimeSpan? TimeEnd { get; set; }
     public List<string>? CourtImgsList { get; set; }
     public int? FeedbackCount { get; set; }
     public int? RentingCount { get; set; }
