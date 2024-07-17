@@ -11,7 +11,7 @@ public class CourtSubdivisionSetting : BaseAuditableEntity
     [ForeignKey("CourtSubdivision")]
     public Guid CourtSubdivisionId { get; set; }
     [ForeignKey("SportCategory")]
-    public Guid SportCategory { get; set; }
+    public Guid SportCategoryId { get; set; }
     //Mo ta ve loai hinh va chat lieu san thi dau
     public string? CourtType { get; set; }
     public virtual SportCategory SportCategories { get; set; }
