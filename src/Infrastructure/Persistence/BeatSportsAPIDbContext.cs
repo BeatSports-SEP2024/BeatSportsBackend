@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Reflection.Emit;
 using BeatSportsAPI.Application.Common.Interfaces;
+using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
@@ -514,6 +515,47 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         var soccerId = Guid.NewGuid();
         var volleyballId = Guid.NewGuid();
         var badmintionId = Guid.NewGuid();
+        #region CourtSubdivisionSetting
+        //var sanbongdanhantao7 = "a93c57bd-f6d5-414e-a4b2-5aa269729a43";
+        //var sanbongdanhantao5 = "457c955b-857d-483d-8e54-02c87dbcffa9";
+        //var sanbongdanhantao11 = "3593decc-3ace-451c-842d-3369cfe571c2";
+        //var sanbongdaco7 = "31689b32-b8d8-4993-98f5-33b436b4f293";
+        //var sanbongdaco11 = "089e939e-10ea-44b6-b7cd-f6d69cf6c06a";
+
+        //var sanbongchuyencat = "41ae23f7-42fe-4a40-8c36-021dc7c1dd06";
+        //var sanbongchuyendat = "3fa63c52 - 80ee - 454a - a8b1 - 34e0c03633eb";
+        //var sanbongchuyenximang = "0c9e0496 - e891 - 468c - aca5 - 6c09c1a8f159";
+        //var sanbongchuyentrongnha = "effd5616 - ad35 - 4204 - 8c5e - 01ad289855e8";
+
+        //var sancaulongtrongnha = "63998125 - 8cbd - 41b7 - 9123 - a6c7ca3ad63e";
+        //var sancaulongngoaitroi = "9ce93f4d - b691 - 4622 - 95a5 - 3825916409f6";
+        builder.Entity<CourtSubdivisionSetting>()
+            .HasData(new CourtSubdivisionSetting 
+            {
+                CourtSubdivisionId = courtSubdivisionId4,
+                SportCategoryId = soccerId,
+                CourtType = "San bong da nhan tao 7 nguoi"
+            },
+            new CourtSubdivisionSetting
+            {
+                CourtSubdivisionId = courtSubdivisionId6,
+                SportCategoryId = volleyballId,
+                CourtType = "San bong chuyen mat cat"
+            },
+            new CourtSubdivisionSetting
+            {
+                CourtSubdivisionId = courtSubdivisionId3,
+                SportCategoryId = badmintionId,
+                CourtType = "San cau long trong nha"
+            },
+            new CourtSubdivisionSetting
+            {
+                CourtSubdivisionId = courtSubdivisionId1,
+                SportCategoryId = badmintionId,
+                CourtType = "San cau long ngoai troi"
+            });
+        #endregion
+        
         #region SportCategories
         builder.Entity<SportCategory>()
             .HasData(new SportCategory
