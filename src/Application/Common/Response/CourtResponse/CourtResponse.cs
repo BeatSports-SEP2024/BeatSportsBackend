@@ -92,6 +92,7 @@ public class CourtResponseV5
     public string? GoogleMapURLs { get; set; }
     public TimeSpan? TimeStart { get; set; }
     public TimeSpan? TimeEnd { get; set; }
+    public int? CourtSubCount { get; set; }
     public List<string>? CourtImgsList { get; set; }
     public int? FeedbackCount { get; set; }
     public int? RentingCount { get; set; }
