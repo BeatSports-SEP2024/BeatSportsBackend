@@ -5,8 +5,8 @@ namespace BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Commands.C
 public class CreateCourtSubdivisionCommand : IRequest<BeatSportsResponse>
 {
     public Guid CourtId { get; set; }
-    public string? Description { get; set; }
-    public string? ImageURL { get; set; }
+    public string? CourtSubDescription { get; set; }
+    //public string? ImageURL { get; set; }
     public decimal BasePrice { get; set; }
     public string? CourtSubdivisionName { get; set; }
 }

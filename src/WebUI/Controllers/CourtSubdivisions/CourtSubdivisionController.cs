@@ -20,7 +20,7 @@ public class CourtSubdivisionController : ApiControllerBase
         _mediator = mediator;
     }
     [HttpPost]
-    public async Task<BeatSportsResponse> Create(CreateListCourtSubdivisionCommand request)
+    public async Task<BeatSportsResponse> Create(CreateCourtSubdivisionCommand request)
     {
         return await _mediator.Send(request);
     }
