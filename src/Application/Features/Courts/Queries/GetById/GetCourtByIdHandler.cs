@@ -5,58 +5,58 @@ using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Response.CourtResponse;
 using BeatSportsAPI.Application.Common.Ultilities;
-using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Courts.Queries.GetById;
-public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtResponseV3>
+public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtResponseV5>
 {
-    private readonly IBeatSportsDbContext _dbContext;
+    private readonly IBeatSportsDbContext _beatSportsDbContext;
     private readonly IMapper _mapper;
 
-    public GetCourtByIdHandler(IBeatSportsDbContext dbContext, IMapper mapper)
+    public GetCourtByIdHandler(IBeatSportsDbContext beatSportsDbContext, IMapper mapper)
     {
-        _dbContext = dbContext;
+        _beatSportsDbContext = beatSportsDbContext;
         _mapper = mapper;
     }
 
-    public Task<CourtResponseV3> Handle(GetCourtByIdCommand request, CancellationToken cancellationToken)
+    public Task<CourtResponseV5> Handle(GetCourtByIdCommand request, CancellationToken cancellationToken)
     {
-       
-
-        var query = _dbContext.Courts
-            .Where(x => !x.IsDelete && x.Id == request.CourtId)
-            .OrderByDescending(b => b.Created)
-            .Include(x => x.Owner).ThenInclude(x => x.Account)
-            .Include(x => x.CourtSubdivision)
+        var courtDetails = _beatSportsDbContext.Courts
+            .Where(c => c.Id == request.CourtId)
+            .Include(cs => cs.CourtSubdivision)
+            .Include(f => f.Feedback)
+            .ThenInclude(f => f.Booking)
+                .ThenInclude(b => b.Customer)
+                    .Include(c => c.Owner)
+                        .ThenInclude(c => c.Account)
+            .Select(c => new CourtResponseV5
+            {
+                Id = c.Id,
+                CourtName = c.CourtName,
+                OwnerName = c.Owner.Account.FirstName + " " + c.Owner.Account.LastName,
+                Description = c.Description,
+                Address = c.Address,
+                PlaceId = c.PlaceId,
+                WallpaperUrls = c.WallpaperUrls,
+                CoverImgUrls = c.CourtAvatarImgUrls, // Chuỗi gốc cho ảnh bìa
+                CourtImgsList = ImageUrlSplitter.SplitImageUrls(c.ImageUrls),
+                RentingCount = c.Feedback.Select(f => f.Booking).Distinct().Count(),
+                FeedbackCount = c.Feedback.Count(),
+                FeedbackStarAvg = c.Feedback.Any() ? c.Feedback.Average(x => x.FeedbackStar) : (decimal?)null,
+                Price = c.CourtSubdivision.FirstOrDefault() != null ? c.CourtSubdivision.FirstOrDefault().BasePrice : (decimal?)null,
+                Feedbacks = c.Feedback
+                    .Where(c => !c.IsDelete)
+                    .Select(c => new FeedbackResponseV2
+                    {
+                        CourtId = c.Id,
+                        FeedbackStar = c.FeedbackStar,
+                        FeedbackContent = c.FeedbackContent,
+                        ProfilePictureUrl = c.Booking.Customer.Account.ProfilePictureURL,
+                        FullName = c.Booking.Customer.Account.FirstName + " " + c.Booking.Customer.Account.LastName
+                    }).ToList(),
+            })
             .FirstOrDefault();
-
-        var listCourtSub = query.CourtSubdivision.Select(b => new CourtSubdivisionResponse
-        {
-            Id = b.Id,
-            CourtId = b.CourtId,
-            CourtSubdivisionName = b.CourtSubdivisionName,
-            BasePrice = b.BasePrice,
-            IsActive = b.IsActive,
-        }).ToList();
-
-        var court = new CourtResponseV3
-        {
-            Id = query.Id,
-            OwnerName = query.Owner.Account.FirstName + " " + query.Owner.Account.LastName,
-            CourtName = query.CourtName,
-            Description = query.Description,
-            Address = query.Address,
-            WallpaperUrls = query.WallpaperUrls,
-            CoverImgUrls = query.CourtAvatarImgUrls, // Chuỗi gốc cho ảnh bìa
-            CourtImgsList = ImageUrlSplitter.SplitImageUrls(query.ImageUrls), // Danh sách tất cả ảnh
-            GoogleMapURLs = query.GoogleMapURLs,
-            TimeStart = query.TimeStart,
-            TimeEnd = query.TimeEnd,
-            CourtSubdivision = listCourtSub,
-        };
-
-        return Task.FromResult(court);
+        return Task.FromResult(courtDetails);
     }
 }
