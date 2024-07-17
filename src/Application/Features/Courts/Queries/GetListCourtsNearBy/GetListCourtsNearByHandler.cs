@@ -10,6 +10,7 @@ using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Response.CourtResponse;
+using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAllCourtsByOwnerId;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
@@ -89,7 +90,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
                          .Select(url => url.Trim())
                          .Where(url => !string.IsNullOrEmpty(url))
                          .ToArray();
-            Console.WriteLine(imageUrls);
+
             var name = _dbContext.Accounts
                 .Where(x => x.Id == c.Owner.AccountId)
                 .FirstOrDefault();
@@ -101,9 +102,9 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
                 CourtName = c.CourtName,
                 Address = c.Address,
                 GoogleMapURLs = c.GoogleMapURLs,
-                WallpaperUrls = imageUrls.FirstOrDefault(), // Lấy ảnh đầu tiên
-                CoverImgUrls = imageUrls.FirstOrDefault(), // Chuỗi gốc cho ảnh bìa
-                CourtImgsList = imageUrls.ToList(), // Danh sách tất cả ảnh
+                WallpaperUrls = "https://res.cloudinary.com/dcbkmwm3v/image/upload/v1721128187/ygodonohp6lac35vjydl.png?fbclid=IwZXh0bgNhZW0CMTEAAR3Ve_wvlx0OYcbc-8MZtCNCcyqyzNa0IUsgtWOHqYExNIvN4XCnxTLcWCQ_aem_z5vVNkzROC3aMrbL8s2-Mg", // Lấy ảnh đầu tiên
+                CoverImgUrls = ImageUrlSplitter.SplitAndGetFirstImageUrls(c.ImageUrls), // Chuỗi gốc cho ảnh bìa
+                CourtImgsList = ImageUrlSplitter.SplitImageUrls(c.ImageUrls), // Danh sách tất cả ảnh
                 TimeStart = c.TimeStart,
                 TimeEnd = c.TimeEnd,
                 PlaceId = c.PlaceId,
