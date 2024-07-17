@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -37,6 +38,11 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
             request.KeyWords = "";
         }
 
+        if (request.Criteria == null)
+        {
+            request.Criteria = "";
+        }
+
         var query = new List<Court>();
 
         if (request.CourtId != Guid.Empty)
@@ -52,12 +58,70 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
         else
         {
             query = _dbContext.Courts
-            .Where(x => !x.IsDelete && (x.CourtName.Contains(request.KeyWords) || x.Address.Contains(request.KeyWords)))
+            .Where(x => !x.IsDelete)
             .Include(x => x.Owner)
             .Include(x => x.Feedback)
             .Include(x => x.CourtSubdivision)
             .ThenInclude(x => x.Bookings)
             .ToList();
+
+            query = query.Where(x => RemoveDiacritics(x.CourtName).ToLower().Contains(request.KeyWords.ToLower()) || 
+                                     RemoveDiacritics(x.Address).ToLower().Contains(request.KeyWords.ToLower()))
+                         .ToList();
+
+            if (request.SportCategory != null)
+            {
+                var sportCategory = _dbContext.SportsCategories
+                                .Where(x => x.Name.Contains(request.SportCategory))
+                                .FirstOrDefault();
+
+                var courtSubList = _dbContext.CourtSportCategories
+                                .Where(x => x.SportCategoryId == sportCategory.Id)
+                                .ToList();
+                var tmp = query.ToList();
+
+                foreach (var court in query)
+                {
+                    var flag = 0;
+                    foreach (var courtSub in court.CourtSubdivision)
+                    {
+                        if (courtSubList.Any(x => x.CourtSubdivisionId == courtSub.Id))
+                        {
+                            flag++;
+                            break;
+                        }
+                    }
+
+                    if (flag == 0)
+                    {
+                        tmp.Remove(court);
+                    }
+                }
+                query = tmp;
+            }
+
+            if (request.Criteria.Equals("Đã thuê") && request.CustomerId != null)
+            {
+                var tmp = query.ToList();
+                foreach (var court in query)
+                {
+                    var flag = 0;
+                    foreach (var c in court.CourtSubdivision)
+                    {
+                        if (c.Bookings.Any(x => x.CustomerId == request.CustomerId))
+                        {
+                            flag++;
+                            break;
+                        }
+                    }
+
+                    if (flag == 0)
+                    {
+                        tmp.Remove(court);
+                    }
+                }
+                query = tmp;
+            }
         }
 
         var list = new List<CourtResponseV3>();
@@ -118,7 +182,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
             });
         }
 
-        if (request.Latitude != 0 && request.Longitude != 0)
+        if (request.Latitude != 0 && request.Longitude != 0 && list.Count > 0)
         {
             //Goi service tinh khoang cach
             var result = distanceCal.GetDistancesAsync(request.Latitude, request.Longitude, query);
@@ -132,9 +196,33 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
 
             list = list.OrderBy(c => c.DistanceInKm).ToList();
 
-            return Task.FromResult(list);
+        }
+
+        if(request.Criteria.Equals("Nổi bật"))
+        {
+            list = list.OrderByDescending(c => c.FbStar).ToList();
+        }else if(request.Criteria.Equals("Thuê nhiều"))
+        {
+            list = list.OrderByDescending(c => c.RentalNumber).ToList();
         }
 
         return Task.FromResult(list);
+    }
+
+    private static string RemoveDiacritics(string text)
+    {
+        var normalizedString = text.Normalize(NormalizationForm.FormD);
+        var stringBuilder = new StringBuilder();
+
+        foreach (var c in normalizedString)
+        {
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            {
+                stringBuilder.Append(c);
+            }
+        }
+
+        return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
     }
 }
