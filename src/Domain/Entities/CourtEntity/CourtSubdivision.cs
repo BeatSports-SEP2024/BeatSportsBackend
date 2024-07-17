@@ -6,6 +6,8 @@ public class CourtSubdivision : BaseAuditableEntity
 {
     [ForeignKey("Court")]
     public Guid CourtId { get; set; }
+    [ForeignKey("CourtSubdivisionSetting")]
+    public Guid CourtSubdivisionSettingId { get; set; }
     public bool IsActive { get; set; }
     public decimal BasePrice { get; set; }
     public string? CourtSubdivisionName { get; set; }

@@ -122,6 +122,29 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         builder.Entity<IdentityUserToken<string>>()
         .HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
 
+        var soccerId = Guid.NewGuid();
+        var volleyballId = Guid.NewGuid();
+        var badmintionId = Guid.NewGuid();
+
+        //var sanbongdanhantao7 = "a93c57bd-f6d5-414e-a4b2-5aa269729a43";
+        var sanbongdanhantao7 = Guid.NewGuid();
+        //var sanbongdanhantao5 = "457c955b-857d-483d-8e54-02c87dbcffa9";
+        //var sanbongdanhantao11 = "3593decc-3ace-451c-842d-3369cfe571c2";
+        //var sanbongdaco7 = "31689b32-b8d8-4993-98f5-33b436b4f293";
+        //var sanbongdaco11 = "089e939e-10ea-44b6-b7cd-f6d69cf6c06a";
+
+        //var sanbongchuyencat = "41ae23f7-42fe-4a40-8c36-021dc7c1dd06";
+        var sanbongchuyencat = Guid.NewGuid();
+        //var sanbongchuyendat = "3fa63c52 - 80ee - 454a - a8b1 - 34e0c03633eb";
+        //var sanbongchuyenximang = "0c9e0496 - e891 - 468c - aca5 - 6c09c1a8f159";
+        //var sanbongchuyentrongnha = "effd5616 - ad35 - 4204 - 8c5e - 01ad289855e8";
+        var sanbongchuyentrongnha = Guid.NewGuid();
+
+        //var sancaulongtrongnha = "63998125 - 8cbd - 41b7 - 9123 - a6c7ca3ad63e";
+        var sancaulongtrongnha = Guid.NewGuid();
+        //var sancaulongngoaitroi = "9ce93f4d - b691 - 4622 - 95a5 - 3825916409f6";
+        var sancaulongngoaitroi = Guid.NewGuid();
+
         var ownerAccountId = Guid.NewGuid();
         var owner1AccountId = Guid.NewGuid();
         var customer1AccountId = Guid.NewGuid();
@@ -418,12 +441,40 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         var courtSubdivisionId5 = Guid.NewGuid();
         var courtSubdivisionId6 = Guid.NewGuid();
         var courtSubdivisionId7 = Guid.NewGuid();
+        #region CourtSubdivisionSetting
+        builder.Entity<CourtSubdivisionSetting>()
+            .HasData(new CourtSubdivisionSetting
+            {
+                Id = sanbongdanhantao7,
+                SportCategoryId = soccerId,
+                CourtType = "San bong da nhan tao 7 nguoi"
+            },
+            new CourtSubdivisionSetting
+            {
+                Id = sanbongchuyencat,
+                SportCategoryId = volleyballId,
+                CourtType = "San bong chuyen mat cat"
+            },
+            new CourtSubdivisionSetting
+            {
+                Id = sancaulongtrongnha,
+                SportCategoryId = badmintionId,
+                CourtType = "San cau long trong nha"
+            },
+            new CourtSubdivisionSetting
+            {
+                Id = sancaulongngoaitroi,
+                SportCategoryId = badmintionId,
+                CourtType = "San cau long ngoai troi"
+            });
+        #endregion
         #region CourtSubdivision
         builder.Entity<CourtSubdivision>()
             .HasData(new CourtSubdivision
             {
                 Id = courtSubdivisionId1,
                 CourtId = court1Id,
+                CourtSubdivisionSettingId = sancaulongtrongnha,
                 CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 1",
                 CourtSubdivisionDescription = "Sân đa dụng cho chơi cầu lông",
                 //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fsieuthicaulong.vn%2Fsan-cau-long%2Fho-chi-minh%2Fclb-san-cau-long-b-zone-11-thu-duc-hcm&psig=AOvVaw0HN4hzDZNEFb3Qak2ZKR0A&ust=1718126663044000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOib5tzG0YYDFQAAAAAdAAAAABAE",
@@ -437,6 +488,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = courtSubdivisionId2,
                 CourtId = court1Id,
+                CourtSubdivisionSettingId = sancaulongtrongnha,
                 CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 2",
                 CourtSubdivisionDescription = "Sân có sẵn vợt carbon cho thuê để chơi cầu lông",
                 //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fsieuthicaulong.vn%2Fsan-cau-long%2Fho-chi-minh%2Fclb-san-cau-long-b-zone-11-thu-duc-hcm&psig=AOvVaw0HN4hzDZNEFb3Qak2ZKR0A&ust=1718126663044000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOib5tzG0YYDFQAAAAAdAAAAABAQ",
@@ -450,6 +502,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = courtSubdivisionId3,
                 CourtId = court1Id,
+                CourtSubdivisionSettingId = sancaulongngoaitroi,
                 CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 3",
                 CourtSubdivisionDescription = "Sân có sẵn vợt carbon cho thuê để chơi cầu lông",
                 //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fsieuthicaulong.vn%2Fsan-cau-long%2Fho-chi-minh%2Fclb-san-cau-long-b-zone-11-thu-duc-hcm&psig=AOvVaw0HN4hzDZNEFb3Qak2ZKR0A&ust=1718126663044000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOib5tzG0YYDFQAAAAAdAAAAABB4",
@@ -463,6 +516,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = courtSubdivisionId4,
                 CourtId = court5Id,
+                CourtSubdivisionSettingId = sanbongdanhantao7,
                 CourtSubdivisionName = "Sân bóng đá Phú Thọ, phân cấp 1",
                 CourtSubdivisionDescription = "Sân cỏ nhân tạo",
                 //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2F797348309003119598%2F&psig=AOvVaw3O8jui3j21qnIivkSvD8yP&ust=1718127217945000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCIDC_eXI0YYDFQAAAAAdAAAAABAJ",
@@ -476,6 +530,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = courtSubdivisionId5,
                 CourtId = court5Id,
+                CourtSubdivisionSettingId = sanbongdanhantao7,
                 CourtSubdivisionName = "Sân bóng đá Phú Thọ, phân cấp 2",
                 CourtSubdivisionDescription = "Sân cỏ tự nhiên",
                 //ImageURL = "https://duongminhfc.com/images/banners/san-bong-da-phu-tho-quan-11.jpg",
@@ -489,6 +544,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = courtSubdivisionId6,
                 CourtId = court4Id,
+                CourtSubdivisionSettingId = sanbongchuyencat,
                 CourtSubdivisionName = "Sân bóng chuyền Tân Bình, phân cấp 1",
                 CourtSubdivisionDescription = "Sân lưới nhân tạo",
                 //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.myuc.vn%2Fson-san-bong-chuyen-tren-be-tong-xi-mang-voi-6-lop-son-co-hat-cao-su-nhu-san-us-open-chong-nut-polyurethane-va-decoturf-usa-84p.html&psig=AOvVaw0Tdhs_letBnUYzuVpHLEY2&ust=1718127751147000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCMDc_ePK0YYDFQAAAAAdAAAAABAJ",
@@ -502,6 +558,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = courtSubdivisionId7,
                 CourtId = court4Id,
+                CourtSubdivisionSettingId = sanbongchuyencat,
                 CourtSubdivisionName = "Sân bóng chuyền Tân Bình, phân cấp 2",
                 CourtSubdivisionDescription = "Sân lưới nhân tạo",
                 //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.myuc.vn%2Fson-san-bong-chuyen-tren-be-tong-xi-mang-voi-6-lop-son-co-hat-cao-su-nhu-san-us-open-chong-nut-polyurethane-va-decoturf-usa-84p.html&psig=AOvVaw0Tdhs_letBnUYzuVpHLEY2&ust=1718127751147000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCMDc_ePK0YYDFQAAAAAdAAAAABAJ",
@@ -512,50 +569,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 IsDelete = false,
             });
         #endregion
-        var soccerId = Guid.NewGuid();
-        var volleyballId = Guid.NewGuid();
-        var badmintionId = Guid.NewGuid();
-        #region CourtSubdivisionSetting
-        //var sanbongdanhantao7 = "a93c57bd-f6d5-414e-a4b2-5aa269729a43";
-        //var sanbongdanhantao5 = "457c955b-857d-483d-8e54-02c87dbcffa9";
-        //var sanbongdanhantao11 = "3593decc-3ace-451c-842d-3369cfe571c2";
-        //var sanbongdaco7 = "31689b32-b8d8-4993-98f5-33b436b4f293";
-        //var sanbongdaco11 = "089e939e-10ea-44b6-b7cd-f6d69cf6c06a";
-
-        //var sanbongchuyencat = "41ae23f7-42fe-4a40-8c36-021dc7c1dd06";
-        //var sanbongchuyendat = "3fa63c52 - 80ee - 454a - a8b1 - 34e0c03633eb";
-        //var sanbongchuyenximang = "0c9e0496 - e891 - 468c - aca5 - 6c09c1a8f159";
-        //var sanbongchuyentrongnha = "effd5616 - ad35 - 4204 - 8c5e - 01ad289855e8";
-
-        //var sancaulongtrongnha = "63998125 - 8cbd - 41b7 - 9123 - a6c7ca3ad63e";
-        //var sancaulongngoaitroi = "9ce93f4d - b691 - 4622 - 95a5 - 3825916409f6";
-        builder.Entity<CourtSubdivisionSetting>()
-            .HasData(new CourtSubdivisionSetting 
-            {
-                CourtSubdivisionId = courtSubdivisionId4,
-                SportCategoryId = soccerId,
-                CourtType = "San bong da nhan tao 7 nguoi"
-            },
-            new CourtSubdivisionSetting
-            {
-                CourtSubdivisionId = courtSubdivisionId6,
-                SportCategoryId = volleyballId,
-                CourtType = "San bong chuyen mat cat"
-            },
-            new CourtSubdivisionSetting
-            {
-                CourtSubdivisionId = courtSubdivisionId3,
-                SportCategoryId = badmintionId,
-                CourtType = "San cau long trong nha"
-            },
-            new CourtSubdivisionSetting
-            {
-                CourtSubdivisionId = courtSubdivisionId1,
-                SportCategoryId = badmintionId,
-                CourtType = "San cau long ngoai troi"
-            });
-        #endregion
-        
+               
         #region SportCategories
         builder.Entity<SportCategory>()
             .HasData(new SportCategory
