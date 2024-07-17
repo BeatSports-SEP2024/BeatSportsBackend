@@ -65,8 +65,8 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
             .ThenInclude(x => x.Bookings)
             .ToList();
 
-            query = query.Where(x => RemoveDiacritics(x.CourtName).ToLower().Contains(request.KeyWords.ToLower()) || 
-                                     RemoveDiacritics(x.Address).ToLower().Contains(request.KeyWords.ToLower()))
+            query = query.Where(x => RemoveDiacritics(x.CourtName).ToLower().Contains(RemoveDiacritics(request.KeyWords).ToLower()) || 
+                                     RemoveDiacritics(x.Address).ToLower().Contains(RemoveDiacritics(request.KeyWords).ToLower()))
                          .ToList();
 
             if (request.SportCategory != null)
