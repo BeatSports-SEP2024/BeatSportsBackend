@@ -13,7 +13,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetAllCourtSubdivisionOfCourt;
-public class GetAllCourtSubdivisionOfCourtHandler : IRequestHandler<GetAllCourtSubdivisionOfCourtQuery, PaginatedList<CourtSubdivisionResponse>>
+public class GetAllCourtSubdivisionOfCourtHandler : IRequestHandler<GetAllCourtSubdivisionOfCourtQuery, PaginatedList<CourtSubdivisionResponseV3>>
 {
     private readonly IBeatSportsDbContext _dbContext;
     private readonly IMapper _mapper;
@@ -24,28 +24,41 @@ public class GetAllCourtSubdivisionOfCourtHandler : IRequestHandler<GetAllCourtS
         _mapper = mapper;
     }
 
-    public Task<PaginatedList<CourtSubdivisionResponse>> Handle(GetAllCourtSubdivisionOfCourtQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<CourtSubdivisionResponseV3>> Handle(GetAllCourtSubdivisionOfCourtQuery request, CancellationToken cancellationToken)
     {
-        if (request.PageIndex <= 0 || request.PageSize <= 0)
-        {
-            throw new BadRequestException("Page index and page size must be greater than 0");
-        }
+        var currentDate = DateTime.Now;
 
-        var courtsQuery = _dbContext.Courts
-            .Where(c => !c.IsDelete && c.Id == request.CourtId);
+        // Prepare the IQueryable query
+        var query = _dbContext.Courts
+            .Where(c => !c.IsDelete && c.Id == request.CourtId)
+            .SelectMany(c => c.CourtSubdivision)
+            .Select(cs => new {
+                Subdivision = cs,
+                Court = cs.Court,
+                TimeCheckings = cs.TimeCheckings
+                    .Where(tc => tc.StartTime.Date == currentDate.Date && tc.EndTime <= currentDate)
+                    .OrderByDescending(tc => tc.StartTime)
+                    .FirstOrDefault()
+            })
+            .Select(x => new CourtSubdivisionResponseV3
+            {
+                Id = x.Subdivision.Id,
+                CourtId = x.Court.Id,
+                CourtName = x.Court.CourtName,
+                Description = x.Subdivision.CourtSubdivisionDescription,
+                ImageURL = ImageUrlSplitter.SplitAndGetFirstImageUrls(x.Court.ImageUrls),
+                IsActive = x.Subdivision.IsActive,
+                BasePrice = x.Subdivision.BasePrice,
+                CourtSubdivisionName = x.Subdivision.CourtSubdivisionName,
+                Status = !x.Subdivision.IsActive ? "Đang bảo trì" :
+                    x.TimeCheckings == null ? "Chưa có lịch" :
+                    (x.TimeCheckings.StartTime <= currentDate && x.TimeCheckings.EndTime >= currentDate ? "Đang cho thuê" :
+                    (x.TimeCheckings.StartTime > currentDate ? "Đã đặt" : "Không có sử dụng"))
+            });
 
-        var subdivisionsQuery = courtsQuery.SelectMany(c => c.CourtSubdivision.Select(cs => new CourtSubdivisionResponse
-        {
-            Id = cs.Id,
-            CourtId = c.Id,
-            CourtName = c.CourtName,
-            Description = cs.CourtSubdivisionDescription, 
-            ImageURL = ImageUrlSplitter.SplitAndGetFirstImageUrls(cs.Court.ImageUrls),  
-            IsActive = cs.IsActive,
-            BasePrice = cs.BasePrice,
-            CourtSubdivisionName = cs.CourtSubdivisionName 
-        })).PaginatedListAsync(request.PageIndex, request.PageSize);
+        // Now use CreateAsync to paginate results
+        var paginatedResult = await PaginatedList<CourtSubdivisionResponseV3>.CreateAsync(query, request.PageIndex, request.PageSize);
 
-        return subdivisionsQuery;
+        return paginatedResult;
     }
 }
