@@ -45,6 +45,17 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                 FeedbackCount = c.Feedback.Count(),
                 FeedbackStarAvg = c.Feedback.Any() ? c.Feedback.Average(x => x.FeedbackStar) : (decimal?)null,
                 Price = c.CourtSubdivision.FirstOrDefault() != null ? c.CourtSubdivision.FirstOrDefault().BasePrice : (decimal?)null,
+
+                CourtSubdivision = c.CourtSubdivision.Select(subCourt => new CourtSubdivisionV2
+                {
+                    CourtSubdivisionId = subCourt.Id,
+                    CourtSubdivisionName = subCourt.CourtSubdivisionName,
+                    Description = subCourt.CourtSubdivisionDescription,
+                    BasePrice = subCourt.BasePrice,
+                    StartTime = c.TimeStart,
+                    EndTime = c.TimeEnd
+                }).ToList(),
+
                 Feedbacks = c.Feedback
                     .Where(c => !c.IsDelete)
                     .Select(c => new FeedbackResponseV2
