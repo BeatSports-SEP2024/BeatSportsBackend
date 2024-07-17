@@ -48,8 +48,8 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
             CourtName = query.CourtName,
             Description = query.Description,
             Address = query.Address,
-            WallpaperUrls = "https://res.cloudinary.com/dcbkmwm3v/image/upload/v1721128187/ygodonohp6lac35vjydl.png?fbclid=IwZXh0bgNhZW0CMTEAAR3Ve_wvlx0OYcbc-8MZtCNCcyqyzNa0IUsgtWOHqYExNIvN4XCnxTLcWCQ_aem_z5vVNkzROC3aMrbL8s2-Mg", // Lấy ảnh đầu tiên
-            CoverImgUrls = ImageUrlSplitter.SplitAndGetFirstImageUrls(query.ImageUrls), // Chuỗi gốc cho ảnh bìa
+            WallpaperUrls = query.WallpaperUrls,
+            CoverImgUrls = query.CourtAvatarImgUrls, // Chuỗi gốc cho ảnh bìa
             CourtImgsList = ImageUrlSplitter.SplitImageUrls(query.ImageUrls), // Danh sách tất cả ảnh
             GoogleMapURLs = query.GoogleMapURLs,
             TimeStart = query.TimeStart,
