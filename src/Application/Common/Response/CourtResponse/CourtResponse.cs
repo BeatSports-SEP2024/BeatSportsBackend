@@ -87,8 +87,11 @@ public class CourtResponseV5
     public string? PlaceId { get; set; }
     public decimal? Price { get; set; }
     public decimal? FeedbackStarAvg { get; set; }
+    public string? WallpaperUrls { get; set; }
+    public string? CoverImgUrls { get; set; }
+    public List<string>? CourtImgsList { get; set; }
     public int? FeedbackCount { get; set; }
     public int? RentingCount { get; set; }
-    public string? ImagesList { get; set; }
+    //public string? ImagesList { get; set; }
     public List<FeedbackResponseV2>? Feedbacks { get; set; } 
 }
