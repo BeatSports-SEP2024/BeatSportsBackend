@@ -60,7 +60,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                     .Where(c => !c.IsDelete)
                     .Select(c => new FeedbackResponseV2
                     {
-                        CourtId = c.Id,
+                        FeedbackId = c.Id,
                         FeedbackStar = c.FeedbackStar,
                         FeedbackContent = c.FeedbackContent,
                         ProfilePictureUrl = c.Booking.Customer.Account.ProfilePictureURL,

@@ -20,7 +20,8 @@ public class FeedbackResponse
 //For Detail Court screen
 public class FeedbackResponseV2
 {
-    public Guid? CourtId { get; set; }
+    public Guid? FeedbackId { get; set; }
+    //public Guid? CourtId { get; set; }
     public decimal? FeedbackStar { get; set; }
     public string? FeedbackContent { get; set; }
     public string? ProfilePictureUrl { get; set; }
