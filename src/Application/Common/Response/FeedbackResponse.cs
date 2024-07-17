@@ -22,7 +22,7 @@ public class FeedbackResponseV2
 {
     public Guid? FeedbackId { get; set; }
     //public Guid? CourtId { get; set; }
-    public decimal? FeedbackStar { get; set; }
+    public decimal? FbStar { get; set; }
     public string? FeedbackContent { get; set; }
     public string? ProfilePictureUrl { get; set; }
     public string? FullName { get; set; }

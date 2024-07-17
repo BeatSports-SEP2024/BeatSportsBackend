@@ -5,8 +5,11 @@ using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Response.CourtResponse;
 using BeatSportsAPI.Application.Common.Ultilities;
+using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Services.MapBox;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BeatSportsAPI.Application.Features.Courts.Queries.GetById;
 public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtResponseV5>
@@ -22,6 +25,9 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
 
     public Task<CourtResponseV5> Handle(GetCourtByIdCommand request, CancellationToken cancellationToken)
     {
+        var distanceCal = new DistanceCalculation();
+        var query = new List<Court>();
+
         var courtDetails = _beatSportsDbContext.Courts
             .Where(c => c.Id == request.CourtId)
             .Include(cs => cs.CourtSubdivision)
@@ -39,6 +45,9 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                 Address = c.Address,
                 PlaceId = c.PlaceId,
                 WallpaperUrls = c.WallpaperUrls,
+                GoogleMapURLs = c.GoogleMapURLs,
+                TimeStart = c.TimeStart,
+                TimeEnd = c.TimeEnd,                
                 CoverImgUrls = c.CourtAvatarImgUrls, // Chuỗi gốc cho ảnh bìa
                 CourtImgsList = ImageUrlSplitter.SplitImageUrls(c.ImageUrls),
                 RentingCount = c.Feedback.Select(f => f.Booking).Distinct().Count(),
@@ -61,7 +70,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                     .Select(c => new FeedbackResponseV2
                     {
                         FeedbackId = c.Id,
-                        FeedbackStar = c.FeedbackStar,
+                        FbStar = c.FeedbackStar,
                         FeedbackContent = c.FeedbackContent,
                         ProfilePictureUrl = c.Booking.Customer.Account.ProfilePictureURL,
                         FullName = c.Booking.Customer.Account.FirstName + " " + c.Booking.Customer.Account.LastName
