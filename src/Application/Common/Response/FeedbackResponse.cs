@@ -26,4 +26,5 @@ public class FeedbackResponseV2
     public string? FeedbackContent { get; set; }
     public string? ProfilePictureUrl { get; set; }
     public string? FullName { get; set; }
+    public string? FeedbackSentTime { get; set; }
 }

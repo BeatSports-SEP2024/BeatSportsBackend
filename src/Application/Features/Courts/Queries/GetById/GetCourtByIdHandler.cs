@@ -25,7 +25,6 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
 
     public Task<CourtResponseV5> Handle(GetCourtByIdCommand request, CancellationToken cancellationToken)
     {
-        var distanceCal = new DistanceCalculation();
         var query = new List<Court>();
 
         var courtDetails = _beatSportsDbContext.Courts
@@ -74,7 +73,8 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                         FbStar = c.FeedbackStar,
                         FeedbackContent = c.FeedbackContent,
                         ProfilePictureUrl = c.Booking.Customer.Account.ProfilePictureURL,
-                        FullName = c.Booking.Customer.Account.FirstName + " " + c.Booking.Customer.Account.LastName
+                        FullName = c.Booking.Customer.Account.FirstName + " " + c.Booking.Customer.Account.LastName,
+                        FeedbackSentTime = ParseTimeExtension.GetFormattedTime(DateTime.Now - c.Created),
                     }).ToList(),
             })
             .FirstOrDefault();
