@@ -9,6 +9,12 @@ public class TimeUtils
 {
     public static IEnumerable<(TimeSpan, TimeSpan)> GenerateTimeSlots(TimeSpan startTime, TimeSpan endTime)
     {
+
+        if (startTime < TimeSpan.Zero || endTime > new TimeSpan(23, 59, 59) || startTime >= endTime)
+        {
+            throw new ArgumentOutOfRangeException("Thời gian bắt đầu và kết thúc phải nằm trong khoảng từ 00:00 đến 23:59 và thời gian bắt đầu phải nhỏ hơn thời gian kết thúc.");
+        }
+
         TimeSpan start = startTime;
         TimeSpan end = endTime;
 

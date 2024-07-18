@@ -16,18 +16,18 @@ public class CreateTimePeriodHandler : IRequestHandler<CreateTimePeriodCommand, 
 
     public async Task<BeatSportsResponse> Handle(CreateTimePeriodCommand request, CancellationToken cancellationToken)
     {
-        var existedCourt = _beatSportsDbContext.CourtSubdivisions
-            .Where(c => c.Id == request.CourtSubdivisionId && !c.IsDelete)
+        var existedCourt = _beatSportsDbContext.Courts
+            .Where(c => c.Id == request.CourtId && !c.IsDelete)
             .FirstOrDefault();
         if (existedCourt == null)
         {
-            throw new NotFoundException($"{request.CourtSubdivisionId} is not existed");
+            throw new NotFoundException($"{request.CourtId} is not existed");
         }
         foreach (var (start, end) in TimeUtils.GenerateTimeSlots(request.StartTime, request.EndTime))
         {
             var newTimePeriod = new Domain.Entities.CourtEntity.TimePeriod
             {
-                CourtSubdivisionId = request.CourtSubdivisionId,
+                CourtId = request.CourtId,
                 //Description = request.Description,
                 StartTime = start,
                 EndTime = end,

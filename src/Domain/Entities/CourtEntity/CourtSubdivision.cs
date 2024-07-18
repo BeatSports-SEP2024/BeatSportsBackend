@@ -19,5 +19,5 @@ public class CourtSubdivision : BaseAuditableEntity
     public virtual IList<TimeChecking> TimeCheckings { get; set; }
     public virtual IList<Booking> Bookings { get; set; } = null!;
     //public virtual IList<CourtSportCategory>? CourtSportCategories { get; set; }
-    public virtual IList<TimePeriod>? TimePeriods { get; set; }
+    //public virtual IList<TimePeriod>? TimePeriods { get; set; }
 }

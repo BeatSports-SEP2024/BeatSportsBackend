@@ -857,7 +857,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             new TimePeriod
             {
                 Id = timePeriodId1,
-                CourtSubdivisionId = courtSubdivisionId1,
+                CourtId = court1Id,
                 Description = "Giờ Cao Điểm",
                 StartTime = new TimeSpan(17, 0, 0),
                 EndTime = new TimeSpan(20, 0, 0),
@@ -866,7 +866,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             new TimePeriod
             {
                 Id = timePeriodId2,
-                CourtSubdivisionId = courtSubdivisionId2,
+                CourtId = court2Id,
                 Description = "Giờ Thấp Điểm",
                 StartTime = new TimeSpan(10, 0, 0),
                 EndTime = new TimeSpan(16, 0, 0),
@@ -875,7 +875,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             new TimePeriod
             {
                 Id = timePeriodId3,
-                CourtSubdivisionId = courtSubdivisionId3,
+                CourtId = court3Id,
                 Description = "Giờ Bình Thường",
                 StartTime = new TimeSpan(20, 30, 0),
                 EndTime = new TimeSpan(23, 0, 0),
