@@ -27,8 +27,6 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
 
     public Task<CourtResponseV5> Handle(GetCourtByIdCommand request, CancellationToken cancellationToken)
     {
-        var query = new List<Court>();
-
         var courtDetails = _beatSportsDbContext.Courts
             .Where(c => c.Id == request.CourtId)
             .Include(cs => cs.CourtSubdivision)
@@ -58,22 +56,24 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                 FeedbackStarAvg = c.Feedback.Any() ? c.Feedback.Average(x => x.FeedbackStar) : (decimal?)null,
                 Price = c.CourtSubdivision.FirstOrDefault() != null ? c.CourtSubdivision.FirstOrDefault().BasePrice : (decimal?)null,
 
-                CourtSubSettingResponses = c.CourtSubdivision.Select(cs => new CourtSubSettingV2
-                {
-                    CourtSubSettingId = cs.CourtSubdivisionSettingId,
-                    TypeSize = cs.CourtSubdivisionSettings.CourtType,
-                    SportCategoryId = cs.CourtSubdivisionSettings.SportCategories.Id,
-                    SportCategoryName = cs.CourtSubdivisionSettings.SportCategories.Name,
-                    CourtSubdivision = cs.CourtSubdivisionSettings.CourtSubdivisions.Select(subCourt => new CourtSubdivisionV4
+                CourtSubSettingResponses = c.CourtSubdivision
+                    .GroupBy(cs => cs.CourtSubdivisionSettings.Id)
+                    .Select(g => new CourtSubSettingV2
                     {
-                        CourtSubdivisionId = subCourt.Id,
-                        CourtSubdivisionName = subCourt.CourtSubdivisionName,
-                        CourtSubType = subCourt.CourtSubdivisionDescription,
-                        BasePrice = subCourt.BasePrice,
-                        StartTime = c.TimeStart,
-                        EndTime = c.TimeEnd,
-                    }).ToList()
-                }).ToList(),
+                        CourtSubSettingId = g.First().CourtSubdivisionSettings.Id,
+                        TypeSize = g.First().CourtSubdivisionSettings.CourtType,
+                        SportCategoryId = g.First().CourtSubdivisionSettings.SportCategories.Id,
+                        SportCategoryName = g.First().CourtSubdivisionSettings.SportCategories.Name,
+                        CourtSubdivision = g.Select(subCourt => new CourtSubdivisionV4
+                        {
+                            CourtSubdivisionId = subCourt.Id,
+                            CourtSubdivisionName = subCourt.CourtSubdivisionName,
+                            CourtSubType = subCourt.CourtSubdivisionDescription,
+                            BasePrice = subCourt.BasePrice,
+                            StartTime = c.TimeStart,
+                            EndTime = c.TimeEnd,
+                        }).ToList()
+                    }).ToList(),
 
                 Feedbacks = c.Feedback
                     .Where(c => !c.IsDelete)
@@ -88,6 +88,11 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                     }).ToList(),
             })
             .FirstOrDefault();
+
+        if (courtDetails == null)
+        {
+            throw new BadRequestException($"Court with ID {request.CourtId} not found.");
+        }
         return Task.FromResult(courtDetails);
     }
 }
