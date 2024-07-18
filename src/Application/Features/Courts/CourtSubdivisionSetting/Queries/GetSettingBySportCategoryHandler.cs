@@ -33,9 +33,9 @@ public class GetSettingBySportCategoryHandler : IRequestHandler<GetSettingBySpor
         var list = await query.Select(c => new CourtSubSettingResponse
         {
             CourtSubSettingId = c.Id,
-            CourtType = c.CourtType,
-            SportCategoryId = c.SportCategories.Id,  // Đảm bảo rằng SportCategory không null trước khi truy cập Id
-            SportCategoryName = c.SportCategories.Name  // Thêm tên của danh mục thể thao
+            TypeSize = c.CourtType,
+            SportCategoryId = c.SportCategories.Id,  
+            SportCategoryName = c.SportCategories.Name  
         }).ToListAsync(cancellationToken);
 
         return list;

@@ -9,6 +9,6 @@ public class CourtSubSettingResponse
 {
     public Guid CourtSubSettingId { get; set; }
     public Guid SportCategoryId { get; set; }
-    public string? CourtType { get; set; }
+    public string? TypeSize { get; set; }
     public string? SportCategoryName { get; set; }
 }

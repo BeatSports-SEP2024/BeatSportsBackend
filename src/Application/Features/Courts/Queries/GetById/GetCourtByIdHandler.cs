@@ -62,14 +62,14 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                     {
                         CourtSubdivisionId = subCourt.Id,
                         CourtSubdivisionName = subCourt.CourtSubdivisionName,
-                        Description = subCourt.CourtSubdivisionDescription,
+                        CourtSubType = subCourt.CourtSubdivisionDescription,
                         BasePrice = subCourt.BasePrice,
                         StartTime = c.TimeStart,
                         EndTime = c.TimeEnd,
-                        CourtSubSettingResponses = new CourtSubSettingResponse // Đổi tên vì nó giờ là một đối tượng đơn
+                        CourtSubSettingResponses = new CourtSubSettingResponse 
                         {
-                            CourtSubSettingId = subCourt.CourtSubdivisionSettings.Id, // Giả sử rằng có thuộc tính Id
-                            CourtType = subCourt.CourtSubdivisionSettings.CourtType,
+                            CourtSubSettingId = subCourt.CourtSubdivisionSettings.Id,
+                            TypeSize = subCourt.CourtSubdivisionSettings.CourtType,
                             SportCategoryId = subCourt.CourtSubdivisionSettings.SportCategories.Id,
                             SportCategoryName = subCourt.CourtSubdivisionSettings.SportCategories.Name
                         }
