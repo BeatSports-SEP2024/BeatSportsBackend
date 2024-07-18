@@ -2,6 +2,7 @@
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -32,9 +33,11 @@ public class CreateCourtSubdivisionHandler : IRequestHandler<CreateCourtSubdivis
             {
                 CourtId = request.CourtId,
                 BasePrice = request.BasePrice,
+                CourtSubdivisionSettingId = request.CourtSubdivisionSettingId,
+                CreatedStatus = CourtSubdivisionCreatedStatus.Pending.ToString(),
                 //ImageURL = command.ImageURL,
                 //Description = command.Description,
-                CourtSubdivisionDescription = request.CourtSubDescription,
+                //CourtSubdivisionDescription = request.CourtSubDescription,
                 IsActive = true,
                 CourtSubdivisionName = request.CourtSubdivisionName,
             };

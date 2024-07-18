@@ -96,7 +96,7 @@ public class CourtResponseV5
     public List<string>? CourtImgsList { get; set; }
     public int? FeedbackCount { get; set; }
     public int? RentingCount { get; set; }
-    public List<CourtSubdivisionV2>? CourtSubdivision { get; set; }
+    public List<CourtSubdivisionV4>? CourtSubdivision { get; set; }
     //public string? ImagesList { get; set; }
     public List<FeedbackResponseV2>? Feedbacks { get; set; } 
 }

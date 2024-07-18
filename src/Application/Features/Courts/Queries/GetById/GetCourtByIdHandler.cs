@@ -7,6 +7,7 @@ using BeatSportsAPI.Application.Common.Response.CourtResponse;
 using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Services.MapBox;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -25,12 +26,12 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
 
     public Task<CourtResponseV5> Handle(GetCourtByIdCommand request, CancellationToken cancellationToken)
     {
-        var distanceCal = new DistanceCalculation();
         var query = new List<Court>();
 
         var courtDetails = _beatSportsDbContext.Courts
             .Where(c => c.Id == request.CourtId)
             .Include(cs => cs.CourtSubdivision)
+                .ThenInclude(cs => cs.CourtSubdivisionSettings)
             .Include(f => f.Feedback)
             .ThenInclude(f => f.Booking)
                 .ThenInclude(b => b.Customer)
@@ -47,7 +48,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                 WallpaperUrls = c.WallpaperUrls,
                 GoogleMapURLs = c.GoogleMapURLs,
                 TimeStart = c.TimeStart,
-                TimeEnd = c.TimeEnd,                
+                TimeEnd = c.TimeEnd,
                 CourtSubCount = c.CourtSubdivision.Count(),
                 CoverImgUrls = c.CourtAvatarImgUrls, // Chuỗi gốc cho ảnh bìa
                 CourtImgsList = ImageUrlSplitter.SplitImageUrls(c.ImageUrls),
@@ -56,15 +57,23 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                 FeedbackStarAvg = c.Feedback.Any() ? c.Feedback.Average(x => x.FeedbackStar) : (decimal?)null,
                 Price = c.CourtSubdivision.FirstOrDefault() != null ? c.CourtSubdivision.FirstOrDefault().BasePrice : (decimal?)null,
 
-                CourtSubdivision = c.CourtSubdivision.Select(subCourt => new CourtSubdivisionV2
-                {
-                    CourtSubdivisionId = subCourt.Id,
-                    CourtSubdivisionName = subCourt.CourtSubdivisionName,
-                    Description = subCourt.CourtSubdivisionDescription,
-                    BasePrice = subCourt.BasePrice,
-                    StartTime = c.TimeStart,
-                    EndTime = c.TimeEnd
-                }).ToList(),
+                CourtSubdivision = c.CourtSubdivision
+                    .Select(subCourt => new CourtSubdivisionV4
+                    {
+                        CourtSubdivisionId = subCourt.Id,
+                        CourtSubdivisionName = subCourt.CourtSubdivisionName,
+                        CourtSubType = subCourt.CourtSubdivisionDescription,
+                        BasePrice = subCourt.BasePrice,
+                        StartTime = c.TimeStart,
+                        EndTime = c.TimeEnd,
+                        CourtSubSettingResponses = new CourtSubSettingResponse 
+                        {
+                            CourtSubSettingId = subCourt.CourtSubdivisionSettings.Id,
+                            TypeSize = subCourt.CourtSubdivisionSettings.CourtType,
+                            SportCategoryId = subCourt.CourtSubdivisionSettings.SportCategories.Id,
+                            SportCategoryName = subCourt.CourtSubdivisionSettings.SportCategories.Name
+                        }
+                    }).ToList(),
 
                 Feedbacks = c.Feedback
                     .Where(c => !c.IsDelete)
@@ -74,7 +83,8 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                         FbStar = c.FeedbackStar,
                         FeedbackContent = c.FeedbackContent,
                         ProfilePictureUrl = c.Booking.Customer.Account.ProfilePictureURL,
-                        FullName = c.Booking.Customer.Account.FirstName + " " + c.Booking.Customer.Account.LastName
+                        FullName = c.Booking.Customer.Account.FirstName + " " + c.Booking.Customer.Account.LastName,
+                        FeedbackSentTime = ParseTimeExtension.GetFormattedTime(DateTime.Now - c.Created),
                     }).ToList(),
             })
             .FirstOrDefault();

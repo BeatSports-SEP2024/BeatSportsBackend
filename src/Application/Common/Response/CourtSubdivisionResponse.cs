@@ -36,3 +36,26 @@ public class CourtSubdivisionResponseV3 : IMapFrom<CourtSubdivision>
     public string? CourtSubdivisionName { get; set; }
     public string? Status { get; set; }
 }
+
+public class CourtSubdivisionV4 : IMapFrom<CourtSubdivision>
+{
+    public Guid CourtSubdivisionId { get; set; }
+    public string? CourtSubdivisionName { get; set; }
+    public string? CourtSubType { get; set; }
+    public decimal BasePrice { get; set; }
+    public TimeSpan StartTime { get; set; }
+    public TimeSpan EndTime { get; set; }
+    public CourtSubSettingResponse? CourtSubSettingResponses { get; set; }
+}
+public class CourtSubdivisionV5
+{
+    public Guid CourtSubId { get; set; }
+    public string? CourtSubName { get; set; }
+    public string? CourtDescription { get; set; }
+    public string? CourtSubDescription { get; set; }
+    public decimal? BasePrice { get; set; }
+    public string? Status { get; set; }
+    public List<string>? ImgUrls { get; set; }
+    public string? CourtType { get; set; }
+    public string? SportCategories { get; set; }
+}

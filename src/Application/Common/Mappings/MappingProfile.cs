@@ -41,8 +41,8 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.WalletId, opt => opt.MapFrom(src => src.Id));
 
         //CourtSport Mapping
-        CreateMap<CourtSubdivision, CourtSportCategoryResponse>()
-            .ForMember(dest => dest.CourtSubdivisionId, opt => opt.MapFrom(src => src.Id));
+        //CreateMap<CourtSubdivision, CourtSportCategoryResponse>()
+        //    .ForMember(dest => dest.CourtSubdivisionId, opt => opt.MapFrom(src => src.Id));
 
         //Time Period Mapping
         CreateMap<TimePeriod, TimePeriodResponse>()

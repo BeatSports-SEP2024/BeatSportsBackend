@@ -65,8 +65,8 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
             .ThenInclude(x => x.Bookings)
             .ToList();
 
-            query = query.Where(x => RemoveDiacritics(x.CourtName).ToLower().Contains(request.KeyWords.ToLower()) || 
-                                     RemoveDiacritics(x.Address).ToLower().Contains(request.KeyWords.ToLower()))
+            query = query.Where(x => RemoveDiacritics(x.CourtName).ToLower().Contains(RemoveDiacritics(request.KeyWords).ToLower()) || 
+                                     RemoveDiacritics(x.Address).ToLower().Contains(RemoveDiacritics(request.KeyWords).ToLower()))
                          .ToList();
 
             if (request.SportCategory != null)
@@ -75,7 +75,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
                                 .Where(x => x.Name.Contains(request.SportCategory))
                                 .FirstOrDefault();
 
-                var courtSubList = _dbContext.CourtSportCategories
+                var courtSubList = _dbContext.CourtSubdivisionSettings
                                 .Where(x => x.SportCategoryId == sportCategory.Id)
                                 .ToList();
                 var tmp = query.ToList();
@@ -85,7 +85,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
                     var flag = 0;
                     foreach (var courtSub in court.CourtSubdivision)
                     {
-                        if (courtSubList.Any(x => x.CourtSubdivisionId == courtSub.Id))
+                        if (courtSubList.Any(x => x.Id == courtSub.CourtSubdivisionSettingId))
                         {
                             flag++;
                             break;

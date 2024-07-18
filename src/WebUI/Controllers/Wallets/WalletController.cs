@@ -1,4 +1,4 @@
-﻿using BeatSportsAPI.Application.Features.Courts.CourtSportCategory.Queries;
+﻿//using BeatSportsAPI.Application.Features.Courts.CourtSportCategory.Queries;
 using BeatSportsAPI.Application.Features.Wallets.Queries;
 using BeatSportsAPI.Application.Features.Wallets.Queries.GetById;
 using MediatR;

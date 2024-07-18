@@ -28,7 +28,7 @@ public class CourtController : ApiControllerBase
     }
 
     [HttpPost]
-    [CustomAuthorize(RoleEnums.Owner)]
+    //[CustomAuthorize(RoleEnums.Owner)]
     public async Task<BeatSportsResponse> Create(CreateCourtCommand request)
     {
         return await _mediator.Send(request);
