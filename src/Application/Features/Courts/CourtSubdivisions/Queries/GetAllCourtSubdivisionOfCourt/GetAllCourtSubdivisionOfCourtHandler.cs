@@ -9,6 +9,7 @@ using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,6 +33,7 @@ public class GetAllCourtSubdivisionOfCourtHandler : IRequestHandler<GetAllCourtS
         var query = _dbContext.Courts
             .Where(c => !c.IsDelete && c.Id == request.CourtId)
             .SelectMany(c => c.CourtSubdivision)
+            .Where(c => c.CreatedStatus != CourtSubdivisionCreatedStatus.Pending.ToString())
             .Select(cs => new {
                 Subdivision = cs,
                 Court = cs.Court,
