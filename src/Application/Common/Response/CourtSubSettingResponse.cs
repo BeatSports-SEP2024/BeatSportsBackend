@@ -19,5 +19,6 @@ public class CourtSubSettingV2
     public Guid SportCategoryId { get; set; }
     public string? TypeSize { get; set; }
     public string? SportCategoryName { get; set; }
+    public string? CourtSubType { get; set; }
     public List<CourtSubdivisionV4>? CourtSubdivision { get; set; }
 }

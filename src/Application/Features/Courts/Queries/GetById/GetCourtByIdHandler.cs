@@ -60,6 +60,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                     .GroupBy(cs => cs.CourtSubdivisionSettings.Id)
                     .Select(g => new CourtSubSettingV2
                     {
+                        CourtSubType = g.First().CourtSubdivisionDescription,
                         CourtSubSettingId = g.First().CourtSubdivisionSettings.Id,
                         TypeSize = g.First().CourtSubdivisionSettings.CourtType,
                         SportCategoryId = g.First().CourtSubdivisionSettings.SportCategories.Id,
@@ -68,7 +69,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                         {
                             CourtSubdivisionId = subCourt.Id,
                             CourtSubdivisionName = subCourt.CourtSubdivisionName,
-                            CourtSubType = subCourt.CourtSubdivisionDescription,
+                            //CourtSubType = subCourt.CourtSubdivisionDescription,
                             BasePrice = subCourt.BasePrice,
                             StartTime = c.TimeStart,
                             EndTime = c.TimeEnd,
