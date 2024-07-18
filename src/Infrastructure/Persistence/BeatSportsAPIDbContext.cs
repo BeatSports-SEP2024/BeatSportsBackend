@@ -443,99 +443,136 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         var courtSubdivisionId7 = Guid.NewGuid();
         #region CourtSubdivisionSetting
         builder.Entity<CourtSubdivisionSetting>().HasData(
-    new CourtSubdivisionSetting
-    {
-        Id = Guid.Parse("a93c57bd-f6d5-414e-a4b2-5aa269729a43"),
-        SportCategoryId = soccerId,
-        CourtType = "Sân bóng đá nhân tạo 7"
-    },
-    new CourtSubdivisionSetting
-    {
-        Id = Guid.Parse("457c955b-857d-483d-8e54-02c87dbcffa9"),
-        SportCategoryId = soccerId,
-        CourtType = "Sân bóng đá nhân tạo 5"
-    },
-    new CourtSubdivisionSetting
-    {
-        Id = Guid.Parse("3593decc-3ace-451c-842d-3369cfe571c2"),
-        SportCategoryId = soccerId,
-        CourtType = "Sân bóng đá nhân tạo 11"
-    },
-    new CourtSubdivisionSetting
-    {
-        Id = Guid.Parse("31689b32-b8d8-4993-98f5-33b436b4f293"),
-        SportCategoryId = soccerId,
-        CourtType = "Sân bóng đá cỏ tự nhiên 7"
-    },
-    // Đảm bảo chỉ rõ ràng các mô tả để đồng bộ với thực tế mô tả của sân
-    new CourtSubdivisionSetting
-    {
-        Id = Guid.Parse("41ae23f7-42fe-4a40-8c36-021dc7c1dd06"),
-        SportCategoryId = volleyballId,
-        CourtType = "Sân bóng chuyền mặt cát"
-    },
-    new CourtSubdivisionSetting
-    {
-        Id = Guid.Parse("effd5616-ad35-4204-8c5e-01ad289855e8"),
-        SportCategoryId = volleyballId,
-        CourtType = "Sân bóng chuyền trong nhà"
-    },
-    new CourtSubdivisionSetting
-    {
-        Id = Guid.Parse("63998125-8cbd-41b7-9123-a6c7ca3ad63e"),
-        SportCategoryId = badmintionId,
-        CourtType = "Sân cầu lông trong nhà"
-    },
-    new CourtSubdivisionSetting
-    {
-        Id = Guid.Parse("9ce93f4d-b691-4622-95a5-3825916409f6"),
-        SportCategoryId = badmintionId,
-        CourtType = "Sân cầu lông ngoài trời"
-    }
-);
+            new CourtSubdivisionSetting
+            {
+                Id = Guid.Parse("a93c57bd-f6d5-414e-a4b2-5aa269729a43"),
+                SportCategoryId = soccerId,
+                CourtType = "Sân bóng đá nhân tạo 7"
+            },
+            new CourtSubdivisionSetting
+            {
+                Id = Guid.Parse("457c955b-857d-483d-8e54-02c87dbcffa9"),
+                SportCategoryId = soccerId,
+                CourtType = "Sân bóng đá nhân tạo 5"
+            },
+            new CourtSubdivisionSetting
+            {
+                Id = Guid.Parse("3593decc-3ace-451c-842d-3369cfe571c2"),
+                SportCategoryId = soccerId,
+                CourtType = "Sân bóng đá nhân tạo 11"
+            },
+            new CourtSubdivisionSetting
+            {
+                Id = Guid.Parse("31689b32-b8d8-4993-98f5-33b436b4f293"),
+                SportCategoryId = soccerId,
+                CourtType = "Sân bóng đá cỏ tự nhiên 7"
+            },
+            new CourtSubdivisionSetting
+            {
+                Id = Guid.Parse("089e939e-10ea-44b6-b7cd-f6d69cf6c06a"),
+                SportCategoryId = soccerId,
+                CourtType = "Sân bóng đá cỏ tự nhiên 11"
+            },
+            new CourtSubdivisionSetting
+            {
+                Id = Guid.Parse("41ae23f7-42fe-4a40-8c36-021dc7c1dd06"),
+                SportCategoryId = volleyballId,
+                CourtType = "Sân bóng chuyền mặt cát"
+            },
+            new CourtSubdivisionSetting
+            {
+                Id = Guid.Parse("effd5616-ad35-4204-8c5e-01ad289855e8"),
+                SportCategoryId = volleyballId,
+                CourtType = "Sân bóng chuyền trong nhà"
+            },
+            new CourtSubdivisionSetting
+            {
+                Id = Guid.Parse("0c9e0496-e891-468c-aca5-6c09c1a8f159"),
+                SportCategoryId = volleyballId,
+                CourtType = "Sân bóng chuyền xi măng"
+            },
+            new CourtSubdivisionSetting
+            {
+                Id = Guid.Parse("63998125-8cbd-41b7-9123-a6c7ca3ad63e"),
+                SportCategoryId = badmintionId,
+                CourtType = "Sân cầu lông trong nhà"
+            },
+            new CourtSubdivisionSetting
+            {
+                Id = Guid.Parse("9ce93f4d-b691-4622-95a5-3825916409f6"),
+                SportCategoryId = badmintionId,
+                CourtType = "Sân cầu lông ngoài trời"
+            }
+        );
         #endregion
         #region CourtSubdivision
         builder.Entity<CourtSubdivision>().HasData(
-    new CourtSubdivision
-    {
-        Id = courtSubdivisionId1,
-        CourtId = court1Id,
-        CourtSubdivisionSettingId = Guid.Parse("63998125-8cbd-41b7-9123-a6c7ca3ad63e"),
-        CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 1",
-        CourtSubdivisionDescription = "Sân đa dụng cho chơi cầu lông, nằm trong nhà",
-        IsActive = true,
-        BasePrice = 60000,
-        Created = DateTime.UtcNow,
-        LastModified = DateTime.UtcNow,
-        IsDelete = false
-    },
-    new CourtSubdivision
-    {
-        Id = courtSubdivisionId2,
-        CourtId = court1Id,
-        CourtSubdivisionSettingId = Guid.Parse("63998125-8cbd-41b7-9123-a6c7ca3ad63e"),
-        CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 2",
-        CourtSubdivisionDescription = "Sân có sẵn vợt carbon cho thuê để chơi cầu lông, nằm trong nhà",
-        IsActive = true,
-        BasePrice = 110000,
-        Created = DateTime.UtcNow,
-        LastModified = DateTime.UtcNow,
-        IsDelete = false
-    },
-    new CourtSubdivision
-    {
-        Id = courtSubdivisionId3,
-        CourtId = court1Id,
-        CourtSubdivisionSettingId = Guid.Parse("9ce93f4d-b691-4622-95a5-3825916409f6"),
-        CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 3",
-        CourtSubdivisionDescription = "Sân có sẵn vợt carbon cho thuê để chơi cầu lông, ngoài trời",
-        IsActive = true,
-        BasePrice = 110000,
-        Created = DateTime.UtcNow,
-        LastModified = DateTime.UtcNow,
-        IsDelete = false
-    }
-);
+            new CourtSubdivision
+            {
+                Id = courtSubdivisionId4,
+                CourtId = court1Id,
+                CourtSubdivisionSettingId = Guid.Parse("0c9e0496-e891-468c-aca5-6c09c1a8f159"),
+                CourtSubdivisionName = "Sân bóng chuyền Ellen, phân cấp 1",
+                CourtSubdivisionDescription = "Sân bóng chuyền xi măng",
+                IsActive = true,
+                BasePrice = 60000,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false
+            },
+            new CourtSubdivision
+            {
+                Id = courtSubdivisionId5,
+                CourtId = court1Id,
+                CourtSubdivisionSettingId = Guid.Parse("effd5616-ad35-4204-8c5e-01ad289855e8"),
+                CourtSubdivisionName = "Sân bóng chuyền Ellen, phân cấp 2",
+                CourtSubdivisionDescription = "Sân bóng chuyền trong nhà",
+                IsActive = true,
+                BasePrice = 60000,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false
+            },
+            new CourtSubdivision
+            {
+                Id = courtSubdivisionId1,
+                CourtId = court1Id,
+                CourtSubdivisionSettingId = Guid.Parse("63998125-8cbd-41b7-9123-a6c7ca3ad63e"),
+                CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 1",
+                CourtSubdivisionDescription = "Sân trong nhà",
+                IsActive = true,
+                BasePrice = 60000,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false
+            },
+            new CourtSubdivision
+            {
+                Id = courtSubdivisionId2,
+                CourtId = court1Id,
+                CourtSubdivisionSettingId = Guid.Parse("63998125-8cbd-41b7-9123-a6c7ca3ad63e"),
+                CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 2",
+                CourtSubdivisionDescription = "Sân trong nhà",
+                IsActive = true,
+                BasePrice = 110000,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false
+            },
+            new CourtSubdivision
+            {
+                Id = courtSubdivisionId3,
+                CourtId = court1Id,
+                CourtSubdivisionSettingId = Guid.Parse("9ce93f4d-b691-4622-95a5-3825916409f6"),
+                CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 3",
+                CourtSubdivisionDescription = "Sân ngoài trời",
+                IsActive = true,
+                BasePrice = 110000,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false
+            }
+        );
         #endregion
 
         #region SportCategories
