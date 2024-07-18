@@ -58,4 +58,6 @@ public class CourtSubdivisionV5
     public List<string>? ImgUrls { get; set; }
     public string? CourtType { get; set; }
     public string? SportCategories { get; set; }
+    public string? Address { get; set; }
+    public string? OwnerFullName { get; set; }
 }
