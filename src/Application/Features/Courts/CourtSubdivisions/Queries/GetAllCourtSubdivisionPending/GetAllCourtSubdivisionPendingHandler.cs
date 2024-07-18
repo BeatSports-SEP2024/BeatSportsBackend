@@ -25,9 +25,11 @@ public class GetAllCourtSubdivisionPendingHandler : IRequestHandler<GetAllCourtS
     public Task<PaginatedList<CourtSubdivisionResponseV3>> Handle(GetAllCourtSubdivisionPendingCommand request, CancellationToken cancellationToken)
     {
         var query = _beatSportsDbContext.CourtSubdivisions
-            .Where(c => !c.IsDelete && c.CreatedStatus.Equals(CourtSubdivisionCreatedStatus.Pending.ToString()));
+            .Where(c => !c.IsDelete && c.CourtId == request.CourtId);
 
-        var listPending = query.Select(x => new CourtSubdivisionResponseV3 
+        var checkPending = query.Where(c => c.CreatedStatus.Equals(CourtSubdivisionCreatedStatus.Pending.ToString()));
+
+        var listPending = checkPending.Select(x => new CourtSubdivisionResponseV3 
         {
             Id = x.Id,
             CourtId = x.Court.Id,

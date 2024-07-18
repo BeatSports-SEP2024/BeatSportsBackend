@@ -11,6 +11,7 @@ using MediatR;
 namespace BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetAllCourtSubdivisionPending;
 public class GetAllCourtSubdivisionPendingCommand : IRequest<PaginatedList<CourtSubdivisionResponseV3>>
 {
+    public Guid CourtId { get; set; }
     [Required]
     public int PageIndex { get; set; }
     [Required]
