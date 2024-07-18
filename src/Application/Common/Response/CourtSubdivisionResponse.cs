@@ -36,3 +36,14 @@ public class CourtSubdivisionResponseV3 : IMapFrom<CourtSubdivision>
     public string? CourtSubdivisionName { get; set; }
     public string? Status { get; set; }
 }
+
+public class CourtSubdivisionV4 : IMapFrom<CourtSubdivision>
+{
+    public Guid CourtSubdivisionId { get; set; }
+    public string? CourtSubdivisionName { get; set; }
+    public string? Description { get; set; }
+    public decimal BasePrice { get; set; }
+    public TimeSpan StartTime { get; set; }
+    public TimeSpan EndTime { get; set; }
+    public CourtSubSettingResponse? CourtSubSettingResponses { get; set; }
+}
