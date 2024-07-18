@@ -73,6 +73,11 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, BeatSports
 
                 string extractedText = StringExtraction.ExtractText(settings.CourtType);
 
+                if(extractedText == null) 
+                {
+                    extractedText = ""; //Default is space when do not have string fit conditional
+                }
+
                 court.CourtSubdivision.Add(new CourtSubdivision
                 {
                     CourtId = court.Id,

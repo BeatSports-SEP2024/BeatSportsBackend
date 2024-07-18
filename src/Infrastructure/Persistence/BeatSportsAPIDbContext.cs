@@ -50,7 +50,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
     public DbSet<Wallet> Wallets { get; set; }
     public DbSet<TimePeriod> TimePeriods { get; set; }
     public DbSet<RefreshToken> RefreshToken { get; set; }
-    public DbSet<DeviceToken> DeviceTokens { get ; set; }
+    public DbSet<DeviceToken> DeviceTokens { get; set; }
     public DbSet<TimeChecking> TimeChecking { get; set; }
     public DbSet<RoomRequest> RoomRequests { get; set; }
 
@@ -442,134 +442,102 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         var courtSubdivisionId6 = Guid.NewGuid();
         var courtSubdivisionId7 = Guid.NewGuid();
         #region CourtSubdivisionSetting
-        builder.Entity<CourtSubdivisionSetting>()
-            .HasData(new CourtSubdivisionSetting
-            {
-                Id = sanbongdanhantao7,
-                SportCategoryId = soccerId,
-                CourtType = "San bong da nhan tao 7 nguoi"
-            },
-            new CourtSubdivisionSetting
-            {
-                Id = sanbongchuyencat,
-                SportCategoryId = volleyballId,
-                CourtType = "San bong chuyen mat cat"
-            },
-            new CourtSubdivisionSetting
-            {
-                Id = sancaulongtrongnha,
-                SportCategoryId = badmintionId,
-                CourtType = "San cau long trong nha"
-            },
-            new CourtSubdivisionSetting
-            {
-                Id = sancaulongngoaitroi,
-                SportCategoryId = badmintionId,
-                CourtType = "San cau long ngoai troi"
-            });
+        builder.Entity<CourtSubdivisionSetting>().HasData(
+    new CourtSubdivisionSetting
+    {
+        Id = Guid.Parse("a93c57bd-f6d5-414e-a4b2-5aa269729a43"),
+        SportCategoryId = soccerId,
+        CourtType = "Sân bóng đá nhân tạo 7"
+    },
+    new CourtSubdivisionSetting
+    {
+        Id = Guid.Parse("457c955b-857d-483d-8e54-02c87dbcffa9"),
+        SportCategoryId = soccerId,
+        CourtType = "Sân bóng đá nhân tạo 5"
+    },
+    new CourtSubdivisionSetting
+    {
+        Id = Guid.Parse("3593decc-3ace-451c-842d-3369cfe571c2"),
+        SportCategoryId = soccerId,
+        CourtType = "Sân bóng đá nhân tạo 11"
+    },
+    new CourtSubdivisionSetting
+    {
+        Id = Guid.Parse("31689b32-b8d8-4993-98f5-33b436b4f293"),
+        SportCategoryId = soccerId,
+        CourtType = "Sân bóng đá cỏ tự nhiên 7"
+    },
+    // Đảm bảo chỉ rõ ràng các mô tả để đồng bộ với thực tế mô tả của sân
+    new CourtSubdivisionSetting
+    {
+        Id = Guid.Parse("41ae23f7-42fe-4a40-8c36-021dc7c1dd06"),
+        SportCategoryId = volleyballId,
+        CourtType = "Sân bóng chuyền mặt cát"
+    },
+    new CourtSubdivisionSetting
+    {
+        Id = Guid.Parse("effd5616-ad35-4204-8c5e-01ad289855e8"),
+        SportCategoryId = volleyballId,
+        CourtType = "Sân bóng chuyền trong nhà"
+    },
+    new CourtSubdivisionSetting
+    {
+        Id = Guid.Parse("63998125-8cbd-41b7-9123-a6c7ca3ad63e"),
+        SportCategoryId = badmintionId,
+        CourtType = "Sân cầu lông trong nhà"
+    },
+    new CourtSubdivisionSetting
+    {
+        Id = Guid.Parse("9ce93f4d-b691-4622-95a5-3825916409f6"),
+        SportCategoryId = badmintionId,
+        CourtType = "Sân cầu lông ngoài trời"
+    }
+);
         #endregion
         #region CourtSubdivision
-        builder.Entity<CourtSubdivision>()
-            .HasData(new CourtSubdivision
-            {
-                Id = courtSubdivisionId1,
-                CourtId = court1Id,
-                CourtSubdivisionSettingId = sancaulongtrongnha,
-                CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 1",
-                CourtSubdivisionDescription = "Sân đa dụng cho chơi cầu lông",
-                //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fsieuthicaulong.vn%2Fsan-cau-long%2Fho-chi-minh%2Fclb-san-cau-long-b-zone-11-thu-duc-hcm&psig=AOvVaw0HN4hzDZNEFb3Qak2ZKR0A&ust=1718126663044000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOib5tzG0YYDFQAAAAAdAAAAABAE",
-                IsActive = true,
-                BasePrice = 60000,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            },
-            new CourtSubdivision
-            {
-                Id = courtSubdivisionId2,
-                CourtId = court1Id,
-                CourtSubdivisionSettingId = sancaulongtrongnha,
-                CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 2",
-                CourtSubdivisionDescription = "Sân có sẵn vợt carbon cho thuê để chơi cầu lông",
-                //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fsieuthicaulong.vn%2Fsan-cau-long%2Fho-chi-minh%2Fclb-san-cau-long-b-zone-11-thu-duc-hcm&psig=AOvVaw0HN4hzDZNEFb3Qak2ZKR0A&ust=1718126663044000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOib5tzG0YYDFQAAAAAdAAAAABAQ",
-                IsActive = true,
-                BasePrice = 110000,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            },
-            new CourtSubdivision
-            {
-                Id = courtSubdivisionId3,
-                CourtId = court1Id,
-                CourtSubdivisionSettingId = sancaulongngoaitroi,
-                CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 3",
-                CourtSubdivisionDescription = "Sân có sẵn vợt carbon cho thuê để chơi cầu lông",
-                //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fsieuthicaulong.vn%2Fsan-cau-long%2Fho-chi-minh%2Fclb-san-cau-long-b-zone-11-thu-duc-hcm&psig=AOvVaw0HN4hzDZNEFb3Qak2ZKR0A&ust=1718126663044000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOib5tzG0YYDFQAAAAAdAAAAABB4",
-                IsActive = true,
-                BasePrice = 110000,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            },
-            new CourtSubdivision
-            {
-                Id = courtSubdivisionId4,
-                CourtId = court5Id,
-                CourtSubdivisionSettingId = sanbongdanhantao7,
-                CourtSubdivisionName = "Sân bóng đá Phú Thọ, phân cấp 1",
-                CourtSubdivisionDescription = "Sân cỏ nhân tạo",
-                //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2F797348309003119598%2F&psig=AOvVaw3O8jui3j21qnIivkSvD8yP&ust=1718127217945000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCIDC_eXI0YYDFQAAAAAdAAAAABAJ",
-                IsActive = true,
-                BasePrice = 110000,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            },
-            new CourtSubdivision
-            {
-                Id = courtSubdivisionId5,
-                CourtId = court5Id,
-                CourtSubdivisionSettingId = sanbongdanhantao7,
-                CourtSubdivisionName = "Sân bóng đá Phú Thọ, phân cấp 2",
-                CourtSubdivisionDescription = "Sân cỏ tự nhiên",
-                //ImageURL = "https://duongminhfc.com/images/banners/san-bong-da-phu-tho-quan-11.jpg",
-                IsActive = true,
-                BasePrice = 120000,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            },
-            new CourtSubdivision
-            {
-                Id = courtSubdivisionId6,
-                CourtId = court4Id,
-                CourtSubdivisionSettingId = sanbongchuyencat,
-                CourtSubdivisionName = "Sân bóng chuyền Tân Bình, phân cấp 1",
-                CourtSubdivisionDescription = "Sân lưới nhân tạo",
-                //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.myuc.vn%2Fson-san-bong-chuyen-tren-be-tong-xi-mang-voi-6-lop-son-co-hat-cao-su-nhu-san-us-open-chong-nut-polyurethane-va-decoturf-usa-84p.html&psig=AOvVaw0Tdhs_letBnUYzuVpHLEY2&ust=1718127751147000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCMDc_ePK0YYDFQAAAAAdAAAAABAJ",
-                IsActive = true,
-                BasePrice = 120000,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            },
-            new CourtSubdivision
-            {
-                Id = courtSubdivisionId7,
-                CourtId = court4Id,
-                CourtSubdivisionSettingId = sanbongchuyencat,
-                CourtSubdivisionName = "Sân bóng chuyền Tân Bình, phân cấp 2",
-                CourtSubdivisionDescription = "Sân lưới nhân tạo",
-                //ImageURL = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.myuc.vn%2Fson-san-bong-chuyen-tren-be-tong-xi-mang-voi-6-lop-son-co-hat-cao-su-nhu-san-us-open-chong-nut-polyurethane-va-decoturf-usa-84p.html&psig=AOvVaw0Tdhs_letBnUYzuVpHLEY2&ust=1718127751147000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCMDc_ePK0YYDFQAAAAAdAAAAABAJ",
-                IsActive = true,
-                BasePrice = 120000,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            });
+        builder.Entity<CourtSubdivision>().HasData(
+    new CourtSubdivision
+    {
+        Id = courtSubdivisionId1,
+        CourtId = court1Id,
+        CourtSubdivisionSettingId = Guid.Parse("63998125-8cbd-41b7-9123-a6c7ca3ad63e"),
+        CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 1",
+        CourtSubdivisionDescription = "Sân đa dụng cho chơi cầu lông, nằm trong nhà",
+        IsActive = true,
+        BasePrice = 60000,
+        Created = DateTime.UtcNow,
+        LastModified = DateTime.UtcNow,
+        IsDelete = false
+    },
+    new CourtSubdivision
+    {
+        Id = courtSubdivisionId2,
+        CourtId = court1Id,
+        CourtSubdivisionSettingId = Guid.Parse("63998125-8cbd-41b7-9123-a6c7ca3ad63e"),
+        CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 2",
+        CourtSubdivisionDescription = "Sân có sẵn vợt carbon cho thuê để chơi cầu lông, nằm trong nhà",
+        IsActive = true,
+        BasePrice = 110000,
+        Created = DateTime.UtcNow,
+        LastModified = DateTime.UtcNow,
+        IsDelete = false
+    },
+    new CourtSubdivision
+    {
+        Id = courtSubdivisionId3,
+        CourtId = court1Id,
+        CourtSubdivisionSettingId = Guid.Parse("9ce93f4d-b691-4622-95a5-3825916409f6"),
+        CourtSubdivisionName = "Sân cầu lông B-ZONE 11, phân cấp 3",
+        CourtSubdivisionDescription = "Sân có sẵn vợt carbon cho thuê để chơi cầu lông, ngoài trời",
+        IsActive = true,
+        BasePrice = 110000,
+        Created = DateTime.UtcNow,
+        LastModified = DateTime.UtcNow,
+        IsDelete = false
+    }
+);
         #endregion
-               
+
         #region SportCategories
         builder.Entity<SportCategory>()
             .HasData(new SportCategory
@@ -786,21 +754,6 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 BookingStatus = "Approved",
                 IsRoomBooking = false,
                 IsDeposit = true
-            },
-            new Booking
-            {
-                Id = bookingId4,
-                CustomerId = customer1Id,
-                CampaignId = lunarnewyear,
-                CourtSubdivisionId = courtSubdivisionId7,
-                PlayingDate = DateTime.Today.AddDays(1),
-                StartTimePlaying = new TimeSpan(18, 0, 0), // 6 PM
-                EndTimePlaying = new TimeSpan(20, 0, 0), // 8 PM
-                BookingDate = DateTime.Today,
-                TotalAmount = 1000,
-                BookingStatus = "Approved",
-                IsRoomBooking = false,
-                IsDeposit = true
             });
         #endregion
         var timePeriodId1 = Guid.NewGuid();
@@ -848,20 +801,6 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 LevelId = expert,
                 StartTimeRoom = new TimeSpan(15, 30, 00),
                 EndTimeRoom = new TimeSpan(16, 30, 00),
-                MaximumMember = 20,
-                RuleRoom = "Rule Room Sample",
-                Note = "Note Sample",
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            },
-            new RoomMatch
-            {
-                Id = roomMatch4,
-                BookingId = bookingId4,
-                LevelId = expert,
-                StartTimeRoom = new TimeSpan(09, 30, 00),
-                EndTimeRoom = new TimeSpan(10, 30, 00),
                 MaximumMember = 20,
                 RuleRoom = "Rule Room Sample",
                 Note = "Note Sample",

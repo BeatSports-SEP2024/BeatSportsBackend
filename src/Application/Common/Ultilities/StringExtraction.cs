@@ -20,7 +20,7 @@ public static class StringExtraction
         }
         else
         {
-            throw new InvalidOperationException("No match found for text part.");
+            return input;
         }
     }
 
