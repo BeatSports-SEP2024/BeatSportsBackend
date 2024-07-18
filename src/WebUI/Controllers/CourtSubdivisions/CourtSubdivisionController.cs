@@ -8,6 +8,7 @@ using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Commands.LockC
 using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Commands.UpdateCourtSubdivision;
 using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetAllCourtSubdivisionOfCourt;
 using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetAllCourtSubdivisionPending;
+using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetCourtSubdivisionAndTimeByCourtIdAndDate;
 using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetCourtSubdivisionById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -58,6 +59,12 @@ public class CourtSubdivisionController : ApiControllerBase
     [Route("pending-subcourt")]
     public async Task<PaginatedList<CourtSubdivisionResponseV3>> GetAllCourtSubPending([FromQuery] GetAllCourtSubdivisionPendingCommand request)
     {
+        return await _mediator.Send(request);
+    }
+    [HttpGet]
+    [Route("court-and-court-sub-and-time-checking")]
+    public async Task<CourtSubdivisionAndTime> GetCourtAndCourtSubdivisionAndTimeChecking([FromQuery] GetCourtSubdivisionAndTimeByCourtIdAndDateQuery request)
+        {
         return await _mediator.Send(request);
     }
     [HttpPut]
