@@ -51,6 +51,7 @@ public class CourtSubdivisionV5
 {
     public Guid CourtSubId { get; set; }
     public string? CourtSubName { get; set; }
+    public string? CourtName { get; set; }
     public string? CourtDescription { get; set; }
     public string? CourtSubDescription { get; set; }
     public decimal? BasePrice { get; set; }
