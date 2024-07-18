@@ -13,7 +13,7 @@ public class CourtSubdivision : BaseAuditableEntity
     public string? CourtSubdivisionName { get; set; }
     public string? CourtSubdivisionDescription { get; set; }
     public string? CreatedStatus { get; set; }
-
+    public string? ReasonOfRejected { get; set; }
     public virtual Court Court { get; set; }
     public virtual CourtSubdivisionSetting CourtSubdivisionSettings { get; set; }
     public virtual IList<TimeChecking> TimeCheckings { get; set; }
