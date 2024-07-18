@@ -60,7 +60,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
 
                 CourtSubSettingResponses = c.CourtSubdivision.Select(cs => new CourtSubSettingV2
                 {
-                    CourtSubSettingId = cs.Id,
+                    CourtSubSettingId = cs.CourtSubdivisionSettingId,
                     TypeSize = cs.CourtSubdivisionSettings.CourtType,
                     SportCategoryId = cs.CourtSubdivisionSettings.SportCategories.Id,
                     SportCategoryName = cs.CourtSubdivisionSettings.SportCategories.Name,
