@@ -48,7 +48,7 @@ public class CourtSubdivisionController : ApiControllerBase
     }
     [HttpGet]
     [Route("get-by-id")]
-    public async Task<CourtSubdivisionResponse?> GetById([FromQuery] GetCourtSubdivisionByIdQuery request)
+    public async Task<CourtSubdivisionV5?> GetById([FromQuery] GetCourtSubdivisionByIdQuery request)
     {
         return await _mediator.Send(request);
     }

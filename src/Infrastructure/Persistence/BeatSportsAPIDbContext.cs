@@ -518,7 +518,8 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 BasePrice = 60000,
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
-                IsDelete = false
+                IsDelete = false,
+                CreatedStatus = "Accepted"
             },
             new CourtSubdivision
             {
@@ -531,7 +532,8 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 BasePrice = 60000,
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
-                IsDelete = false
+                IsDelete = false,
+                CreatedStatus = "Pending"
             },
             new CourtSubdivision
             {
@@ -544,7 +546,8 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 BasePrice = 60000,
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
-                IsDelete = false
+                IsDelete = false,
+                CreatedStatus = "Pending"
             },
             new CourtSubdivision
             {
@@ -557,7 +560,8 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 BasePrice = 110000,
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
-                IsDelete = false
+                IsDelete = false,
+                CreatedStatus = "Rejected"
             },
             new CourtSubdivision
             {
@@ -570,7 +574,8 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 BasePrice = 110000,
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
-                IsDelete = false
+                IsDelete = false,
+                CreatedStatus = "Pending"
             }
         );
         #endregion
@@ -580,7 +585,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             .HasData(new SportCategory
             {
                 Id = soccerId,
-                Name = "Soccer",
+                Name = "Bóng đá",
                 Description = "Sample Description",
                 ImageURL = "Sample Image",
                 IsActive = true,
@@ -591,7 +596,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             new SportCategory
             {
                 Id = volleyballId,
-                Name = "Volleyball",
+                Name = "Bóng chuyền",
                 Description = "Sample Description",
                 ImageURL = "Sample Image",
                 IsActive = true,
@@ -602,7 +607,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             new SportCategory
             {
                 Id = badmintionId,
-                Name = "Badminton",
+                Name = "Cầu lông",
                 Description = "Sample Description",
                 ImageURL = "Sample Image",
                 IsActive = true,
