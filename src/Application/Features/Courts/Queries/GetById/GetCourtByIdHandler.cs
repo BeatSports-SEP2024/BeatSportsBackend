@@ -11,6 +11,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Services.MapBox;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using BeatSportsAPI.Domain.Enums;
 
 namespace BeatSportsAPI.Application.Features.Courts.Queries.GetById;
 public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtResponseV5>
@@ -57,8 +58,13 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                 FeedbackStarAvg = c.Feedback.Any() ? c.Feedback.Average(x => x.FeedbackStar) : (decimal?)null,
                 Price = c.CourtSubdivision.FirstOrDefault() != null ? c.CourtSubdivision.FirstOrDefault().BasePrice : (decimal?)null,
 
-                CourtSubdivision = c.CourtSubdivision
-                    .Select(subCourt => new CourtSubdivisionV4
+                CourtSubSettingResponses = c.CourtSubdivision.Select(cs => new CourtSubSettingV2
+                {
+                    CourtSubSettingId = cs.Id,
+                    TypeSize = cs.CourtSubdivisionSettings.CourtType,
+                    SportCategoryId = cs.CourtSubdivisionSettings.SportCategories.Id,
+                    SportCategoryName = cs.CourtSubdivisionSettings.SportCategories.Name,
+                    CourtSubdivision = cs.CourtSubdivisionSettings.CourtSubdivisions.Select(subCourt => new CourtSubdivisionV4
                     {
                         CourtSubdivisionId = subCourt.Id,
                         CourtSubdivisionName = subCourt.CourtSubdivisionName,
@@ -66,14 +72,8 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                         BasePrice = subCourt.BasePrice,
                         StartTime = c.TimeStart,
                         EndTime = c.TimeEnd,
-                        CourtSubSettingResponses = new CourtSubSettingResponse 
-                        {
-                            CourtSubSettingId = subCourt.CourtSubdivisionSettings.Id,
-                            TypeSize = subCourt.CourtSubdivisionSettings.CourtType,
-                            SportCategoryId = subCourt.CourtSubdivisionSettings.SportCategories.Id,
-                            SportCategoryName = subCourt.CourtSubdivisionSettings.SportCategories.Name
-                        }
-                    }).ToList(),
+                    }).ToList()
+                }).ToList(),
 
                 Feedbacks = c.Feedback
                     .Where(c => !c.IsDelete)
