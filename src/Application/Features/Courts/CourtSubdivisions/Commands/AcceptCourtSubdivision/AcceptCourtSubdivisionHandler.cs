@@ -27,8 +27,16 @@ public class AcceptCourtSubdivisionHandler : IRequestHandler<AcceptCourtSubdivis
 
         foreach (var courtSub in courtSubs)
         {
-            courtSub.CreatedStatus = request.Status.ToString();
-            courtSub.ReasonOfRejected = request.ReasonOfReject;
+            if (request.Status == StatusEnums.Accepted)
+            {
+                courtSub.CreatedStatus = StatusEnums.Accepted.ToString();
+                courtSub.ReasonOfRejected = "";
+            }
+            if (request.Status == StatusEnums.Rejected)
+            {
+                courtSub.CreatedStatus = StatusEnums.Rejected.ToString();
+                courtSub.ReasonOfRejected = request.ReasonOfReject;
+            }
         }
 
         _beatSportsDbContext.CourtSubdivisions.UpdateRange(courtSubs);
