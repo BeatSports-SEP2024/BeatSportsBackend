@@ -20,4 +20,6 @@ public class AccountResponseForLogin
     public Guid? Id { get; set; } = null;
     public string FullName { get; set; }
     public string Email { get; set; }
+    public Guid WalletId { get; set; }
+    public decimal Balance { get; set; }
 }

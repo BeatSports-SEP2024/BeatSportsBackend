@@ -14,7 +14,8 @@ public class FeedbackResponse
     public decimal FeedbackStar { get; set; }
     public bool FeedbackAvailable { get; set; }
     public string? FeedbackStatus { get; set; }
-    public string FeedbackContent { get; set; } 
+    public string FeedbackContent { get; set; }
+    public string? FeedbackSentTime { get; set; }
 }
 
 //For Detail Court screen

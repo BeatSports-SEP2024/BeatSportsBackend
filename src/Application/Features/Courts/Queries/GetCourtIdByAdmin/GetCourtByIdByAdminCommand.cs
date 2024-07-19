@@ -70,6 +70,8 @@ public class GetCourtByIdByAdminCommandHandler : IRequestHandler<GetCourtByIdByA
                         BasePrice = subCourt.BasePrice,
                         StartTime = c.TimeStart,
                         EndTime = c.TimeEnd,
+                        StatusCourtSubdivisor = subCourt.CreatedStatus,
+                        ReasonOfRejected = subCourt.ReasonOfRejected,
                         CourtSubSettingResponses = new CourtSubSettingResponse
                         {
                             CourtSubSettingId = subCourt.CourtSubdivisionSettings.Id,
