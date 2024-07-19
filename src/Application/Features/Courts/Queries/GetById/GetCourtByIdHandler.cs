@@ -48,7 +48,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                 GoogleMapURLs = c.GoogleMapURLs,
                 TimeStart = c.TimeStart,
                 TimeEnd = c.TimeEnd,
-                CourtSubCount = c.CourtSubdivision.Count(),
+                CourtSubCount = c.CourtSubdivision.Where(css => css.CreatedStatus.Equals(CourtSubdivisionCreatedStatus.Pending.ToString())).Count(),
                 CoverImgUrls = c.CourtAvatarImgUrls, // Chuỗi gốc cho ảnh bìa
                 CourtImgsList = ImageUrlSplitter.SplitImageUrls(c.ImageUrls),
                 RentingCount = c.Feedback.Select(f => f.Booking).Distinct().Count(),
@@ -65,7 +65,8 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                         TypeSize = g.First().CourtSubdivisionSettings.CourtType,
                         SportCategoryId = g.First().CourtSubdivisionSettings.SportCategories.Id,
                         SportCategoryName = g.First().CourtSubdivisionSettings.SportCategories.Name,
-                        CourtSubdivision = g.Select(subCourt => new CourtSubdivisionV4
+                        CourtSubdivision = g.Where(css => css.CreatedStatus.Equals(CourtSubdivisionCreatedStatus.Pending.ToString()))
+                        .Select(subCourt => new CourtSubdivisionV4
                         {
                             CourtSubdivisionId = subCourt.Id,
                             CourtSubdivisionName = subCourt.CourtSubdivisionName,
@@ -73,6 +74,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                             BasePrice = subCourt.BasePrice,
                             StartTime = c.TimeStart,
                             EndTime = c.TimeEnd,
+                            CreatedStatus = subCourt.CreatedStatus.ToString()
                         }).ToList()
                     }).ToList(),
 
