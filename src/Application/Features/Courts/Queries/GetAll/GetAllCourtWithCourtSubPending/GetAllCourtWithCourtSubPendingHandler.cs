@@ -40,6 +40,8 @@ public class GetAllCourtWithCourtSubPendingHandler : IRequestHandler<GetAllCourt
                 OwnerBio = c.Owner.Account.Bio,
                 OwnerEmail = c.Owner.Account.Email,
                 OwnerPhone = c.Owner.Account.PhoneNumber,
+                OwnerGender = c.Owner.Account.Gender,
+                OwnerDateOfBirth = c.Owner.Account.DateOfBirth,
                 Address = c.Address,
                 PlaceId = c.PlaceId,
                 WallpaperUrls = c.WallpaperUrls,
@@ -53,6 +55,7 @@ public class GetAllCourtWithCourtSubPendingHandler : IRequestHandler<GetAllCourt
                 FeedbackCount = c.Feedback.Count(),
                 FeedbackStarAvg = c.Feedback.Any() ? c.Feedback.Average(x => x.FeedbackStar) : (decimal?)null,
                 Price = c.CourtSubdivision.FirstOrDefault() != null ? c.CourtSubdivision.FirstOrDefault().BasePrice : (decimal?)null,
+                Created = c.Created,
 
                 CourtSubdivision = c.CourtSubdivision.Where(css => css.CreatedStatus.Equals(pendingStatus))
                     .Select(subCourt => new CourtSubdivisionV6

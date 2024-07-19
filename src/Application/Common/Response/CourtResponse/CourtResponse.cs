@@ -159,6 +159,8 @@ public class CourtResponseV8
     public string? OwnerAddress { get; set; }
     public string? OwnerBio { get; set; }
     public string? OwnerEmail { get; set; }
+    public string? OwnerGender { get; set; }
+    public DateTime? OwnerDateOfBirth { get; set; }
     public string? PlaceId { get; set; }
     public decimal? Price { get; set; }
     public decimal? FeedbackStarAvg { get; set; }
@@ -171,6 +173,8 @@ public class CourtResponseV8
     public List<string>? CourtImgsList { get; set; }
     public int? FeedbackCount { get; set; }
     public int? RentingCount { get; set; }
+    public DateTime? Created { get; set; }
+
     public List<CourtSubdivisionV6>? CourtSubdivision { get; set; }
     //public string? ImagesList { get; set; }
     //public List<CourtSubSettingV2>? CourtSubSettingResponses { get; set; }
