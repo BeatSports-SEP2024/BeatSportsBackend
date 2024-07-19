@@ -179,7 +179,7 @@ public class IdentityService : IIdentityService
             claims.Add(new Claim("CustomerId", user.Customer.Id.ToString()));
         }
 
-        var expiry = DateTime.UtcNow.AddMinutes(5);
+        var expiry = DateTime.UtcNow.AddHours(7);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Issuer = issuer,

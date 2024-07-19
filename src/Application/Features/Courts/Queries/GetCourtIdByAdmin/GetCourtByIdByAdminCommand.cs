@@ -1,32 +1,37 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using BeatSportsAPI.Application.Common.Exceptions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using AutoMapper;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Response.CourtResponse;
 using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using Services.MapBox;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using BeatSportsAPI.Domain.Enums;
 
-namespace BeatSportsAPI.Application.Features.Courts.Queries.GetById;
-public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtResponseV5>
+namespace BeatSportsAPI.Application.Features.Courts.Queries.GetCourtIdByAdmin;
+public class GetCourtByIdByAdminCommand : IRequest<CourtResponseV7>
+{
+    public Guid CourtId { get; set; }
+}
+
+public class GetCourtByIdByAdminCommandHandler : IRequestHandler<GetCourtByIdByAdminCommand, CourtResponseV7>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
     private readonly IMapper _mapper;
 
-    public GetCourtByIdHandler(IBeatSportsDbContext beatSportsDbContext, IMapper mapper)
+    public GetCourtByIdByAdminCommandHandler(IBeatSportsDbContext beatSportsDbContext, IMapper mapper)
     {
         _beatSportsDbContext = beatSportsDbContext;
         _mapper = mapper;
     }
-
-    public Task<CourtResponseV5> Handle(GetCourtByIdCommand request, CancellationToken cancellationToken)
+    public Task<CourtResponseV7> Handle(GetCourtByIdByAdminCommand request, CancellationToken cancellationToken)
     {
+        var query = new List<Court>();
+
         var courtDetails = _beatSportsDbContext.Courts
             .Where(c => c.Id == request.CourtId)
             .Include(cs => cs.CourtSubdivision)
@@ -36,7 +41,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                 .ThenInclude(b => b.Customer)
                     .Include(c => c.Owner)
                         .ThenInclude(c => c.Account)
-            .Select(c => new CourtResponseV5
+            .Select(c => new CourtResponseV7
             {
                 Id = c.Id,
                 CourtName = c.CourtName,
@@ -56,26 +61,22 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                 FeedbackStarAvg = c.Feedback.Any() ? c.Feedback.Average(x => x.FeedbackStar) : (decimal?)null,
                 Price = c.CourtSubdivision.FirstOrDefault() != null ? c.CourtSubdivision.FirstOrDefault().BasePrice : (decimal?)null,
 
-                CourtSubSettingResponses = c.CourtSubdivision
-                    .GroupBy(cs => cs.CourtSubdivisionSettings.Id)
-                    .Select(g => new CourtSubSettingV2
+                CourtSubdivision = c.CourtSubdivision
+                    .Select(subCourt => new CourtSubdivisionV7
                     {
-                        CourtSubType = g.First().CourtSubdivisionDescription,
-                        CourtSubSettingId = g.First().CourtSubdivisionSettings.Id,
-                        TypeSize = g.First().CourtSubdivisionSettings.CourtType,
-                        SportCategoryId = g.First().CourtSubdivisionSettings.SportCategories.Id,
-                        SportCategoryName = g.First().CourtSubdivisionSettings.SportCategories.Name,
-                        CourtSubdivision = g
-                        .Select(subCourt => new CourtSubdivisionV4
+                        CourtSubdivisionId = subCourt.Id,
+                        CourtSubdivisionName = subCourt.CourtSubdivisionName,
+                        CourtSubType = subCourt.CourtSubdivisionDescription,
+                        BasePrice = subCourt.BasePrice,
+                        StartTime = c.TimeStart,
+                        EndTime = c.TimeEnd,
+                        CourtSubSettingResponses = new CourtSubSettingResponse
                         {
-                            CourtSubdivisionId = subCourt.Id,
-                            CourtSubdivisionName = subCourt.CourtSubdivisionName,
-                            //CourtSubType = subCourt.CourtSubdivisionDescription,
-                            BasePrice = subCourt.BasePrice,
-                            StartTime = c.TimeStart,
-                            EndTime = c.TimeEnd,
-                            CreatedStatus = subCourt.CreatedStatus.ToString()
-                        }).ToList()
+                            CourtSubSettingId = subCourt.CourtSubdivisionSettings.Id,
+                            TypeSize = subCourt.CourtSubdivisionSettings.CourtType,
+                            SportCategoryId = subCourt.CourtSubdivisionSettings.SportCategories.Id,
+                            SportCategoryName = subCourt.CourtSubdivisionSettings.SportCategories.Name
+                        }
                     }).ToList(),
 
                 Feedbacks = c.Feedback
@@ -91,11 +92,6 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                     }).ToList(),
             })
             .FirstOrDefault();
-
-        if (courtDetails == null)
-        {
-            throw new BadRequestException($"Court with ID {request.CourtId} not found.");
-        }
         return Task.FromResult(courtDetails);
     }
 }

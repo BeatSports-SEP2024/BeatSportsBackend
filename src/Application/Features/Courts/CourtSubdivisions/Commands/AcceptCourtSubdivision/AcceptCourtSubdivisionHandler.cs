@@ -1,6 +1,7 @@
 ﻿using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Commands.AcceptCourtSubdivision;
@@ -15,19 +16,30 @@ public class AcceptCourtSubdivisionHandler : IRequestHandler<AcceptCourtSubdivis
 
     public Task<BeatSportsResponse> Handle(AcceptCourtSubdivisionCommand request, CancellationToken cancellationToken)
     {
-        var courtSub = _beatSportsDbContext.CourtSubdivisions
-            .Where(cs => !cs.IsDelete && cs.Id == request.CourtSubdivisionId)
-            .FirstOrDefault();
+        var courtSubs = _beatSportsDbContext.CourtSubdivisions
+            .Where(cs => !cs.IsDelete && cs.CourtId == request.CourtId)
+            .ToList();
 
-        if(courtSub == null) 
+        if (!courtSubs.Any())
         {
             throw new BadRequestException("Court Sub is not existed");
         }
 
-        courtSub.CreatedStatus = request.Status.ToString();
-        courtSub.ReasonOfRejected = request.ReasonOfReject;
+        foreach (var courtSub in courtSubs)
+        {
+            if (request.Status == StatusEnums.Accepted)
+            {
+                courtSub.CreatedStatus = StatusEnums.Accepted.ToString();
+                courtSub.ReasonOfRejected = "";
+            }
+            if (request.Status == StatusEnums.Rejected)
+            {
+                courtSub.CreatedStatus = StatusEnums.Rejected.ToString();
+                courtSub.ReasonOfRejected = request.ReasonOfReject;
+            }
+        }
 
-        _beatSportsDbContext.CourtSubdivisions.Update(courtSub);
+        _beatSportsDbContext.CourtSubdivisions.UpdateRange(courtSubs);
         _beatSportsDbContext.SaveChanges();
 
         return Task.FromResult(new BeatSportsResponse

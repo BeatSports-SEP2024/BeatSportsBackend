@@ -12,7 +12,7 @@ namespace BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Commands.A
 public class AcceptCourtSubdivisionCommand : IRequest<BeatSportsResponse>
 {
     [Required]
-    public Guid CourtSubdivisionId { get; set; }
+    public Guid CourtId { get; set; }
     [EnumDataType(typeof(StatusEnums))]
     public StatusEnums Status { get; set; }
     public string? ReasonOfReject { get; set; }
