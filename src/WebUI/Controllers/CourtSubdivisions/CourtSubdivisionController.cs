@@ -6,6 +6,8 @@ using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Commands.Creat
 using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Commands.DeleteCourtSubdivision;
 using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Commands.LockCourtSubdivision;
 using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Commands.UpdateCourtSubdivision;
+using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetAllCourtSubAvailableByTime_V1;
+using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetAllCourtSubAvailableByTime_V2;
 using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetAllCourtSubdivisionOfCourt;
 using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetAllCourtSubdivisionPending;
 using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetCourtSubdivisionAndTimeByCourtIdAndDate;
@@ -70,6 +72,19 @@ public class CourtSubdivisionController : ApiControllerBase
     [HttpPut]
     [Route("accept-courtsub")]
     public async Task<BeatSportsResponse> UpdateStatus(AcceptCourtSubdivisionCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+    [HttpGet]
+    [Route("court-sub-checking-v1")]
+    public async Task<CourtSubCheckedResponse> GetCourtSubAvailableV1([FromQuery] GetAllCourtSubAvailableByTimeV1Command request)
+    {
+        return await _mediator.Send(request);
+    }
+
+    [HttpGet]
+    [Route("court-sub-checking-v2")]
+    public async Task<CourtSubCheckedResponseV2> GetCourtSubAvailableV2([FromQuery] GetAllCourtSubAvailableByTimeV2Command request)
     {
         return await _mediator.Send(request);
     }
