@@ -300,6 +300,10 @@ public class IdentityService : IIdentityService
             .Include(x => x.Customer)
             .Include(x => x.Owner)
             .FirstOrDefault();
+        if (user == null) {
+            throw new BadRequestException("Người dùng không tồn tại");
+        }
+        var walletExist = await _beatSportsDbContext.Wallets.Where(w => w.AccountId == user.Id).SingleOrDefaultAsync();
 
 
         var id = Guid.NewGuid();
@@ -338,7 +342,9 @@ public class IdentityService : IIdentityService
             {
                 Id = id,
                 FullName = user.FirstName +" "+ user.LastName,
-                Email = user.Email
+                Email = user.Email,
+                WalletId = walletExist.Id,
+                Balance = walletExist.Balance,
             }
         };
         return loginResponse;

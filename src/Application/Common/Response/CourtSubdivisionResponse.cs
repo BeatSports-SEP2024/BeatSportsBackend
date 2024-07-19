@@ -84,5 +84,7 @@ public class CourtSubdivisionV7 : IMapFrom<CourtSubdivision>
     public decimal BasePrice { get; set; }
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
+    public string? StatusCourtSubdivisor { get; set; }
+    public string? ReasonOfRejected { get; set; }
     public CourtSubSettingResponse? CourtSubSettingResponses { get; set; }
 }

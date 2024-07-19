@@ -8,6 +8,7 @@ using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Models.Authentication;
+using BeatSportsAPI.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,7 +41,12 @@ public class LoginCommandHandler : IRequestHandler<LoginModelRequest, LoginRespo
                         .Include(x => x.Customer)
                         .Include(x => x.Owner)
                         .FirstOrDefault();
-        
+        if (user == null)
+        {
+            throw new BadRequestException("Người dùng không tồn tại");
+        }
+        var walletExist = await _beatSportsDbContext.Wallets.Where(w => w.AccountId == user.Id).SingleOrDefaultAsync();
+
         var id = Guid.NewGuid();
         
         if(user.Customer == null)
@@ -60,7 +66,9 @@ public class LoginCommandHandler : IRequestHandler<LoginModelRequest, LoginRespo
             {
                 Id = id,
                 FullName = user.FirstName +" "+ user.LastName,
-                Email = user.Email
+                Email = user.Email,
+                WalletId = walletExist.Id,
+                Balance = walletExist.Balance,
             }
         };
     }
