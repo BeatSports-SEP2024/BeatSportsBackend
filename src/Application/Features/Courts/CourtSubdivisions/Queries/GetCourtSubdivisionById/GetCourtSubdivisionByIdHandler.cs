@@ -31,6 +31,9 @@ public class GetCourtSubdivisionByIdHandler : IRequestHandler<GetCourtSubdivisio
         {
             CourtSubId = c.Id,
             BasePrice = c.BasePrice,
+            Address = c.Court.Address,
+            CourtName = c.Court.CourtName,
+            OwnerFullName = c.Court.Owner.Account.FirstName + " " + c.Court.Owner.Account.LastName,
             CourtSubName = c.CourtSubdivisionName,
             CourtType = c.CourtSubdivisionSettings.CourtType,
             CourtDescription = c.Court.Description,

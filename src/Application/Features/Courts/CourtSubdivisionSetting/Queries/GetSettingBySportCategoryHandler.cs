@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Common.Ultilities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +28,7 @@ public class GetSettingBySportCategoryHandler : IRequestHandler<GetSettingBySpor
         if (request.SportCategoriesFilter != null)
         {
             query = query.Include(c => c.SportCategories)
-                         .Where(css => css.SportCategories.Name == request.SportCategoriesFilter.ToString());
+                         .Where(css => css.SportCategories.Name == request.SportCategoriesFilter.GetDescriptionFromEnum());
         }
 
         var list = await query.Select(c => new CourtSubSettingResponse

@@ -3,8 +3,8 @@
 namespace BeatSportsAPI.Domain.Entities.CourtEntity;
 public class TimePeriod : BaseAuditableEntity
 {
-    [ForeignKey("CourtSubdivision")]
-    public Guid CourtSubdivisionId { get; set; }
+    [ForeignKey("Court")]
+    public Guid CourtId { get; set; }
     public string? Description { get; set; }
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
@@ -12,5 +12,5 @@ public class TimePeriod : BaseAuditableEntity
     public bool IsRefundDeposit { get; set; }
     public decimal? PercentDeposit { get; set; }
 
-    public virtual CourtSubdivision CourtSubdivision { get; set; }
+    public virtual Court Courts { get; set; }
 }

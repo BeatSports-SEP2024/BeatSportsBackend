@@ -12,7 +12,7 @@ namespace BeatSportsAPI.Application.Features.Courts.TimePeriod.Command.CreateTim
 public class CreateTimePeriodCommand : IRequest<BeatSportsResponse>
 {
     [Required]
-    public Guid CourtSubdivisionId { get; set; }
+    public Guid CourtId { get; set; }
     //public string Description { get; set; }
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
