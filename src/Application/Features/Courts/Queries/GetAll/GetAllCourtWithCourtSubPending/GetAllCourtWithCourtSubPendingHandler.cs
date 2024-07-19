@@ -64,6 +64,7 @@ public class GetAllCourtWithCourtSubPendingHandler : IRequestHandler<GetAllCourt
                         CourtSubdivisionId = subCourt.Id,
                         CourtSubdivisionName = subCourt.CourtSubdivisionName,
                         CourtSubType = subCourt.CourtSubdivisionDescription,
+                        CreatedStatus = subCourt.CreatedStatus, 
                         BasePrice = subCourt.BasePrice,
                         StartTime = c.TimeStart,
                         EndTime = c.TimeEnd,

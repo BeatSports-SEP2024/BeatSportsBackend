@@ -69,6 +69,7 @@ public class CourtSubdivisionV6 : IMapFrom<CourtSubdivision>
     public Guid CourtSubdivisionId { get; set; }
     public string? CourtSubdivisionName { get; set; }
     public string? CourtSubType { get; set; }
+    public string? CreatedStatus { get; set; }
     public decimal BasePrice { get; set; }
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
