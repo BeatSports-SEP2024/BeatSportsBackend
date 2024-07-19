@@ -29,7 +29,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
         _dbContext = dbContext;
         _mapper = mapper;
     }
-    public Task<List<CourtResponseV3>> Handle(GetListCourtsNearByCommand request, CancellationToken cancellationToken)
+    public async Task<List<CourtResponseV3>> Handle(GetListCourtsNearByCommand request, CancellationToken cancellationToken)
     {
         var distanceCal = new DistanceCalculation();
 
@@ -65,7 +65,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
             .ThenInclude(x => x.Bookings)
             .ToList();
 
-            query = query.Where(x => RemoveDiacritics(x.CourtName).ToLower().Contains(RemoveDiacritics(request.KeyWords).ToLower()) || 
+            query = query.Where(x => RemoveDiacritics(x.CourtName).ToLower().Contains(RemoveDiacritics(request.KeyWords).ToLower()) ||
                                      RemoveDiacritics(x.Address).ToLower().Contains(RemoveDiacritics(request.KeyWords).ToLower()))
                          .ToList();
 
@@ -173,7 +173,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
                 TimeEnd = c.TimeEnd,
                 PlaceId = c.PlaceId,
                 Latitude = c.Latitude,
-                Longitude= c.Longitude,
+                Longitude = c.Longitude,
                 LatitudeDelta = c.LatitudeDelta,
                 LongitudeDelta = c.LongitudeDelta,
                 FbStar = starAvg,
@@ -187,10 +187,10 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
         if (request.Latitude != 0 && request.Longitude != 0 && list.Count > 0)
         {
             //Goi service tinh khoang cach
-            var result = distanceCal.GetDistancesAsync(request.Latitude, request.Longitude, query);
+            var result = await distanceCal.GetDistancesAsync(request.Latitude, request.Longitude, query);
 
             int index = 0;
-            result.Result.ForEach(c =>
+            result.ForEach(c =>
             {
                 list.ElementAt(index).DistanceInKm = c.DistanceInKm;
                 index++;
@@ -200,15 +200,16 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
 
         }
 
-        if(request.Criteria.Equals("Nổi bật"))
+        if (request.Criteria.Equals("Nổi bật"))
         {
             list = list.OrderByDescending(c => c.FbStar).ToList();
-        }else if(request.Criteria.Equals("Thuê nhiều"))
+        }
+        else if (request.Criteria.Equals("Thuê nhiều"))
         {
             list = list.OrderByDescending(c => c.RentalNumber).ToList();
         }
 
-        return Task.FromResult(list);
+        return list;
     }
 
     private static string RemoveDiacritics(string text)
