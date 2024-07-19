@@ -98,7 +98,7 @@ public class CourtController : ApiControllerBase
     [HttpGet]
     [Route("court-with-courtsub-pending")]
     //[CustomAuthorize(RoleEnums.Customer)]
-    public async Task<PaginatedList<CourtResponseV8>> GetAllCourtWithCourtSubPending([FromQuery] GetAllCourtWithCourtSubPendingCommand request)
+    public async Task<CourtResponseV8> GetAllCourtWithCourtSubPending([FromQuery] GetAllCourtWithCourtSubPendingCommand request)
     {
         return await _mediator.Send(request);
     }

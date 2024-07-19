@@ -1,22 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BeatSportsAPI.Application.Common.Interfaces;
-using BeatSportsAPI.Application.Common.Mappings;
-using BeatSportsAPI.Application.Common.Models;
+﻿using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Response.CourtResponse;
 using BeatSportsAPI.Application.Common.Ultilities;
-using BeatSportsAPI.Application.Features.Courts.Queries.GetCourtIdByAdmin;
-using BeatSportsAPI.Domain.Entities.CourtEntity;
+using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Courts.Queries.GetAll.GetAllCourtWithCourtSubPending;
-public class GetAllCourtWithCourtSubPendingHandler : IRequestHandler<GetAllCourtWithCourtSubPendingCommand, PaginatedList<CourtResponseV8>>
+public class GetAllCourtWithCourtSubPendingHandler : IRequestHandler<GetAllCourtWithCourtSubPendingCommand, CourtResponseV8>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
 
@@ -25,7 +17,7 @@ public class GetAllCourtWithCourtSubPendingHandler : IRequestHandler<GetAllCourt
         _beatSportsDbContext = beatSportsDbContext;
     }
 
-    public Task<PaginatedList<CourtResponseV8>> Handle(GetAllCourtWithCourtSubPendingCommand request, CancellationToken cancellationToken)
+    public Task<CourtResponseV8> Handle(GetAllCourtWithCourtSubPendingCommand request, CancellationToken cancellationToken)
     {
         var pendingStatus = CourtSubdivisionCreatedStatus.Pending.ToString();
 
@@ -44,6 +36,9 @@ public class GetAllCourtWithCourtSubPendingHandler : IRequestHandler<GetAllCourt
                 CourtName = c.CourtName,
                 OwnerName = c.Owner.Account.FirstName + " " + c.Owner.Account.LastName,
                 Description = c.Description,
+                OwnerAddress = c.Owner.Address,
+                OwnerBio = c.Owner.Account.Bio,
+                OwnerEmail = c.Owner.Account.Email,
                 Address = c.Address,
                 PlaceId = c.PlaceId,
                 WallpaperUrls = c.WallpaperUrls,
@@ -90,7 +85,11 @@ public class GetAllCourtWithCourtSubPendingHandler : IRequestHandler<GetAllCourt
                 //    }).ToList(),
                 #endregion
             })
-            .PaginatedListAsync(request.PageIndex, request.PageSize);
-        return courtDetails;
+            .FirstOrDefault();
+        if(courtDetails == null)
+        {
+            throw new BadRequestException("Not have any record fit with CourtId");
+        }
+        return Task.FromResult(courtDetails);
     }
 }

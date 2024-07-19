@@ -9,11 +9,7 @@ using BeatSportsAPI.Application.Common.Response.CourtResponse;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Courts.Queries.GetAll.GetAllCourtWithCourtSubPending;
-public class GetAllCourtWithCourtSubPendingCommand : IRequest<PaginatedList<CourtResponseV8>>
+public class GetAllCourtWithCourtSubPendingCommand : IRequest<CourtResponseV8>
 {
     public Guid CourtId { get; set; }
-    [Required]
-    public int PageIndex { get; set; }
-    [Required]
-    public int PageSize { get; set; }
 }

@@ -155,6 +155,9 @@ public class CourtResponseV8
     public string? Description { get; set; }
     public string? CourtName { get; set; }
     public string? Address { get; set; }
+    public string? OwnerAddress { get; set; }
+    public string? OwnerBio { get; set; }
+    public string? OwnerEmail { get; set; }
     public string? PlaceId { get; set; }
     public decimal? Price { get; set; }
     public decimal? FeedbackStarAvg { get; set; }
