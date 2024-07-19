@@ -39,6 +39,7 @@ public class GetAllCourtWithCourtSubPendingHandler : IRequestHandler<GetAllCourt
                 OwnerAddress = c.Owner.Address,
                 OwnerBio = c.Owner.Account.Bio,
                 OwnerEmail = c.Owner.Account.Email,
+                OwnerPhone = c.Owner.Account.PhoneNumber,
                 Address = c.Address,
                 PlaceId = c.PlaceId,
                 WallpaperUrls = c.WallpaperUrls,
