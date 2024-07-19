@@ -39,10 +39,10 @@ public class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequ
             var userId = _currentUserService.UserId ?? string.Empty;
             var userName = string.Empty;
 
-            if (!string.IsNullOrEmpty(userId))
+/*            if (!string.IsNullOrEmpty(userId))
             {
                 userName = await _identityService.GetUserNameAsync(userId);
-            }
+            }*/
 
             _logger.LogWarning("BeatSportsAPI Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@UserId} {@UserName} {@Request}",
                 requestName, elapsedMilliseconds, userId, userName, request);
