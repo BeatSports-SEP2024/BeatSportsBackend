@@ -7,6 +7,7 @@ using BeatSportsAPI.Application.Features.Courts.Commands.CreateCourt;
 using BeatSportsAPI.Application.Features.Courts.Commands.DeleteCourt;
 using BeatSportsAPI.Application.Features.Courts.Commands.UpdateCourt;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAll;
+using BeatSportsAPI.Application.Features.Courts.Queries.GetAll.GetAllCourtWithCourtSubPending;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAllCourtsByOwnerId;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetById;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetCourtIdByAdmin;
@@ -91,6 +92,13 @@ public class CourtController : ApiControllerBase
     [HttpGet]
     [Route("get-list-court-nearby")]
     public async Task<List<CourtResponseV3>> GetCourtNearBya([FromQuery] GetListCourtsNearByCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+    [HttpGet]
+    [Route("court-with-courtsub-pending")]
+    //[CustomAuthorize(RoleEnums.Customer)]
+    public async Task<PaginatedList<CourtResponseV8>> GetAllCourtWithCourtSubPending([FromQuery] GetAllCourtWithCourtSubPendingCommand request)
     {
         return await _mediator.Send(request);
     }
