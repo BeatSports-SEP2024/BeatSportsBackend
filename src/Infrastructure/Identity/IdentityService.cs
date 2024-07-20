@@ -341,10 +341,11 @@ public class IdentityService : IIdentityService
             UserInfo = new AccountResponseForLogin
             {
                 Id = id,
+                AccountId = user.Id,
                 FullName = user.FirstName +" "+ user.LastName,
                 Email = user.Email,
                 WalletId = walletExist.Id,
-                Balance = walletExist.Balance,
+                
             }
         };
         return loginResponse;

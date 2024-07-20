@@ -18,8 +18,9 @@ public class LoginResponse
 public class AccountResponseForLogin
 {
     public Guid? Id { get; set; } = null;
+    public Guid AccountId { get; set; }
     public string FullName { get; set; }
     public string Email { get; set; }
     public Guid WalletId { get; set; }
-    public decimal Balance { get; set; }
+    
 }

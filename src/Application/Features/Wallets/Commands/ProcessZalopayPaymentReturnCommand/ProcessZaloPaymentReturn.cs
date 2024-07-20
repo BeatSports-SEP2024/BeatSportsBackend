@@ -42,7 +42,7 @@ public class ProcessZaloPaymentReturnHandler : IRequestHandler<ProcessZaloPaymen
 
     public async Task<BaseResultWithData<(PaymentReturnDtos, string)>> Handle(ProcessZaloPaymentReturn request, CancellationToken cancellationToken)
     {
-        string returnUrl = "https://www.facebook.com/";
+        string returnUrl = "";
         var result = new BaseResultWithData<(PaymentReturnDtos, string)>();
         try
         {
@@ -116,6 +116,8 @@ public class ProcessZaloPaymentReturnHandler : IRequestHandler<ProcessZaloPaymen
                         resultData.PaymentStatus = "10";
                         resultData.PaymentMessage = "Payment process failed";
                     }
+
+                    returnUrl = merchant?.MerchantReturnUrl ?? string.Empty;
 
                     result.Success = true;
                     result.Message = MessageContants.OK;

@@ -14,6 +14,7 @@ using Duende.IdentityServer.EntityFramework.Entities;
 using Duende.IdentityServer.EntityFramework.Options;
 using MediatR;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -40,7 +41,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
     public DbSet<CourtSubdivisionSetting> CourtSubdivisionSettings { get; set; }
     public DbSet<CourtSubdivision> CourtSubdivisions { get; set; }
     public DbSet<Booking> Bookings { get; set; }
-    public DbSet<PaymentMethod> PaymentMethods { get; set; }
+    //public DbSet<PaymentMethod> PaymentMethods { get; set; }
     public DbSet<Level> Levels { get; set; }
     public DbSet<RoomMember> RoomMembers { get; set; }
     public DbSet<RoomMatch> RoomMatches { get; set; }
@@ -996,6 +997,56 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             DateBooking = DateTime.UtcNow.AddDays(3)
         }
     );
+        #endregion
+
+        #region merchant
+        builder.Entity<Merchant>().HasData(
+            new Merchant
+            {
+                Id = new Guid("281B0F0D-1B5F-4A54-A102-BE0AEAADDAF6"),
+                MerchantName = "BeatSports",
+                MerchantWebLink = "https://www.youtube.com/index", // website của beatsport
+                MerchantIpnUrl = "", // chưa có sài Ipn
+                MerchantReturnUrl = "https://www.youtube.com/index", // thực hiện thành công thì sẽ quay lại app, đường dẫn để open app
+                SecretKey = "3EABD179-956C-4979-A068-01A600D7C8E7", 
+                IsActive = false,
+            }
+            );
+        #endregion
+
+        #region destination
+        builder.Entity<PaymentDestination>().HasData(
+           new PaymentDestination
+           {
+               Id = new Guid("281B0F0D-1B5F-4A54-A102-BE0AEAADDAF6"),
+               DesName = "Cổng thanh toán VnPay",
+               DesShortName = "VNPAY",
+               DesParentId = "",
+               DesLogo = "",
+               SortIndex = 0,
+               IsActive = false,
+           },
+           new PaymentDestination
+           {
+               Id = new Guid("4075443F-01EF-4996-83CB-D04EDF62C6C1"),
+               DesName = "Cổng thanh toán Momo",
+               DesShortName = "MOMO",
+               DesParentId = "",
+               DesLogo = "",
+               SortIndex = 1,
+               IsActive = false,
+           },
+           new PaymentDestination
+           {
+               Id = new Guid("06066EC3-DD51-439D-BCB6-773C69FBB396"),
+               DesName = "Cổng thanh toán Zalopay",
+               DesShortName = "ZALOPAY",
+               DesParentId = "",
+               DesLogo = "",
+               SortIndex = 2,
+               IsActive = false,
+           }
+           );
         #endregion
 
 
