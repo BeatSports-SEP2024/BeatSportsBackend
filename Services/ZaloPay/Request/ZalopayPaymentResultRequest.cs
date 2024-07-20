@@ -20,22 +20,37 @@ public class ZalopayPaymentResultRequest
     
 
     [JsonProperty("appid")]
-    public long? appid { get; set; }
+    public int? appid { get; set; }
 
     [JsonProperty("apptransid")]
     public string apptransid { get; set; } = string.Empty;
 
+    [JsonProperty("pmcid")]
+    public int? pmcid { get; set; }
+
+    [JsonProperty("bankcode")]
+    public string? bankcode { get; set; }
+
+    [JsonProperty("amount")]
+    public long? amount { get; set; }
+
+    [JsonProperty("discountamount")]
+    public long? discountamount { get; set; }
+
+    [JsonProperty("status")]
+    public int? status { get; set; }
+
+    [JsonProperty("checksum")]
+    public string? checksum { get; set; }
+
+   /* [JsonProperty("embeddata")]
+    public string embeddata { get; set; } = string.Empty;
+
     [JsonProperty("apptime")]
-    public long? apptime { get; set; } 
+    public long? apptime { get; set; }
 
     [JsonProperty("appuser")]
     public string appuser { get; set; } = string.Empty;
-
-    [JsonProperty("amount")]
-    public long? amount { get; set; } 
-
-    [JsonProperty("embeddata")]
-    public string embeddata { get; set; } = string.Empty;
 
     [JsonProperty("item")]
     public string item { get; set; } = string.Empty;
@@ -53,22 +68,8 @@ public class ZalopayPaymentResultRequest
     public string merchantuserid { get; set; } = string.Empty;
 
     [JsonProperty("userfeeamount")]
-    public long userfeeamount { get; set; }
+    public long userfeeamount { get; set; }*/
 
-    [JsonProperty("discountamount")]
-    public long? discountamount { get; set; }
-
-    [JsonProperty("pmcid")]
-    public long? pmcid { get; set; }
-
-    [JsonProperty("bankcode")]
-    public string? bankcode { get; set; }
-
-    [JsonProperty("status")]
-    public long? status { get; set; }
-
-    [JsonProperty("checksum")]
-    public string? checksum { get; set; }
 
     public bool IsValidSignature(string key2)
     {

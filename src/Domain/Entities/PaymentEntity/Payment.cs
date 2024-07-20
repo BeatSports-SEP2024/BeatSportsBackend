@@ -5,8 +5,8 @@ public class Payment : BaseAuditableEntity
 {
     [ForeignKey("Account")]
     public Guid AccountId { get; set; }
-    [ForeignKey("PaymentMethod")]
-    public Guid PaymentMethodId { get; set; }
+    /*[ForeignKey("PaymentMethod")]
+    public Guid PaymentMethodId { get; set; }*/
     [ForeignKey("PaymentDestination")]
     public Guid PaymentDestinationId { get; set; }
     [ForeignKey("Merchant")]
@@ -34,7 +34,7 @@ public class Payment : BaseAuditableEntity
     public virtual Account Account { get; set; } = null!;
     public virtual Merchant Merchant { get; set; } = null!;
     public virtual PaymentDestination PaymentDestination { get; set; } = null!;
-    public virtual PaymentMethod PaymentMethod { get; set; }
+    //public virtual PaymentMethod PaymentMethod { get; set; }
     public virtual IList<PaymentSignature> PaymentSignature { get; set; }
     public virtual IList<PaymentTransaction> PaymentTransaction { get; set; }
 }
