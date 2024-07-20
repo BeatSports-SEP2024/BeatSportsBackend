@@ -8,6 +8,7 @@ using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using BeatSportsAPI.Application.Common.Ultilities;
+using BeatSportsAPI.Domain.Enums;
 
 namespace BeatSportsAPI.Application.Features.Courts.Commands.CreateCourt;
 public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, BeatSportsResponse>
@@ -86,7 +87,8 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, BeatSports
                     IsActive = true,
                     BasePrice = subdivision.BasePrice,
                     CourtSubdivisionName = subdivision.CourtSubdivisionName,
-                    CourtSubdivisionSettings = settings
+                    CourtSubdivisionSettings = settings,
+                    CreatedStatus = CourtSubdivisionCreatedStatus.Accepted.ToString()
                 });
             }
         }
