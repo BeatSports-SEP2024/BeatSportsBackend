@@ -1004,11 +1004,21 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             new Merchant
             {
                 Id = new Guid("281B0F0D-1B5F-4A54-A102-BE0AEAADDAF6"),
-                MerchantName = "BeatSports",
+                MerchantName = "BeatSports_AppUser",
                 MerchantWebLink = "https://www.youtube.com/index", // website của beatsport
                 MerchantIpnUrl = "", // chưa có sài Ipn
                 MerchantReturnUrl = "https://www.youtube.com/index", // thực hiện thành công thì sẽ quay lại app, đường dẫn để open app
                 SecretKey = "3EABD179-956C-4979-A068-01A600D7C8E7", 
+                IsActive = false,
+            },
+            new Merchant
+            {
+                Id = new Guid("A82CE63C-6C91-4451-8F58-863B534223D2"),
+                MerchantName = "BeatSports_AppOwner",
+                MerchantWebLink = "https://www.youtube.com/index", // website của beatsport
+                MerchantIpnUrl = "", // chưa có sài Ipn
+                MerchantReturnUrl = "https://www.youtube.com/index", // thực hiện thành công thì sẽ quay lại app, đường dẫn để open app
+                SecretKey = "54061D89-D23D-4300-8A38-C9FDF0DF94B1",
                 IsActive = false,
             }
             );
