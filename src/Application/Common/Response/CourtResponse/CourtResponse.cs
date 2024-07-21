@@ -102,6 +102,7 @@ public class CourtResponseV5
     //public string? ImagesList { get; set; }
     public List<CourtSubSettingV2>? CourtSubSettingResponses { get; set; }
     public List<FeedbackResponseV2>? Feedbacks { get; set; } 
+    public List<CampaignResponseV6?>? CourtCampaignResponses { get; set; }
 }
 
 public class CourtResponseV6 : IMapFrom<Court>

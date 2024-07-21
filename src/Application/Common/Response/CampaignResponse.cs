@@ -95,3 +95,14 @@ public class CampaignResult
     public List<CampaignResponseV4> HistoryCampaigns { get; set; }
     public List<CampaignResponseV4> MyCampaigns { get; set; }
 }
+
+public class CampaignResponseV6
+{
+    public Guid Id { get; set; }
+    public Guid CourtId { get; set; }
+    public decimal PercentDiscount { get; set; }
+    public string? ExpireCampaign { get; set; }
+    public decimal MinValueApply { get; set; }
+    public decimal MaxValueDiscount { get; set; }
+    //public StatusEnums Status { get; set; }
+}

@@ -29,6 +29,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
     {
         var courtDetails = _beatSportsDbContext.Courts
             .Where(c => c.Id == request.CourtId)
+            .Include(c => c.Campaigns)
             .Include(cs => cs.CourtSubdivision)
                 .ThenInclude(cs => cs.CourtSubdivisionSettings)
             .Include(f => f.Feedback)
@@ -76,6 +77,18 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                             EndTime = c.TimeEnd,
                             CreatedStatus = subCourt.CreatedStatus.ToString()
                         }).ToList()
+                    }).ToList(),
+
+                CourtCampaignResponses = c.Campaigns
+                    .Where(c => !c.IsDelete)
+                    .Select(c => new CampaignResponseV6
+                    {
+                        Id = c.Id,
+                        CourtId = c.CourtId,
+                        ExpireCampaign = (c.EndDateApplying - DateTime.Now).ToString(),
+                        MaxValueDiscount = c.MaxValueDiscount,
+                        MinValueApply = c.MinValueApply,
+                        PercentDiscount = c.PercentDiscount,
                     }).ToList(),
 
                 Feedbacks = c.Feedback
