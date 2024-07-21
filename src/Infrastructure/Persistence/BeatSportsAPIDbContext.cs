@@ -1066,7 +1066,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 MerchantName = "BeatSports_AppUser",
                 MerchantWebLink = "https://www.youtube.com/index", // website của beatsport
                 MerchantIpnUrl = "", // chưa có sài Ipn
-                MerchantReturnUrl = "https://www.youtube.com/index", // thực hiện thành công thì sẽ quay lại app, đường dẫn để open app
+                MerchantReturnUrl = "exp://172.31.99.194:8081", // thực hiện thành công thì sẽ quay lại app, đường dẫn để open app
                 SecretKey = "3EABD179-956C-4979-A068-01A600D7C8E7", 
                 IsActive = false,
             },
@@ -1076,7 +1076,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 MerchantName = "BeatSports_AppOwner",
                 MerchantWebLink = "https://www.youtube.com/index", // website của beatsport
                 MerchantIpnUrl = "", // chưa có sài Ipn
-                MerchantReturnUrl = "https://www.youtube.com/index", // thực hiện thành công thì sẽ quay lại app, đường dẫn để open app
+                MerchantReturnUrl = "exp://172.31.99.194:8081", // thực hiện thành công thì sẽ quay lại app, đường dẫn để open app
                 SecretKey = "54061D89-D23D-4300-8A38-C9FDF0DF94B1",
                 IsActive = false,
             }
