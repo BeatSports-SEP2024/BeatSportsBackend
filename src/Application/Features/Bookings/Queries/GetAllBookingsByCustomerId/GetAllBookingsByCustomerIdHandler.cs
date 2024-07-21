@@ -38,7 +38,7 @@ public class GetAllBookingsByCustomerIdHandler : IRequestHandler<GetAllBookingsB
                 query = query.Where(c => c.BookingStatus == BookingEnums.Finished.ToString());
                 break;
 
-            case "Cancelled":
+            case "Cancel":
                 query = query.Where(c => c.BookingStatus == BookingEnums.Cancel.ToString());
                 break;
 
