@@ -80,7 +80,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                     }).ToList(),
 
                 CourtCampaignResponses = c.Campaigns
-                    .Where(c => !c.IsDelete)
+                    .Where(c => !c.IsDelete)    
                     .Select(c => new CampaignResponseV6
                     {
                         Id = c.Id,

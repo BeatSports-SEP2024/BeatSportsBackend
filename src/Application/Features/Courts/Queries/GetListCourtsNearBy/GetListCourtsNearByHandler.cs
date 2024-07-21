@@ -73,7 +73,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
             {
                 var sportCategory = _dbContext.SportsCategories
                                 .Where(x => x.Name.Contains(request.SportCategory))
-                                .FirstOrDefault();
+                                .FirstOrDefault();   
 
                 var courtSubList = _dbContext.CourtSubdivisionSettings
                                 .Where(x => x.SportCategoryId == sportCategory.Id)

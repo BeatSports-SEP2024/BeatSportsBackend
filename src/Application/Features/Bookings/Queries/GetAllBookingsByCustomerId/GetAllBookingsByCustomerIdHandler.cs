@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Mappings;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
-using BeatSportsAPI.Application.Features.Feedbacks.Queries.GetAllFeedbacksByCourtId;
-using BeatSportsAPI.Domain.Entities;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Queries.GetAllBookingsByCustomerId;
@@ -31,9 +25,28 @@ public class GetAllBookingsByCustomerIdHandler : IRequestHandler<GetAllBookingsB
             throw new BadRequestException("Page index and page size cannot less than 0");
         }
 
-        IQueryable<Booking> query = _dbContext.Bookings
-            .Where(x => x.CustomerId == request.CustomerId && !x.IsDelete)
-            .OrderByDescending(x => x.Created);
+        var query = _dbContext.Bookings
+            .Where(b => !b.IsDelete);
+
+        switch (request.BookingFilter.ToString())
+        {
+            case "Approved":
+                query = query.Where(c => c.BookingStatus == BookingEnums.Approved.ToString());
+                break;
+
+            case "Finished":
+                query = query.Where(c => c.BookingStatus == BookingEnums.Finished.ToString());
+                break;
+
+            case "Cancelled":
+                query = query.Where(c => c.BookingStatus == BookingEnums.Cancel.ToString());
+                break;
+
+            default:
+                throw new BadRequestException("An error is occured");
+        }
+
+        query = query.OrderByDescending(b => b.Created);
 
         var list = query.Select(c => new BookingResponse
         {
@@ -48,9 +61,7 @@ public class GetAllBookingsByCustomerIdHandler : IRequestHandler<GetAllBookingsB
             StartTimePlaying = c.StartTimePlaying,
             EndTimePlaying = c.EndTimePlaying,
             BookingStatus = c.BookingStatus,
-
-        })
-        .PaginatedListAsync(request.PageIndex, request.PageSize);
+        }).PaginatedListAsync(request.PageIndex, request.PageSize);
 
         return list;
     }
