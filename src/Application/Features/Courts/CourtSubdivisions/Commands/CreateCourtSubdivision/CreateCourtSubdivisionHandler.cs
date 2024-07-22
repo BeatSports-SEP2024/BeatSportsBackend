@@ -34,7 +34,7 @@ public class CreateCourtSubdivisionHandler : IRequestHandler<CreateCourtSubdivis
                 CourtId = request.CourtId,
                 BasePrice = request.BasePrice,
                 CourtSubdivisionSettingId = request.CourtSubdivisionSettingId,
-                CreatedStatus = CourtSubdivisionCreatedStatus.Pending.ToString(),
+                CreatedStatus = CourtSubdivisionCreatedStatus.Pending,
                 //ImageURL = command.ImageURL,
                 //Description = command.Description,
                 //CourtSubdivisionDescription = request.CourtSubDescription,

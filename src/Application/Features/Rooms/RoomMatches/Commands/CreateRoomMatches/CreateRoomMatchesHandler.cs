@@ -32,11 +32,15 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
         }
 
         //check booking
-        var isValidBooking = _dbContext.Bookings
-            .Where(b => b.Id == request.BookingId && !b.IsDelete && b.IsRoomBooking == true).FirstOrDefault();
-        if(isValidBooking == null)
+        var booking = _dbContext.Bookings
+            .Where(b => b.Id == request.BookingId && !b.IsDelete && b.IsRoomBooking == true && b.BookingStatus == BookingEnums.Approved.ToString()).FirstOrDefault();
+
+        var isRoomUseBookingId = _dbContext.RoomMatches
+            .Where(rm => rm.BookingId == request.BookingId).FirstOrDefault();
+
+        if(booking == null || isRoomUseBookingId != null)
         {
-            throw new BadRequestException("This booking maybe is deleted");
+            throw new BadRequestException("This booking maybe is deleted or this booking is used");
         }
 
         var room = new RoomMatch()
@@ -54,7 +58,7 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
         _dbContext.SaveChanges();
         var roomMember = new RoomMember()
         {
-            CustomerId = isValidBooking.CustomerId,
+            CustomerId = booking.CustomerId,
             RoomMatchId = room.Id,
             RoleInRoom = RoleInRoomEnums.Master.ToString()
         };

@@ -1,6 +1,7 @@
 ﻿//using BeatSportsAPI.Application.Features.Courts.CourtSportCategory.Queries;
 using BeatSportsAPI.Application.Features.Wallets.Queries;
 using BeatSportsAPI.Application.Features.Wallets.Queries.GetById;
+using BeatSportsAPI.Application.Features.Wallets.Queries.GetMerchantAndDestination;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,5 +38,14 @@ public class WalletController : ApiControllerBase
         var response = await _mediator.Send(request);
 
         return Ok(response);
+    }
+
+    [HttpGet]
+    [Route("merchant-destination-customer")]
+    public async Task<MerchantNDestinationResponse> GetMerchantDestinationCustomer()
+    {
+        var response = await _mediator.Send(new GetMerchantDestinationCommand());
+
+        return response;
     }
 }

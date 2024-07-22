@@ -9,6 +9,7 @@ using BeatSportsAPI.Application.Features.Rooms.RoomMatches.Commands.CreateRoomMa
 using BeatSportsAPI.Application.Features.Rooms.RoomMatches.Commands.DeleteRoomMatches;
 using BeatSportsAPI.Application.Features.Rooms.RoomMatches.Commands.UpdateRoomMatches;
 using BeatSportsAPI.Application.Features.Rooms.RoomMatches.Queries.GetAllRoomMatches;
+using BeatSportsAPI.Application.Features.Rooms.RoomMatches.Queries.GetRequestJoinRoom;
 using BeatSportsAPI.Application.Features.Rooms.RoomMatches.Queries.GetRoomMatchById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -48,6 +49,12 @@ public class RoomMatchController : ApiControllerBase
     [HttpGet]
     [Route("get-by-roomMatch-id")]
     public async Task<RoomMatchesResponse> GetByRoomMatchId([FromQuery] GetRoomMatchByIdCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+    [HttpGet]
+    [Route("request-in-room-match")]
+    public async Task<GetRoomRequestInRoom> GetRoomRequestInRoom([FromQuery] GetRequestInRoomMatchCommand request)
     {
         return await _mediator.Send(request);
     }

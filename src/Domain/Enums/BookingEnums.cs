@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace BeatSportsAPI.Domain.Enums;
 public enum BookingEnums
 {
-    //Booking successfully
-    Successfully,
+    //Booking successfully, not played
+    Approved,
     //Cancel booking
     Cancel,
     //Booking successfully and already played

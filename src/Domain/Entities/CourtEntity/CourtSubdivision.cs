@@ -12,7 +12,7 @@ public class CourtSubdivision : BaseAuditableEntity
     public decimal BasePrice { get; set; }
     public string? CourtSubdivisionName { get; set; }
     public string? CourtSubdivisionDescription { get; set; }
-    public string? CreatedStatus { get; set; }
+    public CourtSubdivisionCreatedStatus CreatedStatus { get; set; }
     public string? ReasonOfRejected { get; set; }
     public virtual Court Court { get; set; }
     public virtual CourtSubdivisionSetting CourtSubdivisionSettings { get; set; }

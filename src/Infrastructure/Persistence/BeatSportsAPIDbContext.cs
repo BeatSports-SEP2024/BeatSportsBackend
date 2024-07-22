@@ -14,6 +14,7 @@ using Duende.IdentityServer.EntityFramework.Entities;
 using Duende.IdentityServer.EntityFramework.Options;
 using MediatR;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -40,7 +41,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
     public DbSet<CourtSubdivisionSetting> CourtSubdivisionSettings { get; set; }
     public DbSet<CourtSubdivision> CourtSubdivisions { get; set; }
     public DbSet<Booking> Bookings { get; set; }
-    public DbSet<PaymentMethod> PaymentMethods { get; set; }
+    //public DbSet<PaymentMethod> PaymentMethods { get; set; }
     public DbSet<Level> Levels { get; set; }
     public DbSet<RoomMember> RoomMembers { get; set; }
     public DbSet<RoomMatch> RoomMatches { get; set; }
@@ -554,7 +555,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
-                CreatedStatus = "Accepted"
+                CreatedStatus = CourtSubdivisionCreatedStatus.Accepted
             },
             new CourtSubdivision
             {
@@ -568,7 +569,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
-                CreatedStatus = "Pending"
+                CreatedStatus = CourtSubdivisionCreatedStatus.Pending
             },
             new CourtSubdivision
             {
@@ -582,7 +583,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
-                CreatedStatus = "Pending"
+                CreatedStatus = CourtSubdivisionCreatedStatus.Accepted
             },
             new CourtSubdivision
             {
@@ -596,7 +597,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
-                CreatedStatus = "Rejected"
+                CreatedStatus = CourtSubdivisionCreatedStatus.Rejected
             },
             new CourtSubdivision
             {
@@ -610,7 +611,35 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
-                CreatedStatus = "Pending"
+                CreatedStatus = CourtSubdivisionCreatedStatus.Pending
+            },
+            new CourtSubdivision
+            {
+                Id = courtSubdivisionId6,
+                CourtId = courtId,
+                CourtSubdivisionSettingId = courtSettings1,
+                CourtSubdivisionName = "Sân 1",
+                CourtSubdivisionDescription = "Sân bóng đá nhân tạo",
+                IsActive = true,
+                BasePrice = 110000,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false,
+                CreatedStatus = CourtSubdivisionCreatedStatus.Accepted
+            },
+            new CourtSubdivision
+            {
+                Id = courtSubdivisionId7,
+                CourtId = courtId,
+                CourtSubdivisionSettingId = courtSettings1,
+                CourtSubdivisionName = "Sân 2",
+                CourtSubdivisionDescription = "Sân bóng đá nhân tạo",
+                IsActive = true,
+                BasePrice = 190000,
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false,
+                CreatedStatus = CourtSubdivisionCreatedStatus.Pending
             }
         );
         #endregion
@@ -785,6 +814,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         var bookingId2 = new Guid("22ae1f0b-3b4a-4c7b-947e-3612c4b6a8cd");
         var bookingId3 = new Guid("fba3e7b2-981f-4038-a306-7432db3ef4c6");
         var bookingId4 = new Guid("eadc2d2e-3ad3-4d6f-a4b1-55b6b233fe2e");
+        var bookingId5 = new Guid("6c4099e7-0731-4f9d-90ee-fb7791040777");
 
         #region Booking
         builder.Entity<Booking>().HasData(
@@ -824,14 +854,44 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 CustomerId = customer3Id,
                 CampaignId = lunarnewyear,
                 CourtSubdivisionId = courtSubdivisionId3,
-                PlayingDate = DateTime.Today.AddDays(3),
+                PlayingDate = DateTime.Today.AddDays(0),
                 StartTimePlaying = new TimeSpan(20, 0, 0), // 8 PM
                 EndTimePlaying = new TimeSpan(22, 0, 0), // 10 PM
                 BookingDate = DateTime.Today,
                 TotalAmount = 800,
-                BookingStatus = "Approved",
+                BookingStatus = "Finished",
                 IsRoomBooking = false,
                 IsDeposit = true
+            },
+            new Booking
+            {
+                Id = bookingId4,
+                CustomerId = customer3Id,
+                CampaignId = discount20,
+                CourtSubdivisionId = courtSubdivisionId7,
+                PlayingDate = DateTime.Today.AddDays(3),
+                StartTimePlaying = new TimeSpan(20, 0, 0), // 8 PM
+                EndTimePlaying = new TimeSpan(22, 0, 0), // 10 PM
+                BookingDate = DateTime.Today,
+                TotalAmount = 1800,
+                BookingStatus = "Rejected",
+                IsRoomBooking = false,
+                IsDeposit = true
+            },
+            new Booking
+            {
+                Id = bookingId5,
+                CustomerId = customer1Id,
+                CampaignId= discount20,
+                CourtSubdivisionId = courtSubdivisionId7,
+                PlayingDate = DateTime.Today.AddDays(-1),
+                StartTimePlaying = new TimeSpan(20, 0, 0), // 8 PM
+                EndTimePlaying = new TimeSpan(22, 0, 0), // 10 PM
+                BookingDate = DateTime.Today,
+                TotalAmount = 1800,
+                BookingStatus = "Cancel",
+                IsRoomBooking = false,
+                IsDeposit = false
             });
         #endregion
         var timePeriodId1 = new Guid("34fe77a7-485c-4fc4-b7c9-20f7332538f9");
@@ -996,6 +1056,66 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             DateBooking = DateTime.UtcNow.AddDays(3)
         }
     );
+        #endregion
+
+        #region merchant
+        builder.Entity<Merchant>().HasData(
+            new Merchant
+            {
+                Id = new Guid("281B0F0D-1B5F-4A54-A102-BE0AEAADDAF6"),
+                MerchantName = "BeatSports_AppUser",
+                MerchantWebLink = "https://www.youtube.com/index", // website của beatsport
+                MerchantIpnUrl = "", // chưa có sài Ipn
+                MerchantReturnUrl = "exp://172.31.99.194:8081", // thực hiện thành công thì sẽ quay lại app, đường dẫn để open app
+                SecretKey = "3EABD179-956C-4979-A068-01A600D7C8E7", 
+                IsActive = false,
+            },
+            new Merchant
+            {
+                Id = new Guid("A82CE63C-6C91-4451-8F58-863B534223D2"),
+                MerchantName = "BeatSports_AppOwner",
+                MerchantWebLink = "https://www.youtube.com/index", // website của beatsport
+                MerchantIpnUrl = "", // chưa có sài Ipn
+                MerchantReturnUrl = "exp://172.31.99.194:8081", // thực hiện thành công thì sẽ quay lại app, đường dẫn để open app
+                SecretKey = "54061D89-D23D-4300-8A38-C9FDF0DF94B1",
+                IsActive = false,
+            }
+            );
+        #endregion
+
+        #region destination
+        builder.Entity<PaymentDestination>().HasData(
+           new PaymentDestination
+           {
+               Id = new Guid("281B0F0D-1B5F-4A54-A102-BE0AEAADDAF6"),
+               DesName = "Cổng thanh toán VnPay",
+               DesShortName = "VNPAY",
+               DesParentId = "",
+               DesLogo = "",
+               SortIndex = 0,
+               IsActive = false,
+           },
+           new PaymentDestination
+           {
+               Id = new Guid("4075443F-01EF-4996-83CB-D04EDF62C6C1"),
+               DesName = "Cổng thanh toán Momo",
+               DesShortName = "MOMO",
+               DesParentId = "",
+               DesLogo = "",
+               SortIndex = 1,
+               IsActive = false,
+           },
+           new PaymentDestination
+           {
+               Id = new Guid("06066EC3-DD51-439D-BCB6-773C69FBB396"),
+               DesName = "Cổng thanh toán Zalopay",
+               DesShortName = "ZALOPAY",
+               DesParentId = "",
+               DesLogo = "",
+               SortIndex = 2,
+               IsActive = false,
+           }
+           );
         #endregion
 
 

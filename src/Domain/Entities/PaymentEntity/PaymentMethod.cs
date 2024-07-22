@@ -1,4 +1,4 @@
-﻿namespace BeatSportsAPI.Domain.Entities.PaymentEntity;
+﻿/*namespace BeatSportsAPI.Domain.Entities.PaymentEntity;
 public class PaymentMethod : BaseAuditableEntity
 {
     public string? PaymentMethodName { get; set; }
@@ -7,3 +7,4 @@ public class PaymentMethod : BaseAuditableEntity
 
     public virtual IList<Payment> Payments { get; set; }
 }
+*/

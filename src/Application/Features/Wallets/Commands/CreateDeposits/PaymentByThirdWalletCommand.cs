@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Exceptions;
@@ -12,6 +13,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Services.Momo.Config;
 using Services.Momo.Request;
 using Services.VnPay.Config;
@@ -33,21 +35,13 @@ public class PaymentByThirdWalletCommand : IRequest<PaymentLinkDtos>
 
     public string? MerchantId { get; set; } = string.Empty;
     public string? PaymentDestinationId { get; set; } = string.Empty;
-
-    //public CreatePaymentSignature CreatePaymentSignature { get; set; }
     public TransactionWallet Transaction { get; set; } = null!;
-}
-
-public class CreatePaymentSignature
-{
-    public string? SignValue { get; set; } = string.Empty;
-    public string? SignAlgo { get; set; } = string.Empty;
 }
 public class TransactionWallet
 {
     //public double? Price { get; set; }
     public string? AccountId { get; set; }
-    public string? PaymentMethodId { get; set; }
+    //public string? PaymentMethodId { get; set; }
 
     // Type (Deposit or Withdrawls)
     public string TransactionType { get; set; } = null!;
@@ -101,7 +95,7 @@ public class PaymentByThirdWalletCommandHandler : IRequestHandler<PaymentByThird
                 PaymentDestinationId = Guid.Parse(request.PaymentDestinationId!),
 
                 AccountId = Guid.Parse(request.Transaction.AccountId!),
-                PaymentMethodId = Guid.Parse(request.Transaction.PaymentMethodId!)
+                //PaymentMethodId = Guid.Parse(request.Transaction.PaymentMethodId!)
             };
             _dbContext.Payments.Add(payment);
 
@@ -159,14 +153,14 @@ public class PaymentByThirdWalletCommandHandler : IRequestHandler<PaymentByThird
                     break;
                 case "ZALOPAY":
                     var embed_data = new {
-                        RedirectUrl = "https://localhost:5001/api/v1/payment/zalopay-return",
+                        RedirectUrl = zaloPayConfig.RedirectUrl,
                     };
-                    var callback_url = "https://localhost:5001/api/v1/payment/callback";
+                    //var callback_url = "https://localhost:5001/api/v1/payment/callback";
                     var item = "";
                     var items = new[] { item };
                     var zalopayPayRequest = new CreateZalopayPayRequest(zaloPayConfig.AppId, zaloPayConfig.AppUser,
                         DateTime.Now.GetTimeStamp(), (long)request.RequiredAmount!, DateTime.Now.ToString("yyMMdd") + "_" + payment.Id.ToString() ?? string.Empty,
-                        "zalopayapp", request.PaymentContent ?? string.Empty, embed_data /*, items*/, callback_url);
+                        "zalopayapp", request.PaymentContent ?? string.Empty, JsonConvert.SerializeObject(embed_data), JsonConvert.SerializeObject(items)/*, callback_url*/);
                     zalopayPayRequest.MakeSignature(zaloPayConfig.Key1);
                     (bool createZaloPayLinkResult, string? createZaloPayMessage) = zalopayPayRequest.GetLink(zaloPayConfig.PaymentUrl);
                     if (createZaloPayLinkResult)

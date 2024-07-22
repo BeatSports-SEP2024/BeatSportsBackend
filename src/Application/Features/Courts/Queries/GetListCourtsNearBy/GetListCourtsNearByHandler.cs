@@ -73,7 +73,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
             {
                 var sportCategory = _dbContext.SportsCategories
                                 .Where(x => x.Name.Contains(request.SportCategory))
-                                .FirstOrDefault();
+                                .FirstOrDefault();   
 
                 var courtSubList = _dbContext.CourtSubdivisionSettings
                                 .Where(x => x.SportCategoryId == sportCategory.Id)
@@ -125,9 +125,14 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
         }
 
         var list = new List<CourtResponseV3>();
-
         foreach (var c in query)
         {
+
+            if (request.StartTime.HasValue && request.EndTime.HasValue)
+            {
+                var availableCourtSubdivisions = GetAvailableCourtSubdivisions(request.StartTime, request.EndTime);
+                query = query.Where(court => court.CourtSubdivision.Any(sub => availableCourtSubdivisions.Contains(sub.Id))).ToList();
+            }
             double starAvg = 0;
             decimal price = 0;
             int rentalNumber = 0;
@@ -150,10 +155,6 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
                 BasePrice = b.BasePrice,
                 IsActive = b.IsActive,
             }).ToList();
-            var imageUrls = c.ImageUrls?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                         .Select(url => url.Trim())
-                         .Where(url => !string.IsNullOrEmpty(url))
-                         .ToArray();
 
             var name = _dbContext.Accounts
                 .Where(x => x.Id == c.Owner.AccountId)
@@ -227,5 +228,30 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
         }
 
         return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+    }
+
+    private List<Guid> GetAvailableCourtSubdivisions(DateTime? startTime, DateTime? endTime)
+    {
+        // Lấy tất cả các sân nhỏ
+        var allCourtSubdivisions = _dbContext.CourtSubdivisions
+            .Where(cs => !cs.IsDelete)
+            .ToList();
+
+        // Lấy tất cả các bản ghi kiểm tra thời gian
+        var allTimeCheckings = _dbContext.TimeChecking
+            .ToList();
+
+        // Lọc ra các sân nhỏ có thời gian không trùng với khoảng thời gian được yêu cầu
+        var availableCourtSubdivisions = allCourtSubdivisions
+            .Where(cs => !allTimeCheckings.Any(tc =>
+                ((startTime == null && endTime == null) ||
+                 (startTime != null && endTime != null &&
+                  ((tc.StartTime <= startTime && tc.EndTime >= startTime) ||
+                   (tc.StartTime <= endTime && tc.EndTime >= endTime) ||
+                   (tc.StartTime >= startTime && tc.EndTime <= endTime))))))
+            .Select(cs => cs.Id)
+            .ToList();
+
+        return availableCourtSubdivisions;
     }
 }

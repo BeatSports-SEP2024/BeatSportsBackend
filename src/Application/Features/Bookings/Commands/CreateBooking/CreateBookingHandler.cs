@@ -88,7 +88,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSp
                         PlayingDate = request.PlayingDate,
                         StartTimePlaying = request.StartTimePlaying,
                         EndTimePlaying = request.EndTimePlaying,
-                        BookingStatus = BookingEnums.Successfully.ToString(),
+                        BookingStatus = BookingEnums.Approved.ToString(),
                     };
 
                     if(newBooking != null)

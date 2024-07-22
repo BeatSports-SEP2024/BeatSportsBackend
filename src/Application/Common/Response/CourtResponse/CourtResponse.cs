@@ -82,7 +82,11 @@ public class CourtResponseV4 : IMapFrom<Court>
 public class CourtResponseV5
 {
     public Guid Id { get; set; }
-    public string OwnerName { get; set; }
+    public string? OwnerName { get; set; }
+    public string? OwnerAddress { get; set; }
+    public DateTime? OwnerDoB { get; set; }
+    public string? OwnerBio { get; set; }
+    public string? OwnerPhoneNumber { get; set; }
     public string? Description { get; set; }
     public string? CourtName { get; set; }
     public string? Address { get; set; }
@@ -102,6 +106,7 @@ public class CourtResponseV5
     //public string? ImagesList { get; set; }
     public List<CourtSubSettingV2>? CourtSubSettingResponses { get; set; }
     public List<FeedbackResponseV2>? Feedbacks { get; set; } 
+    public List<CampaignResponseV6>? CourtCampaignResponses { get; set; }
 }
 
 public class CourtResponseV6 : IMapFrom<Court>
@@ -120,7 +125,7 @@ public class CourtResponseV6 : IMapFrom<Court>
     public double? LongitudeDelta { get; set; }
     public double? Latitude { get; set; }
     public double? Longitude { get; set; }
-    public string? StatusCourtSubdivision { get; set; }
+    public CourtSubdivisionCreatedStatus? StatusCourtSubdivision { get; set; }
     //public virtual IList<CourtSubdivision>? CourtSubdivision { get; set; }
 }
 

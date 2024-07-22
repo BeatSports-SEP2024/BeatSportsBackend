@@ -28,11 +28,6 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
     }
     public Task<PaginatedList<RoomMatchesResponse>> Handle(GetAllRoomMatchesCommand request, CancellationToken cancellationToken)
     {
-        if (request.PageIndex <= 0 || request.PageSize <= 0)
-        {
-            throw new BadRequestException("Page index and page size cannot less than 0");
-        }
-
         IQueryable<RoomMatch> query = _dbContext.RoomMatches
             .Where(x => !x.IsDelete)
             .OrderByDescending(b => b.Created);

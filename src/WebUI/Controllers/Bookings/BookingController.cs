@@ -45,7 +45,7 @@ public class BookingController : ApiControllerBase
     }
     [HttpGet]
     [Route("get-by-customer-id")]
-    public async Task<PaginatedList<BookingResponse>> GetByCourtId([FromQuery] GetAllBookingsByCustomerIdCommand request)
+    public async Task<PaginatedList<BookingByCustomerId>> GetByCourtId([FromQuery] GetAllBookingsByCustomerIdCommand request)
     {
         return await _mediator.Send(request);
     }

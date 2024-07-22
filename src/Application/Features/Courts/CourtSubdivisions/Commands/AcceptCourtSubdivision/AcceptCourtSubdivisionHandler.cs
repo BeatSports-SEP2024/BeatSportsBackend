@@ -29,12 +29,12 @@ public class AcceptCourtSubdivisionHandler : IRequestHandler<AcceptCourtSubdivis
         {
             if (request.Status == StatusEnums.Accepted)
             {
-                courtSub.CreatedStatus = StatusEnums.Accepted.ToString();
+                courtSub.CreatedStatus = (CourtSubdivisionCreatedStatus)StatusEnums.Accepted;
                 courtSub.ReasonOfRejected = "";
             }
             if (request.Status == StatusEnums.Rejected)
             {
-                courtSub.CreatedStatus = StatusEnums.Rejected.ToString();
+                courtSub.CreatedStatus = (CourtSubdivisionCreatedStatus)StatusEnums.Rejected;
                 courtSub.ReasonOfRejected = request.ReasonOfReject;
             }
         }

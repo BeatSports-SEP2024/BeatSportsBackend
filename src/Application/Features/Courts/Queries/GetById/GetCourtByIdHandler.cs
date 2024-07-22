@@ -29,6 +29,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
     {
         var courtDetails = _beatSportsDbContext.Courts
             .Where(c => c.Id == request.CourtId)
+            .Include(c => c.Campaigns)
             .Include(cs => cs.CourtSubdivision)
                 .ThenInclude(cs => cs.CourtSubdivisionSettings)
             .Include(f => f.Feedback)
@@ -41,6 +42,10 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                 Id = c.Id,
                 CourtName = c.CourtName,
                 OwnerName = c.Owner.Account.FirstName + " " + c.Owner.Account.LastName,
+                OwnerAddress = c.Owner.Address,
+                OwnerBio = c.Owner.Account.Bio,
+                OwnerDoB = c.Owner.Account.DateOfBirth,
+                OwnerPhoneNumber = c.Owner.Account.PhoneNumber,
                 Description = c.Description,
                 Address = c.Address,
                 PlaceId = c.PlaceId,
@@ -74,8 +79,20 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                             BasePrice = subCourt.BasePrice,
                             StartTime = c.TimeStart,
                             EndTime = c.TimeEnd,
-                            CreatedStatus = subCourt.CreatedStatus.ToString()
+                            CreatedStatus = subCourt.CreatedStatus
                         }).ToList()
+                    }).ToList(),
+
+                CourtCampaignResponses = c.Campaigns
+                    .Where(c => !c.IsDelete)    
+                    .Select(c => new CampaignResponseV6
+                    {
+                        Id = c.Id,
+                        CourtId = c.CourtId,
+                        ExpireCampaign = (c.EndDateApplying - DateTime.Now).ToString(),
+                        MaxValueDiscount = c.MaxValueDiscount,
+                        MinValueApply = c.MinValueApply,
+                        PercentDiscount = c.PercentDiscount,
                     }).ToList(),
 
                 Feedbacks = c.Feedback

@@ -1,16 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Queries.GetAllBookingsByCustomerId;
-public class GetAllBookingsByCustomerIdCommand : IRequest<PaginatedList<BookingResponse>>
+public class GetAllBookingsByCustomerIdCommand : IRequest<PaginatedList<BookingByCustomerId>>
 {
     public Guid CustomerId { get; set; }
+    [EnumDataType(typeof(BookingEnums))]
+    public BookingEnums BookingFilter { get; set; }
+    [Required]
     public int PageIndex { get; set; }
+    [Required]
     public int PageSize { get; set; }
 }
