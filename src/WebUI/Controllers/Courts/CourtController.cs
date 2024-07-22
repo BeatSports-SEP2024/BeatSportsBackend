@@ -74,7 +74,7 @@ public class CourtController : ApiControllerBase
     }
 
     [HttpGet]
-    [Route("get-by-court-id-by-admin")]
+    [Route("get-by-court-id-by-admin-V2")]
     public async Task<ResponseCourtDataInCourtSubAndCourtSettingsAndTimeChecking> GetByCourtIdByAdminTesting([FromQuery] GetCourtSubAndCourtSettingsAndTimeChecking request)
     {
         return await _mediator.Send(request);
