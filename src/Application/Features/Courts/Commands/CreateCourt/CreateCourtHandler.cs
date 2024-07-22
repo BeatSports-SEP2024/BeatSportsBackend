@@ -88,7 +88,7 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, BeatSports
                     BasePrice = subdivision.BasePrice,
                     CourtSubdivisionName = subdivision.CourtSubdivisionName,
                     CourtSubdivisionSettings = settings,
-                    CreatedStatus = CourtSubdivisionCreatedStatus.Accepted.ToString()
+                    CreatedStatus = CourtSubdivisionCreatedStatus.Accepted,
                 });
             }
         }

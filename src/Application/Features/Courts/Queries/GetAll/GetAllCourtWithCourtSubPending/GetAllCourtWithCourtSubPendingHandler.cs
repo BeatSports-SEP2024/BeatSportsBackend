@@ -57,7 +57,7 @@ public class GetAllCourtWithCourtSubPendingHandler : IRequestHandler<GetAllCourt
                 Price = c.CourtSubdivision.FirstOrDefault() != null ? c.CourtSubdivision.FirstOrDefault().BasePrice : (decimal?)null,
                 Created = c.Created,
 
-                CourtSubdivision = c.CourtSubdivision.Where(css => css.CreatedStatus.Equals(pendingStatus))
+                CourtSubdivision = c.CourtSubdivision.Where(css => css.CreatedStatus == 0)
                     .Select(subCourt => new CourtSubdivisionV6
                     {
                         CourtSubdivisionId = subCourt.Id,

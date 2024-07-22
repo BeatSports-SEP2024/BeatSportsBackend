@@ -555,7 +555,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
-                CreatedStatus = "Accepted"
+                CreatedStatus = CourtSubdivisionCreatedStatus.Accepted
             },
             new CourtSubdivision
             {
@@ -569,7 +569,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
-                CreatedStatus = "Pending"
+                CreatedStatus = CourtSubdivisionCreatedStatus.Pending
             },
             new CourtSubdivision
             {
@@ -583,7 +583,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
-                CreatedStatus = "Pending"
+                CreatedStatus = CourtSubdivisionCreatedStatus.Accepted
             },
             new CourtSubdivision
             {
@@ -597,7 +597,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
-                CreatedStatus = "Rejected"
+                CreatedStatus = CourtSubdivisionCreatedStatus.Rejected
             },
             new CourtSubdivision
             {
@@ -611,7 +611,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
-                CreatedStatus = "Pending"
+                CreatedStatus = CourtSubdivisionCreatedStatus.Pending
             },
             new CourtSubdivision
             {
@@ -625,7 +625,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
-                CreatedStatus = "Accepted"
+                CreatedStatus = CourtSubdivisionCreatedStatus.Accepted
             },
             new CourtSubdivision
             {
@@ -639,7 +639,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
-                CreatedStatus = "Pending"
+                CreatedStatus = CourtSubdivisionCreatedStatus.Pending
             }
         );
         #endregion

@@ -1,5 +1,6 @@
 ﻿using BeatSportsAPI.Application.Common.Mappings;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
+using BeatSportsAPI.Domain.Enums;
 
 namespace BeatSportsAPI.Application.Common.Response;
 public class CourtSubdivisionResponse : IMapFrom<CourtSubdivision>
@@ -45,7 +46,7 @@ public class CourtSubdivisionV4 : IMapFrom<CourtSubdivision>
     public decimal BasePrice { get; set; }
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
-    public string? CreatedStatus { get; set; }
+    public CourtSubdivisionCreatedStatus? CreatedStatus { get; set; }
     //public CourtSubSettingResponse? CourtSubSettingResponses { get; set; }
 }
 public class CourtSubdivisionV5
@@ -69,7 +70,7 @@ public class CourtSubdivisionV6 : IMapFrom<CourtSubdivision>
     public Guid CourtSubdivisionId { get; set; }
     public string? CourtSubdivisionName { get; set; }
     public string? CourtSubType { get; set; }
-    public string? CreatedStatus { get; set; }
+    public CourtSubdivisionCreatedStatus? CreatedStatus { get; set; }
     public decimal BasePrice { get; set; }
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }

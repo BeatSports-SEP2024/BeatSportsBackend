@@ -125,7 +125,7 @@ public class CourtResponseV6 : IMapFrom<Court>
     public double? LongitudeDelta { get; set; }
     public double? Latitude { get; set; }
     public double? Longitude { get; set; }
-    public string? StatusCourtSubdivision { get; set; }
+    public CourtSubdivisionCreatedStatus? StatusCourtSubdivision { get; set; }
     //public virtual IList<CourtSubdivision>? CourtSubdivision { get; set; }
 }
 

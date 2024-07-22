@@ -1,5 +1,6 @@
 ﻿using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Utils.Extensions;
@@ -27,8 +28,8 @@ public class GetCourtSubdivisionAndTimeByCourtIdAndDateQueryHandler : IRequestHa
                                              on sub.Id equals timeChecking.CourtSubdivisionId into timeCheckingGroup
                                              from timeChecking in timeCheckingGroup.DefaultIfEmpty()
                                              where sub.CourtId == request.CourtId
-                                             && sub.CreatedStatus != "Pending"
-                                             && sub.CreatedStatus != "Rejected"
+                                             && sub.CreatedStatus != CourtSubdivisionCreatedStatus.Pending
+                                             && sub.CreatedStatus != CourtSubdivisionCreatedStatus.Rejected
                                              && (timeChecking == null ||
                                                  (timeChecking.StartTime.Year == request.DateCheck.Year
                                                   && timeChecking.StartTime.Month == request.DateCheck.Month

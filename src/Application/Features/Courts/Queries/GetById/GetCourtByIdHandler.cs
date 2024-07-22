@@ -79,7 +79,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                             BasePrice = subCourt.BasePrice,
                             StartTime = c.TimeStart,
                             EndTime = c.TimeEnd,
-                            CreatedStatus = subCourt.CreatedStatus.ToString()
+                            CreatedStatus = subCourt.CreatedStatus
                         }).ToList()
                     }).ToList(),
 
