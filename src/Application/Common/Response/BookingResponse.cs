@@ -10,6 +10,7 @@ using BeatSportsAPI.Domain.Entities;
 namespace BeatSportsAPI.Application.Common.Response;
 public class BookingResponse : IMapFrom<Booking>
 {   
+    public Guid BookingId { get; set; }
     public Guid CustomerId { get; set; }
     //public Guid RoomMatchId { get; set; }
     public Guid? CampaignId { get; set; }
