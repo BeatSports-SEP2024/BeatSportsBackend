@@ -10,7 +10,7 @@ using BeatSportsAPI.Domain.Enums;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Queries.GetAllBookingsByCustomerId;
-public class GetAllBookingsByCustomerIdCommand : IRequest<PaginatedList<BookingResponse>>
+public class GetAllBookingsByCustomerIdCommand : IRequest<PaginatedList<BookingByCustomerId>>
 {
     public Guid CustomerId { get; set; }
     [EnumDataType(typeof(BookingEnums))]
