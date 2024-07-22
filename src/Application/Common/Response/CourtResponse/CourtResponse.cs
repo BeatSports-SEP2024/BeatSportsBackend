@@ -82,7 +82,11 @@ public class CourtResponseV4 : IMapFrom<Court>
 public class CourtResponseV5
 {
     public Guid Id { get; set; }
-    public string OwnerName { get; set; }
+    public string? OwnerName { get; set; }
+    public string? OwnerAddress { get; set; }
+    public DateTime? OwnerDoB { get; set; }
+    public string? OwnerBio { get; set; }
+    public string? OwnerPhoneNumber { get; set; }
     public string? Description { get; set; }
     public string? CourtName { get; set; }
     public string? Address { get; set; }
