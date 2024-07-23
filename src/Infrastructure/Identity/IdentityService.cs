@@ -421,7 +421,7 @@ public class IdentityService : IIdentityService
     public async Task<string> RegisterOwnerAccountAsync(RegisterOwnerModelRequest registerModelRequest, CancellationToken cancellationToken)
     {
         var existedUser = _beatSportsDbContext.Accounts
-            .Where(u => u.UserName == registerModelRequest.UserName.ToLower() || u.Email == registerModelRequest.Email)
+            .Where(u => u.UserName == registerModelRequest.UserName || u.Email == registerModelRequest.Email)
             .FirstOrDefault();
         if (existedUser != null)
         {

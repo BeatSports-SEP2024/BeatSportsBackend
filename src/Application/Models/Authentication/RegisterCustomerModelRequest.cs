@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using BeatSportsAPI.Application.Common.Attributes;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Domain.Common;
 using BeatSportsAPI.Domain.Entities;
@@ -18,8 +19,10 @@ public class RegisterCustomerModelRequest : IRequest<BeatSportsResponse>
 {
 
     [Required]
+    [Normalize]
     public string UserName { get; set; } = null!;
     [Required]
+    [Normalize]
     public string Password { get; set; } = null!;
     [EmailAddress]
     public string? Email { get; set; }

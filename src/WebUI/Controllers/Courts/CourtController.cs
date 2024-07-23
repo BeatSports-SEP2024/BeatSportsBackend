@@ -1,5 +1,5 @@
 ﻿using Azure.Core;
-using BeatSportsAPI.Application.Common.Middlewares;
+using BeatSportsAPI.Application.Common;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Response.CourtResponse;
