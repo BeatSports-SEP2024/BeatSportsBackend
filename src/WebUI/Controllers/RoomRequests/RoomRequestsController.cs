@@ -1,5 +1,7 @@
-﻿using BeatSportsAPI.Application.Features.Rooms.RoomRequests.Commands.CreateRoomRequests;
+﻿using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Features.Rooms.RoomRequests.Commands.CreateRoomRequests;
 using BeatSportsAPI.Application.Features.Rooms.RoomRequests.Commands.UpdateRoomRequests;
+using BeatSportsAPI.Application.Features.Rooms.RoomRequests.Queries.GetRoomRequestByCustomer;
 using BeatSportsAPI.Application.Models.Authentication;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -42,5 +44,12 @@ public class RoomRequestsController : ApiControllerBase
         var response = await _mediator.Send(request);
 
         return Ok(response);
+    }
+    [HttpGet]
+    [Route("room-request-pending")]
+    [SwaggerOperation("Lấy các phòng đang chờ duyệt")]
+    public async Task<List<RoomRequestResponseForCustomer>> GetPendingRoomByCusId([FromQuery] GetRoomRequestByCustomerCommand request)
+    {
+        return await _mediator.Send(request);
     }
 }
