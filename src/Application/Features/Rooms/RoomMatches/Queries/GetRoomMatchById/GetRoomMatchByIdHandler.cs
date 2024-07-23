@@ -37,6 +37,8 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
         var court = _dbContext.Courts
                     .Where(x => x.Id == query.Booking.CourtSubdivision.CourtId).FirstOrDefault();
 
+        var courtImgList = court.ImageUrls.Split(",");
+
         var customer = _dbContext.Customers
                     .Where(x => x.Id == request.CustomerId)
                     .Include(x => x.Account)
@@ -90,7 +92,7 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
         {
             RoomMatchId = request.RoomMatchId,
             CourtName = court.CourtName,
-            CourtImage = court.ImageUrls,
+            CourtImage = courtImgList,
             RoomName = query.RoomName,
             CustomerImage = customer.Account.ProfilePictureURL,
             CustomerName = customer.Account.FirstName + " " + customer.Account.LastName,
@@ -106,6 +108,7 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
             JoiningRequest = roomRequests,
             RoomMembers = roomMembers,
             IsPrivate = query.IsPrivate,
+            MaximumMember = query.MaximumMember,
         };
 
         if (room == null)

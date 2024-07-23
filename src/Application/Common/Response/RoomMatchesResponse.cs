@@ -43,7 +43,7 @@ public class RoomMatchesDetailResponse
     public string CustomerImage { get; set; }
     public string CustomerPhone { get; set; }
     public string CourtName { get; set; }
-    public string CourtImage { get; set; }
+    public string[] CourtImage { get; set; }
     public string Address { get; set; }
     public TimeSpan StartTimePlaying { get; set; }
     public TimeSpan EndTimePlaying { get; set; }
