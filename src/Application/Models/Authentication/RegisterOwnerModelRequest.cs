@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BeatSportsAPI.Application.Common.Attributes;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Domain.Common;
 using BeatSportsAPI.Domain.Enums;
@@ -13,6 +14,7 @@ namespace BeatSportsAPI.Application.Models.Authentication;
 public class RegisterOwnerModelRequest : IRequest<BeatSportsResponse>
 {
     [Required]
+    [Normalize]
     public string UserName { get; set; } = null!;
     [EmailAddress]
     public string? Email { get; set; }

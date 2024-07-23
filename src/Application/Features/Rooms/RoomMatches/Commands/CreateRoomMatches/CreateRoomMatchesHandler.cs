@@ -1,12 +1,15 @@
-﻿using BeatSportsAPI.Application.Common.Exceptions;
+﻿using System.Globalization;
+using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Domain.Entities.Room;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Rooms.RoomMatches.Commands.CreateRoomMatches;
-public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand, BeatSportsResponse>
+public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand, RoomMatchResponse>
 {
     private readonly IBeatSportsDbContext _dbContext;
 
@@ -15,59 +18,96 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
         _dbContext = dbContext;
     }
 
-    public Task<BeatSportsResponse> Handle(CreateRoomMatchesCommand request, CancellationToken cancellationToken)
+    public async Task<RoomMatchResponse> Handle(CreateRoomMatchesCommand request, CancellationToken cancellationToken)
     {
-        //check Court
-        var court = _dbContext.CourtSubdivisions.Where(x => x.Id == request.CourtSubdivisionId).SingleOrDefault();
-        if (court == null || court.IsDelete)
-        {
-            throw new BadRequestException($"Court with Court ID:{request.CourtSubdivisionId} does not exist or have been delele");
-        }
-
         //check Level
-        var level = _dbContext.Levels.Where(x => x.Id == request.LevelId).SingleOrDefault();
+        var level = await _dbContext.Levels.Where(x => x.Id == request.LevelId).SingleOrDefaultAsync();
         if (level == null || level.IsDelete)
         {
-            throw new BadRequestException($"Level with Level ID:{request.LevelId} does not exist or have been delele");
+            throw new BadRequestException($"Level with Level ID:{request.LevelId} does not exist or have been deleted");
         }
 
         //check booking
-        var booking = _dbContext.Bookings
-            .Where(b => b.Id == request.BookingId && !b.IsDelete && b.IsRoomBooking == true && b.BookingStatus == BookingEnums.Approved.ToString()).FirstOrDefault();
+        var booking = await _dbContext.Bookings
+            .Include(b => b.CourtSubdivision) 
+            .ThenInclude(cs => cs.CourtSubdivisionSettings) 
+            .ThenInclude(css => css.SportCategories) 
+            .Where(b => b.Id == request.BookingId && !b.IsDelete && b.BookingStatus == BookingEnums.Approved.ToString() && b.IsRoomBooking == false)
+            .FirstOrDefaultAsync();
 
-        var isRoomUseBookingId = _dbContext.RoomMatches
-            .Where(rm => rm.BookingId == request.BookingId).FirstOrDefault();
+        var isRoomUseBookingId = await _dbContext.RoomMatches
+            .Where(rm => rm.BookingId == request.BookingId).FirstOrDefaultAsync();
 
-        if(booking == null || isRoomUseBookingId != null)
+        if (booking == null || isRoomUseBookingId != null)
         {
-            throw new BadRequestException("This booking maybe is deleted or this booking is used");
+            throw new BadRequestException("This booking may be deleted or this booking is used");
+        }
+
+        if (booking.CourtSubdivision == null || booking.CourtSubdivision.CourtSubdivisionSettings == null ||
+            booking.CourtSubdivision.CourtSubdivisionSettings.SportCategories == null)
+        {
+            throw new ArgumentException("Invalid booking details, please check CourtSubdivision or CourtSubdivisionSettings or SportCategories");
+        }
+
+        string sportCategoryName = booking.CourtSubdivision.CourtSubdivisionSettings.SportCategories.Name.ToString();
+        SportCategoriesEnums sportCategoryEnum;
+
+        if (!SportCategoryMapper.SportCategoryMapping.TryGetValue(sportCategoryName, out sportCategoryEnum))
+        {
+            throw new ArgumentException($"Invalid sport category: {sportCategoryName}");
+        }
+
+        string dateFormat = "dd/MM/yyyy HH:mm";
+
+        DateTime startTimeRoom;
+        bool isValidDate = DateTime.TryParseExact(
+            request.StartTimeRoom, 
+            dateFormat,          
+            CultureInfo.InvariantCulture, 
+            DateTimeStyles.None,   
+            out startTimeRoom      
+        );
+
+        if (!isValidDate)
+        {
+            throw new ArgumentException("Invalid date format for StartTimeRoom. Please use 'day/month/year hours:minutes' format.");
         }
 
         var room = new RoomMatch()
         {
+            SportCategory = sportCategoryEnum,
             RoomName = request.RoomName,
             BookingId = request.BookingId,
             LevelId = request.LevelId,
-            StartTimeRoom = request.StartTimeRoom,
-            EndTimeRoom = request.EndTimeRoom,
+            StartTimeRoom = startTimeRoom,
+            EndTimeRoom = booking.PlayingDate + booking.StartTimePlaying,
             MaximumMember = request.MaximumMember,
             RuleRoom = request.RuleRoom,
-            Note = request.Note 
+            Note = request.Note
         };
+
         _dbContext.RoomMatches.Add(room);
-        _dbContext.SaveChanges();
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
         var roomMember = new RoomMember()
         {
             CustomerId = booking.CustomerId,
             RoomMatchId = room.Id,
-            RoleInRoom = RoleInRoomEnums.Master.ToString()
+            RoleInRoom = RoleInRoomEnums.Master
         };
 
         _dbContext.RoomMembers.Add(roomMember);
-        _dbContext.SaveChanges();
-        return Task.FromResult(new BeatSportsResponse
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        booking.IsRoomBooking = true;
+
+        _dbContext.Bookings.Update(booking);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return new RoomMatchResponse
         {
-            Message = "Create RoomMatch successfully!"
-        });
+            Message = $"Create RoomMatch successfully",
+            RoomMatchId = room.Id.ToString(),
+        };
     }
 }

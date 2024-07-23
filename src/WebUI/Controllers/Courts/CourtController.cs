@@ -1,5 +1,5 @@
 ﻿using Azure.Core;
-using BeatSportsAPI.Application.Common.Middlewares;
+using BeatSportsAPI.Application.Common;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Response.CourtResponse;
@@ -74,7 +74,7 @@ public class CourtController : ApiControllerBase
     }
 
     [HttpGet]
-    [Route("get-by-court-id-by-admin")]
+    [Route("get-by-court-id-by-admin-V2")]
     public async Task<ResponseCourtDataInCourtSubAndCourtSettingsAndTimeChecking> GetByCourtIdByAdminTesting([FromQuery] GetCourtSubAndCourtSettingsAndTimeChecking request)
     {
         return await _mediator.Send(request);

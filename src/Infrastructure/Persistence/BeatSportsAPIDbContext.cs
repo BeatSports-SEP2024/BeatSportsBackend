@@ -910,42 +910,45 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Id = roomMatch1,
                 BookingId = bookingId1,
                 LevelId = beginner,
-                StartTimeRoom = new TimeSpan(14, 30, 00),
-                EndTimeRoom = new TimeSpan(15, 30, 00),
+                StartTimeRoom = DateTime.Now.AddHours(1).AddMinutes(30).AddMinutes(25),
+                EndTimeRoom = DateTime.Now.AddHours(2).AddMinutes(30).AddMinutes(25),
                 MaximumMember = 20,
                 RuleRoom = "Rule Room Sample",
                 Note = "Note Sample",
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
+                IsPrivate= false,
             },
             new RoomMatch
             {
                 Id = roomMatch2,
                 BookingId = bookingId2,
                 LevelId = medium,
-                StartTimeRoom = new TimeSpan(14, 30, 00),
-                EndTimeRoom = new TimeSpan(15, 30, 00),
+                StartTimeRoom = DateTime.Now.AddHours(2).AddMinutes(30),
+                EndTimeRoom = DateTime.Now.AddHours(3).AddMinutes(30).AddMinutes(25),
                 MaximumMember = 20,
                 RuleRoom = "Rule Room Sample",
                 Note = "Note Sample",
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
+                IsPrivate = false,
             },
             new RoomMatch
             {
                 Id = roomMatch3,
                 BookingId = bookingId3,
                 LevelId = expert,
-                StartTimeRoom = new TimeSpan(15, 30, 00),
-                EndTimeRoom = new TimeSpan(16, 30, 00),
+                StartTimeRoom = DateTime.Now.AddHours(1).AddMinutes(30).AddMinutes(25),
+                EndTimeRoom = DateTime.Now.AddHours(2).AddMinutes(30).AddMinutes(25),
                 MaximumMember = 20,
                 RuleRoom = "Rule Room Sample",
                 Note = "Note Sample",
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
+                IsPrivate = false,
             });
         #endregion
         #region TimePeriod      
@@ -985,19 +988,19 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 CustomerId = customer1Id,
                 RoomMatchId = roomMatch1,
-                RoleInRoom = "Master",
+                RoleInRoom = RoleInRoomEnums.Master,
             },
             new RoomMember
             {
                 CustomerId = customer2Id,
                 RoomMatchId = roomMatch1,
-                RoleInRoom = "Member",
+                RoleInRoom = RoleInRoomEnums.Member,
             },
             new RoomMember
             {
                 CustomerId = customer3Id,
                 RoomMatchId = roomMatch1,
-                RoleInRoom = "Member",
+                RoleInRoom = RoleInRoomEnums.Member,
             });
         #endregion
         var timeCheckingId1 = new Guid("11111111-1111-1111-1111-111111111111");

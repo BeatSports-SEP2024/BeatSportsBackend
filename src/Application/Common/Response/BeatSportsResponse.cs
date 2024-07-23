@@ -11,3 +11,9 @@ public class BeatSportsResponse
 {
     public string Message { get; set; } = "";
 }
+
+public class RoomMatchResponse
+{
+    public string Message { get; set; } = "";
+    public string? RoomMatchId { get; set; }
+}

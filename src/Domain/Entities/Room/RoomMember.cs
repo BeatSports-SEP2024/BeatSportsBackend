@@ -5,7 +5,7 @@ public class RoomMember
 {
     public Guid CustomerId { get; set; }
     public Guid RoomMatchId { get; set; }
-    public string? RoleInRoom { get; set; }
+    public RoleInRoomEnums RoleInRoom { get; set; }
 
     public virtual Customer Customer { get; set; } = null!;
     public virtual RoomMatch RoomMatch { get; set; } = null!;
