@@ -30,7 +30,7 @@ public class CampaignResponse : IMapFrom<Campaign>
     public Court Court { get; set; } = null!;
 }
 
-public class CampaignResponseV2 
+public class CampaignResponseV2
 {
     public Guid CampaignId { get; set; }
     public Guid CourtId { get; set; }
@@ -42,7 +42,7 @@ public class CampaignResponseV2
     public StatusEnums Status { get; set; }
 }
 
-public class CampaignResponseV3 
+public class CampaignResponseV3
 {
     public Guid Id { get; set; }
     public Guid CourtId { get; set; }
@@ -105,4 +105,9 @@ public class CampaignResponseV6
     public decimal MinValueApply { get; set; }
     public decimal MaxValueDiscount { get; set; }
     //public StatusEnums Status { get; set; }
+}
+
+public class CampaignResponseV7 : CampaignResponseV5
+{
+    public bool CanApplyCampaign { get; set; }
 }
