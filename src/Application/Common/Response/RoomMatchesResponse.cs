@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BeatSportsAPI.Domain.Entities.Room;
 using BeatSportsAPI.Domain.Enums;
 
 namespace BeatSportsAPI.Application.Common.Response;
@@ -32,4 +33,37 @@ public class RoomRequestInRoom
     public string? CustomerAvatar { get; set; } 
     public string? CustomerName { get; set; }
     public RoomRequestEnums JoinStatus { get; set; }
+}
+
+public class RoomMatchesDetailResponse
+{
+    public Guid RoomMatchId { get; set; }
+    public string RoomName { get; set; }
+    public string CustomerName { get; set; }
+    public string CustomerImage { get; set; }
+    public string CustomerPhone { get; set; }
+    public string CourtName { get; set; }
+    public string CourtImage { get; set; }
+    public string Address { get; set; }
+    public TimeSpan StartTimePlaying { get; set; }
+    public TimeSpan EndTimePlaying { get; set; }
+    public string LevelName { get; set; }
+    public DateTime StartTimeRoom { get; set; }
+    public DateTime EndTimeRoom { get; set; }
+    public int MaximumMember { get; set; }
+    public int CountMember { get; set; }
+    public double PlayingCosts { get; set; }
+    public string? RuleRoom { get; set; }
+    public string? Note { get; set; }
+    public IList<RoomRequestInRoom>? JoiningRequest { get; set; }
+    public IList<RoomMemberInRoomResponse>? RoomMembers { get; set; }
+    public bool? IsPrivate { get; set; }
+}
+
+public class RoomMemberInRoomResponse
+{
+    public Guid AccountId { get; set; }
+    public string CustomerName { get; set; }
+    public string CustomerImage { get; set; }
+    public RoleInRoomEnums RoleInRoom { get; set; }
 }

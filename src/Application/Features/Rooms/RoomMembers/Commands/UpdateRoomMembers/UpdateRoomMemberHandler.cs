@@ -27,7 +27,7 @@ public class UpdateRoomMemberHandler : IRequestHandler<UpdateRoomMemberCommand, 
         {
             isValidRoomMember.CustomerId = request.CustomerId;
             isValidRoomMember.RoomMatchId = request.RoomMatchId;
-            isValidRoomMember.RoleInRoom = request.RoleInRoom.ToString();
+            isValidRoomMember.RoleInRoom = request.RoleInRoom;
 
             _beatSportsDbContext.RoomMembers.Update(isValidRoomMember);
             await _beatSportsDbContext.SaveChangesAsync(cancellationToken);

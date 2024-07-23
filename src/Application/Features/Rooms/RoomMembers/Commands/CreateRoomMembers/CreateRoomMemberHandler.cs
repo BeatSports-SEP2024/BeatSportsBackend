@@ -34,7 +34,7 @@ public class CreateRoomMemberHandler : IRequestHandler<CreateRoomMemberCommand, 
         {
             CustomerId = request.CustomerId,
             RoomMatchId = request.RoomMatchId,
-            RoleInRoom = RoleInRoomEnums.Member.ToString(),
+            RoleInRoom = RoleInRoomEnums.Member,
         };
         _beatSportsDbContext.RoomMembers.Add(newRoomMember);
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);

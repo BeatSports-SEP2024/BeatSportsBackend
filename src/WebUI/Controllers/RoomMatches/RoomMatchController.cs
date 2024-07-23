@@ -48,7 +48,7 @@ public class RoomMatchController : ApiControllerBase
     }
     [HttpGet]
     [Route("get-by-roomMatch-id")]
-    public async Task<RoomMatchesResponse> GetByRoomMatchId([FromQuery] GetRoomMatchByIdCommand request)
+    public async Task<RoomMatchesDetailResponse> GetByRoomMatchId([FromQuery] GetRoomMatchByIdCommand request)
     {
         return await _mediator.Send(request);
     }

@@ -38,7 +38,7 @@ public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand
         {
             CustomerId = customer.Id,
             RoomMatchId = roomMatch.Id,
-            JoiningStatus = RoomRequestEnums.Pending.ToString(),
+            JoinStatus = RoomRequestEnums.Pending,
             DateRequest = DateTime.UtcNow,
         };
         _beatSportsDbContext.RoomRequests.Add(roomRequest);
