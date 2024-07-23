@@ -1,4 +1,5 @@
-﻿using BeatSportsAPI.Application.Common.Exceptions;
+﻿using System.Globalization;
+using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Ultilities;
@@ -56,14 +57,30 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
             throw new ArgumentException($"Invalid sport category: {sportCategoryName}");
         }
 
+        string dateFormat = "dd/MM/yyyy HH:mm";
+
+        DateTime startTimeRoom;
+        bool isValidDate = DateTime.TryParseExact(
+            request.StartTimeRoom, 
+            dateFormat,          
+            CultureInfo.InvariantCulture, 
+            DateTimeStyles.None,   
+            out startTimeRoom      
+        );
+
+        if (!isValidDate)
+        {
+            throw new ArgumentException("Invalid date format for StartTimeRoom. Please use 'day/month/year hours:minutes' format.");
+        }
+
         var room = new RoomMatch()
         {
             SportCategory = sportCategoryEnum,
             RoomName = request.RoomName,
             BookingId = request.BookingId,
             LevelId = request.LevelId,
-            StartTimeRoom = request.StartTimeRoom,
-            EndTimeRoom = booking.StartTimePlaying,
+            StartTimeRoom = startTimeRoom,
+            EndTimeRoom = booking.PlayingDate + booking.StartTimePlaying,
             MaximumMember = request.MaximumMember,
             RuleRoom = request.RuleRoom,
             Note = request.Note

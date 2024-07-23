@@ -361,13 +361,13 @@ public class IdentityService : IIdentityService
     public async Task<string> RegisterCustomerAccountAsync(RegisterCustomerModelRequest registerModelRequest, CancellationToken cancellationToken)
     {
         var existedUser = _beatSportsDbContext.Accounts
-            .Where(u => u.UserName == registerModelRequest.UserName && u.Email == registerModelRequest.Email)
+            .Where(u => u.UserName == registerModelRequest.UserName || u.Email == registerModelRequest.Email)
             .FirstOrDefault();
         if (existedUser != null)
         {
             throw new NotFoundException("This user is existed");
         }
-
+        #region Upload Avatar Firebase
         //Save temporary data of image
         //Copy temporary data to memoryStream
         //Convert byte to base64
@@ -384,7 +384,7 @@ public class IdentityService : IIdentityService
         //        profileImageUrl = await _imageUploadService.UploadImage("profileImages", base64string);
         //    }
         //}
-
+        #endregion
         var combinedPassword = CreatePasswordHash(registerModelRequest.Password);
         var newUser = new Account
         {
@@ -421,7 +421,7 @@ public class IdentityService : IIdentityService
     public async Task<string> RegisterOwnerAccountAsync(RegisterOwnerModelRequest registerModelRequest, CancellationToken cancellationToken)
     {
         var existedUser = _beatSportsDbContext.Accounts
-            .Where(u => u.UserName == registerModelRequest.UserName && u.Email == registerModelRequest.Email)
+            .Where(u => u.UserName == registerModelRequest.UserName.ToLower() || u.Email == registerModelRequest.Email)
             .FirstOrDefault();
         if (existedUser != null)
         {
