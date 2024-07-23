@@ -29,7 +29,8 @@ public class GetCampaignByCourtSubdivisionAndTotalMoneyQueryHandler : IRequestHa
                 MinValueApply = x.MinValueApply,
                 StartDateApplying = x.StartDateApplying,
                 Status = x.Status,
-                CanApplyCampaign = request.TotalMoney >= x.MinValueApply
+                CanApplyCampaign = request.TotalMoney >= x.MinValueApply,
+                PercenDiscount = x.PercentDiscount
             })
             .PaginatedListAsync(request.PageIndex, request.PageSize);
         return campaign;

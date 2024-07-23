@@ -110,4 +110,5 @@ public class CampaignResponseV6
 public class CampaignResponseV7 : CampaignResponseV5
 {
     public bool CanApplyCampaign { get; set; }
+    public decimal PercenDiscount { get; set; }
 }
