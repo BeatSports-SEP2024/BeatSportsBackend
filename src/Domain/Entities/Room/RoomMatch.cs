@@ -8,6 +8,7 @@ public class RoomMatch : BaseAuditableEntity
     public Guid BookingId { get; set; }
     [ForeignKey("Level")]
     public Guid LevelId { get; set; }
+    public SportCategoriesEnums SportCategory { get; set; }
     public TimeSpan StartTimeRoom { get; set; }
     public TimeSpan EndTimeRoom { get; set; }
     public int MaximumMember { get; set; }
