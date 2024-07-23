@@ -42,7 +42,7 @@ public class RoomMatchController : ApiControllerBase
     }
     [HttpGet]
     [Route("all")]
-    public async Task<PaginatedList<RoomMatchesResponse>> GetAll([FromQuery] GetAllRoomMatchesCommand request)
+    public async Task<RoomRequestsResponseForGetAll> GetAll([FromQuery] GetAllRoomMatchesCommand request)
     {
         return await _mediator.Send(request);
     }

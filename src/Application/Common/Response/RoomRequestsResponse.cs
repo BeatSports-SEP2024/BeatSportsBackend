@@ -25,9 +25,33 @@ public class RoomRequestResponseForCustomer
     public Guid RoomRequestId { get; set; }
     public Guid LevelId { get; set; }
     public string? Address { get; set; }
-    public int? ResquestCount { get; set; }
+    public int? NumberOfMember { get; set; }
     public DateTime DatePlaying { get; set; } // Get from Start Time Room
     public decimal? Price { get; set; }
     public string? LevelName { get; set; }
     public DateTime DateRequest { get; set; } // Để phân filter
+    public int? MaxMember { get; set; }
+    public Guid? RoomMatchId { get; set; }
+}
+
+public class PublicRoomResponse
+{
+    public string? MasterName { get; set; }
+    //public Guid RoomRequestId { get; set; }
+    public Guid LevelId { get; set; }
+    public string? Address { get; set; }
+    public int? NumberOfMember { get; set; }
+    public DateTime DatePlaying { get; set; } // Get from Start Time Room
+    public decimal? Price { get; set; }
+    public string? LevelName { get; set; }
+    public DateTime DateRequest { get; set; } // Để phân filter
+    public int? MaxMember { get; set; }
+    public Guid? RoomMatchId { get; set; }
+}
+
+public class RoomRequestsResponseForGetAll
+{
+    public List<RoomRequestResponseForCustomer>? PendingRoomList { get; set; }
+    public List<RoomRequestResponseForCustomer>? JoinedRoomList { get; set; }
+    public List<PublicRoomResponse>? PublicRoomList { get; set; }
 }

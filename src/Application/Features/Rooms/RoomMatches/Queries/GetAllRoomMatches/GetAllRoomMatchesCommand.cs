@@ -9,10 +9,11 @@ using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Rooms.RoomMatches.Queries.GetAllRoomMatches;
-public class GetAllRoomMatchesCommand : IRequest<PaginatedList<RoomMatchesResponse>>
+public class GetAllRoomMatchesCommand : IRequest<RoomRequestsResponseForGetAll>
 {
-    [Required]
-    public int PageIndex { get; set; }
-    [Required]
-    public int PageSize { get; set; }
+    //[Required]
+    //public int PageIndex { get; set; }
+    //[Required]
+    //public int PageSize { get; set; }
+    public Guid CustomerId { get; set; }
 }

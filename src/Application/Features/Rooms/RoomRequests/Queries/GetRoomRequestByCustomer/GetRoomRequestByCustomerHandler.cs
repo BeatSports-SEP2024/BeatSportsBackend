@@ -62,7 +62,8 @@ public class GetRoomRequestByCustomerHandler : IRequestHandler<GetRoomRequestByC
                 DateRequest = c.DateRequest,
                 LevelName = roomMatch?.Level?.LevelName ?? "Unknown Level",
                 Price = roomMatch?.Booking?.CourtSubdivision?.BasePrice ?? default(decimal),
-                ResquestCount = roomMatch?.RoomRequests?.Count() ?? 0,
+                NumberOfMember = roomMatch?.RoomMembers?.Count() ?? 0,
+                MaxMember = c.RoomMatch.MaximumMember,
                 RoomRequestId = c.Id,
             };
         }).ToList();

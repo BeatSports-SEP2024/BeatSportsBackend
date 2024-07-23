@@ -67,3 +67,4 @@ public class RoomMemberInRoomResponse
     public string CustomerImage { get; set; }
     public RoleInRoomEnums RoleInRoom { get; set; }
 }
+
