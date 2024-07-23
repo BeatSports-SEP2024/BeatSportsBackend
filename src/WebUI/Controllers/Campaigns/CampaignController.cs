@@ -6,6 +6,7 @@ using BeatSportsAPI.Application.Features.Campaigns.Commands.UpdateCampaign;
 using BeatSportsAPI.Application.Features.Campaigns.Commands.UpdateStatusOfCampaign;
 using BeatSportsAPI.Application.Features.Campaigns.Queries.GetAllCampaigns;
 using BeatSportsAPI.Application.Features.Campaigns.Queries.GetAllCampaignWithPending;
+using BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignByCourtSubdivisionAndTotalMoney;
 using BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignById;
 using BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignFilter;
 using BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignListByFilter;
@@ -79,6 +80,13 @@ public class CampaignController : ApiControllerBase
     [HttpPut]
     [Route("accept-campaign")]
     public async Task<BeatSportsResponse> UpdateStatus(UpdateStatusOfCampaignCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+    [HttpGet]
+    [Route("list-campaign-by-customer")]
+    [SwaggerOperation("Được get lên bởi User by Court sub Id và Total Money")]
+    public async Task<PaginatedList<CampaignResponseV7>> GetListOfCampaignByCustomer([FromQuery] GetCampaignByCourtSubdivisionAndTotalMoneyQuery request)
     {
         return await _mediator.Send(request);
     }
