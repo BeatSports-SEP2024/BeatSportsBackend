@@ -37,7 +37,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
         // B2. Nếu OK rồi thì dựa vào court id trong court sub để tìm trong bảng time period
         // - Mục đích là kiếm xem sân này có nhiều khung giờ hay kh
         // - Nếu có nhiều khung giờ thì check xem thời gian muốn đặt nằm ở trong khung giờ nào để tính tiền
-        var timePeriods = await _dbContext.TimePeriods.Where(x => x.CourtId == courtSub.CourtId && !x.IsDelete).ToListAsync();
+        var timePeriods = await _dbContext.TimePeriods.Where(x => x.CourtId == courtSub.CourtId && !x.IsDelete).OrderBy(x => x.StartTime).ToListAsync();
         var court = await _dbContext.Courts.Where(x => x.Id == courtSub.CourtId).SingleOrDefaultAsync();
         var response = new BookingDetailReadyForFinishBookingResponse()
         {
