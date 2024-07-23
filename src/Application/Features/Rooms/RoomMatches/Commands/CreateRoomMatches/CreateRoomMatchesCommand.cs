@@ -10,7 +10,7 @@ using BeatSportsAPI.Domain.Enums;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Rooms.RoomMatches.Commands.CreateRoomMatches;
-public class CreateRoomMatchesCommand : IRequest<BeatSportsResponse>
+public class CreateRoomMatchesCommand : IRequest<RoomMatchResponse>
 {
     public Guid LevelId { get; set; }
     public Guid BookingId { get; set; }

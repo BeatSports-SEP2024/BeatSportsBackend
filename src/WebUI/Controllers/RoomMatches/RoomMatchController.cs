@@ -26,7 +26,7 @@ public class RoomMatchController : ApiControllerBase
     }
 
     [HttpPost]
-    public async Task<BeatSportsResponse> Create(CreateRoomMatchesCommand request)
+    public async Task<RoomMatchResponse> Create(CreateRoomMatchesCommand request)
     {
         return await _mediator.Send(request);
     }

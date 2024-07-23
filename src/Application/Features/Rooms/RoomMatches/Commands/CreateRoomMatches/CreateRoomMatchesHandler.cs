@@ -8,7 +8,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Rooms.RoomMatches.Commands.CreateRoomMatches;
-public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand, BeatSportsResponse>
+public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand, RoomMatchResponse>
 {
     private readonly IBeatSportsDbContext _dbContext;
 
@@ -17,7 +17,7 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
         _dbContext = dbContext;
     }
 
-    public async Task<BeatSportsResponse> Handle(CreateRoomMatchesCommand request, CancellationToken cancellationToken)
+    public async Task<RoomMatchResponse> Handle(CreateRoomMatchesCommand request, CancellationToken cancellationToken)
     {
         //check Level
         var level = await _dbContext.Levels.Where(x => x.Id == request.LevelId).SingleOrDefaultAsync();
@@ -87,9 +87,10 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
         _dbContext.Bookings.Update(booking);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return new BeatSportsResponse
+        return new RoomMatchResponse
         {
-            Message = $"Create RoomMatch successfully, roomMatch Id {room.Id}"
+            Message = $"Create RoomMatch successfully",
+            RoomMatchId = room.Id.ToString(),
         };
     }
 }
