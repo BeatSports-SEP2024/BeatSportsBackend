@@ -14,7 +14,7 @@ public class RoomRequest : BaseAuditableEntity
     public Guid RoomMatchId { get; set; }
     public RoomRequestEnums JoinStatus { get; set; }
     public DateTime DateRequest { get; set; }
-    public DateTime DateApprove { get; set; }
+    public DateTime? DateApprove { get; set; }
     public virtual Customer Customer { get; set; }
     public virtual RoomMatch RoomMatch { get; set; }
 }
