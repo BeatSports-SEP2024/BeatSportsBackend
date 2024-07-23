@@ -43,10 +43,12 @@ public class RoomMatchesDetailResponse
     public string CustomerImage { get; set; }
     public string CustomerPhone { get; set; }
     public string CourtName { get; set; }
+    public string CourtDescription { get; set; }
     public string[] CourtImage { get; set; }
     public string Address { get; set; }
     public TimeSpan StartTimePlaying { get; set; }
     public TimeSpan EndTimePlaying { get; set; }
+    public DateTime PlayingDate { get; set; }
     public string LevelName { get; set; }
     public DateTime StartTimeRoom { get; set; }
     public DateTime EndTimeRoom { get; set; }
