@@ -65,7 +65,7 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
                 CourtName = c.RoomMatch.Booking.CourtSubdivision.Court.CourtName,
                 RoomName = c.RoomMatch.RoomName,
                 LevelId = roomMatch?.LevelId ?? default(Guid),
-                DatePlaying = roomMatch?.StartTimeRoom ?? DateTime.MinValue,
+                DatePlaying = roomMatch.Booking.PlayingDate,
                 DateRequest = c.DateRequest,
                 StartTimePlaying = c.RoomMatch.Booking.StartTimePlaying,
                 EndTimePlaying = c.RoomMatch.Booking.EndTimePlaying,
@@ -76,7 +76,9 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
                 RoomRequestId = c.Id,
                 RoomMatchId = c.RoomMatch.Id,
             };
-        }).ToList();
+        })
+        .OrderBy(x => x.DatePlaying)
+        .ToList();
 
         #endregion
         #region Join List
@@ -114,7 +116,7 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
                 CourtName = c.RoomMatch.Booking.CourtSubdivision.Court.CourtName,
                 RoomName = c.RoomMatch.RoomName,
                 LevelId = roomMatch?.LevelId ?? default(Guid),
-                DatePlaying = roomMatch?.StartTimeRoom ?? DateTime.MinValue,
+                DatePlaying = roomMatch.Booking.PlayingDate,
                 StartTimePlaying = c.RoomMatch.Booking.StartTimePlaying,
                 EndTimePlaying = c.RoomMatch.Booking.EndTimePlaying,
                 DateRequest = c.DateRequest,
@@ -125,7 +127,9 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
                 RoomRequestId = c.Id,
                 RoomMatchId = c.RoomMatch.Id,
             };
-        }).ToList();
+        })
+        .OrderBy(x => x.DatePlaying)
+        .ToList();
         #endregion
         #region Public Room
         // Lấy danh sách phòng đang public (IsPrivate = false)
@@ -153,7 +157,7 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
                     LevelId = firstRoomMatch.LevelId,
                     CourtName = firstRoomMatch.Booking.CourtSubdivision.Court.CourtName,
                     RoomName = firstRoomMatch.RoomName,
-                    DatePlaying = firstRoomMatch.StartTimeRoom,
+                    DatePlaying = firstRoomMatch.Booking.PlayingDate,
                     StartTimePlaying = firstRoomMatch.Booking.StartTimePlaying,
                     EndTimePlaying = firstRoomMatch.Booking.EndTimePlaying,
                     LevelName = firstRoomMatch.Level?.LevelName ?? "Unknown Level",
@@ -163,6 +167,7 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
                     RoomMatchId = firstRoomMatch.Id
                 };
             })
+            .OrderBy(x => x.DatePlaying)
             .ToList();
         #endregion
         return new RoomRequestsResponseForGetAll
