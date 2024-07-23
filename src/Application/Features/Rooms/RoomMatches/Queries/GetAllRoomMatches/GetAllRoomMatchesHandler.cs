@@ -74,6 +74,7 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
                 NumberOfMember = roomMatch?.RoomMembers?.Count() ?? 0,
                 MaxMember = c.RoomMatch.MaximumMember,
                 RoomRequestId = c.Id,
+                RoomMatchId = c.RoomMatch.Id,
             };
         }).ToList();
 
@@ -122,6 +123,7 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
                 NumberOfMember = roomMembersForJoined.Count(rm => rm.RoomMatchId == c.RoomMatchId),
                 MaxMember = roomMatch?.MaximumMember ?? 0,
                 RoomRequestId = c.Id,
+                RoomMatchId = c.RoomMatch.Id,
             };
         }).ToList();
         #endregion

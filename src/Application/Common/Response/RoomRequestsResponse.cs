@@ -35,7 +35,7 @@ public class RoomRequestResponseForCustomer
     public string? LevelName { get; set; }
     public DateTime DateRequest { get; set; } // Để phân filter
     public int? MaxMember { get; set; }
-    //public Guid? RoomMatchId { get; set; }
+    public Guid? RoomMatchId { get; set; }
 }
 
 public class PublicRoomResponse
