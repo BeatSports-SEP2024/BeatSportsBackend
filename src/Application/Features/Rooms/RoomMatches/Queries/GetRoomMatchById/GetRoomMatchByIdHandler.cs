@@ -12,9 +12,10 @@ using BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignById;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Entities.Room;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Rooms.RoomMatches.Queries.GetRoomMatchById;
-public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, RoomMatchesResponse>
+public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, RoomMatchesDetailResponse>
 {
     private readonly IBeatSportsDbContext _dbContext;
     private readonly IMapper _mapper;
@@ -24,27 +25,94 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
         _dbContext = dbContext;
         _mapper = mapper;
     }
-    public Task<RoomMatchesResponse> Handle(GetRoomMatchByIdCommand request, CancellationToken cancellationToken)
+    public Task<RoomMatchesDetailResponse> Handle(GetRoomMatchByIdCommand request, CancellationToken cancellationToken)
     {
-        IQueryable<RoomMatch> query = _dbContext.RoomMatches
-            .Where(x => x.Id == request.RoomMatchId && !x.IsDelete);
+        var query = _dbContext.RoomMatches
+            .Where(x => x.Id == request.RoomMatchId && !x.IsDelete)
+            .Include(x => x.Level)
+            .Include(x => x.RoomMembers)
+            .Include(x => x.RoomRequests)
+            .Include(x => x.Booking).ThenInclude(c => c.CourtSubdivision).FirstOrDefault();
+            
+        var court = _dbContext.Courts
+                    .Where(x => x.Id == query.Booking.CourtSubdivision.CourtId).FirstOrDefault();
 
-        var room = query.Select(c => new RoomMatchesResponse
+        var customer = _dbContext.Customers
+                    .Where(x => x.Id == request.CustomerId)
+                    .Include(x => x.Account)
+                    .FirstOrDefault();
+
+        var roomRequests = new List<RoomRequestInRoom>();
+        var roomMembers = new List<RoomMemberInRoomResponse>();
+
+        if (query.RoomMembers.Any(x => x.RoleInRoom == Domain.Enums.RoleInRoomEnums.Master 
+                                    && x.CustomerId == request.CustomerId))
         {
-            RoomMatchId = c.Id,
-            BookingId = c.BookingId,
-            LevelId = c.LevelId,
-            StartTimeRoom = c.StartTimeRoom,
-            EndTimeRoom = c.EndTimeRoom,
-            MaximumMember = c.MaximumMember,
-            RuleRoom = c.RuleRoom,
-            Note = c.Note
-        }).SingleOrDefault();
+            foreach (var roomRequest in query.RoomRequests)
+            {
+                var cus = _dbContext.Customers
+                        .Where(x => x.Id == roomRequest.CustomerId)
+                        .Include(x => x.Account)
+                        .FirstOrDefault();
+
+                var result = new RoomRequestInRoom()
+                {
+                    AccountId = cus.Account.Id,
+                    CustomerAvatar = cus.Account.ProfilePictureURL,
+                    CustomerName = cus.Account.FirstName + " " + cus.Account.LastName,
+                    RoomRequestsId = roomRequest.Id,
+                    JoinStatus = roomRequest.JoinStatus,
+                };
+
+                roomRequests.Add(result);
+            }
+        }
+
+        foreach (var roomMember in query.RoomMembers)
+        {
+            var cus = _dbContext.Customers
+                    .Where(x => x.Id == roomMember.CustomerId)
+                    .Include(x => x.Account)
+                    .FirstOrDefault();
+
+            var result = new RoomMemberInRoomResponse()
+            {
+                AccountId = cus.Account.Id,
+                CustomerImage = cus.Account.ProfilePictureURL,
+                CustomerName = cus.Account.FirstName + " " + cus.Account.LastName,
+                RoleInRoom = roomMember.RoleInRoom
+            };
+
+            roomMembers.Add(result);
+        }
+
+        var room = new RoomMatchesDetailResponse()
+        {
+            RoomMatchId = request.RoomMatchId,
+            CourtName = court.CourtName,
+            CourtImage = court.ImageUrls,
+            RoomName = query.RoomName,
+            CustomerImage = customer.Account.ProfilePictureURL,
+            CustomerName = customer.Account.FirstName + " " + customer.Account.LastName,
+            CustomerPhone = customer.Account.PhoneNumber,
+            Address = court.Address,
+            StartTimePlaying = query.Booking.StartTimePlaying,
+            EndTimePlaying = query.Booking.EndTimePlaying,
+            StartTimeRoom = query.StartTimeRoom, 
+            EndTimeRoom = query.EndTimeRoom,
+            CountMember = query.RoomMembers.Count,
+            PlayingCosts = (int)query.Booking.TotalAmount/ query.MaximumMember,
+            RuleRoom = query.RuleRoom,
+            JoiningRequest = roomRequests,
+            RoomMembers = roomMembers,
+            IsPrivate = query.IsPrivate,
+        };
 
         if (room == null)
         {
             throw new NotFoundException($"Do not find RoomMatch with RoomMatch ID: {request.RoomMatchId}");
         }
+
         return Task.FromResult(room);
     }
 }

@@ -918,6 +918,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
+                IsPrivate= false,
             },
             new RoomMatch
             {
@@ -932,6 +933,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
+                IsPrivate = false,
             },
             new RoomMatch
             {
@@ -946,6 +948,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
+                IsPrivate = false,
             });
         #endregion
         #region TimePeriod      
@@ -985,19 +988,19 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 CustomerId = customer1Id,
                 RoomMatchId = roomMatch1,
-                RoleInRoom = "Master",
+                RoleInRoom = RoleInRoomEnums.Master,
             },
             new RoomMember
             {
                 CustomerId = customer2Id,
                 RoomMatchId = roomMatch1,
-                RoleInRoom = "Member",
+                RoleInRoom = RoleInRoomEnums.Member,
             },
             new RoomMember
             {
                 CustomerId = customer3Id,
                 RoomMatchId = roomMatch1,
-                RoleInRoom = "Member",
+                RoleInRoom = RoleInRoomEnums.Member,
             });
         #endregion
         var timeCheckingId1 = new Guid("11111111-1111-1111-1111-111111111111");

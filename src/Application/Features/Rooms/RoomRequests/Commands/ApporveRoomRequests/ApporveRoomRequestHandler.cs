@@ -29,7 +29,7 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
         }
 
         //Chu room approve request do
-        roomRequest.JoiningStatus = RoomRequestEnums.Accepted.ToString();
+        roomRequest.JoinStatus = RoomRequestEnums.Accepted;
         roomRequest.DateApprove = DateTime.UtcNow;
 
         _beatSportsDbContext.RoomRequests.Update(roomRequest);
@@ -38,7 +38,7 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
         {
             CustomerId = roomRequest.CustomerId,
             RoomMatchId = roomRequest.RoomMatchId,
-            RoleInRoom = RoleInRoomEnums.Member.ToString(),
+            RoleInRoom = RoleInRoomEnums.Member,
         };
         _beatSportsDbContext.RoomMembers.Add(roomMember);
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);

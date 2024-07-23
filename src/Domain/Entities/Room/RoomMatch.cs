@@ -15,6 +15,7 @@ public class RoomMatch : BaseAuditableEntity
     public string? RoomName { get; set; }
     public string? RuleRoom { get; set; }
     public string? Note { get; set; }
+    public bool? IsPrivate { get; set; }
 
     public virtual Booking Booking { get; set; } = null!;
     public virtual Level Level { get; set; } = null!;

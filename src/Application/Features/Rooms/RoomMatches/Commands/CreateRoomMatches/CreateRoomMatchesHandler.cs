@@ -93,7 +93,7 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
         {
             CustomerId = booking.CustomerId,
             RoomMatchId = room.Id,
-            RoleInRoom = RoleInRoomEnums.Master.ToString()
+            RoleInRoom = RoleInRoomEnums.Master
         };
 
         _dbContext.RoomMembers.Add(roomMember);
