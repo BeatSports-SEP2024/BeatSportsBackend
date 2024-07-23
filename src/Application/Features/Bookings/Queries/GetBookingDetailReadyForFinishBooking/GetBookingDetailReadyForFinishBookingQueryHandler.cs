@@ -84,7 +84,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                     {
                         TimePeriodId = item.Id.ToString(),
                         PriceInTimePeriod = courtSub.BasePrice * item.RateMultiplier ?? 1,
-                        TimePeriodDescription = "Khung giờ " 
+                        TimePeriodDescription = "Khung giờ "
                         + "'"
                         + item.Description
                         + "'"
@@ -136,6 +136,23 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                 totalPrice += courtSub.BasePrice * Convert.ToDecimal(timePlayInThisPeriod.TotalHours);
                 currentStart = request.EndTimeWantToPlay;
             }
+        }
+        else
+        {
+            var newCourtSubResponse = new CourtDetailInBookingDetailReadyForFinishBookingReponse()
+            {
+                TimePeriodId = null,
+                PriceInTimePeriod = courtSub.BasePrice,
+                TimePeriodDescription = "Khung giờ từ "
+                                        + currentStart.ToString(@"hh\:mm")
+                                        + " đến "
+                                        + request.EndTimeWantToPlay.ToString(@"hh\:mm")
+            };
+            listCourtSubInReponse.Add(newCourtSubResponse);
+
+            var timePlayInThisPeriod = request.EndTimeWantToPlay - currentStart;
+            totalPrice += courtSub.BasePrice * Convert.ToDecimal(timePlayInThisPeriod.TotalHours);
+            currentStart = request.EndTimeWantToPlay;
         }
         response.ListCourtByTimePeriod = listCourtSubInReponse;
         response.TotalPrice = Math.Round(totalPrice, 2);
