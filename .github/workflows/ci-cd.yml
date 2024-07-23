@@ -2,7 +2,7 @@ name: CD
 
 on:
   push:
-    branches: develop_minh_v2
+    branches: develop
 
 jobs:
   build:
