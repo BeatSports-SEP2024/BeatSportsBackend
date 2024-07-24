@@ -9,5 +9,5 @@ public enum RoomRequestEnums
 {
     Pending,
     Accepted,
-    Declined
+    Declined,
 }

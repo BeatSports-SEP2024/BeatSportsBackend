@@ -27,7 +27,6 @@
     <ItemGroup>
       <Folder Include="Features\Customers\Commands\" />
       <Folder Include="Features\Owners\Commands\" />
-      <Folder Include="Features\Rooms\RoomMatches\Commands\" />
       <Folder Include="Features\Wallets\Commands\CreateWithdrawls\" />
     </ItemGroup>
 
