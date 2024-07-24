@@ -28,24 +28,37 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
             throw new NotFoundException($"{request.RoomRequestId} is not existed");
         }
 
-        //Chu room approve request do
-        roomRequest.JoinStatus = RoomRequestEnums.Accepted;
-        roomRequest.DateApprove = DateTime.UtcNow;
-
-        _beatSportsDbContext.RoomRequests.Update(roomRequest);
-        //Khi Accepted thi RoomMatch do co them member
-        var roomMember = new RoomMember
+        switch (request.RoomRequest.ToString())
         {
-            CustomerId = roomRequest.CustomerId,
-            RoomMatchId = roomRequest.RoomMatchId,
-            RoleInRoom = RoleInRoomEnums.Member,
-        };
-        _beatSportsDbContext.RoomMembers.Add(roomMember);
+            case "Accepted":
+                // Chủ phòng chấp nhận yêu cầu
+                roomRequest.JoinStatus = RoomRequestEnums.Accepted;
+                roomRequest.DateApprove = DateTime.UtcNow;
+
+                _beatSportsDbContext.RoomRequests.Update(roomRequest);
+                // Khi được chấp nhận, thì RoomMatch có thêm thành viên
+                var roomMember = new RoomMember
+                {
+                    CustomerId = roomRequest.CustomerId,
+                    RoomMatchId = roomRequest.RoomMatchId,
+                    RoleInRoom = RoleInRoomEnums.Member,
+                };
+                _beatSportsDbContext.RoomMembers.Add(roomMember);
+                break;
+
+            case "Declined":
+                roomRequest.JoinStatus = RoomRequestEnums.Declined;
+                roomRequest.DateApprove = DateTime.UtcNow;
+
+                _beatSportsDbContext.RoomRequests.Update(roomRequest);
+                break;
+        }
+
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
 
         return new BeatSportsResponse
         {
-            Message = "Room request approved successfully."
+            Message = roomRequest.JoinStatus == RoomRequestEnums.Accepted ? "Room request approved successfully." : "Room request declined."
         };
     }
 }
