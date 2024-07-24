@@ -59,7 +59,7 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
 
                 var result = new RoomRequestInRoom()
                 {
-                    AccountId = cus.Account.Id,
+                    CustomerId = cus.Id,
                     CustomerAvatar = cus.Account.ProfilePictureURL,
                     CustomerName = cus.Account.FirstName + " " + cus.Account.LastName,
                     RoomRequestsId = roomRequest.Id,
@@ -79,7 +79,7 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
 
             var result = new RoomMemberInRoomResponse()
             {
-                AccountId = cus.Account.Id,
+                CustomerId = cus.Id,
                 CustomerImage = cus.Account.ProfilePictureURL,
                 CustomerName = cus.Account.FirstName + " " + cus.Account.LastName,
                 RoleInRoom = roomMember.RoleInRoom
@@ -111,6 +111,7 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
             RoomMembers = roomMembers,
             IsPrivate = query.IsPrivate,
             MaximumMember = query.MaximumMember,
+            Note = query.Note,
         };
 
         if (room == null)

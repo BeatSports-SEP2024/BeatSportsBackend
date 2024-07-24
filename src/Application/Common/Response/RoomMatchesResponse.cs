@@ -28,7 +28,7 @@ public class GetRoomRequestInRoom
 
 public class RoomRequestInRoom
 {
-    public Guid AccountId { get; set; }
+    public Guid CustomerId { get; set; }
     public Guid RoomRequestsId { get; set; }
     public string? CustomerAvatar { get; set; } 
     public string? CustomerName { get; set; }
@@ -64,7 +64,7 @@ public class RoomMatchesDetailResponse
 
 public class RoomMemberInRoomResponse
 {
-    public Guid AccountId { get; set; }
+    public Guid CustomerId { get; set; }
     public string CustomerName { get; set; }
     public string CustomerImage { get; set; }
     public RoleInRoomEnums RoleInRoom { get; set; }
