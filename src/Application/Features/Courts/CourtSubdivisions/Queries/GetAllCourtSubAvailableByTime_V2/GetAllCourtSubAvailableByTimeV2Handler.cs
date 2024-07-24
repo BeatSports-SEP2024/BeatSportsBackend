@@ -46,12 +46,12 @@ public class GetAllCourtSubAvailableByTimeV2Handler : IRequestHandler<GetAllCour
                         flag++;
                         break;
                     }
-                    else if (((startTime <= timeCheck.StartTime) && (timeCheck.StartTime <= endTime)))
+                    else if (((startTime <= timeCheck.StartTime) && (timeCheck.StartTime < endTime)))
                     {
                         flag++;
                         break;
                     }
-                    else if (((startTime <= timeCheck.EndTime) && (timeCheck.EndTime <= endTime)))
+                    else if (((startTime < timeCheck.EndTime) && (timeCheck.EndTime <= endTime)))
                     {
                         flag++;
                         break;
