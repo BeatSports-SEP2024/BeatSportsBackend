@@ -34,7 +34,7 @@ public class GetRequestInRoomMatchHandler : IRequestHandler<GetRequestInRoomMatc
                 CustomerAvatar = req.Customer.Account.ProfilePictureURL,
                 RoomRequestsId = req.Id,
                 CustomerName = req.Customer.Account.FirstName + " " + req.Customer.Account.LastName,
-                AccountId = req.Customer.Account.Id,
+                CustomerId = req.Customer.Id,
             }).ToList()
         }).FirstOrDefaultAsync(cancellationToken);
 
