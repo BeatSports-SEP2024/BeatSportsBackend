@@ -83,12 +83,22 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
         #endregion
         #region Join List
         // Danh sách phòng đang tham gia (JoiningStatus = 1 và có data trong table roomMember)
-        var joinedRoomRequests = query.Where(rr => rr.Customer.Id == request.CustomerId && (int)rr.JoinStatus == 1);
+        var joinedRoomRequests = query.Where(rr => rr.CustomerId == request.CustomerId && (int)rr.JoinStatus == 1);
 
         var joinedRoomMatchIds = joinedRoomRequests.Select(rr => rr.RoomMatchId).ToList();
 
+        // Thêm những RoomMatchId từ RoomMembers để lấy những người đã có mặt trong roomMatch ngay từ đầu.
+        var initialMembersRoomMatchIds = _beatSportsDbContext.RoomMembers
+            .Where(rm => rm.CustomerId == request.CustomerId)
+            .Select(rm => rm.RoomMatchId)
+            .Distinct()
+            .ToList();
+
+        // Gộp danh sách RoomMatchId có JoiningStatus = 1 và những người đã có mặt trong roomMatch.
+        var allRoomMatchIds = joinedRoomMatchIds.Concat(initialMembersRoomMatchIds).Distinct().ToList();
+
         var roomMatchesForJoined = await _beatSportsDbContext.RoomMatches
-            .Where(rm => joinedRoomMatchIds.Contains(rm.Id))
+            .Where(rm => allRoomMatchIds.Contains(rm.Id))
             .Include(rm => rm.Booking)
                 .ThenInclude(b => b.CourtSubdivision)
                     .ThenInclude(cs => cs.Court)
@@ -96,36 +106,36 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
             .ToListAsync(cancellationToken);
 
         var roomMembersForJoined = await _beatSportsDbContext.RoomMembers
-            .Where(rm => joinedRoomMatchIds.Contains(rm.RoomMatchId))
+            .Where(rm => allRoomMatchIds.Contains(rm.RoomMatchId))
             .Include(rm => rm.Customer)
                 .ThenInclude(c => c.Account)
             .ToListAsync(cancellationToken);
 
-        var joinedResult = joinedRoomRequests.Select(c =>
+        var joinedResult = allRoomMatchIds.Select(id =>
         {
-            var roomMatch = roomMatchesForJoined.FirstOrDefault(rm => rm.Id == c.RoomMatchId);
-            var masterMember = roomMembersForJoined.FirstOrDefault(rm => rm.RoomMatchId == c.RoomMatchId && rm.RoleInRoom == 0);
+            var roomMatch = roomMatchesForJoined.FirstOrDefault(rm => rm.Id == id);
+            var masterMember = roomMembersForJoined.FirstOrDefault(rm => rm.RoomMatchId == id && rm.RoleInRoom == 0);
             var masterName = masterMember != null
                 ? $"{masterMember.Customer?.Account?.FirstName} {masterMember.Customer?.Account?.LastName}"
                 : "Unknown Master Name";
 
-            return new RoomRequestResponseForCustomer
+            return new JoinListResponse
             {
                 MasterName = masterName,
                 Address = roomMatch?.Booking?.CourtSubdivision?.Court?.Address ?? "Unknown Address",
-                CourtName = c.RoomMatch.Booking.CourtSubdivision.Court.CourtName,
-                RoomName = c.RoomMatch.RoomName,
+                CourtName = roomMatch?.Booking?.CourtSubdivision?.Court?.CourtName ?? "Unknown Court Name",
+                RoomName = roomMatch?.RoomName ?? "Unknown Room Name",
                 LevelId = roomMatch?.LevelId ?? default(Guid),
-                DatePlaying = roomMatch.Booking.PlayingDate,
-                StartTimePlaying = c.RoomMatch.Booking.StartTimePlaying,
-                EndTimePlaying = c.RoomMatch.Booking.EndTimePlaying,
-                DateRequest = c.DateRequest,
+                DatePlaying = roomMatch?.Booking?.PlayingDate ?? DateTime.MinValue,
+                StartTimePlaying = roomMatch?.Booking?.StartTimePlaying ?? TimeSpan.Zero,
+                EndTimePlaying = roomMatch?.Booking?.EndTimePlaying ?? TimeSpan.Zero,
+                //DateRequest = DateTime.MinValue, // Update this to the correct DateRequest if needed
                 LevelName = roomMatch?.Level?.LevelName ?? "Unknown Level",
                 Price = roomMatch?.Booking?.CourtSubdivision?.BasePrice ?? default(decimal),
-                NumberOfMember = roomMembersForJoined.Count(rm => rm.RoomMatchId == c.RoomMatchId),
+                NumberOfMember = roomMembersForJoined.Count(rm => rm.RoomMatchId == id),
                 MaxMember = roomMatch?.MaximumMember ?? 0,
-                RoomRequestId = c.Id,
-                RoomMatchId = c.RoomMatch.Id,
+                //RoomRequestId = Guid.Empty, // Update this to the correct RoomRequestId if needed
+                RoomMatchId = id,
             };
         })
         .OrderBy(x => x.DatePlaying)
