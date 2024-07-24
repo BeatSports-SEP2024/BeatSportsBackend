@@ -75,6 +75,7 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
 
         var room = new RoomMatch()
         {
+            IsPrivate = request.IsPrivate,
             SportCategory = sportCategoryEnum,
             RoomName = request.RoomName,
             BookingId = request.BookingId,

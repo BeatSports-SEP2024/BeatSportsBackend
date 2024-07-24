@@ -21,4 +21,5 @@ public class CreateRoomMatchesCommand : IRequest<RoomMatchResponse>
     public int MaximumMember { get; set; }
     public string? RuleRoom { get; set; }
     public string? Note { get; set; }
+    public bool IsPrivate { get; set; }
 }
