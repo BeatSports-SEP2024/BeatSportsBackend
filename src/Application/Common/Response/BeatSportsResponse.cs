@@ -17,3 +17,9 @@ public class RoomMatchResponse
     public string Message { get; set; } = "";
     public string? RoomMatchId { get; set; }
 }
+
+public class BookingSuccessResponse
+{
+    public Guid BookingId { get; set; }
+    public string Message { get; set; } = "";
+}
