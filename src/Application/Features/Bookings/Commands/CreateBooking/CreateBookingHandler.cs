@@ -58,7 +58,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                         .SingleOrDefault();
 
                     var courtBookedList = _beatSportsDbContext.Bookings
-                                        .Where(x => x.CustomerId == request.CustomerId)
+                                        .Where(x => x.CustomerId == request.CustomerId && x.CourtSubdivisionId == request.CourtSubdivisionId)
                                         .ToList();
 
                     if (isValidCustomer == null)
