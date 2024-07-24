@@ -9,7 +9,7 @@ using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Commands.CreateBooking;
-public class CreateBookingCommand : IRequest<BeatSportsResponse>
+public class CreateBookingCommand : IRequest<BookingSuccessResponse>
 {
     public Guid CustomerId { get; set; }
     //public Guid? RoomMatchId { get; set; }

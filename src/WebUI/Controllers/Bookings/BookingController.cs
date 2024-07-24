@@ -30,9 +30,16 @@ public class BookingController : ApiControllerBase
         return await _mediator.Send(request);
     }
     [HttpPost]
-    public async Task<BeatSportsResponse> Create(CreateBookingCommand request)
+    public async Task<IActionResult> Create(CreateBookingCommand request)
     {
-        return await _mediator.Send(request);
+        var response = await _mediator.Send(request);
+
+        if (response.Message.Equals("400"))
+        {
+            response.Message = "Bạn đã book sân trong thời gian này!";
+            return BadRequest(response);
+        }
+        return Ok(response);
     }
     [HttpDelete]
     public async Task<BeatSportsResponse> Delete(DeleteBookingCommand request)

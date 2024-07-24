@@ -9,9 +9,10 @@ using StackExchange.Redis;
 using BeatSportsAPI.Application.Common.Models;
 using Microsoft.EntityFrameworkCore;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
+using BeatSportsAPI.Domain.Entities.Room;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Commands.CreateBooking;
-public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSportsResponse>
+public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BookingSuccessResponse>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
     private readonly IDatabase _database;
@@ -24,7 +25,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSp
         _notificationService = notificationService;
     }
 
-    public async Task<BeatSportsResponse> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
+    public async Task<BookingSuccessResponse> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
     {
         //tạo key trong Redis
         string lockKey = $"booking:{request.CourtSubdivisionId}:{request.StartTimePlaying}:lock";
@@ -42,7 +43,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSp
                     Console.WriteLine($"Booking {request.CustomerId} is being processed.");
 
                     //vd thời gian diễn ra booking
-                    Task.Delay(10000).Wait();
+                    Task.Delay(5000).Wait();
 
                     var isValidCustomer = _beatSportsDbContext.Customers
                         .Where(c => c.Id == request.CustomerId && !c.IsDelete)
@@ -55,6 +56,10 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSp
                     var isValidCourtSub = _beatSportsDbContext.CourtSubdivisions
                         .Where(cs => cs.Id == request.CourtSubdivisionId && !cs.IsDelete)
                         .SingleOrDefault();
+
+                    var courtBookedList = _beatSportsDbContext.Bookings
+                                        .Where(x => x.CustomerId == request.CustomerId)
+                                        .ToList();
 
                     if (isValidCustomer == null)
                     {
@@ -74,6 +79,43 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSp
                     if (isValidCourtSub == null)
                     {
                         throw new BadRequestException($"{request.CourtSubdivisionId} is not existed");
+                    }
+
+                    if (courtBookedList.Count > 0)
+                    {
+                        var flag = 0;
+
+                        foreach (var courtBooked in courtBookedList)
+                        {
+
+                            if (request.PlayingDate.Date == courtBooked.PlayingDate.Date)
+                            {
+                                if (request.StartTimePlaying <= courtBooked.StartTimePlaying && request.EndTimePlaying >= courtBooked.EndTimePlaying)
+                                {
+                                    flag++;
+                                    break;
+                                }
+                                else if (((request.StartTimePlaying <= courtBooked.StartTimePlaying) && (courtBooked.StartTimePlaying < request.EndTimePlaying)))
+                                {
+                                    flag++;
+                                    break;
+                                }
+                                else if (((request.StartTimePlaying < courtBooked.EndTimePlaying) && (courtBooked.EndTimePlaying <= request.EndTimePlaying)))
+                                {
+                                    flag++;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (flag > 0)
+                        {
+                            return new BookingSuccessResponse
+                            {
+                                Message = "400"
+                            };
+                        }
+
                     }
 
                     var newBooking = new Booking
@@ -120,8 +162,9 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSp
                     //    });
                     //test console
                     Console.WriteLine($"Booking {request.CustomerId} is complete.");
-                    return new BeatSportsResponse
+                    return new BookingSuccessResponse
                     {
+                        BookingId = newBooking.Id,
                         Message = "Booking Successfully"
                     };
 
@@ -135,7 +178,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BeatSp
             {
                 //test console
                 Console.WriteLine($"Booking in {request.CourtSubdivisionId} is already in progress by another instance.");
-                return new BeatSportsResponse
+                return new BookingSuccessResponse
                 {
                     Message = $"Booking in {request.CourtSubdivisionId} is already in progress by another instance."
                 };
