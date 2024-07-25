@@ -21,7 +21,9 @@ public class GetAllBookingsByCustomerIdHandler : IRequestHandler<GetAllBookingsB
     public Task<PaginatedList<BookingByCustomerId>> Handle(GetAllBookingsByCustomerIdCommand request, CancellationToken cancellationToken)
     {
         var query = _dbContext.Bookings
-            .Where(b => !b.IsDelete && b.IsRoomBooking == false);
+            .Where(b => !b.IsDelete && b.IsRoomBooking == false
+                        && b.CustomerId == request.CustomerId
+                        && (b.PlayingDate.Date > DateTime.Now.Date || (b.PlayingDate.Date == DateTime.Now.Date && b.StartTimePlaying > DateTime.Now.TimeOfDay)));
 
         switch (request.BookingFilter.ToString())
         {

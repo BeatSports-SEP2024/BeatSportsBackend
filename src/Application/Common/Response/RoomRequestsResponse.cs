@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Mappings;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Entities.Room;
+using BeatSportsAPI.Domain.Enums;
 
 namespace BeatSportsAPI.Application.Common.Response;
 public class RoomRequestsResponse : IMapFrom<RoomRequest>

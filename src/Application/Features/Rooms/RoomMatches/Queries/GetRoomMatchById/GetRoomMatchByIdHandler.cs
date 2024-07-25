@@ -33,7 +33,7 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
             .Include(x => x.RoomMembers)
             .Include(x => x.RoomRequests)
             .Include(x => x.Booking).ThenInclude(c => c.CourtSubdivision).FirstOrDefault();
-            
+
         var court = _dbContext.Courts
                     .Where(x => x.Id == query.Booking.CourtSubdivision.CourtId).FirstOrDefault();
 
@@ -47,15 +47,19 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
         var roomRequests = new List<RoomRequestInRoom>();
         var roomMembers = new List<RoomMemberInRoomResponse>();
 
-        if (query.RoomMembers.Any(x => x.RoleInRoom == Domain.Enums.RoleInRoomEnums.Master 
+        if (query.RoomMembers.Any(x => x.RoleInRoom == Domain.Enums.RoleInRoomEnums.Master
                                     && x.CustomerId == request.CustomerId))
         {
             foreach (var roomRequest in query.RoomRequests)
             {
+                if (roomRequest.JoinStatus == Domain.Enums.RoomRequestEnums.Accepted || roomRequest.JoinStatus == Domain.Enums.RoomRequestEnums.Declined)
+                {
+                    continue;
+                }
                 var cus = _dbContext.Customers
-                        .Where(x => x.Id == roomRequest.CustomerId)
-                        .Include(x => x.Account)
-                        .FirstOrDefault();
+                    .Where(x => x.Id == roomRequest.CustomerId)
+                    .Include(x => x.Account)
+                    .FirstOrDefault();
 
                 var result = new RoomRequestInRoom()
                 {
@@ -88,6 +92,9 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
             roomMembers.Add(result);
         }
 
+        var findingStatusOfRoom = _dbContext.RoomRequests.Where(rq => rq.CustomerId == request.CustomerId && rq.RoomMatchId == request.RoomMatchId).SingleOrDefault();
+        var master = query.RoomMembers.Any(x => x.RoleInRoom == Domain.Enums.RoleInRoomEnums.Master
+                                    && x.CustomerId == request.CustomerId);
         var room = new RoomMatchesDetailResponse()
         {
             RoomMatchId = request.RoomMatchId,
@@ -102,13 +109,14 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
             StartTimePlaying = query.Booking.StartTimePlaying,
             EndTimePlaying = query.Booking.EndTimePlaying,
             PlayingDate = query.Booking.PlayingDate,
-            StartTimeRoom = query.StartTimeRoom, 
+            StartTimeRoom = query.StartTimeRoom,
             EndTimeRoom = query.EndTimeRoom,
             CountMember = query.RoomMembers.Count,
-            PlayingCosts = (int)query.Booking.TotalAmount/ query.MaximumMember,
+            PlayingCosts = (int)query.Booking.TotalAmount / query.MaximumMember,
             RuleRoom = query.RuleRoom,
             JoiningRequest = roomRequests,
             RoomMembers = roomMembers,
+            JoinedIfPendingStatus = master ? Domain.Enums.RoomRequestEnums.Accepted : (findingStatusOfRoom == null ? Domain.Enums.RoomRequestEnums.Declined : findingStatusOfRoom.JoinStatus),
             IsPrivate = query.IsPrivate,
             MaximumMember = query.MaximumMember,
             Note = query.Note,
