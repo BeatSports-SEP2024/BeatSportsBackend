@@ -60,7 +60,7 @@ public class GetBookingDashboardHandler : IRequestHandler<GetBookingDashboardCom
                     result.Items[$"{hour:00}-{hour + 2:00}"] = new BookingDetails
                     {
                         Count = bookingsInGroup.Count,
-                        BookingList = bookingsInGroup.Select(ToBookingByCustomerId).ToList()
+                        BookingList = bookingsInGroup.Select(BookingDashboards).ToList()
                     };
                 }
                 break;
@@ -76,7 +76,7 @@ public class GetBookingDashboardHandler : IRequestHandler<GetBookingDashboardCom
                     result.Items[Enum.GetName(typeof(DayOfWeek), day)] = new BookingDetails
                     {
                         Count = bookingsInDay.Count,
-                        BookingList = bookingsInDay.Select(ToBookingByCustomerId).ToList()
+                        BookingList = bookingsInDay.Select(BookingDashboards).ToList()
                     };
                 }
                 break;
@@ -88,7 +88,7 @@ public class GetBookingDashboardHandler : IRequestHandler<GetBookingDashboardCom
                     result.Items[$"Month {month}"] = new BookingDetails
                     {
                         Count = bookingsInMonth.Count,
-                        BookingList = bookingsInMonth.Select(ToBookingByCustomerId).ToList()
+                        BookingList = bookingsInMonth.Select(BookingDashboards).ToList()
                     };
                 }
                 break;
@@ -101,7 +101,7 @@ public class GetBookingDashboardHandler : IRequestHandler<GetBookingDashboardCom
         return result;
     }
 
-    private BookingDashboard ToBookingByCustomerId(Booking b)
+    private BookingDashboard BookingDashboards(Booking b)
     {
         return new BookingDashboard
         {
