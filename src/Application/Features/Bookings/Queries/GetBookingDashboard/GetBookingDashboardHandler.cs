@@ -23,7 +23,7 @@ public class BookingDashboardResult
 public class BookingDetails
 {
     public int Count { get; set; }
-    public List<BookingByCustomerId> BookingList { get; set; }
+    public List<BookingDashboard> BookingList { get; set; }
 }
 
 public class GetBookingDashboardHandler : IRequestHandler<GetBookingDashboardCommand, BookingDashboardResult>
@@ -101,9 +101,9 @@ public class GetBookingDashboardHandler : IRequestHandler<GetBookingDashboardCom
         return result;
     }
 
-    private BookingByCustomerId ToBookingByCustomerId(Booking b)
+    private BookingDashboard ToBookingByCustomerId(Booking b)
     {
-        return new BookingByCustomerId
+        return new BookingDashboard
         {
             BookingId = b.Id,
             CustomerId = b.CustomerId,
