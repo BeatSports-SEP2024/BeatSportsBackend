@@ -59,6 +59,7 @@ public class RoomMatchesDetailResponse
     public string? Note { get; set; }
     public IList<RoomRequestInRoom>? JoiningRequest { get; set; }
     public IList<RoomMemberInRoomResponse>? RoomMembers { get; set; }
+    public RoomRequestEnums JoinedIfPendingStatus { get; set; }
     public bool? IsPrivate { get; set; }
 }
 
@@ -68,4 +69,5 @@ public class RoomMemberInRoomResponse
     public string CustomerName { get; set; }
     public string CustomerImage { get; set; }
     public RoleInRoomEnums RoleInRoom { get; set; }
+
 }

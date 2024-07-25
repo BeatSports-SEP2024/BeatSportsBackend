@@ -11,5 +11,6 @@ namespace BeatSportsAPI.Application.Features.Rooms.RoomRequests.Commands.UpdateR
 public class ApporveRoomRequestCommand : IRequest<BeatSportsResponse>
 {
     public Guid RoomRequestId { get; set; }
+    public Guid CustomerId { get; set; }
     public RoomRequestEnums RoomRequest{ get; set; }
 }

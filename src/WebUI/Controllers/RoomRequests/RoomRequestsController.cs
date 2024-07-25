@@ -42,7 +42,7 @@ public class RoomRequestsController : ApiControllerBase
     [HttpPost]
     [Route("approve-request")]
     [SwaggerOperation("Room Master Apporve Request to join Matching")]
-    public async Task<IActionResult> ApproveRoomRequest([FromQuery] ApporveRoomRequestCommand request)
+    public async Task<IActionResult> ApproveRoomRequest([FromBody] ApporveRoomRequestCommand request)
     {
         if (!ModelState.IsValid)
         {
@@ -52,6 +52,22 @@ public class RoomRequestsController : ApiControllerBase
 
         return Ok(response);
     }
+
+    [HttpPost]
+    [Route("out-room-request")]
+    [SwaggerOperation("Room member out room")]
+    public async Task<IActionResult> MemberOutRoomRequest([FromBody] UpdateRoomRequestCommand request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var response = await _mediator.Send(request);
+
+        return Ok(response);
+    }
+
     [HttpGet]
     [Route("room-request-pending")]
     [SwaggerOperation("Lấy các phòng đang chờ duyệt")]
