@@ -22,5 +22,5 @@ public class Campaign : BaseAuditableEntity
     public string? CampaignImageURL { get; set; }
     public string? ReasonOfReject { get; set; }
     public virtual Court Court { get; set; } = null!;
-    public virtual IList<Booking> Booking { get; set; } = null!;
+    public virtual IList<Booking>? Booking { get; set; }
 }
