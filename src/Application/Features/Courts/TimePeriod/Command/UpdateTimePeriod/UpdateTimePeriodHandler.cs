@@ -1,4 +1,4 @@
-﻿using BeatSportsAPI.Application.Common.Interfaces;
+﻿/*using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 using BeatSportsAPI.Application.Common.Exceptions;
@@ -51,4 +51,4 @@ public class UpdateTimePeriodHandler : IRequestHandler<UpdateTimePeriodCommand, 
             Message = "Time Period Updated Successfully"
         };
     }
-}
+}*/
