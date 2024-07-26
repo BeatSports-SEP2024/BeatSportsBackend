@@ -12,6 +12,7 @@ public class CourtSubdivisionSetting : BaseAuditableEntity
     public Guid SportCategoryId { get; set; }
     //Mo ta ve loai hinh va chat lieu san thi dau
     public string? CourtType { get; set; }
+    public string? ShortName { get; set; }
     public virtual SportCategory SportCategories { get; set; }
     public virtual IList<CourtSubdivision> CourtSubdivisions { get; set; }
 }
