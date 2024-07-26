@@ -16,6 +16,8 @@ public class CreateTimePeriodHandler : IRequestHandler<CreateTimePeriodCommand, 
 
     public async Task<BeatSportsResponse> Handle(CreateTimePeriodCommand request, CancellationToken cancellationToken)
     {
+        // Đối với case chọn ngày 28 29 xong tạo tiếp 1 ngày 29 30 sẽ luôn false
+        // bởi vì t đang lưu là ngày end sẽ là 23:59:59, nên khi gửi lại start = 29 thì nó sẽ bị trùng
         // 1. Xác định áp dụng cho ngày thường
         if (request.IsNormalDay)
         {
@@ -54,9 +56,10 @@ public class CreateTimePeriodHandler : IRequestHandler<CreateTimePeriodCommand, 
                 IsNormalDay = true,
             };
             _dbContext.TimePeriods.Add(timePeriod);
+            // Check dựa vào court setting trước
             foreach (var item in request.ListCourtSettingId)
             {
-                var courtSubs = _dbContext.CourtSubdivisions.Where(x => x.CourtSubdivisionSettingId == item).ToList();
+                var courtSubs = _dbContext.CourtSubdivisions.Where(x => x.CourtSubdivisionSettingId == item && !x.IsDelete).ToList();
                 foreach (var courtSub in courtSubs)
                 {
                     var courtSubdivisionId = courtSub.Id;
@@ -66,10 +69,21 @@ public class CreateTimePeriodHandler : IRequestHandler<CreateTimePeriodCommand, 
                                        join cs in _dbContext.CourtSubdivisions on tpcs.CourtSubdivisionId equals cs.Id
                                        where
                                        tpcs.CourtSubdivisionId == courtSubdivisionId
+                                       && cs.CourtSubdivisionSettingId == item
                                        && tp.IsNormalDay
                                        && !tp.IsDelete
                                        && !cs.IsDelete
                                        select tp).ToList();
+                    var tesdst = (from tpcs in _dbContext.TimePeriodCourtSubdivisions
+                                       join tp in _dbContext.TimePeriods on tpcs.TimePeriodId equals tp.Id
+                                       join cs in _dbContext.CourtSubdivisions on tpcs.CourtSubdivisionId equals cs.Id
+                                       where
+                                       tpcs.CourtSubdivisionId == courtSubdivisionId
+                                       && cs.CourtSubdivisionSettingId == item
+                                       && tp.IsNormalDay
+                                       && !tp.IsDelete
+                                       && !cs.IsDelete
+                                       select cs).ToList();
                     /*   if (timePeriods.Any(tp => !(request.EndTime <= tp.StartTime || request.StartTime >= tp.EndTime)))
                        {
                            throw new BadRequestException("Time period overlaps with existing period. Please check and try again.");
@@ -115,7 +129,7 @@ public class CreateTimePeriodHandler : IRequestHandler<CreateTimePeriodCommand, 
                 ListDayByString = null,
                 IsNormalDay = false,
                 StartDayApply = request.DayStartTimePeriod,
-                EndDayApply = request.DayEndTimePeriod,
+                EndDayApply = endDate,
             };
             _dbContext.TimePeriods.Add(timePeriod);
             foreach (var item in request.ListCourtSettingId)

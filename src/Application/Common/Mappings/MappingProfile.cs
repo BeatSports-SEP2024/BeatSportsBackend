@@ -45,8 +45,8 @@ public class MappingProfile : Profile
         //    .ForMember(dest => dest.CourtSubdivisionId, opt => opt.MapFrom(src => src.Id));
 
         //Time Period Mapping
-        CreateMap<TimePeriod, TimePeriodResponse>()
-            .ForMember(dest => dest.TimePeriodId, opt => opt.MapFrom(src => src.Id));
+        /*CreateMap<TimePeriod, TimePeriodResponse>()
+            .ForMember(dest => dest.TimePeriodId, opt => opt.MapFrom(src => src.Id));*/
     }
 
     private void ApplyMappingsFromAssembly(Assembly assembly)
