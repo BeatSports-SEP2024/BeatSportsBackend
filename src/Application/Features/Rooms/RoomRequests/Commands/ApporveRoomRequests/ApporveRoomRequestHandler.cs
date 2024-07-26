@@ -20,7 +20,7 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
     public async Task<BeatSportsResponse> Handle(ApporveRoomRequestCommand request, CancellationToken cancellationToken)
     {
         var roomRequest = _beatSportsDbContext.RoomRequests
-            .Where(rq => rq.Id == request.RoomRequestId && !rq.IsDelete)
+            .Where(rq => rq.Id == request.RoomRequestId && rq.CustomerId == request.CustomerId && !rq.IsDelete)
             .FirstOrDefault();
 
         if (roomRequest == null)
@@ -47,10 +47,10 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
                 break;
 
             case "Declined":
-                roomRequest.JoinStatus = RoomRequestEnums.Declined;
-                roomRequest.DateApprove = DateTime.UtcNow;
+                //roomRequest.JoinStatus = RoomRequestEnums.Declined;
+                //roomRequest.DateApprove = DateTime.UtcNow;
 
-                _beatSportsDbContext.RoomRequests.Update(roomRequest);
+                _beatSportsDbContext.RoomRequests.Remove(roomRequest);
                 break;
         }
 

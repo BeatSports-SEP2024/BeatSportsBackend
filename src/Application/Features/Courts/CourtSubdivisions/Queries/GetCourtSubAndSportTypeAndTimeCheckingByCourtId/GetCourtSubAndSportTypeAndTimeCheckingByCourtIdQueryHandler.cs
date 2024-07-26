@@ -45,16 +45,18 @@ public class GetCourtSubAndSportTypeAndTimeCheckingByCourtIdQueryHandler : IRequ
                                                                 SportCategoryId = sportCategory.Id,
                                                                 SportCategoryName = sportCategory.Name,
                                                                 CourtType = courtSubSetting.CourtType,
+                                                                ShortName = courtSubSetting.ShortName,
                                                                 CourtSubdivisionId = cs.Id,
                                                                 CourtSubdivisionName = cs.CourtSubdivisionName
                                                             } into courtSubSettings
-                                                            group courtSubSettings by new { courtSubSettings.Id, courtSubSettings.SportCategoryId, courtSubSettings.SportCategoryName, courtSubSettings.CourtType } into groupedCourtSubSettings
+                                                            group courtSubSettings by new { courtSubSettings.Id, courtSubSettings.SportCategoryId, courtSubSettings.SportCategoryName, courtSubSettings.CourtType, courtSubSettings.ShortName } into groupedCourtSubSettings
                                                             select new CourtSubSettingResponseV2
                                                             {
                                                                 CourtSubSettingId = groupedCourtSubSettings.Key.Id,
                                                                 SportCategoryId = groupedCourtSubSettings.Key.SportCategoryId,
                                                                 SportCategoryName = groupedCourtSubSettings.Key.SportCategoryName,
                                                                 TypeSize = groupedCourtSubSettings.Key.CourtType,
+                                                                ShortName = groupedCourtSubSettings.Key.ShortName,
                                                                 CourtSubdivision = groupedCourtSubSettings.Select(sub => new ListCourtSubdivisionAndTimeDataByCourtSubdivisionId
                                                                 {
                                                                     CourtSubdivisionId = sub.CourtSubdivisionId.ToString(),
