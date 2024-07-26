@@ -6,6 +6,7 @@ using BeatSportsAPI.Application.Common.Response.CourtResponse;
 using BeatSportsAPI.Application.Features.Courts.Commands.CreateCourt;
 using BeatSportsAPI.Application.Features.Courts.Commands.DeleteCourt;
 using BeatSportsAPI.Application.Features.Courts.Commands.UpdateCourt;
+using BeatSportsAPI.Application.Features.Courts.CourtSportCategory.Queries.GetCourtSportCategoryWIthCourtSubByCourtId;
 using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetCourtSubAndSportTypeAndTimeCheckingByCourtId;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAll;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAll.GetAllCourtWithCourtSubPending;
@@ -29,6 +30,14 @@ public class CourtController : ApiControllerBase
     public CourtController(IMediator mediator)
     {
         _mediator = mediator;
+    }
+
+
+    [HttpGet]
+    [Route("get-sport-category-by-court-id")]
+    public async Task<List<CourtSportCategoryWIthCourtSubResponse>> GetListCourtSportAndCourtSubByCourtId([FromQuery] GetCourtSportCategoryWIthCourtSubByCourtIdQuery request)
+    {
+        return await _mediator.Send(request);
     }
 
     [HttpPost]

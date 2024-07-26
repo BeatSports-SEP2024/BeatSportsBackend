@@ -5,6 +5,7 @@ using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
+using BeatSportsAPI.Domain.Entities.CourtEntity.TimePeriod;
 using BeatSportsAPI.Domain.Entities.PaymentEntity;
 using BeatSportsAPI.Domain.Entities.Room;
 using BeatSportsAPI.Domain.Enums;
@@ -50,6 +51,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<Wallet> Wallets { get; set; }
     public DbSet<TimePeriod> TimePeriods { get; set; }
+    public DbSet<TimePeriodCourtSubdivision> TimePeriodCourtSubdivisions { get; set; }
     public DbSet<RefreshToken> RefreshToken { get; set; }
     public DbSet<DeviceToken> DeviceTokens { get; set; }
     public DbSet<TimeChecking> TimeChecking { get; set; }
@@ -97,6 +99,20 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             entity.HasOne(ss => ss.RoomMatch)
             .WithMany(ss => ss.RoomMembers)
             .HasForeignKey(ss => ss.RoomMatchId)
+            .OnDelete(DeleteBehavior.NoAction);
+        });
+        builder.Entity<TimePeriodCourtSubdivision>(entity =>
+        {
+            entity.HasKey(ss => new { ss.CourtSubdivisionId, ss.TimePeriodId });
+
+            entity.HasOne(ss => ss.TimePeriod)
+            .WithMany(ss => ss.TimePeriodCourtSubdivisions)
+            .HasForeignKey(ss => ss.TimePeriodId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(ss => ss.CourtSubdivision)
+            .WithMany(ss => ss.TimePeriodCourtSubdivision)
+            .HasForeignKey(ss => ss.CourtSubdivisionId)
             .OnDelete(DeleteBehavior.NoAction);
         });
 
@@ -882,7 +898,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = bookingId5,
                 CustomerId = customer1Id,
-                CampaignId= discount20,
+                CampaignId = discount20,
                 CourtSubdivisionId = courtSubdivisionId7,
                 PlayingDate = DateTime.Today.AddDays(-1),
                 StartTimePlaying = new TimeSpan(20, 0, 0), // 8 PM
@@ -918,7 +934,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
-                IsPrivate= false,
+                IsPrivate = false,
             },
             new RoomMatch
             {
@@ -953,11 +969,12 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         #endregion
         #region TimePeriod      
 
-        builder.Entity<TimePeriod>().HasData(
+        /*builder.Entity<TimePeriod>().HasData(
             new TimePeriod
             {
                 Id = timePeriodId1,
                 CourtId = court1Id,
+                MinCancellationTime = new TimeSpan(6,0,0),
                 Description = "Giờ Cao Điểm",
                 StartTime = new TimeSpan(17, 0, 0),
                 EndTime = new TimeSpan(20, 0, 0),
@@ -967,6 +984,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = timePeriodId2,
                 CourtId = court2Id,
+                MinCancellationTime = new TimeSpan(6, 0, 0),
                 Description = "Giờ Thấp Điểm",
                 StartTime = new TimeSpan(10, 0, 0),
                 EndTime = new TimeSpan(16, 0, 0),
@@ -976,11 +994,12 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             {
                 Id = timePeriodId3,
                 CourtId = court3Id,
+                MinCancellationTime = new TimeSpan(6, 0, 0),
                 Description = "Giờ Bình Thường",
                 StartTime = new TimeSpan(20, 30, 0),
                 EndTime = new TimeSpan(23, 0, 0),
                 RateMultiplier = 1.0M,
-            });
+            });*/
         #endregion
         #region Room_Member
         builder.Entity<RoomMember>()
@@ -1070,7 +1089,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 MerchantWebLink = "https://www.youtube.com/index", // website của beatsport
                 MerchantIpnUrl = "", // chưa có sài Ipn
                 MerchantReturnUrl = "exp://172.31.99.194:8081", // thực hiện thành công thì sẽ quay lại app, đường dẫn để open app
-                SecretKey = "3EABD179-956C-4979-A068-01A600D7C8E7", 
+                SecretKey = "3EABD179-956C-4979-A068-01A600D7C8E7",
                 IsActive = false,
             },
             new Merchant

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using BeatSportsAPI.Domain.Entities.CourtEntity.TimePeriod;
 using BeatSportsAPI.Domain.Entities.Room;
 
 namespace BeatSportsAPI.Domain.Entities.CourtEntity;
@@ -17,6 +18,7 @@ public class CourtSubdivision : BaseAuditableEntity
     public virtual Court Court { get; set; }
     public virtual CourtSubdivisionSetting CourtSubdivisionSettings { get; set; }
     public virtual IList<TimeChecking> TimeCheckings { get; set; }
+    public virtual IList<TimePeriodCourtSubdivision> TimePeriodCourtSubdivision { get; set; }
     public virtual IList<Booking> Bookings { get; set; } = null!;
     //public virtual IList<CourtSportCategory>? CourtSportCategories { get; set; }
     //public virtual IList<TimePeriod>? TimePeriods { get; set; }
