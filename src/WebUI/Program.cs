@@ -17,6 +17,7 @@ using WebAPI.Controllers.Queries;
 using WebAPI;
 using WebAPI.Controllers.ChatHubs;
 using BeatSportsAPI.Application.Features.Jobs;
+using Newtonsoft.Json;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -101,6 +102,11 @@ builder.Services.AddScoped<StackExchange.Redis.IDatabase>(sp => sp.GetRequiredSe
 
 builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+builder.Services.AddControllers()
+            .AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            });
 
 
 builder.Services.AddSwaggerGen(config =>
