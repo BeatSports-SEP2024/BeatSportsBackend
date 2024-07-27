@@ -1,5 +1,6 @@
 ﻿using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
+using BeatSportsAPI.Domain.Entities.CourtEntity.TimePeriod;
 using BeatSportsAPI.Domain.Entities.PaymentEntity;
 using BeatSportsAPI.Domain.Entities.Room;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,7 @@ public interface IBeatSportsDbContext
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<Wallet> Wallets { get; set; }
     public DbSet<TimePeriod> TimePeriods { get; set; }
+    public DbSet<TimePeriodCourtSubdivision> TimePeriodCourtSubdivisions { get; set; }
     public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
     public DbSet<Merchant> Merchants { get; set; }
     public DbSet<SportCategory> SportsCategories { get; set; }

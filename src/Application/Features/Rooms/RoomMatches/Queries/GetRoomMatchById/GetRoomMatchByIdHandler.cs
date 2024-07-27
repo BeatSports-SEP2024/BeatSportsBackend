@@ -8,6 +8,7 @@ using AutoMapper.QueryableExtensions;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignById;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Entities.Room;
@@ -86,7 +87,7 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
                 CustomerId = cus.Id,
                 CustomerImage = cus.Account.ProfilePictureURL,
                 CustomerName = cus.Account.FirstName + " " + cus.Account.LastName,
-                RoleInRoom = roomMember.RoleInRoom
+                RoleInRoom =  roomMember.RoleInRoom.GetDescriptionFromEnum()
             };
 
             roomMembers.Add(result);
@@ -116,7 +117,7 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
             RuleRoom = query.RuleRoom,
             JoiningRequest = roomRequests,
             RoomMembers = roomMembers,
-            JoinedIfPendingStatus = master ? Domain.Enums.RoomRequestEnums.Accepted : (findingStatusOfRoom == null ? Domain.Enums.RoomRequestEnums.Declined : findingStatusOfRoom.JoinStatus),
+            JoinedIfPendingStatus = (master ? Domain.Enums.RoomRequestEnums.Accepted : (findingStatusOfRoom == null ? Domain.Enums.RoomRequestEnums.Declined : findingStatusOfRoom.JoinStatus)).ToString(),
             IsPrivate = query.IsPrivate,
             MaximumMember = query.MaximumMember,
             Note = query.Note,

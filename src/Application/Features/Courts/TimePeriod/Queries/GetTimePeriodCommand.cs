@@ -8,8 +8,8 @@ using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Courts.TimePeriod.Queries;
-public class GetTimePeriodCommand : IRequest<PaginatedList<TimePeriodResponse>>
+public class GetTimePeriodCommand : IRequest<List<TimePeriodResponse>>
 {
-    public int PageIndex { get; set; }
-    public int PageSize { get; set; }
+    public Guid CourtId { get; set; }
+    public Guid SportCategoryId { get; set; }   
 }

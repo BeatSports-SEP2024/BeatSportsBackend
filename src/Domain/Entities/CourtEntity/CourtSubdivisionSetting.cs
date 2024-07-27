@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BeatSportsAPI.Domain.Entities.CourtEntity.TimePeriod;
 
 namespace BeatSportsAPI.Domain.Entities.CourtEntity;
 public class CourtSubdivisionSetting : BaseAuditableEntity

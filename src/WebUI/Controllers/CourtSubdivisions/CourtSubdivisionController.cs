@@ -12,6 +12,7 @@ using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetAll
 using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetAllCourtSubdivisionPending;
 using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetCourtSubdivisionAndTimeByCourtIdAndDate;
 using BeatSportsAPI.Application.Features.Courts.CourtSubdivisions.Queries.GetCourtSubdivisionById;
+using BeatSportsAPI.Application.Features.Courts.CourtSubdivisionSetting.Queries.GetCourtSubSettingByCourtIdAndSportCategoryId;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,6 +28,13 @@ public class CourtSubdivisionController : ApiControllerBase
     }
     [HttpPost]
     public async Task<BeatSportsResponse> Create(CreateCourtSubdivisionCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+
+    [HttpGet]
+    [Route("get-court-sub-by-court-and-sport")]
+    public async Task<List<CourtSubSettingByCourtIdAndSportCategoryIdResponse>> GetCourtSubSettingByCourtIdAndSportCategoryIdQueryHandler([FromQuery]GetCourtSubSettingByCourtIdAndSportCategoryIdQuery request)
     {
         return await _mediator.Send(request);
     }

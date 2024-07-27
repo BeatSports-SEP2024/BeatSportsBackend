@@ -41,10 +41,6 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                 {
                     // bắt đầu book
                     Console.WriteLine($"Booking {request.CustomerId} is being processed.");
-
-                    //vd thời gian diễn ra booking
-                    Task.Delay(5000).Wait();
-
                     var isValidCustomer = _beatSportsDbContext.Customers
                         .Where(c => c.Id == request.CustomerId && !c.IsDelete)
                         .SingleOrDefault();
@@ -66,12 +62,12 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                         throw new BadRequestException($"{request.CustomerId} is not existed");
                     }
 
-                    if (isValidCampaign == null)
+                /*    if (isValidCampaign == null)
                     {
                         throw new BadRequestException($"{request.CampaignId} is not existed");
-                    }
+                    }*/
 
-                    if (isValidCampaign.QuantityOfCampaign < 1)
+                    if (isValidCampaign != null && isValidCampaign.QuantityOfCampaign < 1)
                     {
                         throw new BadRequestException($"{isValidCampaign.QuantityOfCampaign} is not enough");
                     }
@@ -121,7 +117,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                     var newBooking = new Booking
                     {
                         CustomerId = request.CustomerId,
-                        CampaignId = request.CampaignId ?? Guid.Empty,
+                        CampaignId = request.CampaignId ?? null,
                         CourtSubdivisionId = request.CourtSubdivisionId,
                         BookingDate = DateTime.UtcNow,
                         TotalAmount = request.TotalAmount,
@@ -133,12 +129,11 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                         BookingStatus = BookingEnums.Approved.ToString(),
                     };
 
-                    if(newBooking != null)
+                    if(newBooking != null && isValidCampaign != null)
                     {
                         isValidCampaign.QuantityOfCampaign -= 1;
                     }
-                    await _beatSportsDbContext.Bookings.AddAsync(newBooking);
-                    await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
+                    _beatSportsDbContext.Bookings.Add(newBooking);
 
                     DateTime startTime = newBooking.PlayingDate.Date.Add(newBooking.StartTimePlaying);
                     DateTime endTime = newBooking.PlayingDate.Date.Add(newBooking.EndTimePlaying);
@@ -149,8 +144,19 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                         EndTime = endTime,
                         IsLock = true
                     };
-                    await _beatSportsDbContext.TimeChecking.AddAsync(courtSubLock);
-                    await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
+                    _beatSportsDbContext.TimeChecking.Add(courtSubLock);
+                    try
+                    {
+                        await _beatSportsDbContext.SaveChangesAsync();
+
+                    }
+                    catch (Exception e)
+                    {
+                        return new BookingSuccessResponse
+                        {
+                            Message = $"Booking in {e.Message}"
+                        };
+                    }
 
                     // Send notification after successful booking
                     //await _notificationService.SendNotificationAsync( 
