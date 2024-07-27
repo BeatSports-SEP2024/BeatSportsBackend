@@ -23,3 +23,9 @@ public class BookingSuccessResponse
     public Guid BookingId { get; set; }
     public string Message { get; set; } = "";
 }
+
+public class BeatSportsResponseV2
+{
+    public int Status { get; set; }
+    public string Message { get; set; } = "";
+}

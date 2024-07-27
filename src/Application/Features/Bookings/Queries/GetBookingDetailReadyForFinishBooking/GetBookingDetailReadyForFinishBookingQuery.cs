@@ -3,6 +3,7 @@
 namespace BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDetailReadyForFinishBooking;
 public class GetBookingDetailReadyForFinishBookingQuery : IRequest<BookingDetailReadyForFinishBookingResponse>
 {
+    public Guid CustomerId { get; set; }
     public Guid CourtSubdivisionId { get; set; }
     /// <summary>
     /// Format hh:mm:ss
@@ -20,6 +21,10 @@ public class GetBookingDetailReadyForFinishBookingQuery : IRequest<BookingDetail
 
 public class BookingDetailReadyForFinishBookingResponse
 {
+    /// <summary>
+    /// tạo thành công r thì trả nó lên, để lúc xác nhận thì gửi xuống lại
+    /// </summary>
+    public Guid BookingId { get; set; }
     public Guid CourtId { get; set; }
     public string? CourtName { get; set; }
     public string? ImageCourtURL { get; set; }

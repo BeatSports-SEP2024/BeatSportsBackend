@@ -4,10 +4,12 @@ namespace BeatSportsAPI.Domain.Entities;
 public class Transaction : BaseAuditableEntity
 {
     [ForeignKey("Wallet")]
-    public Guid WalletId { get; set; }  
+    public Guid WalletId { get; set; }
+    public Guid WalletTargetId { get; set; }
     public string? TransactionMessage { get; set; }
     public string? TransactionPayload { get; set; }
     public string? TransactionStatus { get; set; }
+    public AdminCheckEnums? AdminCheckStatus { get; set; }
     public decimal? TransactionAmount { get; set; }
     public DateTime? TransactionDate { get; set; }    
     public string? TransactionType { get; set; } 

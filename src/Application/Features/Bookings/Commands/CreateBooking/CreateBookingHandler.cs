@@ -10,6 +10,8 @@ using BeatSportsAPI.Application.Common.Models;
 using Microsoft.EntityFrameworkCore;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
 using BeatSportsAPI.Domain.Entities.Room;
+using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDashboard;
+using Newtonsoft.Json.Linq;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Commands.CreateBooking;
 public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BookingSuccessResponse>
@@ -27,153 +29,76 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
 
     public async Task<BookingSuccessResponse> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
     {
+
+        var checkBookingInDB = await _beatSportsDbContext.Bookings.Where(x => x.Id == request.BookingId && x.BookingStatus == BookingEnums.Process.ToString() && !x.IsDelete).SingleOrDefaultAsync();
+        if (checkBookingInDB == null)
+        {
+            throw new NotFoundException("Không tìm thấy booking như trên");
+        }
         //tạo key trong Redis
-        string lockKey = $"booking:{request.CourtSubdivisionId}:{request.StartTimePlaying}:lock";
+        string lockKey = $"booking:{checkBookingInDB.CourtSubdivisionId}:{checkBookingInDB.StartTimePlaying}:lock";
         //tạo value tương ứng với key vừa tạo trong Redis
         string lockValue = Guid.NewGuid().ToString();
         //thời gian hết hạn
-        TimeSpan expiry = TimeSpan.FromSeconds(30); 
+        TimeSpan expiry = TimeSpan.FromSeconds(30);
         using (var redisLock = new RedisLock(_database, lockKey, lockValue, expiry))
         {
             if (redisLock.AcquireLock())
             {
                 try
                 {
-                    // bắt đầu book
-                    Console.WriteLine($"Booking {request.CustomerId} is being processed.");
-                    var isValidCustomer = _beatSportsDbContext.Customers
-                        .Where(c => c.Id == request.CustomerId && !c.IsDelete)
-                        .SingleOrDefault();
-
-                    var isValidCampaign = _beatSportsDbContext.Campaigns
-                        .Where(campaigns => campaigns.Id == request.CampaignId)
-                        .SingleOrDefault();
-
-                    var isValidCourtSub = _beatSportsDbContext.CourtSubdivisions
-                        .Where(cs => cs.Id == request.CourtSubdivisionId && !cs.IsDelete)
-                        .SingleOrDefault();
-
-                    var courtBookedList = _beatSportsDbContext.Bookings
-                                        .Where(x => x.CustomerId == request.CustomerId && x.CourtSubdivisionId == request.CourtSubdivisionId)
-                                        .ToList();
-
-                    if (isValidCustomer == null)
+                    // Check lại giá tổng coi đã đúng hay chưa.
+                    if (request.CampaignId != null)
                     {
-                        throw new BadRequestException($"{request.CustomerId} is not existed");
-                    }
-
-                /*    if (isValidCampaign == null)
-                    {
-                        throw new BadRequestException($"{request.CampaignId} is not existed");
-                    }*/
-
-                    if (isValidCampaign != null && isValidCampaign.QuantityOfCampaign < 1)
-                    {
-                        throw new BadRequestException($"{isValidCampaign.QuantityOfCampaign} is not enough");
-                    }
-
-                    if (isValidCourtSub == null)
-                    {
-                        throw new BadRequestException($"{request.CourtSubdivisionId} is not existed");
-                    }
-
-                    if (courtBookedList.Count > 0)
-                    {
-                        var flag = 0;
-
-                        foreach (var courtBooked in courtBookedList)
+                        var campaignIfExist = await _beatSportsDbContext.Campaigns.Where(x => x.Id == request.CampaignId
+                        && x.QuantityOfCampaign > 0
+                        && x.EndDateApplying >= checkBookingInDB.PlayingDate
+                        && !x.IsDelete).SingleOrDefaultAsync();
+                        if (campaignIfExist == null)
                         {
-
-                            if (request.PlayingDate.Date == courtBooked.PlayingDate.Date)
-                            {
-                                if (request.StartTimePlaying <= courtBooked.StartTimePlaying && request.EndTimePlaying >= courtBooked.EndTimePlaying)
-                                {
-                                    flag++;
-                                    break;
-                                }
-                                else if (((request.StartTimePlaying <= courtBooked.StartTimePlaying) && (courtBooked.StartTimePlaying < request.EndTimePlaying)))
-                                {
-                                    flag++;
-                                    break;
-                                }
-                                else if (((request.StartTimePlaying < courtBooked.EndTimePlaying) && (courtBooked.EndTimePlaying <= request.EndTimePlaying)))
-                                {
-                                    flag++;
-                                    break;
-                                }
-                            }
+                            throw new BadRequestException("Campaign đã hết số lượng sử dụng hoặc hết hạn sử dụng");
                         }
-
-                        if (flag > 0)
+                        // Nếu có tồn tại thì check lại giá tiền
+                        // Đối với booking status process được lưu trong db thì giá đang là giá ch apply campaign
+                        // Tính giá trị giảm trước
+                        var value = (checkBookingInDB.TotalAmount * campaignIfExist.PercentDiscount) / 100;
+                        decimal realApply = 0;
+                        if (value > campaignIfExist.MaxValueDiscount)
                         {
-                            return new BookingSuccessResponse
-                            {
-                                Message = "400"
-                            };
+                            realApply = campaignIfExist.MaxValueDiscount;
                         }
-
-                    }
-
-                    var newBooking = new Booking
-                    {
-                        CustomerId = request.CustomerId,
-                        CampaignId = request.CampaignId ?? null,
-                        CourtSubdivisionId = request.CourtSubdivisionId,
-                        BookingDate = DateTime.UtcNow,
-                        TotalAmount = request.TotalAmount,
-                        IsRoomBooking = request.IsRoomBooking,
-                        IsDeposit = request.IsDeposit,
-                        PlayingDate = request.PlayingDate,
-                        StartTimePlaying = request.StartTimePlaying,
-                        EndTimePlaying = request.EndTimePlaying,
-                        BookingStatus = BookingEnums.Approved.ToString(),
-                    };
-
-                    if(newBooking != null && isValidCampaign != null)
-                    {
-                        isValidCampaign.QuantityOfCampaign -= 1;
-                    }
-                    _beatSportsDbContext.Bookings.Add(newBooking);
-
-                    DateTime startTime = newBooking.PlayingDate.Date.Add(newBooking.StartTimePlaying);
-                    DateTime endTime = newBooking.PlayingDate.Date.Add(newBooking.EndTimePlaying);
-                    var courtSubLock = new TimeChecking
-                    {
-                        CourtSubdivisionId = newBooking.CourtSubdivisionId,
-                        StartTime = startTime,
-                        EndTime = endTime,
-                        IsLock = true
-                    };
-                    _beatSportsDbContext.TimeChecking.Add(courtSubLock);
-                    try
-                    {
+                        else
+                        {
+                            realApply = value;
+                        }
+                        var checkTotalMoney = checkBookingInDB.TotalAmount - realApply;
+                        if (checkTotalMoney != request.TotalAmount)
+                        {
+                            throw new BadRequestException("Tiền không đúng với giá trị thực tế khi áp dụng mã giảm giá");
+                        }
+                        checkBookingInDB.BookingStatus = BookingEnums.Approved.ToString();
+                        checkBookingInDB.TotalAmount = checkTotalMoney;
+                        _beatSportsDbContext.Bookings.Update(checkBookingInDB);
                         await _beatSportsDbContext.SaveChangesAsync();
-
-                    }
-                    catch (Exception e)
-                    {
+                        Console.WriteLine($"Booking {checkBookingInDB.CustomerId} is complete.");
                         return new BookingSuccessResponse
                         {
-                            Message = $"Booking in {e.Message}"
+                            BookingId = checkBookingInDB.Id,
+                            Message = "Booking Successfully"
                         };
                     }
-
-                    // Send notification after successful booking
-                    //await _notificationService.SendNotificationAsync( 
-                    //    new NotificationModels
-                    //    {
-                    //        UserId = request.CustomerId,
-                    //        Title = "Booking thành công",
-                    //        Body = "Đơn của bạn đang được xử lý"
-                    //    });
-                    //test console
-                    Console.WriteLine($"Booking {request.CustomerId} is complete.");
-                    return new BookingSuccessResponse
+                    else
                     {
-                        BookingId = newBooking.Id,
-                        Message = "Booking Successfully"
-                    };
-
+                        checkBookingInDB.BookingStatus = BookingEnums.Approved.ToString();
+                        _beatSportsDbContext.Bookings.Update(checkBookingInDB);
+                        await _beatSportsDbContext.SaveChangesAsync();
+                        Console.WriteLine($"Booking {checkBookingInDB.CustomerId} is complete.");
+                        return new BookingSuccessResponse
+                        {
+                            BookingId = checkBookingInDB.Id,
+                            Message = "Booking Successfully"
+                        };
+                    }
                 }
                 finally
                 {

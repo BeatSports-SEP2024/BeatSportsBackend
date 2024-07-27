@@ -31,5 +31,11 @@ public class TimePeriodWithCourtInformationResponse : TimePeriodResponse
     public Guid CourtId { get; set; }
     public string? CourtName { get; set; }
     public string? Address { get; set; }
+    public List<CourtSubInTimePeriodWithCourtInformationResponse> ListCourtSub { get;set; }
 }
 
+public class CourtSubInTimePeriodWithCourtInformationResponse
+{
+    public Guid CourtSubdivisionId { get; set; }
+    public string? CourtSubdivisionName { get; set; }
+}

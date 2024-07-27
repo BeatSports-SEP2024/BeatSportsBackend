@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 namespace BeatSportsAPI.Domain.Enums;
 public enum BookingEnums
 {
+    //Waiting for finish booking
+    Process,
     //Booking successfully, not played
     Approved,
     //Cancel booking
