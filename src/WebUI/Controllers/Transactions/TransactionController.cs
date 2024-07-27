@@ -1,4 +1,7 @@
-﻿using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactions;
+﻿using BeatSportsAPI.Application.Features.Transactions.Commands.ApproveMoneyForOwner;
+using BeatSportsAPI.Application.Features.Transactions.Commands.RejectMoneyForOwner;
+using BeatSportsAPI.Application.Features.Transactions.Commands.TransferMoneyInApp;
+using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactions;
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactionsByCustomer;
 using BeatSportsAPI.Application.Features.Wallets.Queries;
 using MediatR;
@@ -39,4 +42,43 @@ public class TransactionController : ApiControllerBase
 
         return Ok(response);
     }
+
+    [HttpPost]
+    [Route("transfer-money-in-app")]
+    public async Task<IActionResult> TransferMoneyInApp([FromBody] TransferMoneyInAppCommand request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var response = await _mediator.Send(request);
+
+        if (response.Status == 400)
+        {
+            return BadRequest(response);
+        }
+
+        return Ok(response);
+    }
+
+    [HttpPost]
+    [Route("approve-money-for-owner")]
+    public async Task<IActionResult> ApproveMoneyForOwner([FromBody] ApproveMoneyForOwnerCommand request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var response = await _mediator.Send(request);
+
+        if (response.Status == 400)
+        {
+            return BadRequest(response);
+        }
+
+        return Ok(response);
+    }
+
 }
