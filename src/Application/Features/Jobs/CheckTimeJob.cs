@@ -31,10 +31,15 @@ public class CheckTimeJob
                                    && x.StartTime == startTime && x.EndTime == endTime && x.DateBooking == booking.PlayingDate)
                                    .FirstOrDefault();
 
-                if (timeChecking != null)
+
+                if(timeChecking != null)
                 {
-                    _beatSportsDbContext.TimeChecking.Remove(timeChecking);
-                    _beatSportsDbContext.Bookings.Remove(booking);
+                    timeChecking.IsDelete = true;
+                    _beatSportsDbContext.TimeChecking.Update(timeChecking);
+                    _beatSportsDbContext.SaveChanges();
+
+                    booking.IsDelete = true;
+                    _beatSportsDbContext.Bookings.Update(booking);
                     _beatSportsDbContext.SaveChanges();
 
                     Console.WriteLine($"Recurring job executed start for Booking ${booking.Id}");
