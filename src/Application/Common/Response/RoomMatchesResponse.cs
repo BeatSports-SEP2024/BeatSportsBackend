@@ -38,14 +38,14 @@ public class RoomRequestInRoom
 public class RoomMatchesDetailResponse
 {
     public Guid RoomMatchId { get; set; }
-    public string RoomName { get; set; }
-    public string CustomerName { get; set; }
-    public string CustomerImage { get; set; }
-    public string CustomerPhone { get; set; }
-    public string CourtName { get; set; }
-    public string CourtDescription { get; set; }
+    public string? RoomName { get; set; }
+    public string? CustomerName { get; set; }
+    public string? CustomerImage { get; set; }
+    public string? CustomerPhone { get; set; }
+    public string? CourtName { get; set; }
+    public string? CourtDescription { get; set; }
     public string[] CourtImage { get; set; }
-    public string Address { get; set; }
+    public string? Address { get; set; }
     public TimeSpan StartTimePlaying { get; set; }
     public TimeSpan EndTimePlaying { get; set; }
     public DateTime PlayingDate { get; set; }
@@ -59,7 +59,7 @@ public class RoomMatchesDetailResponse
     public string? Note { get; set; }
     public IList<RoomRequestInRoom>? JoiningRequest { get; set; }
     public IList<RoomMemberInRoomResponse>? RoomMembers { get; set; }
-    public RoomRequestEnums JoinedIfPendingStatus { get; set; }
+    public string? JoinedIfPendingStatus { get; set; }
     public bool? IsPrivate { get; set; }
 }
 
@@ -68,6 +68,6 @@ public class RoomMemberInRoomResponse
     public Guid CustomerId { get; set; }
     public string CustomerName { get; set; }
     public string CustomerImage { get; set; }
-    public RoleInRoomEnums RoleInRoom { get; set; }
+    public string RoleInRoom { get; set; }
 
 }
