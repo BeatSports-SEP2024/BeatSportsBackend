@@ -197,7 +197,7 @@ app.MapGraphQL("/graphql");
 //Hangfire Dashboard
 app.UseHangfireDashboard();
 
-// Schedule a recurring job
+// Schedule a recurring job/
+//RecurringJob.AddOrUpdate<CheckTimeJob>("my-recurring-job", job => job.CheckTimeOfCourt(), Cron.Minutely);
 RecurringJob.AddOrUpdate<CheckTimeJob>("my-recurring-job", job => job.CheckTimeOfCourt(), Cron.MinuteInterval(2));
-
 app.Run();
