@@ -89,6 +89,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                     {
                         Id = c.Id,
                         CourtId = c.CourtId,
+                        CampaignName = c.CampaignName,
                         ExpireCampaign = (c.EndDateApplying - DateTime.Now).ToString(),
                         MaxValueDiscount = c.MaxValueDiscount,
                         MinValueApply = c.MinValueApply,
