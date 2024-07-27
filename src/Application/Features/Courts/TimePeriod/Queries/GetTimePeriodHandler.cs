@@ -57,7 +57,7 @@ public class GetTimePeriodHandler : IRequestHandler<GetTimePeriodCommand, List<T
                                   tp.ListDayByString,
                                   tp.PriceAdjustment
                               } into g
-                              orderby g.Key.IsNormalDay, g.Key.CourtType, g.Key.StartDayApply
+                              orderby g.Key.CourtSubdivisionSettingId, g.Key.CourtType, g.Key.IsNormalDay,  g.Key.StartDayApply
                               select new TimePeriodResponse
                               {
                                   TimePeriodId = g.Key.TimePeriodId,
