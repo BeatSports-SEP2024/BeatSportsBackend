@@ -5,6 +5,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using Services.Redis;
+using BeatSportsAPI.Domain.Entities;
+using BeatSportsAPI.Domain.Enums;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDetailReadyForFinishBooking;
 public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler<GetBookingDetailReadyForFinishBookingQuery, BookingDetailReadyForFinishBookingResponse>
@@ -25,7 +27,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
         string startTimeWantToPlay = request.StartTimeWantToPlay.ToString(@"hh\:mm");
         string lockKey = $"booking:{courtSubdivisionId}:{dayWantToPlay}:{startTimeWantToPlay}:lock";
         string lockValue = Guid.NewGuid().ToString();
-        TimeSpan expiry = TimeSpan.FromMinutes(2); // Khóa trong 2 phút
+        TimeSpan expiry = TimeSpan.FromSeconds(30); // Khóa trong 30s
         // B1. Kiểm tra xem sân nhỏ muốn đặt tại thời điểm muốn chơi có trùng với time checking hay không?
         using (var redisLock = new RedisLock(_database, lockKey, lockValue, expiry))
         {
@@ -117,6 +119,31 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
 
                     response.ListCourtByTimePeriod = listCourtSubInReponse;
                     response.TotalPrice = Math.Round(totalPrice, 2);
+                    var newBooking = new Booking
+                    {
+                        CustomerId = request.CustomerId,
+                        CampaignId = null,
+                        CourtSubdivisionId = request.CourtSubdivisionId,
+                        BookingDate = DateTime.UtcNow,
+                        TotalAmount = response.TotalPrice,
+                        IsRoomBooking = false,
+                        IsDeposit = false,
+                        PlayingDate = request.DayWantToPlay,
+                        StartTimePlaying = request.StartTimeWantToPlay,
+                        EndTimePlaying = request.EndTimeWantToPlay,
+                        BookingStatus = BookingEnums.Process.ToString(),
+                    };
+                    DateTime startTime = newBooking.PlayingDate.Date.Add(newBooking.StartTimePlaying);
+                    DateTime endTime = newBooking.PlayingDate.Date.Add(newBooking.EndTimePlaying);
+                    var courtSubLock = new TimeChecking
+                    {
+                        CourtSubdivisionId = newBooking.CourtSubdivisionId,
+                        StartTime = startTime,
+                        EndTime = endTime,
+                        IsLock = true
+                    };
+                    _dbContext.TimeChecking.Add(courtSubLock);
+                    await _dbContext.SaveChangesAsync();
                     return response;
                 }
                 finally
