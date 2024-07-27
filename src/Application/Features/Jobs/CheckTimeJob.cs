@@ -16,29 +16,32 @@ public class CheckTimeJob
     }
     public void CheckTimeOfCourt()
     {
-        var court = _beatSportsDbContext.Courts.ToList();
-        foreach (var course in court)
+        var bookingList = _beatSportsDbContext.Bookings.ToList();
+        foreach (var booking in bookingList)
         {
-            //DateTime referenceDate = DateTime.Today;
-            //DateTime startTime = referenceDate.Add(course.TimeStart);
-            //DateTime endTime = referenceDate.Add(course.TimeEnd);
+            DateTime startTime = booking.PlayingDate.Date.Add(booking.StartTimePlaying);
+            DateTime endTime = booking.PlayingDate.Date.Add(booking.EndTimePlaying);
 
-            //if (startTime <= DateTime.Now)
-            //{
-            //    course.IsDelete = true;
-            //    _beatSportsDbContext.Courts.Update(course);
-            //    _beatSportsDbContext.SaveChanges();
-            //    Console.WriteLine($"Recurring job executed start for Court ${course.CourtName}");
-            //}
+            if (booking.BookingStatus.Equals("Process"))
+            {
+                var timeChecking = _beatSportsDbContext.TimeChecking
+                                   .Where(x => x.CourtSubdivisionId == booking.CourtSubdivisionId
+                                   && x.StartTime == startTime && x.EndTime == endTime && x.DateBooking == booking.PlayingDate)
+                                   .FirstOrDefault();
 
-            //if (endTime <= DateTime.Now)
-            //{
-            //    course.IsDelete = false;
-            //    _beatSportsDbContext.Courts.Update(course);
-            //    _beatSportsDbContext.SaveChanges();
-            //    Console.WriteLine($"Recurring job executed end for Court ${course.CourtName}");
-            //}
+                if(timeChecking != null)
+                {
+                    timeChecking.IsDelete = true;
+                    _beatSportsDbContext.TimeChecking.Update(timeChecking);
+                    _beatSportsDbContext.SaveChanges();
 
+                    booking.IsDelete = true;
+                    _beatSportsDbContext.Bookings.Update(booking);
+                    _beatSportsDbContext.SaveChanges();
+
+                    Console.WriteLine($"Recurring job executed start for Booking ${booking.Id}");
+                }
+            }
         }
     }
 }
