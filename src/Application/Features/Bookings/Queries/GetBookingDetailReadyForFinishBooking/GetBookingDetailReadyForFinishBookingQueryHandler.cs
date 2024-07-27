@@ -7,6 +7,7 @@ using StackExchange.Redis;
 using Services.Redis;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Enums;
+using BeatSportsAPI.Application.Common.Response;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDetailReadyForFinishBooking;
 public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler<GetBookingDetailReadyForFinishBookingQuery, BookingDetailReadyForFinishBookingResponse>
@@ -35,6 +36,51 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
             {
                 try
                 {
+                    Console.WriteLine($"Booking {request.CustomerId} is being processed.");
+                    var isValidCustomer = _dbContext.Customers
+                        .Where(c => c.Id == request.CustomerId && !c.IsDelete)
+                        .SingleOrDefault();
+                    if (isValidCustomer == null)
+                    {
+                        throw new BadRequestException($"{request.CustomerId} is not existed");
+                    }
+                    var courtBookedList = _dbContext.Bookings
+                   .Where(x => x.CustomerId == request.CustomerId && x.CourtSubdivisionId == request.CourtSubdivisionId)
+                   .ToList();
+
+                    if (courtBookedList.Count > 0)
+                    {
+                        var flag = 0;
+
+                        foreach (var courtBooked in courtBookedList)
+                        {
+
+                            if (request.DayWantToPlay.Date == courtBooked.PlayingDate.Date)
+                            {
+                                if (request.StartTimeWantToPlay <= courtBooked.StartTimePlaying && request.EndTimeWantToPlay >= courtBooked.EndTimePlaying)
+                                {
+                                    flag++;
+                                    break;
+                                }
+                                else if (((request.StartTimeWantToPlay <= courtBooked.StartTimePlaying) && (courtBooked.StartTimePlaying < request.EndTimeWantToPlay)))
+                                {
+                                    flag++;
+                                    break;
+                                }
+                                else if (((request.StartTimeWantToPlay < courtBooked.EndTimePlaying) && (courtBooked.EndTimePlaying <= request.EndTimeWantToPlay)))
+                                {
+                                    flag++;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (flag > 0)
+                        {
+                            throw new BadRequestException("Booking của bạn trùng giờ với môn khác bạn đang chơi!");
+                        }
+
+                    }
                     // B1. Kiểm tra xem sân nhỏ muốn đặt tại thời điểm muốn chơi có trùng với time checking hay không?
                     var courtSub = await _dbContext.CourtSubdivisions.Where(x => x.Id == request.CourtSubdivisionId).SingleOrDefaultAsync();
                     if (courtSub == null)
