@@ -1,4 +1,4 @@
-﻿/*using BeatSportsAPI.Application.Common.Response;
+﻿using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Courts.TimePeriod.Queries.GetTimePeriodById;
@@ -6,4 +6,3 @@ public class GetTimePeriodByIdQuery : IRequest<TimePeriodWithCourtInformationRes
 {
     public Guid TimePeriodId { get; set; }
 }
-*/
