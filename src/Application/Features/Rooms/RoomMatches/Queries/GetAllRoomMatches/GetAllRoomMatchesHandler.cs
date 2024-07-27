@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using AutoMapper;
+﻿using AutoMapper;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
-using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
-using BeatSportsAPI.Application.Features.Rooms.RoomRequests.Queries.GetRoomRequestByCustomer;
+using BeatSportsAPI.Application.Common.Ultilities;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -173,6 +172,25 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
                 .ThenInclude(c => c.Account)
         .ToListAsync(cancellationToken);
 
+        string sportFilter = request.sportFilter.ToString()?? string.Empty;
+        if(!string.IsNullOrEmpty(sportFilter))
+        {
+            switch (sportFilter)
+            {
+                case "Football":
+                    welcomeRoomMatches = welcomeRoomMatches.Where(c => c.SportCategory == 0).ToList();
+                    break;
+
+                case "Volleyball":
+                    welcomeRoomMatches = welcomeRoomMatches.Where(c => (int)c.SportCategory == 1).ToList();
+                    break;
+
+                case "Badminton":
+                    welcomeRoomMatches = welcomeRoomMatches.Where(c => (int)c.SportCategory == 2).ToList();
+                    break;
+            }
+        }   
+
         var welcomeResult = welcomeRoomMatches
             .GroupBy(rm => rm.Id)
             .Select(group =>
@@ -199,6 +217,33 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
             })
             .OrderBy(x => x.DatePlaying)
             .ToList();
+
+        string requestedLevelDescriptions = request.Level?.ToString() ?? string.Empty;
+
+        if (!string.IsNullOrEmpty(requestedLevelDescriptions))
+        {
+            var requestedLevels = requestedLevelDescriptions.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                                             .Select(level => level.Trim())
+                                                             .ToList();
+
+            var validLevels = new List<string> { "Trung bình", "Tập sự", "Chuyên gia" };
+
+            if (requestedLevels.Any(level => !validLevels.Contains(level)))
+            {
+                throw new NotFoundException("Your search does not match any record \"Trung bình\", \"Tập sự\", \"Chuyên gia\"");
+            }
+
+            welcomeResult = welcomeResult.Where(x => requestedLevels.Contains(x.LevelName)).ToList();
+        }
+
+        string queryContains = request.Query?.RemoveDiacritics() ?? string.Empty;
+
+        if (!string.IsNullOrEmpty(queryContains))
+        {
+            welcomeResult = welcomeResult.Where(x => x.MasterName.RemoveDiacritics().Contains(queryContains, StringComparison.OrdinalIgnoreCase)
+                                             || x.Address.RemoveDiacritics().Contains(queryContains, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
         response.PublicRoomList = welcomeResult;
 
         #endregion
