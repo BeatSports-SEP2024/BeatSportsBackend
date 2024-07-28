@@ -76,6 +76,7 @@ public class BookingDetailByCustomer
     //public decimal MinValueApply { get; set; }   
     public Guid CourtId { get; set; }
     public string? CourtName { get; set; }
+    public string? CourtAddress { get; set; }
     public DateTime BookingDate { get; set; }
     public decimal TotalAmount { get; set; }
     public DateTime PlayingDate { get; set; }
