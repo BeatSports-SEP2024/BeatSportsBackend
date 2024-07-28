@@ -62,3 +62,25 @@ public class BookingDashboard : IMapFrom<Booking>
     public TimeSpan EndTimePlaying { get; set; }
     public string BookingStatus { get; set; }
 }
+
+public class BookingDetailByCustomer 
+{
+    public Guid BookingId { get; set; }
+    public Guid CustomerId { get; set; }
+    public Guid? CampaignId { get; set; }
+    public string? FullName { get; set; }
+    public string? CustomerAddress { get; set; }
+    public string? CustomerPhone { get; set; }
+    public string? CampaignName { get; set; }
+    //public decimal MaxValueDiscount { get; set; }
+    //public decimal MinValueApply { get; set; }   
+    public Guid CourtId { get; set; }
+    public string? CourtName { get; set; }
+    public DateTime BookingDate { get; set; }
+    public decimal TotalAmount { get; set; }
+    public DateTime PlayingDate { get; set; }
+    public TimeSpan StartTimePlaying { get; set; }
+    public TimeSpan EndTimePlaying { get; set; }
+    public string BookingStatus { get; set; }
+    public decimal DiscountPrice { get; set; }
+}

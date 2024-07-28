@@ -6,6 +6,7 @@ using BeatSportsAPI.Application.Features.Bookings.Commands.UpdateBooking;
 using BeatSportsAPI.Application.Features.Bookings.Queries;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetAllBookingsByCustomerId;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDashboard;
+using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDetailByCustomer;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDetailReadyForFinishBooking;
 using BeatSportsAPI.Application.Features.Campaigns.Commands.CreateCampaign;
 using BeatSportsAPI.Application.Features.Campaigns.Commands.DeleteCampaign;
@@ -71,5 +72,11 @@ public class BookingController : ApiControllerBase
         var response = await _mediator.Send(request);
         return response;
     }
-
+    [HttpGet]
+    [Route("booking-detail")]
+    public async Task<List<BookingDetailByCustomer>> GetBookingDetailByCustomer([FromQuery] GetBookingDetailByCustomerCommand request)
+    {
+        var response = await _mediator.Send(request);
+        return response;
+    }
 }
