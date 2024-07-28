@@ -42,6 +42,7 @@ public class GetBookingDetailByCustomerHandler : IRequestHandler<GetBookingDetai
                 CustomerPhone = customer.Account.PhoneNumber,
                 CourtId = court.Id,
                 CourtName = court.CourtName,
+                CourtAddress = court.Address,
                 BookingDate = booking.BookingDate,
                 TotalAmount = booking.TotalAmount,
                 PlayingDate = booking.PlayingDate,
