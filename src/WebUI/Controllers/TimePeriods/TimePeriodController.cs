@@ -56,7 +56,7 @@ public class TimePeriodController : ApiControllerBase
         return Ok(response);
     }
     [HttpPut]
-    public async Task<IActionResult> UpdateTimePeriod(UpdateTimePeriodCommand request)
+    public async Task<IActionResult> UpdateTimePeriod([FromBody] UpdateTimePeriodCommand request)
     {
         if (!ModelState.IsValid)
         {

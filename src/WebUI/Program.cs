@@ -18,6 +18,7 @@ using WebAPI;
 using WebAPI.Controllers.ChatHubs;
 using BeatSportsAPI.Application.Features.Jobs;
 using Newtonsoft.Json;
+using BeatSportsAPI.Application.Features.Hubs;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -193,7 +194,7 @@ app.MapFallbackToFile("index.html"); ;
 //Config Graphql
 app.MapControllers();
 app.MapGraphQL("/graphql");
-
+app.MapHub<TimePeriodHub>("/timePeriodHub");
 //Hangfire Dashboard
 app.UseHangfireDashboard();
 

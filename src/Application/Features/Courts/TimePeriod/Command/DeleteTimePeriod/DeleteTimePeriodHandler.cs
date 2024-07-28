@@ -23,6 +23,7 @@ public class DeleteTimePeriodHandler : IRequestHandler<DeleteTimePeriodCommand, 
             throw new BadRequestException("Time Period does not existed");
         }
         response.IsDelete = true;
+        _beatSportsDbContext.TimePeriods.Update(response);
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
         return new BeatSportsResponse
         {
