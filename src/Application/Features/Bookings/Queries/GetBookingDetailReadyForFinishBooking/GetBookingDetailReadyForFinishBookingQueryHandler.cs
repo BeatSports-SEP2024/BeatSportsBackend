@@ -179,17 +179,21 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                         EndTimePlaying = request.EndTimeWantToPlay,
                         BookingStatus = BookingEnums.Process.ToString(),
                     };
+                    _dbContext.Bookings.Add(newBooking);
                     DateTime startTime = newBooking.PlayingDate.Date.Add(newBooking.StartTimePlaying);
                     DateTime endTime = newBooking.PlayingDate.Date.Add(newBooking.EndTimePlaying);
                     var courtSubLock = new TimeChecking
                     {
                         CourtSubdivisionId = newBooking.CourtSubdivisionId,
+                        DateBooking = request.DayWantToPlay,// :))))))))
                         StartTime = startTime,
                         EndTime = endTime,
                         IsLock = true
                     };
                     _dbContext.TimeChecking.Add(courtSubLock);
                     await _dbContext.SaveChangesAsync();
+
+                    response.BookingId = newBooking.Id;
                     return response;
                 }
                 finally
