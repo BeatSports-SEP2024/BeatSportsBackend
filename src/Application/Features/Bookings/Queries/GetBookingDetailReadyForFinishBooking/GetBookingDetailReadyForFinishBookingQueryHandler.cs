@@ -30,7 +30,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
         string startTimeWantToPlay = request.StartTimeWantToPlay.ToString(@"hh\:mm");
         string lockKey = $"booking:{courtSubdivisionId}:{dayWantToPlay}:{startTimeWantToPlay}:lock";
         string lockValue = Guid.NewGuid().ToString();
-        long unixTimestampMinCancellationFlag = 0;
+        DateTime unixTimestampMinCancellationFlag = new DateTime();
         TimeSpan expiry = TimeSpan.FromSeconds(30); // Khóa trong 30s
         // B1. Kiểm tra xem sân nhỏ muốn đặt tại thời điểm muốn chơi có trùng với time checking hay không?
         using (var redisLock = new RedisLock(_database, lockKey, lockValue, expiry))
@@ -174,8 +174,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                         var maxTimeSpanInlist = LocalListTimestampMinCancellation.Max();
                         DateTime playingDateTime = request.DayWantToPlay.Date.Add(request.StartTimeWantToPlay);
                         var minTimeCancellationDateTime = playingDateTime - maxTimeSpanInlist;
-                        DateTimeOffset dateTimeOffset = new DateTimeOffset(minTimeCancellationDateTime);
-                        unixTimestampMinCancellationFlag = dateTimeOffset.ToUnixTimeMilliseconds();
+                        unixTimestampMinCancellationFlag = minTimeCancellationDateTime;
                     }
                     else
                     {
@@ -183,8 +182,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                         var maxTimeSpanInlist = new TimeSpan(0, 0, 0);
                         DateTime playingDateTime = request.DayWantToPlay.Date.Add(request.StartTimeWantToPlay);
                         var minTimeCancellationDateTime = playingDateTime - maxTimeSpanInlist;
-                        DateTimeOffset dateTimeOffset = new DateTimeOffset(minTimeCancellationDateTime);
-                        unixTimestampMinCancellationFlag = dateTimeOffset.ToUnixTimeMilliseconds();
+                        unixTimestampMinCancellationFlag = minTimeCancellationDateTime;
                     }
 
                     var newBooking = new Booking

@@ -9,6 +9,9 @@ public class Feedback : BaseAuditableEntity
     [ForeignKey("Court")]
     public Guid CourtId { get; set; }
     public decimal FeedbackStar {  get; set; }
+    /// <summary>
+    /// Đã feedback rồi thì true => để UI disable nút feedback
+    /// </summary>
     public bool FeedbackAvailable { get; set; }
     public string? FeedbackStatus { get; set; }
     public string FeedbackContent { get; set; } = null!;

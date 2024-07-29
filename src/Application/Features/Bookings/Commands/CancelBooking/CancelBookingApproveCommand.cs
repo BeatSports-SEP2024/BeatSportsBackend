@@ -38,8 +38,8 @@ public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingA
         }
 
         // Chuyển đổi Unix timestamp ngược lại thành DateTime
-        DateTimeOffset dateTimeOffsetFromUnix = DateTimeOffset.FromUnixTimeSeconds(bookingApprove.UnixTimestampMinCancellation);
-        DateTime datetimeFromUnix = dateTimeOffsetFromUnix.DateTime;
+        // DateTimeOffset dateTimeOffsetFromUnix = DateTimeOffset.FromUnixTimeSeconds(bookingApprove.UnixTimestampMinCancellation);
+        DateTime datetimeFromUnix = bookingApprove.UnixTimestampMinCancellation;
         // Ghép PlayingDate và StartTimePlaying lại
         DateTime playingStartDateTime = bookingApprove.PlayingDate.Date.Add(bookingApprove.StartTimePlaying);
 
@@ -52,7 +52,7 @@ public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingA
         if (timeDifference <= TimeSpan.Zero)
         {
             // Thời gian hủy nhỏ hơn hoặc bằng thời gian hiện tại
-            throw new BadRequestException($"Cannot cancel booking. The minimum cancellation time has passed. Time difference: {timeDifference}");
+            throw new BadRequestException($"Không thể hủy đặt sân, thời gian tối thiểu để hủy lịch đặt sân đã trôi qua. Thời gian bị lệch: {timeDifference}");
         }
         DateTime startTime = bookingApprove.PlayingDate.Date.Add(bookingApprove.StartTimePlaying);
         DateTime endTime = bookingApprove.PlayingDate.Date.Add(bookingApprove.EndTimePlaying);

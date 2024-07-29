@@ -30,6 +30,8 @@ public class GetBookingHistoryByCusIdCommandHandler : IRequestHandler<GetBooking
             join customer in _dbContext.Customers on booking.CustomerId equals customer.Id
             join subCourt in _dbContext.CourtSubdivisions on booking.CourtSubdivisionId equals subCourt.Id
             join court in _dbContext.Courts on subCourt.CourtId equals court.Id
+            join feedback in _dbContext.Feedbacks on booking.Id equals feedback.BookingId into feedbackJoin
+            from feedback in feedbackJoin.DefaultIfEmpty()
             select new BookingHistoryByCustomerId
             {
                 BookingId = booking.Id,
@@ -48,6 +50,7 @@ public class GetBookingHistoryByCusIdCommandHandler : IRequestHandler<GetBooking
                 StartTimePlaying = booking.StartTimePlaying,
                 EndTimePlaying = booking.EndTimePlaying,
                 BookingStatus = booking.BookingStatus,
+                FeedbackId = feedback.Id,
 
             }).ToListAsync();
         return listBookingExist;

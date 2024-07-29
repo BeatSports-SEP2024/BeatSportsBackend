@@ -106,13 +106,14 @@ public class BookingHistoryByCustomerId
     public TimeSpan StartTimePlaying { get; set; }
     public TimeSpan EndTimePlaying { get; set; }
     public string BookingStatus { get; set; }
+    public Guid? FeedbackId { get; set; }
 }
 public class BookingHistoryDetailByCustomerId
 {
     public Guid BookingId { get; set; }
     public Guid CustomerId { get; set; }
     public string? FirstName { get; set; }
-    public long UnixTimestampMinCancellation { get; set; }
+    public DateTime UnixTimestampMinCancellation { get; set; }
     public string? LastName { get; set; }
     public string? PhoneNumber { get; set; }
     public string? CustomerAddress { get; set; }

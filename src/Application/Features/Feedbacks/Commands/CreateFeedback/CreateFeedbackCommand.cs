@@ -13,11 +13,11 @@ public class CreateFeedbackCommand : IRequest<BeatSportsResponse>
 {
     [Required]
     public Guid BookingId { get; set; }
-    [Required]
-    public Guid CourtId { get; set; }
+    // [Required]
+    // public Guid CourtId { get; set; }
     public decimal FeedbackStar { get; set; }
-    public bool FeedbackAvailable { get; set; }
-    public string? FeedbackStatus { get; set; }
+    //public bool FeedbackAvailable { get; set; }
+    //public string? FeedbackStatus { get; set; }
     public string FeedbackContent { get; set; } 
 
 }

@@ -23,7 +23,7 @@ public class Booking : BaseAuditableEntity
     /// <summary>
     /// Dùng để lưu thời gian cần thể nó hủy
     /// </summary>
-    public long UnixTimestampMinCancellation { get; set; }
+    public DateTime UnixTimestampMinCancellation { get; set; }
     public bool IsDeposit {  get; set; }
     public DateTime PlayingDate { get; set; }
     public TimeSpan StartTimePlaying { get; set; }
