@@ -80,7 +80,11 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                         checkBookingInDB.CampaignId = request.CampaignId;   
                         checkBookingInDB.TotalPriceDiscountCampaign = realApply;
                         checkBookingInDB.BookingStatus = BookingEnums.Approved.ToString();
+                        //Giảm giá tiền sau khi áp dụng campaign
                         checkBookingInDB.TotalAmount = checkTotalMoney;
+                        //Cập nhật số lượng campaign
+                        campaignIfExist.QuantityOfCampaign = campaignIfExist.QuantityOfCampaign - 1;
+                        _beatSportsDbContext.Campaigns.Update(campaignIfExist);
                         _beatSportsDbContext.Bookings.Update(checkBookingInDB);
                         await _beatSportsDbContext.SaveChangesAsync();
                         Console.WriteLine($"Booking {checkBookingInDB.CustomerId} is complete.");
