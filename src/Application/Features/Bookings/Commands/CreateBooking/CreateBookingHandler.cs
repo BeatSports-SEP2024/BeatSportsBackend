@@ -127,7 +127,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                     }
                     // Case không áp dụng campaign
                     else
-                    {
+                    {   
                         checkBookingInDB.BookingStatus = BookingEnums.Approved.ToString();
                         _beatSportsDbContext.Bookings.Update(checkBookingInDB);
                         await _beatSportsDbContext.SaveChangesAsync();
