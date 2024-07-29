@@ -16,6 +16,9 @@ public class Booking : BaseAuditableEntity
     public Guid CourtSubdivisionId { get; set; }
     public DateTime BookingDate { get; set; }   
     public decimal TotalAmount { get; set; }
+    public decimal TotalPriceInTimePeriod { get; set; }
+    public decimal TotalPriceDiscountCampaign { get; set; }
+    public string? PayloadDescriptionPriceOfTimePeriod { get; set; }
     public bool IsRoomBooking { get; set; } 
     public bool IsDeposit {  get; set; }
     public DateTime PlayingDate { get; set; }

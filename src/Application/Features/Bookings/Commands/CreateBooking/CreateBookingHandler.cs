@@ -76,6 +76,9 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                         {
                             throw new BadRequestException("Tiền không đúng với giá trị thực tế khi áp dụng mã giảm giá");
                         }
+                        //Update Campaign to Booking
+                        checkBookingInDB.CampaignId = request.CampaignId;   
+                        checkBookingInDB.TotalPriceDiscountCampaign = realApply;
                         checkBookingInDB.BookingStatus = BookingEnums.Approved.ToString();
                         checkBookingInDB.TotalAmount = checkTotalMoney;
                         _beatSportsDbContext.Bookings.Update(checkBookingInDB);

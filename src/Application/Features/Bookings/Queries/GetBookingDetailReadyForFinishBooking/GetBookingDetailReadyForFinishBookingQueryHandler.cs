@@ -8,6 +8,7 @@ using Services.Redis;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Enums;
 using BeatSportsAPI.Application.Common.Response;
+using Newtonsoft.Json;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDetailReadyForFinishBooking;
 public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler<GetBookingDetailReadyForFinishBookingQuery, BookingDetailReadyForFinishBookingResponse>
@@ -165,6 +166,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
 
                     response.ListCourtByTimePeriod = listCourtSubInReponse;
                     response.TotalPrice = Math.Round(totalPrice, 2);
+                    string serializedListCourtSubInReponse = JsonConvert.SerializeObject(response.ListCourtByTimePeriod);
                     var newBooking = new Booking
                     {
                         CustomerId = request.CustomerId,
@@ -172,6 +174,9 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                         CourtSubdivisionId = request.CourtSubdivisionId,
                         BookingDate = DateTime.UtcNow,
                         TotalAmount = response.TotalPrice,
+                        TotalPriceDiscountCampaign = 0,
+                        TotalPriceInTimePeriod= response.TotalPrice,
+                        PayloadDescriptionPriceOfTimePeriod = serializedListCourtSubInReponse,
                         IsRoomBooking = false,
                         IsDeposit = false,
                         PlayingDate = request.DayWantToPlay,
