@@ -31,7 +31,6 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
         string lockKey = $"booking:{courtSubdivisionId}:{dayWantToPlay}:{startTimeWantToPlay}:lock";
         string lockValue = Guid.NewGuid().ToString();
         DateTime unixTimestampMinCancellationFlag = new DateTime();
-        long unixTimestampMinCancellationFlag = 0;
         TimeSpan expiry = TimeSpan.FromSeconds(30); // Khóa trong 30s
         // B1. Kiểm tra xem sân nhỏ muốn đặt tại thời điểm muốn chơi có trùng với time checking hay không?
         using (var redisLock = new RedisLock(_database, lockKey, lockValue, expiry))
