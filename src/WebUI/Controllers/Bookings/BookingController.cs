@@ -10,12 +10,9 @@ using BeatSportsAPI.Application.Features.Bookings.Queries.GetAllBookingsByCustom
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDashboard;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDetailByCustomer;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDetailReadyForFinishBooking;
+using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingFinishForInvoice;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetDetailBookingHistoryByCustomerId;
-using BeatSportsAPI.Application.Features.Campaigns.Commands.CreateCampaign;
-using BeatSportsAPI.Application.Features.Campaigns.Commands.DeleteCampaign;
-using BeatSportsAPI.Application.Features.Campaigns.Commands.UpdateCampaign;
-using BeatSportsAPI.Application.Features.Campaigns.Queries.GetAllCampaigns;
-using BeatSportsAPI.Application.Features.Feedbacks.Queries.GetAllFeedbacksByCourtId;
+using BeatSportsAPI.Application.Common.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -107,6 +104,17 @@ public class BookingController : ApiControllerBase
     [Route("cancel-booking-approve")]
     public async Task<BeatSportsResponse> CancelBookingApprove([FromBody] CancelBookingApproveCommand request)
     {
+        return await _mediator.Send(request);
+    }
+
+    [HttpGet]
+    [Route("invoice")]
+    public async Task<List<BookingFinishForInvoiceResponse>> GetInvoice([FromQuery] GetBookingFinishForInvoiceQuery request)
+    {
+        if (!ModelState.IsValid)
+        {
+            throw new BadRequestException("An error is occured");
+        }
         return await _mediator.Send(request);
     }
 }
