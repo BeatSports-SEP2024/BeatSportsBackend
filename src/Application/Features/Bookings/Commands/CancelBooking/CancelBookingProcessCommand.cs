@@ -46,6 +46,25 @@ public class CancelBookingProcessCommandHandler : IRequestHandler<CancelBookingP
                            .FirstOrDefault();
         if (timeChecking != null)
         {
+            var getCustomerByAccount = _beatSportsDbContext.Customers
+            .Where(x => x.Id == request.CustomerId && !x.IsDelete).SingleOrDefault();
+
+            if (getCustomerByAccount == null)
+            {
+                throw new NotFoundException("Cannot find this customer");
+            }
+
+            var accountId = getCustomerByAccount.AccountId;
+
+            var customerWallet = _beatSportsDbContext.Wallets
+                .Where(x => x.AccountId == accountId && !x.IsDelete).SingleOrDefault();
+
+            if (customerWallet != null)
+            {
+                customerWallet.Balance += bookingProcess.TotalAmount;
+                _beatSportsDbContext.Wallets.Update(customerWallet);
+            }
+
             _beatSportsDbContext.TimeChecking.Remove(timeChecking);
             _beatSportsDbContext.Bookings.Remove(bookingProcess);
             _beatSportsDbContext.SaveChanges();

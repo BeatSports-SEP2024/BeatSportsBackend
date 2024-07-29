@@ -74,6 +74,25 @@ public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingA
             _beatSportsDbContext.Campaigns.Update(campaignExist);
         }
 
+        var getCustomerByAccount = _beatSportsDbContext.Customers
+            .Where(x => x.Id == request.CustomerId && !x.IsDelete).SingleOrDefault();
+
+        if (getCustomerByAccount == null)
+        {
+            throw new NotFoundException("Cannot find this customer");
+        }
+
+        var accountId = getCustomerByAccount.AccountId;
+
+        var customerWallet = _beatSportsDbContext.Wallets
+            .Where(x => x.AccountId == accountId && !x.IsDelete).SingleOrDefault();
+
+        if(customerWallet != null)
+        {
+            customerWallet.Balance += bookingApprove.TotalAmount;
+            _beatSportsDbContext.Wallets.Update(customerWallet);
+        }
+
         bookingApprove.BookingStatus = BookingEnums.Cancel.ToString();
         _beatSportsDbContext.Bookings.Update(bookingApprove);
         await _beatSportsDbContext.SaveChangesAsync();
