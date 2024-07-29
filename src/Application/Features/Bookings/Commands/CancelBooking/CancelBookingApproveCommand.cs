@@ -37,6 +37,23 @@ public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingA
             throw new NotFoundException("Not Found");
         }
 
+        // Chuyển đổi Unix timestamp ngược lại thành DateTime
+        DateTimeOffset dateTimeOffsetFromUnix = DateTimeOffset.FromUnixTimeSeconds(bookingApprove.UnixTimestampMinCancellation);
+        DateTime datetimeFromUnix = dateTimeOffsetFromUnix.DateTime;
+        // Ghép PlayingDate và StartTimePlaying lại
+        DateTime playingStartDateTime = bookingApprove.PlayingDate.Date.Add(bookingApprove.StartTimePlaying);
+
+        // Lấy thời gian hiện tại
+        DateTime currentDateTime = DateTime.Now;
+
+        // So sánh thời gian hủy với thời gian hiện tại
+        TimeSpan timeDifference = playingStartDateTime - currentDateTime;
+
+        if (timeDifference <= TimeSpan.Zero)
+        {
+            // Thời gian hủy nhỏ hơn hoặc bằng thời gian hiện tại
+            throw new BadRequestException($"Cannot cancel booking. The minimum cancellation time has passed. Time difference: {timeDifference}");
+        }
         DateTime startTime = bookingApprove.PlayingDate.Date.Add(bookingApprove.StartTimePlaying);
         DateTime endTime = bookingApprove.PlayingDate.Date.Add(bookingApprove.EndTimePlaying);
         var timeChecking = _beatSportsDbContext.TimeChecking

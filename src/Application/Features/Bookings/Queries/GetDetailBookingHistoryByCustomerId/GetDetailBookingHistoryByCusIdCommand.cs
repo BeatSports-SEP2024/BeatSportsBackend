@@ -46,12 +46,14 @@ public class GetDetailBookingHistoryByCusIdCommandHandler : IRequestHandler<GetD
                 LastName = account.LastName,
                 PhoneNumber = account.PhoneNumber,
                 CustomerAddress = customer.Address,
+                UnixTimestampMinCancellation = booking.UnixTimestampMinCancellation,
 
                 CampaignId = booking.CampaignId,
                 CampaignName = campaign != null ? campaign.CampaignName : null,
                 PercentDiscount = campaign != null ? campaign.PercentDiscount : (decimal?)null,
                 MinValueApply = campaign != null ? campaign.MinValueApply : (decimal?)null,
                 MaxValueDiscount = campaign != null ? campaign.MaxValueDiscount : (decimal?)null,
+
 
                 CourtSubdivisionId = subCourt.Id,
                 CourtSubName = subCourt.CourtSubdivisionName,

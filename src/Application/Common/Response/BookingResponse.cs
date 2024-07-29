@@ -112,6 +112,7 @@ public class BookingHistoryDetailByCustomerId
     public Guid BookingId { get; set; }
     public Guid CustomerId { get; set; }
     public string? FirstName { get; set; }
+    public long UnixTimestampMinCancellation { get; set; }
     public string? LastName { get; set; }
     public string? PhoneNumber { get; set; }
     public string? CustomerAddress { get; set; }
