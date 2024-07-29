@@ -1,13 +1,16 @@
 ﻿using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Features.Bookings.Commands.CancelBooking;
 using BeatSportsAPI.Application.Features.Bookings.Commands.CreateBooking;
 using BeatSportsAPI.Application.Features.Bookings.Commands.DeleteBooking;
 using BeatSportsAPI.Application.Features.Bookings.Commands.UpdateBooking;
 using BeatSportsAPI.Application.Features.Bookings.Queries;
+using BeatSportsAPI.Application.Features.Bookings.Queries.GetAllBookingHistoryByCustomerId;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetAllBookingsByCustomerId;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDashboard;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDetailByCustomer;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDetailReadyForFinishBooking;
+using BeatSportsAPI.Application.Features.Bookings.Queries.GetDetailBookingHistoryByCustomerId;
 using BeatSportsAPI.Application.Features.Campaigns.Commands.CreateCampaign;
 using BeatSportsAPI.Application.Features.Campaigns.Commands.DeleteCampaign;
 using BeatSportsAPI.Application.Features.Campaigns.Commands.UpdateCampaign;
@@ -78,5 +81,32 @@ public class BookingController : ApiControllerBase
     {
         var response = await _mediator.Send(request);
         return response;
+	}
+    [HttpGet]
+    [Route("get-history-by-customer-id")]
+    public async Task<List<BookingHistoryByCustomerId>> GetHistoryByCustomerId([FromQuery] GetBookingHistoryByCusIdCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+
+    [HttpGet]
+    [Route("get-detail-history-by-customer-id")]
+    public async Task<BookingHistoryDetailByCustomerId> GetDetailHistoryByCustomerId([FromQuery] GetDetailBookingHistoryByCusIdCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+
+    [HttpPut]
+    [Route("cancel-booking-process")]
+    public async Task<BeatSportsResponse> CancelBookingProcess([FromBody] CancelBookingProcessCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+
+    [HttpPut]
+    [Route("cancel-booking-approve")]
+    public async Task<BeatSportsResponse> CancelBookingApprove([FromBody] CancelBookingApproveCommand request)
+    {
+        return await _mediator.Send(request);
     }
 }
