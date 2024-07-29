@@ -1,8 +1,10 @@
-﻿namespace BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingFinishForInvoice;
+﻿using MediatR;
+
+namespace BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingFinishForInvoice;
 /// <summary>
 /// Get hết những th booking của court id này theo ngày bắt đầu, ngày kết thúc mà FE gửi xuống
 /// </summary>
-public class GetBookingFinishForInvoiceQuery
+public class GetBookingFinishForInvoiceQuery : IRequest<List<BookingFinishForInvoiceResponse>>
 {
     public Guid CourtId { get; set; }
     /// <summary>
@@ -23,12 +25,13 @@ public class BookingFinishForInvoiceResponse
     /// Format ra string yyyy-MM-dd hh:mm:ss
     /// </summary>
     public string? DateCheck { get; set; }
+    public decimal? TotalPriceOfDay { get; set; }
     public List<BookingOfCourtInDay>? ListBooked { get; set; }
 }
 public class BookingOfCourtInDay
 {
     public Guid BookingId { get; set; }
-    public Guid CourtSubdivision { get; set; }
+    public Guid CourtSubdivisionId { get; set; }
     public Guid CustomerId { get; set; }
     /// <summary>
     /// Full name của người chơi

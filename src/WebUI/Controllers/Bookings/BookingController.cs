@@ -109,4 +109,36 @@ public class BookingController : ApiControllerBase
     {
         return await _mediator.Send(request);
     }
+
+    [HttpGet]
+    [Route("get-detail-history-by-customer-id")]
+    public async Task<BookingHistoryDetailByCustomerId> GetDetailHistoryByCustomerId([FromQuery] GetDetailBookingHistoryByCusIdCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+
+    [HttpPut]
+    [Route("cancel-booking-process")]
+    public async Task<BeatSportsResponse> CancelBookingProcess([FromBody] CancelBookingProcessCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+
+    [HttpPut]
+    [Route("cancel-booking-approve")]
+    public async Task<BeatSportsResponse> CancelBookingApprove([FromBody] CancelBookingApproveCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+
+    [HttpGet]
+    [Route("invoice")]
+    public async Task<List<BookingFinishForInvoiceResponse>> GetInvoice([FromQuery] GetBookingFinishForInvoiceQuery request)
+    {
+        if (!ModelState.IsValid)
+        {
+            throw new BadRequestException("An error is occured");
+        }
+        return await _mediator.Send(request);
+    }
 }
