@@ -25,22 +25,27 @@ public class CreateFeedbackHandler : IRequestHandler<CreateFeedbackCommand, Beat
         var booking = _dbContext.Bookings.Where(x => x.Id == request.BookingId).SingleOrDefault();
         if (booking == null || booking.IsDelete)
         {
-            throw new BadRequestException($"Booking with Booking ID:{request.BookingId} does not exist or have been delele");
+            throw new NotFoundException($"Booking with Booking ID:{request.BookingId} does not exist or have been delele");
         }
 
         //check Court
-        var court = _dbContext.Courts.Where(x => x.Id == request.CourtId).SingleOrDefault();
+        var subCourt = _dbContext.CourtSubdivisions.Where(c => c.Id == booking.CourtSubdivisionId).SingleOrDefault();
+        if (subCourt == null || subCourt.IsDelete)
+        {
+            throw new NotFoundException($"Sub Court Not found");
+        }
+        var court = _dbContext.Courts.Where(x => x.Id == subCourt.CourtId).SingleOrDefault();
         if (court == null || court.IsDelete)
         {
-            throw new BadRequestException($"Court with Court ID:{request.CourtId} does not exist or have been delele");
+            throw new NotFoundException($"Court Not found");
         }
         var feedback = new Feedback()
         {
             BookingId = request.BookingId,
-            CourtId = request.CourtId,
+            CourtId = court.Id,
             FeedbackStar = request.FeedbackStar,
-            FeedbackAvailable = request.FeedbackAvailable,
-            FeedbackStatus = request.FeedbackStatus,
+            FeedbackAvailable = true,
+            //FeedbackStatus = request.FeedbackStatus,
             FeedbackContent = request.FeedbackContent,
         };
         _dbContext.Feedbacks.Add(feedback);

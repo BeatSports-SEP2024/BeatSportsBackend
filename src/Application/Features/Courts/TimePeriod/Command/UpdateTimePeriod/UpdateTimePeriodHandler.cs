@@ -1,54 +1,42 @@
-﻿/*using BeatSportsAPI.Application.Common.Interfaces;
+﻿using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 using BeatSportsAPI.Application.Common.Exceptions;
 using System.Reflection;
 using BeatSportsAPI.Application.Common.Ultilities;
+using BeatSportsAPI.Application.Features.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BeatSportsAPI.Application.Features.Courts.TimePeriod.Command.UpdateTimePeriod;
 public class UpdateTimePeriodHandler : IRequestHandler<UpdateTimePeriodCommand, BeatSportsResponse>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
+    private readonly IHubContext<TimePeriodHub> _hubContext;
 
-    public UpdateTimePeriodHandler(IBeatSportsDbContext beatSportsDbContext)
+    public UpdateTimePeriodHandler(IBeatSportsDbContext beatSportsDbContext, IHubContext<TimePeriodHub> hubContext)
     {
         _beatSportsDbContext = beatSportsDbContext;
+        _hubContext = hubContext;
     }
 
     public async Task<BeatSportsResponse> Handle(UpdateTimePeriodCommand request, CancellationToken cancellationToken)
     {
         //check that time period is existed or not
         var existingTimePeriod = _beatSportsDbContext.TimePeriods
-            .FirstOrDefault(tp => tp.Id == request.TimePeriodId && tp.CourtId == request.CourtId && !tp.IsDelete);
+            .FirstOrDefault(tp => tp.Id == request.TimePeriodId && !tp.IsDelete);
 
         if (existingTimePeriod == null)
         {
             throw new NotFoundException("Time period not found.");
         }
-        //list time period, check is overlaps or not
-        var timePeriods = _beatSportsDbContext.TimePeriods
-            .Where(tp => tp.CourtId == request.CourtId && tp.Id != request.TimePeriodId && !tp.IsDelete).ToList();
-
-        foreach (var (start, end) in TimeUtils.GenerateTimeSlots(request.StartTime, request.EndTime))
-        {
-            if (timePeriods.Any(tp => tp.StartTime < end && start < tp.EndTime))
-            {
-                throw new BadRequestException("Time period overlaps with existing period. Please check and try again.");
-            }
-        }
-
-        var (newStart, newEnd) = TimeUtils.GenerateTimeSlots(request.StartTime, request.EndTime).FirstOrDefault();
-
-        existingTimePeriod.StartTime = newStart;
-        existingTimePeriod.EndTime = newEnd;
+        existingTimePeriod.PriceAdjustment = request.PriceAdjustment;
         existingTimePeriod.Description = request.Description;
-        existingTimePeriod.RateMultiplier = request.RateMultiplier;
-
+        _beatSportsDbContext.TimePeriods.Update(existingTimePeriod);
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
-
+        await _hubContext.Clients.All.SendAsync("UpdateTimePeriods");
         return new BeatSportsResponse
         {
             Message = "Time Period Updated Successfully"
         };
     }
-}*/
+}

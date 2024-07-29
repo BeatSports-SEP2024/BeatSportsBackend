@@ -1,19 +1,20 @@
 ﻿using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Features.Bookings.Commands.CancelBooking;
 using BeatSportsAPI.Application.Features.Bookings.Commands.CreateBooking;
 using BeatSportsAPI.Application.Features.Bookings.Commands.DeleteBooking;
 using BeatSportsAPI.Application.Features.Bookings.Commands.UpdateBooking;
 using BeatSportsAPI.Application.Features.Bookings.Queries;
+using BeatSportsAPI.Application.Features.Bookings.Queries.GetAllBookingHistoryByCustomerId;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetAllBookingsByCustomerId;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDashboard;
+using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDetailByCustomer;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDetailReadyForFinishBooking;
-using BeatSportsAPI.Application.Features.Campaigns.Commands.CreateCampaign;
-using BeatSportsAPI.Application.Features.Campaigns.Commands.DeleteCampaign;
-using BeatSportsAPI.Application.Features.Campaigns.Commands.UpdateCampaign;
-using BeatSportsAPI.Application.Features.Campaigns.Queries.GetAllCampaigns;
-using BeatSportsAPI.Application.Features.Feedbacks.Queries.GetAllFeedbacksByCourtId;
+using BeatSportsAPI.Application.Features.Bookings.Queries.GetDetailBookingHistoryByCustomerId;
+using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingFinishForInvoice;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using BeatSportsAPI.Application.Common.Exceptions;
 
 namespace WebAPI.Controllers.Bookings;
 
@@ -66,10 +67,54 @@ public class BookingController : ApiControllerBase
     }
     [HttpGet]
     [Route("get-booking-detail-before-finish")]
-    public async Task<BookingDetailReadyForFinishBookingResponse> GetBookingDetailReadyForFinishBookingResponse([FromQuery]GetBookingDetailReadyForFinishBookingQuery request)
+    public async Task<BookingDetailReadyForFinishBookingResponse> GetBookingDetailReadyForFinishBookingResponse([FromQuery] GetBookingDetailReadyForFinishBookingQuery request)
     {
         var response = await _mediator.Send(request);
         return response;
     }
+    [HttpGet]
+    [Route("booking-detail")]
+    public async Task<List<BookingDetailByCustomer>> GetBookingDetailByCustomer([FromQuery] GetBookingDetailByCustomerCommand request)
+    {
+        var response = await _mediator.Send(request);
+        return response;
+    }
+    [HttpGet]
+    [Route("get-history-by-customer-id")]
+    public async Task<List<BookingHistoryByCustomerId>> GetHistoryByCustomerId([FromQuery] GetBookingHistoryByCusIdCommand request)
+    {
+        return await _mediator.Send(request);
+    }
 
+    [HttpGet]
+    [Route("get-detail-history-by-customer-id")]
+    public async Task<BookingHistoryDetailByCustomerId> GetDetailHistoryByCustomerId([FromQuery] GetDetailBookingHistoryByCusIdCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+
+    [HttpPut]
+    [Route("cancel-booking-process")]
+    public async Task<BeatSportsResponse> CancelBookingProcess([FromBody] CancelBookingProcessCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+
+    [HttpPut]
+    [Route("cancel-booking-approve")]
+    public async Task<BeatSportsResponse> CancelBookingApprove([FromBody] CancelBookingApproveCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+
+    [HttpGet]
+    [Route("invoice")]
+    public async Task<List<BookingFinishForInvoiceResponse>> GetInvoice([FromQuery] GetBookingFinishForInvoiceQuery request)
+    {
+        if (!ModelState.IsValid)
+        {
+            throw new BadRequestException("An error is occured");
+        }
+        return await _mediator.Send(request);
+    }
 }

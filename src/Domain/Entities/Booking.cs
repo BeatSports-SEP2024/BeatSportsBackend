@@ -16,7 +16,14 @@ public class Booking : BaseAuditableEntity
     public Guid CourtSubdivisionId { get; set; }
     public DateTime BookingDate { get; set; }   
     public decimal TotalAmount { get; set; }
-    public bool IsRoomBooking { get; set; } 
+    public decimal TotalPriceInTimePeriod { get; set; }
+    public decimal TotalPriceDiscountCampaign { get; set; }
+    public string? PayloadDescriptionPriceOfTimePeriod { get; set; }
+    public bool IsRoomBooking { get; set; }
+    /// <summary>
+    /// Dùng để lưu thời gian cần thể nó hủy
+    /// </summary>
+    public DateTime UnixTimestampMinCancellation { get; set; }
     public bool IsDeposit {  get; set; }
     public DateTime PlayingDate { get; set; }
     public TimeSpan StartTimePlaying { get; set; }

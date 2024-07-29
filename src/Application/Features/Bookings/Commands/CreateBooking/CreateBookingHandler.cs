@@ -76,8 +76,46 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                         {
                             throw new BadRequestException("Tiền không đúng với giá trị thực tế khi áp dụng mã giảm giá");
                         }
+                        
+                        // Check account dựa trên booking của customer đó
+                        var getCustomerByAccount = _beatSportsDbContext.Customers
+                                .Where(x => x.Id == checkBookingInDB.CustomerId && !x.IsDelete).SingleOrDefault();
+
+                        if (getCustomerByAccount == null)
+                        {
+                            throw new NotFoundException("Cannot find this customer");
+                        }
+
+                        var accountId = getCustomerByAccount.AccountId;
+
+                        var customerWallet = _beatSportsDbContext.Wallets
+                            .Where(x => x.AccountId == accountId && !x.IsDelete).SingleOrDefault();
+                        // Xét 2 trường hợp
+                        if (customerWallet != null)
+                        {
+                            if(customerWallet.Balance >= checkTotalMoney)
+                            {
+                                customerWallet.Balance -= checkTotalMoney;
+                                _beatSportsDbContext.Wallets.Update(customerWallet);
+                            }                            
+                            else if(customerWallet.Balance < checkTotalMoney) 
+                            {
+                                checkBookingInDB.BookingStatus = BookingEnums.Cancel.ToString();
+                                _beatSportsDbContext.Bookings.Update(checkBookingInDB);
+                                await _beatSportsDbContext.SaveChangesAsync();
+                                throw new BadRequestException("Balance is not enough for booking");
+                            }                           
+                        }
+
+                        //Update Campaign to Booking
+                        checkBookingInDB.CampaignId = request.CampaignId;   
+                        checkBookingInDB.TotalPriceDiscountCampaign = realApply;
                         checkBookingInDB.BookingStatus = BookingEnums.Approved.ToString();
+                        //Giảm giá tiền sau khi áp dụng campaign
                         checkBookingInDB.TotalAmount = checkTotalMoney;
+                        //Cập nhật số lượng campaign
+                        campaignIfExist.QuantityOfCampaign = campaignIfExist.QuantityOfCampaign - 1;
+                        _beatSportsDbContext.Campaigns.Update(campaignIfExist);
                         _beatSportsDbContext.Bookings.Update(checkBookingInDB);
                         await _beatSportsDbContext.SaveChangesAsync();
                         Console.WriteLine($"Booking {checkBookingInDB.CustomerId} is complete.");
@@ -87,8 +125,9 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                             Message = "Booking Successfully"
                         };
                     }
+                    // Case không áp dụng campaign
                     else
-                    {
+                    {   
                         checkBookingInDB.BookingStatus = BookingEnums.Approved.ToString();
                         _beatSportsDbContext.Bookings.Update(checkBookingInDB);
                         await _beatSportsDbContext.SaveChangesAsync();

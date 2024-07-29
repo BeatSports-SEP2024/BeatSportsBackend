@@ -8,12 +8,14 @@ using Services.Redis;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Enums;
 using BeatSportsAPI.Application.Common.Response;
+using Newtonsoft.Json;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDetailReadyForFinishBooking;
 public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler<GetBookingDetailReadyForFinishBookingQuery, BookingDetailReadyForFinishBookingResponse>
 {
     private readonly IBeatSportsDbContext _dbContext;
     private readonly IDatabase _database;
+    private List<TimeSpan> LocalListTimestampMinCancellation = new List<TimeSpan>();
     public GetBookingDetailReadyForFinishBookingQueryHandler(IBeatSportsDbContext dbContext, IDatabase database)
     {
         _dbContext = dbContext;
@@ -28,6 +30,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
         string startTimeWantToPlay = request.StartTimeWantToPlay.ToString(@"hh\:mm");
         string lockKey = $"booking:{courtSubdivisionId}:{dayWantToPlay}:{startTimeWantToPlay}:lock";
         string lockValue = Guid.NewGuid().ToString();
+        DateTime unixTimestampMinCancellationFlag = new DateTime();
         TimeSpan expiry = TimeSpan.FromSeconds(30); // Khóa trong 30s
         // B1. Kiểm tra xem sân nhỏ muốn đặt tại thời điểm muốn chơi có trùng với time checking hay không?
         using (var redisLock = new RedisLock(_database, lockKey, lockValue, expiry))
@@ -165,6 +168,23 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
 
                     response.ListCourtByTimePeriod = listCourtSubInReponse;
                     response.TotalPrice = Math.Round(totalPrice, 2);
+                    string serializedListCourtSubInReponse = JsonConvert.SerializeObject(response.ListCourtByTimePeriod);
+                    if (LocalListTimestampMinCancellation.Any())
+                    {
+                        var maxTimeSpanInlist = LocalListTimestampMinCancellation.Max();
+                        DateTime playingDateTime = request.DayWantToPlay.Date.Add(request.StartTimeWantToPlay);
+                        var minTimeCancellationDateTime = playingDateTime - maxTimeSpanInlist;
+                        unixTimestampMinCancellationFlag = minTimeCancellationDateTime;
+                    }
+                    else
+                    {
+                        // Mặc định hệ thống sẽ là 0
+                        var maxTimeSpanInlist = new TimeSpan(0, 0, 0);
+                        DateTime playingDateTime = request.DayWantToPlay.Date.Add(request.StartTimeWantToPlay);
+                        var minTimeCancellationDateTime = playingDateTime - maxTimeSpanInlist;
+                        unixTimestampMinCancellationFlag = minTimeCancellationDateTime;
+                    }
+
                     var newBooking = new Booking
                     {
                         CustomerId = request.CustomerId,
@@ -172,6 +192,10 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                         CourtSubdivisionId = request.CourtSubdivisionId,
                         BookingDate = DateTime.UtcNow,
                         TotalAmount = response.TotalPrice,
+                        UnixTimestampMinCancellation = unixTimestampMinCancellationFlag,
+                        TotalPriceDiscountCampaign = 0,
+                        TotalPriceInTimePeriod = response.TotalPrice,
+                        PayloadDescriptionPriceOfTimePeriod = serializedListCourtSubInReponse,
                         IsRoomBooking = false,
                         IsDeposit = false,
                         PlayingDate = request.DayWantToPlay,
@@ -179,17 +203,21 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                         EndTimePlaying = request.EndTimeWantToPlay,
                         BookingStatus = BookingEnums.Process.ToString(),
                     };
+                    _dbContext.Bookings.Add(newBooking);
                     DateTime startTime = newBooking.PlayingDate.Date.Add(newBooking.StartTimePlaying);
                     DateTime endTime = newBooking.PlayingDate.Date.Add(newBooking.EndTimePlaying);
                     var courtSubLock = new TimeChecking
                     {
                         CourtSubdivisionId = newBooking.CourtSubdivisionId,
+                        DateBooking = request.DayWantToPlay,// :))))))))
                         StartTime = startTime,
                         EndTime = endTime,
                         IsLock = true
                     };
                     _dbContext.TimeChecking.Add(courtSubLock);
                     await _dbContext.SaveChangesAsync();
+
+                    response.BookingId = newBooking.Id;
                     return response;
                 }
                 finally
@@ -249,6 +277,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                 + periodEnd.ToString(@"hh\:mm")
             };
             var timePlayInThisPeriod = periodEnd - currentStart;
+            LocalListTimestampMinCancellation.Add(item.MinCancellationTime);
             listCourtSubInReponse.Add(newCourtSubResponse);
 
             totalPrice += courtSub.BasePrice * Convert.ToDecimal(timePlayInThisPeriod.TotalHours) + item.PriceAdjustment ?? 0;
@@ -267,7 +296,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
             };
             var timePlayInThisPeriod = request.EndTimeWantToPlay - currentStart;
             listCourtSubInReponse.Add(newCourtSubResponse);
-
+            LocalListTimestampMinCancellation.Add(item.MinCancellationTime);
             totalPrice += courtSub.BasePrice * Convert.ToDecimal(timePlayInThisPeriod.TotalHours) + item.PriceAdjustment ?? 0;
             currentStart = periodEnd;
         }

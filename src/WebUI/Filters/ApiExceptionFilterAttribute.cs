@@ -1,6 +1,7 @@
 ﻿using BeatSportsAPI.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using static Duende.IdentityServer.Models.IdentityResources;
 
 namespace WebAPI.Filters;
 public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
@@ -122,10 +123,12 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
 
     private void HandleBadRequestException(ExceptionContext context)
     {
+        var exception = (BadRequestException)context.Exception;
         var details = new ProblemDetails
         {
             Status = StatusCodes.Status400BadRequest,
             Title = "BadRequest",
+            Detail = exception.Message,
             Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
         };
 

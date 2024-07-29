@@ -100,6 +100,7 @@ public class CampaignResponseV6
 {
     public Guid Id { get; set; }
     public Guid CourtId { get; set; }
+    public string? CampaignName { get; set; }
     public decimal PercentDiscount { get; set; }
     public string? ExpireCampaign { get; set; }
     public decimal MinValueApply { get; set; }
