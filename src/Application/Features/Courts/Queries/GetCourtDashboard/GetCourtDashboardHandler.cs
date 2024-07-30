@@ -26,7 +26,13 @@ public class GetCourtDashboardHandler : IRequestHandler<GetCourtDashboardCommand
         var courtSubList = _beatSportsDbContext.CourtSubdivisions
                         .Where(x => x.CourtId == request.CourtId)
                         .Include(x => x.Bookings)
+                        .Include(x => x.CourtSubdivisionSettings).ThenInclude(x => x.SportCategories)
                         .ToList();
+
+        if(request.SportCategory != null)
+        {
+            courtSubList = courtSubList.Where(x => x.CourtSubdivisionSettings.SportCategories.Name.Equals(request.SportCategory)).ToList();
+        }
 
         var result = new List<CourtDashboardResponse>();
 
