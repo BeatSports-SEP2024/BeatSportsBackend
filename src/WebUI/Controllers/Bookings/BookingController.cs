@@ -16,6 +16,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetVenueBarchartByRangeDate;
+using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingByCourtId;
 
 namespace WebAPI.Controllers.Bookings;
 
@@ -135,6 +136,12 @@ public class BookingController : ApiControllerBase
         {
             throw new BadRequestException("An error is occured");
         }
+        return await _mediator.Send(request);
+    }
+    [HttpGet]
+    [Route("booking-by-court-id")]
+    public async Task<List<GetBookingByCourtIdResponse>> GetAllBookingByCourtId([FromQuery] GetBookingByCourtIdCommand request)
+    {
         return await _mediator.Send(request);
     }
 }
