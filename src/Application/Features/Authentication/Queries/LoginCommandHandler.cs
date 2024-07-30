@@ -33,6 +33,7 @@ public class LoginCommandHandler : IRequestHandler<CustomerLoginModelRequest, Lo
         }
 
         var user = await _beatSportsDbContext.Accounts
+            .Include(c => c.Customer)
             .Where(x => x.UserName == request.Username)
             .FirstOrDefaultAsync();
 
@@ -58,7 +59,7 @@ public class LoginCommandHandler : IRequestHandler<CustomerLoginModelRequest, Lo
             RefreshToken = loginResponse.RefreshToken,
             UserInfo = new AccountResponseForLogin
             {
-                Id = user.Id,
+                Id = user.Customer.Id,
                 AccountId = user.Id,
                 FullName = user.FirstName + " " + user.LastName,
                 Email = user.Email,
