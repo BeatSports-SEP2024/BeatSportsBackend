@@ -9,6 +9,11 @@ namespace BeatSportsAPI.Application.Features.Bookings.Queries.GetIncomeByBooking
 public class GetIncomeByBookingByCourtIdQuery : IRequest<List<IncomeByBookingResponse>>
 {
     public Guid CourtId { get; set; }
+    /// <summary>
+    /// trong so sánh nhớ có >= hoặc <=, đừng dùng mỗi dấu > <
+    /// </summary>
+    public DateTime DayStart { get; set; }
+    public DateTime DayEnd { get; set; }
 }
 public class IncomeByBookingResponse
 {
