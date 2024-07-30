@@ -1,39 +1,33 @@
-﻿using System.Dynamic;
-using AutoMapper;
-using BeatSportsAPI.Application.Common.Exceptions;
+﻿using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDetailReadyForFinishBooking;
-using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Queries.GetDetailBookingHistoryByCustomerId;
-public class GetDetailBookingHistoryByCusIdCommand : IRequest<BookingHistoryDetailByCustomerId>
+public class GetDetailBookingHistoryByBookingIdCommand : IRequest<BookingHistoryDetailByCustomerId>
 {
     public Guid BookingId { get; set; }
-    public Guid CustomerId { get; set; }
 }
 
-public class GetDetailBookingHistoryByCusIdCommandHandler : IRequestHandler<GetDetailBookingHistoryByCusIdCommand, BookingHistoryDetailByCustomerId>
+public class GetDetailBookingHistoryByBookingIdCommandHandler : IRequestHandler<GetDetailBookingHistoryByBookingIdCommand, BookingHistoryDetailByCustomerId>
 {
     private readonly IBeatSportsDbContext _dbContext;
-    private readonly IMapper _mapper;
 
-    public GetDetailBookingHistoryByCusIdCommandHandler(IBeatSportsDbContext dbContext, IMapper mapper)
+    public GetDetailBookingHistoryByBookingIdCommandHandler(IBeatSportsDbContext dbContext)
     {
         _dbContext = dbContext;
-        _mapper = mapper;
     }
 
-    public async Task<BookingHistoryDetailByCustomerId> Handle(GetDetailBookingHistoryByCusIdCommand request, CancellationToken cancellationToken)
+    public async Task<BookingHistoryDetailByCustomerId> Handle(GetDetailBookingHistoryByBookingIdCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            var bookingExist = await (
+            var bookingExist = await(
             from booking in _dbContext.Bookings
-            where !booking.IsDelete && booking.CustomerId == request.CustomerId && booking.Id == request.BookingId
+            where !booking.IsDelete && booking.Id == request.BookingId
             join customer in _dbContext.Customers on booking.CustomerId equals customer.Id
             join account in _dbContext.Accounts on customer.AccountId equals account.Id
             join subCourt in _dbContext.CourtSubdivisions on booking.CourtSubdivisionId equals subCourt.Id
@@ -90,6 +84,6 @@ public class GetDetailBookingHistoryByCusIdCommandHandler : IRequestHandler<GetD
             throw new NotFoundException("Not Found exception: " + ex.Message);
 
         }
-
     }
 }
+

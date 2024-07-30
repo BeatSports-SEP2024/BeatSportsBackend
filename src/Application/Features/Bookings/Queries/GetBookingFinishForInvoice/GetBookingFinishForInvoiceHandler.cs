@@ -32,6 +32,7 @@ public class GetBookingFinishForInvoiceHandler : IRequestHandler<GetBookingFinis
             join customer in _beatSportsDbContext.Customers on booking.CustomerId equals customer.Id
             join account in _beatSportsDbContext.Accounts on customer.Account.Id equals account.Id
             join courtSub in _beatSportsDbContext.CourtSubdivisions on booking.CourtSubdivisionId equals courtSub.Id
+
             select new
             {
                 booking,
@@ -55,9 +56,11 @@ public class GetBookingFinishForInvoiceHandler : IRequestHandler<GetBookingFinis
                 DayTimeBooking = q.booking.BookingDate.ToString("yyyy-MM-dd hh:mm:ss"),
                 //TotalPrice = query.Where(q => q.booking.BookingDate.Date == date).Sum(q => q.booking.TotalAmount)
                 TotalPrice = q.booking.TotalAmount,
-            }).ToList(),
+            }).OrderByDescending(x => x.DayTimeBooking).ToList(),
         }).ToList();
+        // Lọc ra những response có ListBooked.Any() = true
+        var filteredResponse = response.Where(r => r.ListBooked.Any()).ToList();
 
-        return response;
+        return filteredResponse;
     }
 }
