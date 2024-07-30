@@ -29,6 +29,12 @@ public class GetCourtDashboardHandler : IRequestHandler<GetCourtDashboardCommand
                         .Include(x => x.CourtSubdivisionSettings).ThenInclude(x => x.SportCategories)
                         .ToList();
 
+        var year = request.Year;
+        if (year == 0)
+        {
+            year = 2000;
+        }
+
         if(request.SportCategory != null)
         {
             courtSubList = courtSubList.Where(x => x.CourtSubdivisionSettings.SportCategories.Name.Equals(request.SportCategory)).ToList();
@@ -43,16 +49,19 @@ public class GetCourtDashboardHandler : IRequestHandler<GetCourtDashboardCommand
             foreach (var courtSub in courtSubList)
             {
                 var bookingsInGroup = courtSub.Bookings
-                .Where(b => b.Created.Month == month && b.Created.Year == request.Year)
+                .Where(b => b.Created.Month == month && b.Created.Year == year)
                 .ToList();
 
                 courtResponse.Y += bookingsInGroup.Sum(x => x.TotalAmount);
             }
 
-            courtResponse.X = DateTime.Parse($"1/{month}/{request.Year}");
+            //courtResponse.X = DateTime.Parse($"1/{month}/{request.Year}");
+            courtResponse.X = new DateTime(year, month, 1);
+
+
             result.Add(courtResponse);
         }
-        
+
         return Task.FromResult(result);
     }
 }

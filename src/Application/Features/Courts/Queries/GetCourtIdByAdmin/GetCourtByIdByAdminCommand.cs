@@ -34,12 +34,13 @@ public class GetCourtByIdByAdminCommandHandler : IRequestHandler<GetCourtByIdByA
 
         var courtDetails = _beatSportsDbContext.Courts
             .Where(c => c.Id == request.CourtId)
-            .Include(cs => cs.CourtSubdivision)
-                .ThenInclude(cs => cs.CourtSubdivisionSettings)
-            .Include(f => f.Feedback)
-            .ThenInclude(f => f.Booking)
-                .ThenInclude(b => b.Customer)
-                    .Include(c => c.Owner)
+                .Include(cs => cs.CourtSubdivision)
+                    .ThenInclude(cs => cs.CourtSubdivisionSettings)
+                        .ThenInclude(css => css.SportCategories)
+                .Include(f => f.Feedback)
+                    .ThenInclude(f => f.Booking)
+                        .ThenInclude(b => b.Customer)
+                .Include(c => c.Owner)
                         .ThenInclude(c => c.Account)
             .Select(c => new CourtResponseV7
             {
@@ -60,6 +61,15 @@ public class GetCourtByIdByAdminCommandHandler : IRequestHandler<GetCourtByIdByA
                 FeedbackCount = c.Feedback.Count(),
                 FeedbackStarAvg = c.Feedback.Any() ? c.Feedback.Average(x => x.FeedbackStar) : (decimal?)null,
                 Price = c.CourtSubdivision.FirstOrDefault() != null ? c.CourtSubdivision.FirstOrDefault().BasePrice : (decimal?)null,
+
+                SportCategoryList = c.CourtSubdivision
+                        .Select(cs => cs.CourtSubdivisionSettings.SportCategories)
+                        .Distinct()
+                        .Select(sc => new SportCategoryResponse
+                        {
+                            SportId = sc.Id,
+                            SportName = sc.Name
+                        }).ToList(),
 
                 CourtSubdivision = c.CourtSubdivision
                     .Select(subCourt => new CourtSubdivisionV7
