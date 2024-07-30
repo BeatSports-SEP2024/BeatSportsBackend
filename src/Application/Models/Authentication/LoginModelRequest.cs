@@ -13,3 +13,8 @@ public class LoginModelRequest : IRequest<LoginResponse>
     public string Username { get; set; } = null!;
     public string Password { get; set; } = null!;
 }
+public class AdminLoginModelRequest : LoginModelRequest { }
+
+public class OwnerLoginModelRequest : LoginModelRequest { }
+
+public class CustomerLoginModelRequest : LoginModelRequest { }

@@ -15,6 +15,8 @@ using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingFinishForInv
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using BeatSportsAPI.Application.Common.Exceptions;
+using BeatSportsAPI.Application.Features.Bookings.Queries.GetVenueBarchartByRangeDate;
+using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingByCourtId;
 
 namespace WebAPI.Controllers.Bookings;
 
@@ -93,6 +95,14 @@ public class BookingController : ApiControllerBase
         return await _mediator.Send(request);
     }
 
+    [HttpGet]
+    [Route("get-detail-history-by-booking-id")]
+    public async Task<BookingHistoryDetailByCustomerId> GetDetailHistoryByBookingId([FromQuery] GetDetailBookingHistoryByBookingIdCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+
+
     [HttpPut]
     [Route("cancel-booking-process")]
     public async Task<BeatSportsResponse> CancelBookingProcess([FromBody] CancelBookingProcessCommand request)
@@ -115,6 +125,23 @@ public class BookingController : ApiControllerBase
         {
             throw new BadRequestException("An error is occured");
         }
+        return await _mediator.Send(request);
+    }
+
+    [HttpGet]
+    [Route("venue-bar-chart")]
+    public async Task<List<VenueBarchartResponse>> GetVenueBarchart([FromQuery] GetVenueBarchartByRangeDateCommand request)
+    {
+        if (!ModelState.IsValid)
+        {
+            throw new BadRequestException("An error is occured");
+        }
+        return await _mediator.Send(request);
+    }
+    [HttpGet]
+    [Route("booking-by-court-id")]
+    public async Task<List<GetBookingByCourtIdResponse>> GetAllBookingByCourtId([FromQuery] GetBookingByCourtIdCommand request)
+    {
         return await _mediator.Send(request);
     }
 }

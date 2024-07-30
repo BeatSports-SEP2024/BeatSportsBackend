@@ -147,3 +147,24 @@ public class BookingHistoryDetailByCustomerId
     public string BookingStatus { get; set; }
 
 }
+
+public class VenueBarchartResponse
+{
+    public string Days { get; set; }
+    public decimal TotalVenueOfDays { get; set; }
+    public DateTime Date { get; set; }
+}
+
+public class GetBookingByCourtIdResponse
+{
+    public Guid CustomerId { get; set; }
+    public Guid BookingId { get; set; }
+    public Guid CourtId { get; set; }
+    public string? CustomerBookName { get; set; }
+    public string? CustomerAddress { get; set; }
+    public string? CourtAddress { get; set; }
+    public string? CourtName { get; set; }
+    public DateTime BookingDate { get; set; }
+    public decimal TotalAmount { get; set; }
+    public string? StatusBooking { get; set; }
+}

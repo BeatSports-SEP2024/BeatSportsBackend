@@ -24,14 +24,58 @@ public class AuthController : ApiControllerBase
         _mediator = mediator;
     }
     [HttpPost]
-    [Route("login")]
-    public async Task<IActionResult> Login([FromBody] LoginModelRequest request)
+    [Route("admin/login")]
+    public async Task<IActionResult> AdminLogin([FromBody] AdminLoginModelRequest request)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
+
         var response = await _mediator.Send(request);
+
+        if (response.UserInfo.Role != "Admin")
+        {
+            return Unauthorized("Invalid role");
+        }
+
+        return Ok(response);
+    }
+
+    [HttpPost]
+    [Route("owner/login")]
+    public async Task<IActionResult> OwnerLogin([FromBody] OwnerLoginModelRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var response = await _mediator.Send(request);
+
+        if (response.UserInfo.Role != "Owner")
+        {
+            return Unauthorized("Invalid role");
+        }
+
+        return Ok(response);
+    }
+
+    [HttpPost]
+    [Route("customer/login")]
+    public async Task<IActionResult> CustomerLogin([FromBody] CustomerLoginModelRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var response = await _mediator.Send(request);
+
+        if (response.UserInfo.Role != "Customer")
+        {
+            return Unauthorized("Invalid role");
+        }
 
         return Ok(response);
     }

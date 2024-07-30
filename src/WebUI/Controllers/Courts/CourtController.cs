@@ -3,6 +3,7 @@ using BeatSportsAPI.Application.Common;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Response.CourtResponse;
+using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDashboard;
 using BeatSportsAPI.Application.Features.Courts.Commands.CreateCourt;
 using BeatSportsAPI.Application.Features.Courts.Commands.DeleteCourt;
 using BeatSportsAPI.Application.Features.Courts.Commands.UpdateCourt;
@@ -12,6 +13,7 @@ using BeatSportsAPI.Application.Features.Courts.Queries.GetAll;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAll.GetAllCourtWithCourtSubPending;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAllCourtsByOwnerId;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetById;
+using BeatSportsAPI.Application.Features.Courts.Queries.GetCourtDashboard;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetCourtIdByAdmin;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetListCourtPending;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetListCourtsNearBy;
@@ -118,6 +120,13 @@ public class CourtController : ApiControllerBase
     [Route("court-with-courtsub-pending")]
     //[CustomAuthorize(RoleEnums.Customer)]
     public async Task<CourtResponseV8> GetAllCourtWithCourtSubPending([FromQuery] GetAllCourtWithCourtSubPendingCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+
+    [HttpGet]
+    [Route("dashboard")]
+    public async Task<List<CourtDashboardResponse>> DashboardResult([FromQuery] GetCourtDashboardCommand request)
     {
         return await _mediator.Send(request);
     }
