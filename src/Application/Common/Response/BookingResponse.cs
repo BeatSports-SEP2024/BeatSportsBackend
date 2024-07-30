@@ -147,3 +147,10 @@ public class BookingHistoryDetailByCustomerId
     public string BookingStatus { get; set; }
 
 }
+
+public class VenueBarchartResponse
+{
+    public string Days { get; set; }
+    public decimal TotalVenueOfDays { get; set; }
+    public DateTime Date { get; set; }
+}
