@@ -14,6 +14,8 @@ public class Booking : BaseAuditableEntity
     public Guid? CampaignId { get; set; }
     [ForeignKey("CourtSubdivision")]
     public Guid CourtSubdivisionId { get; set; }
+    [ForeignKey("Transaction")]
+    public Guid? TransactionId { get; set; }
     public DateTime BookingDate { get; set; }   
     public decimal TotalAmount { get; set; }
     public decimal TotalPriceInTimePeriod { get; set; }
@@ -34,4 +36,5 @@ public class Booking : BaseAuditableEntity
     public virtual Campaign? Campaign { get; set; }
     public virtual Feedback? Feedback { get; set; }
     public virtual RoomMatch? RoomMatch { get; set; }
+    public virtual Transaction? Transaction { get; set; }
 }

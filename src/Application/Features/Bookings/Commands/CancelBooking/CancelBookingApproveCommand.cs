@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BeatSportsAPI.Application.Common.Constants;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
@@ -91,6 +92,20 @@ public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingA
         {
             customerWallet.Balance += bookingApprove.TotalAmount;
             _beatSportsDbContext.Wallets.Update(customerWallet);
+        }
+
+        if (bookingApprove.TransactionId.HasValue)
+        {
+            var transaction = await _beatSportsDbContext.Transactions
+                .Where(t => t.Id == bookingApprove.TransactionId.Value && !t.IsDelete)
+                .FirstOrDefaultAsync();
+
+            if (transaction != null)
+            {
+                transaction.TransactionMessage = TransactionConstant.TransactionCancel;
+                transaction.TransactionStatus = TransactionEnum.Cancel.ToString();
+                _beatSportsDbContext.Transactions.Update(transaction);
+            }
         }
 
         bookingApprove.BookingStatus = BookingEnums.Cancel.ToString();

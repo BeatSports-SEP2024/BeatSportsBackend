@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BeatSportsAPI.Application.Common.Contants;
-public class MessageContants
+public class MessageConstants
 {
     public static string OK => "OK";
     public static string Cancel => "Cancel";

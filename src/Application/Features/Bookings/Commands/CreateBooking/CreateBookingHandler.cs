@@ -12,6 +12,7 @@ using BeatSportsAPI.Domain.Entities.CourtEntity;
 using BeatSportsAPI.Domain.Entities.Room;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDashboard;
 using Newtonsoft.Json.Linq;
+using BeatSportsAPI.Application.Common.Constants;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Commands.CreateBooking;
 public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BookingSuccessResponse>
@@ -30,7 +31,14 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
     public async Task<BookingSuccessResponse> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
     {
 
-        var checkBookingInDB = await _beatSportsDbContext.Bookings.Where(x => x.Id == request.BookingId && x.BookingStatus == BookingEnums.Process.ToString() && !x.IsDelete).SingleOrDefaultAsync();
+        var checkBookingInDB = await _beatSportsDbContext.Bookings
+            .Include(b => b.CourtSubdivision)
+                .ThenInclude(cs => cs.Court)
+                    .ThenInclude(c => c.Owner)
+                        .ThenInclude(o => o.Account)
+                            .ThenInclude(a => a.Wallet)
+            .Where(x => x.Id == request.BookingId && x.BookingStatus == BookingEnums.Process.ToString() && !x.IsDelete)
+            .SingleOrDefaultAsync();
         if (checkBookingInDB == null)
         {
             throw new NotFoundException("Không tìm thấy booking như trên");
@@ -81,12 +89,20 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                         var getCustomerByAccount = _beatSportsDbContext.Customers
                                 .Where(x => x.Id == checkBookingInDB.CustomerId && !x.IsDelete).SingleOrDefault();
 
+                        // Check account cua owner dua tren booking 
+                        if (checkBookingInDB.CourtSubdivision.Court.Owner.Account.Wallet == null)
+                        {
+                            throw new BadRequestException("Owner wallet not found");
+                        }
+
+                        var ownerWalletId = checkBookingInDB.CourtSubdivision.Court.Owner.Account.Wallet.Id;
+
                         if (getCustomerByAccount == null)
                         {
                             throw new NotFoundException("Cannot find this customer");
                         }
 
-                        var accountId = getCustomerByAccount.AccountId;
+                        var accountId = getCustomerByAccount.AccountId; 
 
                         var customerWallet = _beatSportsDbContext.Wallets
                             .Where(x => x.AccountId == accountId && !x.IsDelete).SingleOrDefault();
@@ -97,11 +113,48 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                             {
                                 customerWallet.Balance -= checkTotalMoney;
                                 _beatSportsDbContext.Wallets.Update(customerWallet);
+                                var transaction = new Transaction
+                                {
+                                    Id = Guid.NewGuid(),
+                                    WalletId = customerWallet.Id,
+                                    WalletTargetId = ownerWalletId, 
+                                    TransactionMessage = TransactionConstant.TransactionSuccessMessage,
+                                    TransactionPayload = null, 
+                                    TransactionStatus = TransactionEnum.Pending.ToString(),
+                                    AdminCheckStatus = 0, 
+                                    TransactionAmount = checkTotalMoney,
+                                    TransactionDate = DateTime.UtcNow,
+                                    TransactionType = TransactionConstant.TransactionType,
+                                    Created = DateTime.UtcNow,
+                                    CreatedBy = accountId.ToString(), 
+                                    IsDelete = false
+                                };
+                                _beatSportsDbContext.Transactions.Add(transaction);
+                                checkBookingInDB.TransactionId = transaction.Id;
                             }                            
                             else if(customerWallet.Balance < checkTotalMoney) 
                             {
                                 checkBookingInDB.BookingStatus = BookingEnums.Cancel.ToString();
                                 _beatSportsDbContext.Bookings.Update(checkBookingInDB);
+
+                                var transaction = new Transaction
+                                {
+                                    Id = Guid.NewGuid(),
+                                    WalletId = customerWallet.Id,
+                                    WalletTargetId = ownerWalletId,
+                                    TransactionMessage = TransactionConstant.TransactionFailedInsufficientBalance,
+                                    TransactionPayload = null, 
+                                    TransactionStatus = TransactionEnum.Cancel.ToString(),
+                                    AdminCheckStatus = 0, 
+                                    TransactionAmount = checkTotalMoney,
+                                    TransactionDate = DateTime.UtcNow,
+                                    TransactionType = TransactionConstant.TransactionType,
+                                    Created = DateTime.UtcNow,
+                                    CreatedBy = accountId.ToString(), // hoặc người tạo nếu khác
+                                    IsDelete = false
+                                };
+                                _beatSportsDbContext.Transactions.Add(transaction);
+                                checkBookingInDB.TransactionId = transaction.Id;
                                 await _beatSportsDbContext.SaveChangesAsync();
                                 throw new BadRequestException("Balance is not enough for booking");
                             }                           

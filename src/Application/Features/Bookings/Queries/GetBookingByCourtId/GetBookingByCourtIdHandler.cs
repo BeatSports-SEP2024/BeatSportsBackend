@@ -35,6 +35,7 @@ public class GetBookingByCourtIdHandler : IRequestHandler<GetBookingByCourtIdCom
                     CourtAddress = courtSub.Court.Address,
                     CourtName = courtSub.Court.CourtName,
                     CustomerAddress = customer.Address,
+                    TotalAmount = booking.TotalAmount,
                     CustomerBookName = customer.Account.FirstName + " " + customer.Account.LastName,
                     CustomerId = customer.Id,
                     StatusBooking = booking.BookingStatus,
