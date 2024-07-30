@@ -10,6 +10,7 @@ using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Mappings;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAll;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
@@ -60,7 +61,7 @@ public class GetAllCampaignHandler : IRequestHandler<GetAllCampaignsCommand, Pag
             EndDateApplying = c.EndDateApplying,
             SportTypeApply = c.SportTypeApply,
             Created = c.Created,
-            Status = c.Status,
+            Status = c.Status.ToString(),
         })
         .PaginatedListAsync(request.PageIndex, request.PageSize); 
 
