@@ -190,7 +190,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                         CustomerId = request.CustomerId,
                         CampaignId = null,
                         CourtSubdivisionId = request.CourtSubdivisionId,
-                        BookingDate = DateTime.UtcNow,
+                        BookingDate = DateTime.Now,
                         TotalAmount = response.TotalPrice,
                         UnixTimestampMinCancellation = unixTimestampMinCancellationFlag,
                         TotalPriceDiscountCampaign = 0,
