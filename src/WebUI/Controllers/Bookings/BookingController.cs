@@ -15,6 +15,7 @@ using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingFinishForInv
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using BeatSportsAPI.Application.Common.Exceptions;
+using BeatSportsAPI.Application.Features.Bookings.Queries.GetVenueBarchartByRangeDate;
 
 namespace WebAPI.Controllers.Bookings;
 
@@ -110,6 +111,17 @@ public class BookingController : ApiControllerBase
     [HttpGet]
     [Route("invoice")]
     public async Task<List<BookingFinishForInvoiceResponse>> GetInvoice([FromQuery] GetBookingFinishForInvoiceQuery request)
+    {
+        if (!ModelState.IsValid)
+        {
+            throw new BadRequestException("An error is occured");
+        }
+        return await _mediator.Send(request);
+    }
+
+    [HttpGet]
+    [Route("venue-bar-chart")]
+    public async Task<List<VenueBarchartResponse>> GetVenueBarchart([FromQuery] GetVenueBarchartByRangeDateCommand request)
     {
         if (!ModelState.IsValid)
         {
