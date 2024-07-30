@@ -31,6 +31,7 @@ public class OwnerLoginHandler : IRequestHandler<OwnerLoginModelRequest, LoginRe
         }
 
         var user = await _beatSportsDbContext.Accounts
+            .Include(o => o.Owner)
             .Where(x => x.UserName == request.Username)
             .FirstOrDefaultAsync();
 
@@ -56,7 +57,7 @@ public class OwnerLoginHandler : IRequestHandler<OwnerLoginModelRequest, LoginRe
             RefreshToken = loginResponse.RefreshToken,
             UserInfo = new AccountResponseForLogin
             {
-                Id = user.Id,
+                Id = user.Owner.Id,
                 AccountId = user.Id,
                 FullName = user.FirstName + " " + user.LastName,
                 Email = user.Email,
