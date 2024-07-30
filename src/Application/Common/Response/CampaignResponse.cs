@@ -39,7 +39,7 @@ public class CampaignResponseV2
     public DateTime EndDateApplying { get; set; }
     public string SportTypeApply { get; set; }
     public DateTime Created { get; set; }
-    public StatusEnums Status { get; set; }
+    public string? Status { get; set; }
 }
 
 public class CampaignResponseV3
