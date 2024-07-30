@@ -14,4 +14,5 @@ public class GetCourtDashboardCommand : IRequest<List<CourtDashboardResponse>>
 {
     public Guid CourtId { get; set; }
     public int Year { get; set; }
+    public string SportCategory { get; set; }
 }
