@@ -11,6 +11,7 @@ using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using BeatSportsAPI.Application.Common.Constants;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Commands.CancelBooking;
 public class CancelBookingProcessCommand : IRequest<BeatSportsResponse>
@@ -63,6 +64,20 @@ public class CancelBookingProcessCommandHandler : IRequestHandler<CancelBookingP
             {
                 customerWallet.Balance += bookingProcess.TotalAmount;
                 _beatSportsDbContext.Wallets.Update(customerWallet);
+            }
+
+            if (bookingProcess.TransactionId.HasValue)
+            {
+                var transaction = await _beatSportsDbContext.Transactions
+                    .Where(t => t.Id == bookingProcess.TransactionId.Value && !t.IsDelete)
+                    .FirstOrDefaultAsync();
+
+                if (transaction != null)
+                {
+                    transaction.TransactionMessage = TransactionConstant.TransactionCancel;
+                    transaction.TransactionStatus = TransactionEnum.Cancel.ToString();
+                    _beatSportsDbContext.Transactions.Update(transaction);
+                }
             }
 
             _beatSportsDbContext.TimeChecking.Remove(timeChecking);

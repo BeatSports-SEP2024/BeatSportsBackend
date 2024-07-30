@@ -68,7 +68,7 @@ public class ProcessZaloPaymentReturnHandler : IRequestHandler<ProcessZaloPaymen
                         ///TODO: Update database
                         var transaction = new PaymentTransaction
                         {
-                            TranMessage = MessageContants.OK,
+                            TranMessage = MessageConstants.OK,
                             TranPayload = JsonConvert.SerializeObject(request),
                             TranStatus = "0",
                             TranAmount = request.amount,
@@ -120,7 +120,7 @@ public class ProcessZaloPaymentReturnHandler : IRequestHandler<ProcessZaloPaymen
                     returnUrl = merchant?.MerchantReturnUrl ?? string.Empty;
 
                     result.Success = true;
-                    result.Message = MessageContants.OK;
+                    result.Message = MessageConstants.OK;
                     result.Data = (resultData, returnUrl);
 
                 }
@@ -139,10 +139,10 @@ public class ProcessZaloPaymentReturnHandler : IRequestHandler<ProcessZaloPaymen
         }
         catch (Exception ex)
         {
-            result.Set(false, MessageContants.Error);
+            result.Set(false, MessageConstants.Error);
             result.Errors.Add(new BaseError()
             {
-                Code = MessageContants.Exception,
+                Code = MessageConstants.Exception,
                 Message = ex.Message,
             });
         }

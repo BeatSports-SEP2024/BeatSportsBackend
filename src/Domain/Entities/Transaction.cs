@@ -15,4 +15,5 @@ public class Transaction : BaseAuditableEntity
     public string? TransactionType { get; set; } 
 
     public virtual Wallet Wallet { get; set; } = null!;
+    public virtual Booking Booking { get; set; }
 }
