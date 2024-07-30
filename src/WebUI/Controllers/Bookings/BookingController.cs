@@ -94,6 +94,14 @@ public class BookingController : ApiControllerBase
         return await _mediator.Send(request);
     }
 
+    [HttpGet]
+    [Route("get-detail-history-by-booking-id")]
+    public async Task<BookingHistoryDetailByCustomerId> GetDetailHistoryByBookingId([FromQuery] GetDetailBookingHistoryByBookingIdCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+
+
     [HttpPut]
     [Route("cancel-booking-process")]
     public async Task<BeatSportsResponse> CancelBookingProcess([FromBody] CancelBookingProcessCommand request)
