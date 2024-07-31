@@ -33,6 +33,11 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
             request.KeyWord = "";
         }
 
+        if (request.Filter == null)
+        {
+            request.Filter = "";
+        }
+
         var query = _beatSportsDbContext.Transactions
             .Where(t => !t.IsDelete)
             .OrderByDescending(b => b.Created);
