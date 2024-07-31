@@ -137,14 +137,14 @@ public class BookingHistoryDetailByCustomerId
     public decimal TotalAmount { get; set; }
     public decimal TotalPriceInTimePeriod { get; set; }
     public decimal TotalPriceDiscountCampaign { get; set; }
-    public List<CourtDetailInBookingDetailReadyForFinishBookingReponse> ListCourtByTimePeriod { get; set; }
+    public List<CourtDetailInBookingDetailReadyForFinishBookingReponse>? ListCourtByTimePeriod { get; set; }
 
     public bool IsRoomBooking { get; set; }
     public bool IsDeposit { get; set; }
     public DateTime PlayingDate { get; set; }
     public TimeSpan StartTimePlaying { get; set; }
     public TimeSpan EndTimePlaying { get; set; }
-    public string BookingStatus { get; set; }
+    public string? BookingStatus { get; set; }
 
 }
 

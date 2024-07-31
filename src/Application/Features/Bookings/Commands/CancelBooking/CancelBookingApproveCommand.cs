@@ -34,6 +34,11 @@ public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingA
     public async Task<BeatSportsResponse> Handle(CancelBookingApproveCommand request, CancellationToken cancellationToken)
     {
         var bookingApprove = await _beatSportsDbContext.Bookings
+            .Include(b => b.CourtSubdivision)
+                .ThenInclude(cs => cs.Court)
+                    .ThenInclude(c => c.Owner)
+                        .ThenInclude(o => o.Account)
+                            .ThenInclude(a => a.Wallet)
             .Where(x => x.BookingStatus == BookingEnums.Approved.ToString()
             && x.Id == request.BookingId
             && x.CustomerId == request.CustomerId).FirstOrDefaultAsync();
@@ -78,6 +83,7 @@ public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingA
             campaignExist!.QuantityOfCampaign += 1;
             _beatSportsDbContext.Campaigns.Update(campaignExist);
         }
+        var ownerWallet = bookingApprove.CourtSubdivision.Court.Owner.Account.Wallet;
 
         var getCustomerByAccount = _beatSportsDbContext.Customers
             .Where(x => x.Id == request.CustomerId && !x.IsDelete).SingleOrDefault();
@@ -108,6 +114,9 @@ public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingA
                     // Decimal trong trường hợp này kh có null được đâu. Khỏi lo
                     customerWallet.Balance += (decimal)transaction.TransactionAmount!;
                     _beatSportsDbContext.Wallets.Update(customerWallet);
+                    // Trừ tiền tương đương trong ví owner với số tiền customer đặt đơn
+                    ownerWallet.Balance -= (decimal)transaction.TransactionAmount!;
+                    _beatSportsDbContext.Wallets.Update(ownerWallet);
                     // Hủy transaction đó
                     transaction.TransactionMessage = TransactionConstant.TransactionCancel;
                     transaction.TransactionStatus = TransactionEnum.Cancel.ToString();
