@@ -96,6 +96,7 @@ public class ProcessZaloPaymentReturnHandler : IRequestHandler<ProcessZaloPaymen
                             TransactionAmount = transactionExist.TranAmount,
                             TransactionDate = transactionExist.TranDate,
                             TransactionType = payment.PaymentType,
+                            PaymentTransactionId = paymentId
                         };
                         _dbContext.Transactions.Add(transactionWallet);
                         await _dbContext.SaveChangesAsync();
