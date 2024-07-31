@@ -11,5 +11,5 @@ public class TransactionConstant
     public static string TransactionFailedInsufficientBalance => "Số dư không đủ để thanh toán";
     public static string TransactionCancel => "Hủy đặt sân, nhận lại tiền đã thanh toán";
 
-    public static string TransactionType => "Sử dụng số dư ví";
+    public static string TransactionType => "Giao dịch trong ứng dụng";
 }
