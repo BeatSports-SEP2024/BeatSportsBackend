@@ -28,7 +28,7 @@ public class GetCampaignByCourtSubdivisionAndTotalMoneyQueryHandler : IRequestHa
                 MaxValueDiscount = x.MaxValueDiscount,
                 MinValueApply = x.MinValueApply,
                 StartDateApplying = x.StartDateApplying,
-                Status = x.Status,
+                Status = x.Status.ToString(),
                 CanApplyCampaign = request.TotalMoney >= x.MinValueApply,
                 PercenDiscount = x.PercentDiscount
             })
