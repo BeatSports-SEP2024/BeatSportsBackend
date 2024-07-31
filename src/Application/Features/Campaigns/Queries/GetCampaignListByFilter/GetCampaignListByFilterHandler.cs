@@ -54,7 +54,7 @@ public class GetCampaignListByFilterHandler : IRequestHandler<GetCampaignListByF
             StartDateApplying = q.StartDateApplying,
             EndDateApplying = q.EndDateApplying,
             ExpireCampaign = (q.EndDateApplying - DateTime.Now).Days.ToString(),
-            Status = q.EndDateApplying < DateTime.Now ? StatusEnums.Expired : q.Status,
+            Status = (q.EndDateApplying < DateTime.Now ? StatusEnums.Expired : q.Status).ToString(),
             MinValueApply = q.MinValueApply,
             MaxValueDiscount = q.MaxValueDiscount,            
         }).PaginatedListAsync(request.PageIndex, request.PageSize);

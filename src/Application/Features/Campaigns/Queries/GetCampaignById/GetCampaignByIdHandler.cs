@@ -58,7 +58,7 @@ public class GetCampaignByIdHandler : IRequestHandler<GetCampaignByIdCommand, Ca
             MinValueApply = c.MinValueApply,
             MaxValueDiscount = c.MaxValueDiscount,
             Created = c.Created,
-            Status = c.Status,
+            Status = c.Status.ToString(),
             QuantityOfCampaign = c.QuantityOfCampaign,
             CampaignImageUrl = c.CampaignImageURL,
             ReasonOfReject = c.ReasonOfReject,

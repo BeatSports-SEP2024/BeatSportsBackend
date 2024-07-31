@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 
-namespace BeatSportsAPI.Application.Features.Transactions.Commands.TransferMoneyInApp;
-public class TransferMoneyInAppCommand : IRequest<BeatSportsResponseV2>
+namespace BeatSportsAPI.Application.Features.Transactions.Commands.CreateWithdrawalRequestByOwner;
+public class CreateWithdrawalRequestByOwnerCommand : IRequest<BeatSportsResponseV2>
 {
-    public Guid CustomerId { get; set; }
     public Guid OwnerId { get; set; }
     public decimal? TransactionAmount { get; set; }
 }

@@ -69,9 +69,9 @@ public class GetDetailBookingHistoryByCusIdCommandHandler : IRequestHandler<GetD
                 TotalAmount = booking.TotalAmount,
                 TotalPriceInTimePeriod = booking.TotalPriceInTimePeriod,
                 TotalPriceDiscountCampaign = booking.TotalPriceDiscountCampaign,
-                ListCourtByTimePeriod = !string.IsNullOrEmpty(booking.PayloadDescriptionPriceOfTimePeriod) ? 
-                JsonConvert.DeserializeObject<List<CourtDetailInBookingDetailReadyForFinishBookingReponse>>(booking.PayloadDescriptionPriceOfTimePeriod) 
-                : null,
+                ListCourtByTimePeriod = !string.IsNullOrEmpty(booking.PayloadDescriptionPriceOfTimePeriod) ?
+                    JsonConvert.DeserializeObject<List<CourtDetailInBookingDetailReadyForFinishBookingReponse>>(booking.PayloadDescriptionPriceOfTimePeriod) :
+                    new List<CourtDetailInBookingDetailReadyForFinishBookingReponse>(),
 
                 IsRoomBooking = booking.IsRoomBooking,
                 IsDeposit = booking.IsDeposit,
