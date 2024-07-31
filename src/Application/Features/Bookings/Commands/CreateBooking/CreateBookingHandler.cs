@@ -57,7 +57,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
             throw new BadRequestException("Owner wallet not found");
         }
 
-        var ownerWalletId = checkBookingInDB.CourtSubdivision.Court.Owner.Account.Wallet.Id;
+        var ownerWallet = checkBookingInDB.CourtSubdivision.Court.Owner.Account.Wallet;
 
         if (getCustomerByAccount == null)
         {
@@ -84,6 +84,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
             {
                 try
                 {
+                    // Case check  
                     // Check lại giá tổng coi đã đúng hay chưa.
                     if (request.CampaignId != null)
                     {
@@ -124,9 +125,9 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                                 var transaction = new Transaction
                                 {
                                     WalletId = customerWallet.Id,
-                                    WalletTargetId = ownerWalletId,
+                                    WalletTargetId = ownerWallet.Id,
                                     TransactionMessage = TransactionConstant.TransactionSuccessMessage,
-                                    TransactionPayload = null,
+                                    TransactionPayload = "",
                                     TransactionStatus = TransactionEnum.Pending.ToString(),
                                     AdminCheckStatus = 0,
                                     TransactionAmount = checkTotalMoney,
@@ -136,6 +137,10 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                                 };
                                 _beatSportsDbContext.Transactions.Add(transaction);
                                 checkBookingInDB.TransactionId = transaction.Id;
+
+                                // cập nhật số dư cho owner nếu thành công
+                                ownerWallet.Balance += checkTotalMoney;
+                                _beatSportsDbContext.Wallets.Update(ownerWallet);
                             }
                             else if (customerWallet.Balance < checkTotalMoney)
                             {
@@ -146,9 +151,9 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                                 var transaction = new Transaction
                                 {
                                     WalletId = customerWallet.Id,
-                                    WalletTargetId = ownerWalletId,
+                                    WalletTargetId = ownerWallet.Id,
                                     TransactionMessage = TransactionConstant.TransactionFailedInsufficientBalance,
-                                    TransactionPayload = null,
+                                    TransactionPayload = "",
                                     TransactionStatus = TransactionEnum.Cancel.ToString(),
                                     AdminCheckStatus = 0,
                                     TransactionAmount = checkTotalMoney,
@@ -181,6 +186,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                             Message = "Booking Successfully"
                         };
                     }
+
                     // Case không áp dụng campaign
                     else
                     {
@@ -195,7 +201,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                                 var transaction = new Transaction
                                 {
                                     WalletId = customerWallet.Id,
-                                    WalletTargetId = ownerWalletId,
+                                    WalletTargetId = ownerWallet.Id,
                                     TransactionMessage = TransactionConstant.TransactionSuccessMessage,
                                     TransactionPayload = null,
                                     TransactionStatus = TransactionEnum.Pending.ToString(),
@@ -207,6 +213,10 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                                 };
                                 _beatSportsDbContext.Transactions.Add(transaction);
                                 checkBookingInDB.TransactionId = transaction.Id;
+
+                                // cập nhật số dư cho owner nếu thành công
+                                ownerWallet.Balance += checkBookingInDB.TotalAmount;
+                                _beatSportsDbContext.Wallets.Update(ownerWallet);
                             }
                             else if (customerWallet.Balance < checkBookingInDB.TotalAmount)
                             {
@@ -217,7 +227,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                                 var transaction = new Transaction
                                 {
                                     WalletId = customerWallet.Id,
-                                    WalletTargetId = ownerWalletId,
+                                    WalletTargetId = ownerWallet.Id,
                                     TransactionMessage = TransactionConstant.TransactionFailedInsufficientBalance,
                                     TransactionPayload = null,
                                     TransactionStatus = TransactionEnum.Cancel.ToString(),
