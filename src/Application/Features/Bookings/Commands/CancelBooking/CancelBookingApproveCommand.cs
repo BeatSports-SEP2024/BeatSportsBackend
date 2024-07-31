@@ -120,6 +120,7 @@ public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingA
                     // Hủy transaction đó
                     transaction.TransactionMessage = TransactionConstant.TransactionCancel;
                     transaction.TransactionStatus = TransactionEnum.Cancel.ToString();
+                    transaction.AdminCheckStatus = AdminCheckEnums.Cancel;
                     _beatSportsDbContext.Transactions.Update(transaction);
                 }
             }

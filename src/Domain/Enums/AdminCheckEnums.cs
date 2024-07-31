@@ -9,5 +9,6 @@ public enum AdminCheckEnums
 {
     Pending,
     Accepted,
+    Cancel,
     Rejected
 }
