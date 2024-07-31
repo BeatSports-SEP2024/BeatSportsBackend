@@ -33,6 +33,15 @@ public class ApproveMoneyForOwnerHandler : IRequestHandler<ApproveMoneyForOwnerC
             });
         }
 
+        if(transaction.Created.Date.AddDays(7) > DateTime.Now.Date)
+        {
+            return Task.FromResult(new BeatSportsResponseV2
+            {
+                Status = 400,
+                Message = "Chua den ngay chuyen tien!"
+            });
+        }
+
         var owner = _dbContext.Owners
                     .Where(x => x.Id == request.OwnerId)
                     .FirstOrDefault();
