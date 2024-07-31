@@ -141,7 +141,7 @@ public class BookingController : ApiControllerBase
     }
     [HttpGet]
     [Route("booking-by-court-id")]
-    public async Task<List<GetBookingByCourtIdResponse>> GetAllBookingByCourtId([FromQuery] GetBookingByCourtIdCommand request)
+    public async Task<PaginatedList<GetBookingByCourtIdResponse>> GetAllBookingByCourtId([FromQuery] GetBookingByCourtIdCommand request)
     {
         return await _mediator.Send(request);
     }

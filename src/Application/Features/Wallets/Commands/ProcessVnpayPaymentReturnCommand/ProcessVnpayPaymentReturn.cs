@@ -107,6 +107,7 @@ public class ProcessVnpayPaymentReturnHandler : IRequestHandler<ProcessVnpayPaym
                                     TransactionAmount = transactionExist.TranAmount,
                                     TransactionDate = transactionExist.TranDate,
                                     TransactionType = payment.PaymentType,
+                                    PaymentTransactionId = request.vnp_TxnRef,
                                 };
                                 _dbContext.Transactions.Add(transactionWallet);
                                 await _dbContext.SaveChangesAsync();
@@ -158,6 +159,7 @@ public class ProcessVnpayPaymentReturnHandler : IRequestHandler<ProcessVnpayPaym
                                     TransactionAmount = transactionExist.TranAmount,
                                     TransactionDate = transactionExist.TranDate,
                                     TransactionType = payment.PaymentType,
+                                    PaymentTransactionId = request.vnp_TxnRef
                                 };
                                 _dbContext.Transactions.Add(transactionWallet);
                                 await _dbContext.SaveChangesAsync();

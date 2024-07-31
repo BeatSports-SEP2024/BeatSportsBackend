@@ -98,6 +98,7 @@ public class ProcessMomoPaymentReturnHandler : IRequestHandler<ProcessMomoPaymen
                             TransactionAmount = transactionExist.TranAmount,
                             TransactionDate = transactionExist.TranDate,
                             TransactionType = payment.PaymentType,
+                            PaymentTransactionId = request.orderId
                         };
                         _dbContext.Transactions.Add(transactionWallet);
                         await _dbContext.SaveChangesAsync();
