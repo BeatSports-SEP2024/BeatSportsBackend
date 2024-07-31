@@ -25,7 +25,7 @@ public class GetDetailBookingHistoryByBookingIdCommandHandler : IRequestHandler<
     {
         try
         {
-            var bookingExist = await(
+            var bookingExist = await (
             from booking in _dbContext.Bookings
             where !booking.IsDelete && booking.Id == request.BookingId
             join customer in _dbContext.Customers on booking.CustomerId equals customer.Id
@@ -64,8 +64,8 @@ public class GetDetailBookingHistoryByBookingIdCommandHandler : IRequestHandler<
                 TotalPriceInTimePeriod = booking.TotalPriceInTimePeriod,
                 TotalPriceDiscountCampaign = booking.TotalPriceDiscountCampaign,
                 ListCourtByTimePeriod = !string.IsNullOrEmpty(booking.PayloadDescriptionPriceOfTimePeriod) ?
-                JsonConvert.DeserializeObject<List<CourtDetailInBookingDetailReadyForFinishBookingReponse>>(booking.PayloadDescriptionPriceOfTimePeriod)
-                : null,
+                    JsonConvert.DeserializeObject<List<CourtDetailInBookingDetailReadyForFinishBookingReponse>>(booking.PayloadDescriptionPriceOfTimePeriod) :
+                    new List<CourtDetailInBookingDetailReadyForFinishBookingReponse>(),
 
                 IsRoomBooking = booking.IsRoomBooking,
                 IsDeposit = booking.IsDeposit,
