@@ -22,21 +22,10 @@ public class TransactionResponse : IMapFrom<Transaction>
     public string? TransactionType { get; set; }
 }
 
-public class TransactionResponseV3 
+public class TransactionResponseV2 
 {
     public Guid TransactionId { get; set; }
-    public UserInfo2 UserInfo { get; set; }  
-    public decimal? TransactionAmount { get; set; }
-    public string? TransactionStatus { get; set; }
-    public string AdminCheckStatus { get; set; }
-    public DateTime? TransactionDate { get; set; }
-    public string? TransactionType { get; set; }
-}
-
-public class TransactionResponseV2
-{
-    public Guid TransactionId { get; set; }
-    public UserInfo From { get; set; }
+    public UserInfo From { get; set; }  
     public UserInfo To { get; set; }
     public decimal? TransactionAmount { get; set; }
     public string? TransactionStatus { get; set; }
@@ -47,13 +36,6 @@ public class TransactionResponseV2
 
 public class UserInfo
 {
-    public Guid WalletId { get; set; }
-    public string Name { get; set; }
-    public string Role { get; set; }
-}
-public class UserInfo2
-{
-    public Guid OwnerId { get; set; }
     public Guid WalletId { get; set; }
     public string Name { get; set; }
     public string Role { get; set; }
