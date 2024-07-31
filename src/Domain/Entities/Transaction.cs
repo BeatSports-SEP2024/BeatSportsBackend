@@ -13,6 +13,7 @@ public class Transaction : BaseAuditableEntity
     public decimal? TransactionAmount { get; set; }
     public DateTime? TransactionDate { get; set; }    
     public string? TransactionType { get; set; } 
+    public string? ImageOfInvoice { get; set; }
     /// <summary>
     /// Không cần relationship, để 
     /// check coi call back được thì lấy 

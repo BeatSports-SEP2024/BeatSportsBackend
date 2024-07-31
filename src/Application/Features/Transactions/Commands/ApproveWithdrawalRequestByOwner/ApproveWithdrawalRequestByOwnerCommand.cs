@@ -11,5 +11,5 @@ public class ApproveWithdrawalRequestByOwnerCommand : IRequest<BeatSportsRespons
 {
     public Guid OwnerId { get; set; }
     public Guid TransactionId { get; set; }
-    public string[] ImageOfInvoice { get; set; }
+    public string ImageOfInvoice { get; set; }
 }
