@@ -28,28 +28,61 @@ public class GetTransactionByCusIdCommandHandler : IRequestHandler<GetTransactio
     {
         var listTransaction = new List<TransactionThirdpartyResponse>();
         var cusIdExist = await _beatSportsDbContext.Customers.Where(c => c.Id == request.CustomerId).FirstOrDefaultAsync();
-        var paymentExist = await _beatSportsDbContext.Payments.Where(p => p.AccountId == cusIdExist!.AccountId).ToListAsync();
+        if (cusIdExist == null)
+        {
+            return listTransaction;
+        }
+        var paymentExist = await _beatSportsDbContext.Payments.Where(p => p.AccountId == cusIdExist.AccountId).ToListAsync();
         foreach (var payment in paymentExist)
         {
-            var transactionCusIdExist = await _beatSportsDbContext.PaymentTransactions.Where(pt => pt.PaymentId == payment.Id).FirstOrDefaultAsync();
-
-
-            //var transactionPayload = JsonConvert.DeserializeObject<TransactionPayload>(transactionCusIdExist.TranPayload!);
-            //JObject transactionPayload = JObject.Parse(transactionCusIdExist!.TranPayload!);
-            var transactionPayload = JsonConvert.DeserializeObject<ExpandoObject>(transactionCusIdExist!.TranPayload!)!;
-
-            var data = new TransactionThirdpartyResponse
+            // kiểm tra xem transation của wallet đã update chưa, nếu có update rồi thì tức là call back đã gọi thành công
+            // nếu mà chưa có tức là call back ko được, phải thực hiện hoàn tiền từ buosc này, nên chưa handle, chỉ check thôi
+            var transactionWallet = await _beatSportsDbContext.Transactions.Where(t => t.PaymentTransactionId == payment.Id.ToString()).FirstOrDefaultAsync();
+            // đã call back thành công nè
+            if (transactionWallet != null)
             {
-                TransactionId = transactionCusIdExist.Id,
-                TransactionMessage = transactionCusIdExist!.TranMessage,
-                TransactionPayload = transactionPayload,
-                TransactionStatus = transactionCusIdExist.TranStatus,
-                TransactionAmount = transactionCusIdExist.TranAmount,
-                TransactionDate = transactionCusIdExist.TranDate,
-                PaymentId = transactionCusIdExist.PaymentId,
-                TransactionType = payment.PaymentType,
-            };
-            listTransaction.Add(data);
+                var transactionCusIdExist = await _beatSportsDbContext.PaymentTransactions.Where(pt => pt.PaymentId == payment.Id).FirstOrDefaultAsync();
+                //var transactionPayload = JsonConvert.DeserializeObject<TransactionPayload>(transactionCusIdExist.TranPayload!);
+                //JObject transactionPayload = JObject.Parse(transactionCusIdExist!.TranPayload!);
+                var transactionPayload = JsonConvert.DeserializeObject<ExpandoObject>(transactionCusIdExist!.TranPayload!)!;
+
+                var data = new TransactionThirdpartyResponse
+                {
+                    TransactionId = transactionCusIdExist.Id,
+                    TransactionMessage = transactionCusIdExist!.TranMessage,
+                    TransactionPayload = transactionPayload,
+                    TransactionStatus = transactionCusIdExist.TranStatus,
+                    TransactionAmount = transactionCusIdExist.TranAmount,
+                    TransactionDate = transactionCusIdExist.TranDate,
+                    PaymentId = transactionCusIdExist.PaymentId,
+                    TransactionType = payment.PaymentType,
+                    CallbackStatus = "Success"
+                };
+                listTransaction.Add(data);
+            }
+
+            // call back thất bại => tức là paymentTransaction tồn tại nhưng transaction của ví ko tồn tại
+            else
+            {
+                var transactionCusIdExist = await _beatSportsDbContext.PaymentTransactions.Where(pt => pt.PaymentId == payment.Id).FirstOrDefaultAsync();
+                //var transactionPayload = JsonConvert.DeserializeObject<TransactionPayload>(transactionCusIdExist.TranPayload!);
+                //JObject transactionPayload = JObject.Parse(transactionCusIdExist!.TranPayload!);
+                var transactionPayload = JsonConvert.DeserializeObject<ExpandoObject>(transactionCusIdExist!.TranPayload!)!;
+
+                var data = new TransactionThirdpartyResponse
+                {
+                    TransactionId = transactionCusIdExist.Id,
+                    TransactionMessage = transactionCusIdExist!.TranMessage,
+                    TransactionPayload = transactionPayload,
+                    TransactionStatus = transactionCusIdExist.TranStatus,
+                    TransactionAmount = transactionCusIdExist.TranAmount,
+                    TransactionDate = transactionCusIdExist.TranDate,
+                    PaymentId = transactionCusIdExist.PaymentId,
+                    TransactionType = payment.PaymentType,
+                    CallbackStatus = "Failed"
+                };
+                listTransaction.Add(data);
+            }
         }
         return listTransaction.OrderByDescending(p => p.TransactionDate).ToList();
     }

@@ -19,6 +19,10 @@ public class TransactionThirdpartyResponse
     public DateTime? TransactionDate { get; set; }
     public string? TransactionType { get; set; }
     public Guid PaymentId { get; set; }
+    /// <summary>
+    /// Success, Failed .Just only 2 case
+    /// </summary>
+    public string? CallbackStatus { get; set; }
 }
 
 public class ResponseData
