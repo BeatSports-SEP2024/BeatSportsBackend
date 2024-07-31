@@ -55,7 +55,10 @@ public class GetCourtDashboardHandler : IRequestHandler<GetCourtDashboardCommand
                 courtResponse.Y += bookingsInGroup.Sum(x => x.TotalAmount);
             }
 
-            courtResponse.X = DateTime.Parse($"{request.Year}/{month}/1");
+            //courtResponse.X = DateTime.Parse($"1/{month}/{request.Year}");
+            courtResponse.X = new DateTime(year, month, 1);
+
+
             result.Add(courtResponse);
         }
 
