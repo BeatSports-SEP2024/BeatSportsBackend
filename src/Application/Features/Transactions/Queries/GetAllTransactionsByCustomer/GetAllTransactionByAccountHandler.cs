@@ -34,7 +34,9 @@ public class GetAllTransactionByAccountHandler : IRequestHandler<GetAllTransacti
         // Chuyển đổi kết quả query sang TransactionResponse
         var transactionResponses = query.Select(c => new TransactionResponse
         {
-            AccountId = c.Wallet.Account.Id,
+            TransactionId = c.Id,
+            AdminCheckStatus = c.AdminCheckStatus.ToString(),
+            WalletTargetId = c.WalletTargetId,
             WalletId = c.Wallet.Id,
             TransactionMessage = c.TransactionMessage,
             TransactionPayload = c.TransactionPayload,
