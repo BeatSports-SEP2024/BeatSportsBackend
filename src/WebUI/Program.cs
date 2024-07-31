@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.Json.Serialization;
 using BeatSportsAPI.Application;
 using BeatSportsAPI.Domain.Entities;
@@ -194,7 +194,13 @@ app.MapFallbackToFile("index.html"); ;
 //Config Graphql
 app.MapControllers();
 app.MapGraphQL("/graphql");
+
+
+#region Khúc này đăng ký HUB cho SignalR
 app.MapHub<TimePeriodHub>("/timePeriodHub");
+app.MapHub<BookingHub>("/bookingHub");
+
+#endregion
 //Hangfire Dashboard
 app.UseHangfireDashboard();
 

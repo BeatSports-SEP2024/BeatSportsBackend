@@ -46,7 +46,7 @@ public class GetVenueBarchartByRangeDateCommandHandler : IRequestHandler<GetVenu
                 from booking in _dbContext.Bookings
                 join subCourt in _dbContext.CourtSubdivisions on booking.CourtSubdivisionId equals subCourt.Id
                 join court in _dbContext.Courts on subCourt.CourtId equals court.Id
-                where !booking.IsDelete && booking.PlayingDate >= startDate && booking.PlayingDate <= endDate
+                where !booking.IsDelete && booking.PlayingDate >= startDate && booking.PlayingDate <= endDate.AddHours(23).AddMinutes(59).AddSeconds(59)
                     && court.OwnerId == request.OwnerId
                 group booking by booking.PlayingDate.Date into bookingGroupDate
                 select new

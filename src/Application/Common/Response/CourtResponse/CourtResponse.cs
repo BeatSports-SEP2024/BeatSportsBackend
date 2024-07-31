@@ -151,6 +151,13 @@ public class CourtResponseV7
     public List<CourtSubdivisionV7>? CourtSubdivision { get; set; }
     //public string? ImagesList { get; set; }
     public List<FeedbackResponseV2>? Feedbacks { get; set; }
+    public List<SportCategoryResponse> SportCategoryList { get; set; }
+}
+
+public class SportCategoryResponse
+{
+    public Guid SportId { get; set; }
+    public string SportName { get; set; }
 }
 
 public class CourtResponseV8
