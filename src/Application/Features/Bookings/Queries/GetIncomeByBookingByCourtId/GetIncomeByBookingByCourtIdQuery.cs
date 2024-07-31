@@ -41,7 +41,7 @@ public class BookingOfCourtInDayV2
 {
     public Guid BookingId { get; set; }
     public Guid CourtSubdivisionId { get; set; }
-    public Guid TransactionId { get; set; }
+    public Guid? TransactionId { get; set; }
     /// <summary>
     /// Trả status ra cho t
     /// </summary>

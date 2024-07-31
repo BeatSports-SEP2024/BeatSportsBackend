@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetVenueBarchartByRangeDate;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingByCourtId;
+using BeatSportsAPI.Application.Features.Bookings.Queries.GetIncomeByBookingByCourtId;
 
 namespace WebAPI.Controllers.Bookings;
 
@@ -141,6 +142,12 @@ public class BookingController : ApiControllerBase
     [HttpGet]
     [Route("booking-by-court-id")]
     public async Task<List<GetBookingByCourtIdResponse>> GetAllBookingByCourtId([FromQuery] GetBookingByCourtIdCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+    [HttpGet]
+    [Route("income-by-court-id")]
+    public async Task<List<IncomeByBookingResponse>> GetIncomeByCourtId([FromQuery] GetIncomeByBookingByCourtIdQuery request)
     {
         return await _mediator.Send(request);
     }
