@@ -64,7 +64,7 @@ public class CampaignResponseV3
     public string? ExpireCampaign { get; set; }
     public decimal MinValueApply { get; set; }
     public decimal MaxValueDiscount { get; set; }
-    public StatusEnums Status { get; set; }
+    public string? Status { get; set; }
     public int QuantityOfCampaign { get; set; }
     public string CampaignImageUrl { get; set; }
     public string ReasonOfReject { get; set; }
@@ -80,7 +80,7 @@ public class CampaignResponseV4
 public class CampaignResponseV5
 {
     public Guid CampaignId { get; set; }
-    public StatusEnums Status { get; set; }
+    public string? Status { get; set; }
     public string? CampaignName { get; set; }
     public DateTime StartDateApplying { get; set; }
     public DateTime EndDateApplying { get; set; }
