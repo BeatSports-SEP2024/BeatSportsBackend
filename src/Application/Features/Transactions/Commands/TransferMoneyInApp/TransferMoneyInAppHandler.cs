@@ -52,12 +52,12 @@ public class TransferMoneyInAppHandler : IRequestHandler<TransferMoneyInAppComma
         {
             WalletId = customerWallet.Id,
             WalletTargetId = ownerWallet.Id,
-            TransactionMessage = "Chuyen khoan thanh cong",
+            TransactionMessage = "Chuyển khoản thành công",
             TransactionStatus = "0",
             AdminCheckStatus = AdminCheckEnums.Pending,
             TransactionAmount = request.TransactionAmount,
             TransactionDate = DateTime.Now,
-            TransactionType = request.TransactionType,
+            TransactionType = "Giao dịch trong App",
         };
 
         _dbContext.Transactions.Add(transaction);

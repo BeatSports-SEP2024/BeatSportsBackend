@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using BeatSportsAPI.Application.Common.Interfaces;
@@ -13,6 +14,7 @@ using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 namespace BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactions;
 public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsCommand, List<TransactionResponseV2>>
@@ -100,6 +102,15 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
                          .Include(x => x.Account)
                          .FirstOrDefault();
 
+            var toUserResponse = new UserInfo();
+
+            if(toUser != null)
+            {
+                toUserResponse.Name = toUser.Account.FirstName + " " + toUser.Account.LastName;
+                toUserResponse.WalletId = transaction.WalletTargetId;
+                toUserResponse.Role = toUser.Account.Role;
+            }
+
             var response = new TransactionResponseV2()
             {
                 TransactionId = transaction.Id,
@@ -109,12 +120,7 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
                     WalletId = transaction.WalletId,
                     Role = fromUser.Account.Role
                 },
-                To = new UserInfo()
-                {
-                    Name = toUser.Account.FirstName + " " + toUser.Account.LastName,
-                    WalletId = transaction.WalletTargetId,
-                    Role = toUser.Account.Role
-                },
+                To = toUserResponse,
                 TransactionAmount = transaction.TransactionAmount,
                 TransactionStatus = transaction.TransactionStatus,
                 AdminCheckStatus = transaction.AdminCheckStatus.ToString(),

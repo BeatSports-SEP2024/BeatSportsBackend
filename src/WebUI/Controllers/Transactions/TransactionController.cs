@@ -1,4 +1,5 @@
 ﻿using BeatSportsAPI.Application.Features.Transactions.Commands.ApproveMoneyForOwner;
+using BeatSportsAPI.Application.Features.Transactions.Commands.CreateWithdrawalRequestByOwner;
 using BeatSportsAPI.Application.Features.Transactions.Commands.RejectMoneyForOwner;
 using BeatSportsAPI.Application.Features.Transactions.Commands.TransferMoneyInApp;
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactions;
@@ -65,6 +66,25 @@ public class TransactionController : ApiControllerBase
     [HttpPost]
     [Route("approve-money-for-owner")]
     public async Task<IActionResult> ApproveMoneyForOwner([FromBody] ApproveMoneyForOwnerCommand request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var response = await _mediator.Send(request);
+
+        if (response.Status == 400)
+        {
+            return BadRequest(response);
+        }
+
+        return Ok(response);
+    }
+
+    [HttpPost]
+    [Route("withdraw-money-in-app")]
+    public async Task<IActionResult> WithdrawMoneyInApp([FromBody] CreateWithdrawalRequestByOwnerCommand request)
     {
         if (!ModelState.IsValid)
         {
