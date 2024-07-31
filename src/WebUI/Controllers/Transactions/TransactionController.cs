@@ -6,6 +6,7 @@ using BeatSportsAPI.Application.Features.Transactions.Commands.RejectWithdrawalR
 using BeatSportsAPI.Application.Features.Transactions.Commands.TransferMoneyInApp;
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactions;
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactionsByCustomer;
+using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllWithdrawalRequestByOwner;
 using BeatSportsAPI.Application.Features.Wallets.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,19 @@ public class TransactionController : ApiControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAllTransactions([FromQuery] GetAllTransactionsCommand request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var response = await _mediator.Send(request);
+
+        return Ok(response);
+    }
+
+    [HttpGet]
+    [Route("request-withdraw-money-in-app")]
+    public async Task<IActionResult> WithdrawalRequestMoneyInApp([FromQuery] GetAllWithdrawalRequestByOwnerCommand request)
     {
         if (!ModelState.IsValid)
         {

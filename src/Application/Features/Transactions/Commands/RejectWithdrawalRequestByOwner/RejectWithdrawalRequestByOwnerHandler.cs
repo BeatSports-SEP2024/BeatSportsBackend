@@ -71,7 +71,7 @@ public class RejectWithdrawalRequestByOwnerHandler : IRequestHandler<RejectWithd
         return Task.FromResult(new BeatSportsResponseV2
         {
             Status = 200,
-            Message = "Từ chối đơn rút tiền cho owner thành công!"
+            Message = "Từ chối đơn rút tiền của owner thành công!"
         });
     }
 }
