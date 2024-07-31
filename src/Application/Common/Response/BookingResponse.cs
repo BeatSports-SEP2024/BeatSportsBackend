@@ -162,6 +162,7 @@ public class GetBookingByCourtIdResponse
     public Guid CourtId { get; set; }
     public string? CustomerBookName { get; set; }
     public string? CustomerAddress { get; set; }
+    public string? CustomerPhone { get; set; }
     public string? CourtAddress { get; set; }
     public string? CourtName { get; set; }
     public DateTime BookingDate { get; set; }
