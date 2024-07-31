@@ -7,8 +7,10 @@ using BeatSportsAPI.Application.Common.Constants;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Features.Hubs;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Commands.CancelBooking;
@@ -21,10 +23,12 @@ public class CancelBookingApproveCommand : IRequest<BeatSportsResponse>
 public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingApproveCommand, BeatSportsResponse>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
+    private readonly IHubContext<BookingHub> _hubContext;
 
-    public CancelBookingApproveCommandHandler(IBeatSportsDbContext beatSportsDbContext)
+    public CancelBookingApproveCommandHandler(IBeatSportsDbContext beatSportsDbContext, IHubContext<BookingHub> hubContext)
     {
         _beatSportsDbContext = beatSportsDbContext;
+        _hubContext = hubContext;
     }
 
     public async Task<BeatSportsResponse> Handle(CancelBookingApproveCommand request, CancellationToken cancellationToken)
@@ -64,7 +68,7 @@ public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingA
         if (timeChecking != null)
         {
             _beatSportsDbContext.TimeChecking.Remove(timeChecking);
-            _beatSportsDbContext.SaveChanges();
+            //_beatSportsDbContext.SaveChanges();
         }
 
         // check campaign
@@ -88,29 +92,34 @@ public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingA
         var customerWallet = _beatSportsDbContext.Wallets
             .Where(x => x.AccountId == accountId && !x.IsDelete).SingleOrDefault();
 
-        if(customerWallet != null)
+        // Nếu ví có tồn tại
+        if (customerWallet != null)
         {
-            customerWallet.Balance += bookingApprove.TotalAmount;
-            _beatSportsDbContext.Wallets.Update(customerWallet);
-        }
-
-        if (bookingApprove.TransactionId.HasValue)
-        {
-            var transaction = await _beatSportsDbContext.Transactions
-                .Where(t => t.Id == bookingApprove.TransactionId.Value && !t.IsDelete)
-                .FirstOrDefaultAsync();
-
-            if (transaction != null)
+            // Nếu booking đó có transaction
+            if (bookingApprove.TransactionId.HasValue)
             {
-                transaction.TransactionMessage = TransactionConstant.TransactionCancel;
-                transaction.TransactionStatus = TransactionEnum.Cancel.ToString();
-                _beatSportsDbContext.Transactions.Update(transaction);
+                var transaction = await _beatSportsDbContext.Transactions
+                    .Where(t => t.Id == bookingApprove.TransactionId.Value && !t.IsDelete)
+                    .FirstOrDefaultAsync();
+                // Nếu transaction không null, mà thực chất ID thì làm gì kh có transaction được
+                if (transaction != null)
+                {
+                    // Cộng lại tiền cho ví
+                    // Decimal trong trường hợp này kh có null được đâu. Khỏi lo
+                    customerWallet.Balance += (decimal)transaction.TransactionAmount!;
+                    _beatSportsDbContext.Wallets.Update(customerWallet);
+                    // Hủy transaction đó
+                    transaction.TransactionMessage = TransactionConstant.TransactionCancel;
+                    transaction.TransactionStatus = TransactionEnum.Cancel.ToString();
+                    _beatSportsDbContext.Transactions.Update(transaction);
+                }
             }
         }
-
+        // Hủy booking đó
         bookingApprove.BookingStatus = BookingEnums.Cancel.ToString();
         _beatSportsDbContext.Bookings.Update(bookingApprove);
         await _beatSportsDbContext.SaveChangesAsync();
+        await _hubContext.Clients.All.SendAsync("DeleteBooking");
 
         return new BeatSportsResponse
         {

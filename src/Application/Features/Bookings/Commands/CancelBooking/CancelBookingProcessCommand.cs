@@ -12,6 +12,8 @@ using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using BeatSportsAPI.Application.Common.Constants;
+using BeatSportsAPI.Application.Features.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Commands.CancelBooking;
 public class CancelBookingProcessCommand : IRequest<BeatSportsResponse>
@@ -23,11 +25,14 @@ public class CancelBookingProcessCommand : IRequest<BeatSportsResponse>
 public class CancelBookingProcessCommandHandler : IRequestHandler<CancelBookingProcessCommand, BeatSportsResponse>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
+    private readonly IHubContext<BookingHub> _hubContext;
 
-    public CancelBookingProcessCommandHandler(IBeatSportsDbContext beatSportsDbContext)
+    public CancelBookingProcessCommandHandler(IBeatSportsDbContext beatSportsDbContext, IHubContext<BookingHub> hubContext)
     {
         _beatSportsDbContext = beatSportsDbContext;
+        _hubContext = hubContext;
     }
+
     public async Task<BeatSportsResponse> Handle(CancelBookingProcessCommand request, CancellationToken cancellationToken)
     {
         var bookingProcess = await _beatSportsDbContext.Bookings
@@ -83,6 +88,8 @@ public class CancelBookingProcessCommandHandler : IRequestHandler<CancelBookingP
             _beatSportsDbContext.TimeChecking.Remove(timeChecking);
             _beatSportsDbContext.Bookings.Remove(bookingProcess);
             _beatSportsDbContext.SaveChanges();
+            await _hubContext.Clients.All.SendAsync("DeleteBookingProcess");
+
         }
 
         return new BeatSportsResponse

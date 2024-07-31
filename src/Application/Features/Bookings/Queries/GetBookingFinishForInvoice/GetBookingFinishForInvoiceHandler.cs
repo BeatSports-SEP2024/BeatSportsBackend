@@ -27,8 +27,8 @@ public class GetBookingFinishForInvoiceHandler : IRequestHandler<GetBookingFinis
             from booking in _beatSportsDbContext.Bookings
             where !booking.IsDelete
                 && booking.CourtSubdivision.Court.Id == request.CourtId
-                && booking.BookingDate >= request.DayStart
-                && booking.BookingDate <= request.DayEnd
+                && booking.BookingDate.Date >= request.DayStart.Date
+                && booking.BookingDate.Date <= request.DayEnd.Date
             join customer in _beatSportsDbContext.Customers on booking.CustomerId equals customer.Id
             join account in _beatSportsDbContext.Accounts on customer.Account.Id equals account.Id
             join courtSub in _beatSportsDbContext.CourtSubdivisions on booking.CourtSubdivisionId equals courtSub.Id
@@ -59,6 +59,7 @@ public class GetBookingFinishForInvoiceHandler : IRequestHandler<GetBookingFinis
             }).OrderByDescending(x => x.DayTimeBooking).ToList(),
         }).ToList();
         // Lọc ra những response có ListBooked.Any() = true
+        response.Reverse();
         var filteredResponse = response.Where(r => r.ListBooked.Any()).ToList();
 
         return filteredResponse;

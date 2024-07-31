@@ -13,6 +13,8 @@ using BeatSportsAPI.Domain.Entities.Room;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDashboard;
 using Newtonsoft.Json.Linq;
 using BeatSportsAPI.Application.Common.Constants;
+using BeatSportsAPI.Application.Features.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Commands.CreateBooking;
 public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BookingSuccessResponse>
@@ -20,12 +22,14 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
     private readonly IBeatSportsDbContext _beatSportsDbContext;
     private readonly IDatabase _database;
     private readonly INotificationService _notificationService;
+    private readonly IHubContext<BookingHub> _hubContext;
 
-    public CreateBookingHandler(IBeatSportsDbContext beatSportsDbContext, IDatabase database, INotificationService notificationService)
+    public CreateBookingHandler(IBeatSportsDbContext beatSportsDbContext, IDatabase database, INotificationService notificationService, IHubContext<BookingHub> hubContext)
     {
         _beatSportsDbContext = beatSportsDbContext;
         _database = database;
         _notificationService = notificationService;
+        _hubContext = hubContext;
     }
 
     public async Task<BookingSuccessResponse> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
@@ -43,12 +47,37 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
         {
             throw new NotFoundException("Không tìm thấy booking như trên");
         }
+        // Check account dựa trên booking của customer đó
+        var getCustomerByAccount = _beatSportsDbContext.Customers
+                .Where(x => x.Id == checkBookingInDB.CustomerId && !x.IsDelete).SingleOrDefault();
+
+        // Check account cua owner dua tren booking 
+        if (checkBookingInDB.CourtSubdivision.Court.Owner.Account.Wallet == null)
+        {
+            throw new BadRequestException("Owner wallet not found");
+        }
+
+        var ownerWalletId = checkBookingInDB.CourtSubdivision.Court.Owner.Account.Wallet.Id;
+
+        if (getCustomerByAccount == null)
+        {
+            throw new NotFoundException("Cannot find this customer");
+        }
+
+        var accountId = getCustomerByAccount.AccountId;
+
+        var customerWallet = _beatSportsDbContext.Wallets
+            .Where(x => x.AccountId == accountId && !x.IsDelete).SingleOrDefault();
+
+        #region Redis
         //tạo key trong Redis
         string lockKey = $"booking:{checkBookingInDB.CourtSubdivisionId}:{checkBookingInDB.StartTimePlaying}:lock";
         //tạo value tương ứng với key vừa tạo trong Redis
         string lockValue = Guid.NewGuid().ToString();
         //thời gian hết hạn
         TimeSpan expiry = TimeSpan.FromSeconds(30);
+        #endregion
+
         using (var redisLock = new RedisLock(_database, lockKey, lockValue, expiry))
         {
             if (redisLock.AcquireLock())
@@ -84,84 +113,58 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                         {
                             throw new BadRequestException("Tiền không đúng với giá trị thực tế khi áp dụng mã giảm giá");
                         }
-                        
-                        // Check account dựa trên booking của customer đó
-                        var getCustomerByAccount = _beatSportsDbContext.Customers
-                                .Where(x => x.Id == checkBookingInDB.CustomerId && !x.IsDelete).SingleOrDefault();
 
-                        // Check account cua owner dua tren booking 
-                        if (checkBookingInDB.CourtSubdivision.Court.Owner.Account.Wallet == null)
-                        {
-                            throw new BadRequestException("Owner wallet not found");
-                        }
-
-                        var ownerWalletId = checkBookingInDB.CourtSubdivision.Court.Owner.Account.Wallet.Id;
-
-                        if (getCustomerByAccount == null)
-                        {
-                            throw new NotFoundException("Cannot find this customer");
-                        }
-
-                        var accountId = getCustomerByAccount.AccountId; 
-
-                        var customerWallet = _beatSportsDbContext.Wallets
-                            .Where(x => x.AccountId == accountId && !x.IsDelete).SingleOrDefault();
                         // Xét 2 trường hợp
                         if (customerWallet != null)
                         {
-                            if(customerWallet.Balance >= checkTotalMoney)
+                            if (customerWallet.Balance >= checkTotalMoney)
                             {
                                 customerWallet.Balance -= checkTotalMoney;
                                 _beatSportsDbContext.Wallets.Update(customerWallet);
                                 var transaction = new Transaction
                                 {
-                                    Id = Guid.NewGuid(),
                                     WalletId = customerWallet.Id,
-                                    WalletTargetId = ownerWalletId, 
+                                    WalletTargetId = ownerWalletId,
                                     TransactionMessage = TransactionConstant.TransactionSuccessMessage,
-                                    TransactionPayload = null, 
+                                    TransactionPayload = null,
                                     TransactionStatus = TransactionEnum.Pending.ToString(),
-                                    AdminCheckStatus = 0, 
+                                    AdminCheckStatus = 0,
                                     TransactionAmount = checkTotalMoney,
                                     TransactionDate = DateTime.UtcNow,
                                     TransactionType = TransactionConstant.TransactionType,
-                                    Created = DateTime.UtcNow,
-                                    CreatedBy = accountId.ToString(), 
                                     IsDelete = false
                                 };
                                 _beatSportsDbContext.Transactions.Add(transaction);
                                 checkBookingInDB.TransactionId = transaction.Id;
-                            }                            
-                            else if(customerWallet.Balance < checkTotalMoney) 
+                            }
+                            else if (customerWallet.Balance < checkTotalMoney)
                             {
+                                /// TODO: cần check lại là có cần thiết phải hủy nếu kh đủ tiền kh
                                 checkBookingInDB.BookingStatus = BookingEnums.Cancel.ToString();
                                 _beatSportsDbContext.Bookings.Update(checkBookingInDB);
 
                                 var transaction = new Transaction
                                 {
-                                    Id = Guid.NewGuid(),
                                     WalletId = customerWallet.Id,
                                     WalletTargetId = ownerWalletId,
                                     TransactionMessage = TransactionConstant.TransactionFailedInsufficientBalance,
-                                    TransactionPayload = null, 
+                                    TransactionPayload = null,
                                     TransactionStatus = TransactionEnum.Cancel.ToString(),
-                                    AdminCheckStatus = 0, 
+                                    AdminCheckStatus = 0,
                                     TransactionAmount = checkTotalMoney,
                                     TransactionDate = DateTime.UtcNow,
                                     TransactionType = TransactionConstant.TransactionType,
-                                    Created = DateTime.UtcNow,
-                                    CreatedBy = accountId.ToString(), // hoặc người tạo nếu khác
                                     IsDelete = false
                                 };
                                 _beatSportsDbContext.Transactions.Add(transaction);
                                 checkBookingInDB.TransactionId = transaction.Id;
                                 await _beatSportsDbContext.SaveChangesAsync();
                                 throw new BadRequestException("Balance is not enough for booking");
-                            }                           
+                            }
                         }
 
                         //Update Campaign to Booking
-                        checkBookingInDB.CampaignId = request.CampaignId;   
+                        checkBookingInDB.CampaignId = request.CampaignId;
                         checkBookingInDB.TotalPriceDiscountCampaign = realApply;
                         checkBookingInDB.BookingStatus = BookingEnums.Approved.ToString();
                         //Giảm giá tiền sau khi áp dụng campaign
@@ -180,7 +183,56 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                     }
                     // Case không áp dụng campaign
                     else
-                    {   
+                    {
+
+                        // Xét 2 trường hợp
+                        if (customerWallet != null)
+                        {
+                            if (customerWallet.Balance >= checkBookingInDB.TotalAmount)
+                            {
+                                customerWallet.Balance -= checkBookingInDB.TotalAmount;
+                                _beatSportsDbContext.Wallets.Update(customerWallet);
+                                var transaction = new Transaction
+                                {
+                                    WalletId = customerWallet.Id,
+                                    WalletTargetId = ownerWalletId,
+                                    TransactionMessage = TransactionConstant.TransactionSuccessMessage,
+                                    TransactionPayload = null,
+                                    TransactionStatus = TransactionEnum.Pending.ToString(),
+                                    AdminCheckStatus = 0,
+                                    TransactionAmount = checkBookingInDB.TotalAmount,
+                                    TransactionDate = DateTime.UtcNow,
+                                    TransactionType = TransactionConstant.TransactionType,
+                                    IsDelete = false
+                                };
+                                _beatSportsDbContext.Transactions.Add(transaction);
+                                checkBookingInDB.TransactionId = transaction.Id;
+                            }
+                            else if (customerWallet.Balance < checkBookingInDB.TotalAmount)
+                            {
+                                /// TODO: cần check lại là có cần thiết phải hủy nếu kh đủ tiền kh
+                                checkBookingInDB.BookingStatus = BookingEnums.Cancel.ToString();
+                                _beatSportsDbContext.Bookings.Update(checkBookingInDB);
+
+                                var transaction = new Transaction
+                                {
+                                    WalletId = customerWallet.Id,
+                                    WalletTargetId = ownerWalletId,
+                                    TransactionMessage = TransactionConstant.TransactionFailedInsufficientBalance,
+                                    TransactionPayload = null,
+                                    TransactionStatus = TransactionEnum.Cancel.ToString(),
+                                    AdminCheckStatus = 0,
+                                    TransactionAmount = checkBookingInDB.TotalAmount,
+                                    TransactionDate = DateTime.UtcNow,
+                                    TransactionType = TransactionConstant.TransactionType,
+                                    IsDelete = false
+                                };
+                                _beatSportsDbContext.Transactions.Add(transaction);
+                                checkBookingInDB.TransactionId = transaction.Id;
+                                await _beatSportsDbContext.SaveChangesAsync();
+                                throw new BadRequestException("Balance is not enough for booking");
+                            }
+                        }
                         checkBookingInDB.BookingStatus = BookingEnums.Approved.ToString();
                         _beatSportsDbContext.Bookings.Update(checkBookingInDB);
                         await _beatSportsDbContext.SaveChangesAsync();
@@ -194,6 +246,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                 }
                 finally
                 {
+                    await _hubContext.Clients.All.SendAsync("CreateBooking");
                     redisLock.ReleaseLock();
                 }
             }
