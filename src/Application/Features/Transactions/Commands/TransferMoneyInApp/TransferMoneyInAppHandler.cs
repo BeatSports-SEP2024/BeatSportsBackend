@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
+using BeatSportsAPI.Application.Common.Constants;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Courts.Commands.CreateCourt;
@@ -52,12 +53,12 @@ public class TransferMoneyInAppHandler : IRequestHandler<TransferMoneyInAppComma
         {
             WalletId = customerWallet.Id,
             WalletTargetId = ownerWallet.Id,
-            TransactionMessage = "Chuyển khoản thành công",
+            TransactionMessage = TransactionConstant.TransactionForTransferSuccess,
             TransactionStatus = "0",
             AdminCheckStatus = AdminCheckEnums.Pending,
             TransactionAmount = request.TransactionAmount,
             TransactionDate = DateTime.Now,
-            TransactionType = "Giao dịch trong App",
+            TransactionType = TransactionConstant.TransactionTypeInApp,
         };
 
         _dbContext.Transactions.Add(transaction);
