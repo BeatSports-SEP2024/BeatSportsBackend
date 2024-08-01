@@ -9,7 +9,7 @@ using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactions;
-public class GetAllTransactionsCommand : IRequest<List<TransactionResponseV2>>
+public class GetAllTransactionsCommand : IRequest<PaginatedTransactionResponse>
 {
     [Required]
     public int PageIndex { get; set; }
