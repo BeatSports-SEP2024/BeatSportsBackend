@@ -18,12 +18,12 @@ public class CheckTimeJob
     }
     public void CheckTimeOfCourt()
     {
-       var bookingList = _beatSportsDbContext.Bookings.Where(x => x.BookingStatus == BookingEnums.Process.ToString()).ToList();
+        var bookingList = _beatSportsDbContext.Bookings.Where(x => x.BookingStatus == BookingEnums.Process.ToString()).ToList();
         foreach (var booking in bookingList)
         {
 
             var checkAfter2Minutes = booking.Created.AddMinutes(2);
-            if(DateTime.Now > checkAfter2Minutes)
+            if (DateTime.Now > checkAfter2Minutes)
             {
                 DateTime startTime = booking.PlayingDate.Date.Add(booking.StartTimePlaying);
                 DateTime endTime = booking.PlayingDate.Date.Add(booking.EndTimePlaying);
@@ -33,7 +33,7 @@ public class CheckTimeJob
                                    .FirstOrDefault();
 
 
-                if(timeChecking != null)
+                if (timeChecking != null)
                 {
                     timeChecking.IsDelete = true;
                     _beatSportsDbContext.TimeChecking.Update(timeChecking);
@@ -51,23 +51,20 @@ public class CheckTimeJob
 
     public void CheckTimeOfBooking()
     {
+        // Lấy những booking nào đang có status là Approved ra 
         var bookingList = _beatSportsDbContext.Bookings
-                        .Where(x => !x.IsDelete && x.BookingStatus.Equals("Pending"))
+                        .Where(x => !x.IsDelete && x.BookingStatus == BookingEnums.Approved.ToString())
                         .ToList();
 
         foreach (var booking in bookingList)
         {
-            // Chuyển đổi Unix timestamp ngược lại thành DateTime
-            // DateTimeOffset dateTimeOffsetFromUnix = DateTimeOffset.FromUnixTimeSeconds(bookingApprove.UnixTimestampMinCancellation);
+            // UnixTimestampMinCancellation là thời gian tối thiểu để hủy booking (này bao gồm cả ngày và giờ rồi)
             DateTime datetimeFromUnix = booking.UnixTimestampMinCancellation;
             // Ghép PlayingDate và StartTimePlaying lại
-            DateTime playingStartDateTime = booking.PlayingDate.Date.Add(booking.StartTimePlaying - datetimeFromUnix.TimeOfDay);
-
-            // Lấy thời gian hiện tại
-            DateTime currentDateTime = DateTime.Now;
+            DateTime playingStartDateTime = booking.PlayingDate.Date.Add(booking.StartTimePlaying);
 
             // So sánh thời gian hủy với thời gian hiện tại
-            TimeSpan timeDifference = playingStartDateTime - currentDateTime;
+            TimeSpan timeDifference = playingStartDateTime - datetimeFromUnix;
 
             if (timeDifference <= TimeSpan.Zero)
             {
@@ -76,7 +73,7 @@ public class CheckTimeJob
                 var transaction = _beatSportsDbContext.Transactions
                                 .Where(x => x.Id == booking.TransactionId && x.AdminCheckStatus == AdminCheckEnums.Pending)
                                 .FirstOrDefault();
-                if(transaction != null)
+                if (transaction != null)
                 {
                     var ownerWallet = _beatSportsDbContext.Wallets
                                 .Where(x => x.Id == transaction.WalletTargetId)
@@ -90,9 +87,9 @@ public class CheckTimeJob
                     _beatSportsDbContext.Wallets.Update(ownerWallet);
                     _beatSportsDbContext.SaveChanges();
                 }
-                
+
             }
         }
-        
+
     }
 }

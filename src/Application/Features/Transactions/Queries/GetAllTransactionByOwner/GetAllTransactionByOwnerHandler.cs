@@ -7,11 +7,12 @@ using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Mappings;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactionByOwner;
-public class GetAllTransactionByOwnerHandler : IRequestHandler<GetAllTransactionByOwner, PaginatedList<TransactionResponse>>
+public class GetAllTransactionByOwnerHandler : IRequestHandler<GetAllTransactionByOwner, List<TransactionResponse>>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
 
@@ -20,14 +21,15 @@ public class GetAllTransactionByOwnerHandler : IRequestHandler<GetAllTransaction
         _beatSportsDbContext = beatSportsDbContext;
     }
 
-    public async Task<PaginatedList<TransactionResponse>> Handle(GetAllTransactionByOwner request, CancellationToken cancellationToken)
+    public async Task<List<TransactionResponse>> Handle(GetAllTransactionByOwner request, CancellationToken cancellationToken)
     {
         var query = _beatSportsDbContext.Transactions
             .Include(t => t.Wallet)
                 .ThenInclude(w => w.Account)
                     .ThenInclude(a => a.Owner)
-            .Where(t => t.Wallet.Account.Owner.Id == request.OwnerId && 
-            (t.TransactionType == "Giao dịch trong App" || t.TransactionType == "Rút tiền"));
+            .Where(t => t.Wallet.Account.Owner.Id == request.OwnerId &&
+            ((t.TransactionType == "Giao dịch trong App" && t.AdminCheckStatus == AdminCheckEnums.Accepted) || t.TransactionType == "Rút tiền"))
+            .OrderByDescending(x => x.LastModified);
 
         var response = await query.Select(t => new TransactionResponse
         {
@@ -41,8 +43,8 @@ public class GetAllTransactionByOwnerHandler : IRequestHandler<GetAllTransaction
             TransactionAmount = t.TransactionAmount,
             TransactionDate = t.TransactionDate,
             TransactionType = t.TransactionType
-        }).PaginatedListAsync(request.PageIndex, request.PageSize);
-       
+        }).ToListAsync();
+
         return response;
     }
 }
