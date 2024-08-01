@@ -54,7 +54,7 @@ public class TransferMoneyInAppHandler : IRequestHandler<TransferMoneyInAppComma
             WalletId = customerWallet.Id,
             WalletTargetId = ownerWallet.Id,
             TransactionMessage = TransactionConstant.TransactionForTransferSuccess,
-            TransactionStatus = "0",
+            TransactionStatus = TransactionEnum.Pending.ToString(),
             AdminCheckStatus = AdminCheckEnums.Pending,
             TransactionAmount = request.TransactionAmount,
             TransactionDate = DateTime.Now,

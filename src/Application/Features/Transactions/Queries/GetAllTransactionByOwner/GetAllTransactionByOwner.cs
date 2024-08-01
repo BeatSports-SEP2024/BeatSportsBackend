@@ -9,11 +9,7 @@ using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactionByOwner;
-public class GetAllTransactionByOwner : IRequest<PaginatedList<TransactionResponse>>
+public class GetAllTransactionByOwner : IRequest<List<TransactionResponse>>
 {
     public Guid OwnerId { get; set; }
-    [Required]
-    public int PageIndex { get; set; }
-    [Required]
-    public int PageSize { get; set; }
 }
