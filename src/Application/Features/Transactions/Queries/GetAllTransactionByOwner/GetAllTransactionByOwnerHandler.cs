@@ -36,7 +36,7 @@ public class GetAllTransactionByOwnerHandler : IRequestHandler<GetAllTransaction
             WalletTargetId = t.WalletTargetId,
             TransactionMessage = t.TransactionMessage,
             TransactionPayload = t.TransactionPayload,
-            TransactionStatus = t.TransactionStatus,
+            TransactionStatus = t.TransactionStatus.ToString(),
             AdminCheckStatus = t.AdminCheckStatus.ToString(),
             TransactionAmount = t.TransactionAmount,
             TransactionDate = t.TransactionDate,
