@@ -28,9 +28,9 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
         _mapper = mapper;
     }
 
-    public Task<List<TransactionResponseV2>> Handle(GetAllTransactionsCommand request, CancellationToken cancellationToken)
+    public async Task<List<TransactionResponseV2>> Handle(GetAllTransactionsCommand request, CancellationToken cancellationToken)
     {
-        if(request.KeyWord == null)
+        if (request.KeyWord == null)
         {
             request.KeyWord = "";
         }
@@ -46,57 +46,62 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
 
         if (request.Filter.Equals("TransactionStatus"))
         {
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && t.TransactionStatus.Contains(request.KeyWord))
-            .OrderByDescending(b => b.Created);
-
-        }else if (request.Filter.Equals("AdminCheckStatus"))
+            query = query
+                .Where(t => t.TransactionStatus.Contains(request.KeyWord))
+                .OrderByDescending(t => t.Created);
+        }
+        else if (request.Filter.Equals("AdminCheckStatus"))
         {
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && t.AdminCheckStatus.ToString().Contains(request.KeyWord))
-            .OrderByDescending(b => b.Created);
+            query = query
+                .Where(t => t.AdminCheckStatus.ToString().Contains(request.KeyWord))
+                .OrderByDescending(t => t.Created);
         }
         else if (request.Filter.Equals("TransactionType"))
         {
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && t.TransactionType.Contains(request.KeyWord))
-            .OrderByDescending(b => b.Created);
-        }else if (request.Filter.Equals("From"))
+            query = query
+                .Where(t => t.TransactionType.Contains(request.KeyWord))
+                .OrderByDescending(t => t.Created);
+        }
+        else if (request.Filter.Equals("From"))
         {
-            var fromUser = _beatSportsDbContext.Wallets
-                         .Include(x => x.Account)
-                         .ToList();
+            var fromUserIds = _beatSportsDbContext.Wallets
+                             .Include(x => x.Account)
+                             .Where(x => (x.Account.FirstName + " " + x.Account.LastName).Contains(request.KeyWord))
+                             .Select(x => x.Id)
+                             .ToList();
 
-            fromUser = fromUser.Where(x => (x.Account.FirstName + " " + x.Account.LastName).Contains(request.KeyWord)).ToList();
-
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && fromUser.Any(x => x.Id == t.WalletId))
-            .OrderByDescending(b => b.Created);
-
-        }else if (request.Filter.Equals("To"))
+            query = query
+                .Where(t => fromUserIds.Contains(t.WalletId))
+                .OrderByDescending(t => t.Created);
+        }
+        else if (request.Filter.Equals("To"))
         {
-            var fromUser = _beatSportsDbContext.Wallets
-                         .Include(x => x.Account)
-                         .ToList();
+            var toUserIds = _beatSportsDbContext.Wallets
+                             .Include(x => x.Account)
+                             .Where(x => (x.Account.FirstName + " " + x.Account.LastName).Contains(request.KeyWord))
+                             .Select(x => x.Id)
+                             .ToList();
 
-            fromUser = fromUser.Where(x => (x.Account.FirstName + " " + x.Account.LastName).Contains(request.KeyWord)).ToList();
-
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && fromUser.Any(x => x.Id == t.WalletTargetId))
-            .OrderByDescending(b => b.Created);
+            query = query
+                .Where(t => toUserIds.Contains(t.WalletTargetId))
+                .OrderByDescending(t => t.Created);
         }
 
+        // Implementing pagination
+        var pagedResult = await query
+            .Skip((request.PageIndex - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .ToListAsync(cancellationToken);
 
         var result = new List<TransactionResponseV2>();
 
-        foreach(var transaction in query)
+        foreach (var transaction in pagedResult)
         {
             var fromUser = _beatSportsDbContext.Wallets
                          .Where(x => x.Id == transaction.WalletId)
                          .Include(x => x.Account)
                          .FirstOrDefault();
 
-            
             var toUser = _beatSportsDbContext.Wallets
                          .Where(x => x.Id == transaction.WalletTargetId)
                          .Include(x => x.Account)
@@ -104,7 +109,7 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
 
             var toUserResponse = new UserInfo();
 
-            if(toUser != null)
+            if (toUser != null)
             {
                 toUserResponse.Name = toUser.Account.FirstName + " " + toUser.Account.LastName;
                 toUserResponse.WalletId = transaction.WalletTargetId;
@@ -131,6 +136,6 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
             result.Add(response);
         }
 
-        return Task.FromResult(result);
+        return result;
     }
 }
