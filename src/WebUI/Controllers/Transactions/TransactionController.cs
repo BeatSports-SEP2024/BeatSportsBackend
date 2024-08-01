@@ -7,6 +7,7 @@ using BeatSportsAPI.Application.Features.Transactions.Commands.TransferMoneyInAp
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactions;
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactionsByCustomer;
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllWithdrawalRequestByOwner;
+using BeatSportsAPI.Application.Features.Transactions.Queries.GetDetailWithdrawalRequestByOwner;
 using BeatSportsAPI.Application.Features.Wallets.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -37,6 +38,19 @@ public class TransactionController : ApiControllerBase
     [HttpGet]
     [Route("request-withdraw-money-in-app")]
     public async Task<IActionResult> WithdrawalRequestMoneyInApp([FromQuery] GetAllWithdrawalRequestByOwnerCommand request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var response = await _mediator.Send(request);
+
+        return Ok(response);
+    }
+
+    [HttpGet]
+    [Route("request-withdraw-money-in-app-detail")]
+    public async Task<IActionResult> WithdrawalRequestMoneyInAppDetail([FromQuery] GetDetailWithdrawalRequestByOwnerCommand request)
     {
         if (!ModelState.IsValid)
         {
@@ -79,24 +93,24 @@ public class TransactionController : ApiControllerBase
         return Ok(response);
     }
 
-    [HttpPost]
-    [Route("approve-money-for-owner")]
-    public async Task<IActionResult> ApproveMoneyForOwner([FromBody] ApproveMoneyForOwnerCommand request)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
+    //[HttpPost]
+    //[Route("approve-money-for-owner")]
+    //public async Task<IActionResult> ApproveMoneyForOwner([FromBody] ApproveMoneyForOwnerCommand request)
+    //{
+    //    if (!ModelState.IsValid)
+    //    {
+    //        return BadRequest(ModelState);
+    //    }
 
-        var response = await _mediator.Send(request);
+    //    var response = await _mediator.Send(request);
 
-        if (response.Status == 400)
-        {
-            return BadRequest(response);
-        }
+    //    if (response.Status == 400)
+    //    {
+    //        return BadRequest(response);
+    //    }
 
-        return Ok(response);
-    }
+    //    return Ok(response);
+    //}
 
     [HttpPost]
     [Route("withdraw-money-in-app")]

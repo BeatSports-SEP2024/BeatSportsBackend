@@ -58,3 +58,14 @@ public class UserInfo2
     public string Name { get; set; }
     public string Role { get; set; }
 }
+
+public class TransactionResponseV4
+{
+    public Guid TransactionId { get; set; }
+    public UserInfo2 UserInfo { get; set; }
+    public List<TransactionResponseV2> TransactionList { get; set; }
+    public decimal? TotalAmountReceived { get; set; }
+    public decimal? TotalAmountWithdrawn { get; set; }
+    public decimal? TotalAmountAvailableForWithdrawal { get; set; }
+    public decimal? ToTalAmountWithdrawalRequestByOwner { get; set; }
+}
