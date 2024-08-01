@@ -138,9 +138,8 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                                 _beatSportsDbContext.Transactions.Add(transaction);
                                 checkBookingInDB.TransactionId = transaction.Id;
 
-                                // cập nhật số dư cho owner nếu thành công
-                                ownerWallet.Balance += checkTotalMoney;
-                                _beatSportsDbContext.Wallets.Update(ownerWallet);
+                                // => Sau khi booking xong, sẽ ghi trạng thái transaction là pending
+                                // Sau khi admin check chỗ tiền này chuyển cho owner, đổi thành approved
                             }
                             else if (customerWallet.Balance < checkTotalMoney)
                             {
@@ -213,10 +212,8 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                                 };
                                 _beatSportsDbContext.Transactions.Add(transaction);
                                 checkBookingInDB.TransactionId = transaction.Id;
-
-                                // cập nhật số dư cho owner nếu thành công
-                                ownerWallet.Balance += checkBookingInDB.TotalAmount;
-                                _beatSportsDbContext.Wallets.Update(ownerWallet);
+                                // => Sau khi booking xong, sẽ ghi trạng thái transaction là pending
+                                // Sau khi admin check chỗ tiền này chuyển cho owner, đổi thành approved
                             }
                             else if (customerWallet.Balance < checkBookingInDB.TotalAmount)
                             {
