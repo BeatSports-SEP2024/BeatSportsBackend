@@ -12,4 +12,5 @@ public class RejectWithdrawalRequestByOwnerCommand : IRequest<BeatSportsResponse
 {
     public Guid OwnerId { get; set; }
     public Guid TransactionId { get; set; }
+    public string? ReasonOfRejected { get; set; }
 }
