@@ -12,8 +12,4 @@ namespace BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransact
 public class GetAllTransactionByOwner : IRequest<List<TransactionResponse>>
 {
     public Guid OwnerId { get; set; }
-    [Required]
-    public int PageIndex { get; set; }
-    [Required]
-    public int PageSize { get; set; }
 }
