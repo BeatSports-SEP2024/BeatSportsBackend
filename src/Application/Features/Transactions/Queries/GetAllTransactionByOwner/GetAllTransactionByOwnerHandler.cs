@@ -26,7 +26,8 @@ public class GetAllTransactionByOwnerHandler : IRequestHandler<GetAllTransaction
             .Include(t => t.Wallet)
                 .ThenInclude(w => w.Account)
                     .ThenInclude(a => a.Owner)
-            .Where(t => t.Wallet.Account.Owner.Id == request.OwnerId && t.TransactionType == "Giao dịch trong ứng dụng");
+            .Where(t => t.Wallet.Account.Owner.Id == request.OwnerId && 
+            (t.TransactionType == "Giao dịch trong App" || t.TransactionType == "Rút tiền"));
 
         var response = await query.Select(t => new TransactionResponse
         {

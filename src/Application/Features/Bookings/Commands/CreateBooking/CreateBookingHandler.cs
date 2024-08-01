@@ -132,7 +132,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                                     AdminCheckStatus = 0,
                                     TransactionAmount = checkTotalMoney,
                                     TransactionDate = DateTime.UtcNow,
-                                    TransactionType = TransactionConstant.TransactionType,
+                                    TransactionType = TransactionConstant.TransactionTypeInApp,
                                     IsDelete = false
                                 };
                                 _beatSportsDbContext.Transactions.Add(transaction);
@@ -157,7 +157,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                                     AdminCheckStatus = 0,
                                     TransactionAmount = checkTotalMoney,
                                     TransactionDate = DateTime.UtcNow,
-                                    TransactionType = TransactionConstant.TransactionType,
+                                    TransactionType = TransactionConstant.TransactionTypeInApp,
                                     IsDelete = false
                                 };
                                 _beatSportsDbContext.Transactions.Add(transaction);
@@ -207,7 +207,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                                     AdminCheckStatus = 0,
                                     TransactionAmount = checkBookingInDB.TotalAmount,
                                     TransactionDate = DateTime.UtcNow,
-                                    TransactionType = TransactionConstant.TransactionType,
+                                    TransactionType = TransactionConstant.TransactionTypeInApp,
                                     IsDelete = false
                                 };
                                 _beatSportsDbContext.Transactions.Add(transaction);
@@ -231,7 +231,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                                     AdminCheckStatus = 0,
                                     TransactionAmount = checkBookingInDB.TotalAmount,
                                     TransactionDate = DateTime.UtcNow,
-                                    TransactionType = TransactionConstant.TransactionType,
+                                    TransactionType = TransactionConstant.TransactionTypeInApp,
                                     IsDelete = false
                                 };
                                 _beatSportsDbContext.Transactions.Add(transaction);
