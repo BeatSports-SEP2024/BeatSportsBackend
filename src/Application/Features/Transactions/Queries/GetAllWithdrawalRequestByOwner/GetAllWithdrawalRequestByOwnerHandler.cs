@@ -111,7 +111,8 @@ public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithd
                     OwnerId = owner?.Id ?? Guid.Empty,
                     Name = userWallet.Account.FirstName + " " + userWallet.Account.LastName,
                     WalletId = transaction.WalletId,
-                    Role = userWallet.Account.Role
+                    Role = userWallet.Account.Role,
+                    OwnerBankAccount = owner.BankAccount,
                 },
                 TransactionAmount = transaction.TransactionAmount,
                 TransactionStatus = transaction.TransactionStatus,
