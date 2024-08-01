@@ -10,4 +10,5 @@ namespace BeatSportsAPI.Application.Features.Transactions.Commands.RejectMoneyFo
 public class RejectMoneyForOwnerCommand : IRequest<BeatSportsResponseV2>
 {
     public Guid TransactionId { get; set; }
+    public string? ReasonOfRejected { get; set; }
 }
