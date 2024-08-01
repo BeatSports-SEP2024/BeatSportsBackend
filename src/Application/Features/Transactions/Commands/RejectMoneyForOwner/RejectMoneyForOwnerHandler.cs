@@ -34,6 +34,7 @@ public class RejectMoneyForOwnerHandler : IRequestHandler<RejectMoneyForOwnerCom
         }
 
         transaction.AdminCheckStatus = AdminCheckEnums.Rejected;
+        transaction.ReasonOfRejected = request.ReasonOfRejected;
 
         _dbContext.Transactions.Update(transaction);
         _dbContext.SaveChanges();

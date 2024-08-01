@@ -67,6 +67,9 @@ public class GetIncomeByBookingByCourtIdQueryHandler : IRequestHandler<GetIncome
                 .OrderByDescending(x => x.DayTimeBooking)
                 .ToList(),
         }).ToList();
-        return response;
+        response.Reverse();
+        var filteredResponse = response.Where(r => r.ListBooked.Any()).ToList();
+
+        return filteredResponse;
     }
 }

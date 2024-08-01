@@ -62,6 +62,7 @@ public class RejectWithdrawalRequestByOwnerHandler : IRequestHandler<RejectWithd
         }
 
         transaction.AdminCheckStatus = AdminCheckEnums.Rejected;
+        transaction.ReasonOfRejected = request.ReasonOfRejected;
         ownerWallet.Balance += (int)transaction.TransactionAmount;
 
         _dbContext.Transactions.Update(transaction);
