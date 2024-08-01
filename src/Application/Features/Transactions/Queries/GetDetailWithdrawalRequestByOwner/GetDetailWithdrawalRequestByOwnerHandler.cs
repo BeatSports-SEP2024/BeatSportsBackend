@@ -96,13 +96,14 @@ public class GetDetailWithdrawalRequestByOwnerHandler : IRequestHandler<GetDetai
                 OwnerId = owner.Id,
                 Name = userWallet.Account.FirstName + " " + userWallet.Account.LastName,
                 WalletId = transactionRequest.WalletId,
-                Role = userWallet.Account.Role
+                Role = userWallet.Account.Role,
+                OwnerBankAccount = owner.BankAccount,
             },
             TransactionList = result,
             TotalAmountReceived = totalAmountReceived,
             TotalAmountWithdrawn = totalAmountWithdrawn,
             TotalAmountAvailableForWithdrawal = totalAmountAvailableForWithdrawal,
-            ToTalAmountWithdrawalRequestByOwner = transactionRequest.TransactionAmount
+            TotalAmountWithdrawalRequestByOwner = transactionRequest.TransactionAmount
         };
 
         return Task.FromResult(response);
