@@ -23,15 +23,28 @@ public class GetAllTransactionByOwnerHandler : IRequestHandler<GetAllTransaction
 
     public async Task<List<TransactionResponse>> Handle(GetAllTransactionByOwner request, CancellationToken cancellationToken)
     {
-        var query = _beatSportsDbContext.Transactions
-            .Include(t => t.Wallet)
-                .ThenInclude(w => w.Account)
-                    .ThenInclude(a => a.Owner)
-            .Where(t => t.Wallet.Account.Owner.Id == request.OwnerId &&
-            ((t.TransactionType == "Giao dịch trong App" && t.AdminCheckStatus == AdminCheckEnums.Accepted) || t.TransactionType == "Rút tiền"))
-            .OrderByDescending(x => x.LastModified);
-
-        var response = await query.Select(t => new TransactionResponse
+        var owner = _beatSportsDbContext.Owners.Where(x => x.Id == request.OwnerId).FirstOrDefault();
+        var wallet = _beatSportsDbContext.Wallets.Where(x => x.AccountId == owner.AccountId).FirstOrDefault();
+        var listTransaction = await _beatSportsDbContext.Transactions.Where(x =>
+                                                                      // Trường hợp khi ví của owner là đích đến
+                                                                      // Tức là nó "Giao dịch trong app
+                                                                      (x.WalletTargetId == wallet.Id &&
+                                                                      x.TransactionType.Trim() == "Giao dịch trong App" &&
+                                                                      x.AdminCheckStatus == AdminCheckEnums.Accepted)
+                                                                      ||
+                                                                      (x.WalletId == wallet.Id &&
+                                                                      x.TransactionType.Trim() == "Rút tiền"))
+            .OrderByDescending(x => x.LastModified).ThenByDescending(x => x.Created).ToListAsync();
+        /*        var query = await _beatSportsDbContext.Transactions
+                    .Include(t => t.Wallet)
+                        .ThenInclude(w => w.Account)
+                            .ThenInclude(a => a.Owner)
+                    .Where(t => t.Wallet.Account.Owner.Id == request.OwnerId &&
+                    ((t.TransactionType.Trim() == "Giao dịch trong App" && t.AdminCheckStatus == AdminCheckEnums.Accepted)
+                    || t.TransactionType.Trim() == "Rút tiền"))
+                    .OrderByDescending(x => x.LastModified).ToListAsync();
+        */
+        var response = listTransaction.Select(t => new TransactionResponse
         {
             TransactionId = t.Id,
             WalletId = t.WalletId,
@@ -43,7 +56,7 @@ public class GetAllTransactionByOwnerHandler : IRequestHandler<GetAllTransaction
             TransactionAmount = t.TransactionAmount,
             TransactionDate = t.TransactionDate,
             TransactionType = t.TransactionType
-        }).ToListAsync();
+        }).ToList();
 
         return response;
     }
