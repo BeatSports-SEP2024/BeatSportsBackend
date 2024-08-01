@@ -9,6 +9,5 @@ public enum TransactionEnum
 {
     Pending,
     Approved,
-    Rejected,
     Cancel
 }
