@@ -78,9 +78,11 @@ public class CheckTimeJob
                     var ownerWallet = _beatSportsDbContext.Wallets
                                 .Where(x => x.Id == transaction.WalletTargetId)
                                 .FirstOrDefault();
-
+                    // Không hiểu nổi 
                     transaction.AdminCheckStatus = AdminCheckEnums.Accepted;
-
+                    // Hoàn thành transaction này để đánh dấu nó approve
+                    transaction.TransactionStatus = TransactionEnum.Approved.ToString();
+                    // Cộng vào ví owner
                     ownerWallet.Balance += (int)transaction.TransactionAmount;
 
                     _beatSportsDbContext.Transactions.Update(transaction);
