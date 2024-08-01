@@ -11,7 +11,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Transactions.Queries.GetAllWithdrawalRequestByOwner;
-public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithdrawalRequestByOwnerCommand, List<TransactionResponseV3>>
+public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithdrawalRequestByOwnerCommand, PaginatedTransactionResponseV2>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
 
@@ -19,7 +19,7 @@ public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithd
     {
         _beatSportsDbContext = beatSportsDbContext;
     }
-    public Task<List<TransactionResponseV3>> Handle(GetAllWithdrawalRequestByOwnerCommand request, CancellationToken cancellationToken)
+    public async Task<PaginatedTransactionResponseV2> Handle(GetAllWithdrawalRequestByOwnerCommand request, CancellationToken cancellationToken)
     {
         if (request.KeyWord == null)
         {
@@ -82,10 +82,16 @@ public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithd
             .OrderByDescending(b => b.Created);
         }
 
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var pagedResult = await query
+            .Skip((request.PageIndex - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .ToListAsync(cancellationToken);
 
         var result = new List<TransactionResponseV3>();
 
-        foreach (var transaction in query)
+        foreach (var transaction in pagedResult)
         {
             var userWallet = _beatSportsDbContext.Wallets
                          .Where(x => x.Id == transaction.WalletId)
@@ -102,7 +108,7 @@ public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithd
                 TransactionId = transaction.Id,
                 UserInfo = new UserInfo2()
                 {
-                    OwnerId = owner.Id,
+                    OwnerId = owner?.Id ?? Guid.Empty,
                     Name = userWallet.Account.FirstName + " " + userWallet.Account.LastName,
                     WalletId = transaction.WalletId,
                     Role = userWallet.Account.Role
@@ -116,7 +122,14 @@ public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithd
 
             result.Add(response);
         }
+        var paginatedResponse = new PaginatedTransactionResponseV2
+        {
+            PageNumber = request.PageIndex,
+            TotalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize),
+            TotalCount = totalCount,
+            Items = result
+        };
 
-        return Task.FromResult(result);
+        return paginatedResponse;
     }
 }

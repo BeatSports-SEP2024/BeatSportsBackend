@@ -53,6 +53,14 @@ public class PaginatedTransactionResponse
     public List<TransactionResponseV2> Items { get; set; }
 }
 
+public class PaginatedTransactionResponseV2
+{
+    public int PageNumber { get; set; }
+    public int TotalPages { get; set; }
+    public int TotalCount { get; set; }
+    public List<TransactionResponseV3> Items { get; set; }
+}
+
 public class UserInfo
 {
     public Guid WalletId { get; set; }
