@@ -71,6 +71,7 @@ public class UserInfo2
 {
     public Guid OwnerId { get; set; }
     public Guid WalletId { get; set; }
+    public string OwnerBankAccount { get; set; }
     public string Name { get; set; }
     public string Role { get; set; }
 }
@@ -83,5 +84,5 @@ public class TransactionResponseV4
     public decimal? TotalAmountReceived { get; set; }
     public decimal? TotalAmountWithdrawn { get; set; }
     public decimal? TotalAmountAvailableForWithdrawal { get; set; }
-    public decimal? ToTalAmountWithdrawalRequestByOwner { get; set; }
+    public decimal? TotalAmountWithdrawalRequestByOwner { get; set; }
 }

@@ -52,7 +52,7 @@ public class CreateWithdrawalRequestByOwnerHandler : IRequestHandler<CreateWithd
         {
             WalletId = ownerWallet.Id,
             TransactionMessage = "Rút tiền thành công",
-            TransactionStatus = "0",
+            TransactionStatus = TransactionEnum.Pending.ToString(),
             AdminCheckStatus = AdminCheckEnums.Pending,
             TransactionAmount = request.TransactionAmount,
             TransactionDate = DateTime.Now,
