@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 
 namespace BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactions;
-public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsCommand, List<TransactionResponseV2>>
+public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsCommand, PaginatedTransactionResponse>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
     private readonly IMapper _mapper;
@@ -28,7 +28,7 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
         _mapper = mapper;
     }
 
-    public async Task<List<TransactionResponseV2>> Handle(GetAllTransactionsCommand request, CancellationToken cancellationToken)
+    public async Task<PaginatedTransactionResponse> Handle(GetAllTransactionsCommand request, CancellationToken cancellationToken)
     {
         if (request.KeyWord == null)
         {
@@ -88,6 +88,7 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
         }
 
         // Implementing pagination
+        var totalCount = await query.CountAsync(cancellationToken);
         var pagedResult = await query
             .Skip((request.PageIndex - 1) * request.PageSize)
             .Take(request.PageSize)
@@ -136,6 +137,14 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
             result.Add(response);
         }
 
-        return result;
+        var paginatedResponse = new PaginatedTransactionResponse
+        {
+            PageNumber = request.PageIndex,
+            TotalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize),
+            TotalCount = totalCount,
+            Items = result
+        };
+
+        return paginatedResponse;
     }
 }

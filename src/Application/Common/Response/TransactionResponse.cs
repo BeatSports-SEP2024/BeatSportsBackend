@@ -45,6 +45,14 @@ public class TransactionResponseV2
     public string? TransactionType { get; set; }
 }
 
+public class PaginatedTransactionResponse
+{
+    public int PageNumber { get; set; }
+    public int TotalPages { get; set; }
+    public int TotalCount { get; set; }
+    public List<TransactionResponseV2> Items { get; set; }
+}
+
 public class UserInfo
 {
     public Guid WalletId { get; set; }
