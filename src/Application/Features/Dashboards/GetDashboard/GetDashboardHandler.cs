@@ -24,27 +24,58 @@ namespace BeatSportsAPI.Application.Features.Dashboards
         {
             // Lấy tổng tiền đặt sân đã duyệt
             var totalBookingMoneyInApp = await _dbContext.Bookings
-                .Where(b => b.BookingStatus == "Approved")
+                .Where(b => b.BookingStatus == "Approved" && !b.IsDelete)
                 .SumAsync(b => b.TotalAmount, cancellationToken);
 
             // Lấy tổng số chủ sân
             var totalOwner = await _dbContext.Accounts
-                .CountAsync(a => a.Role == "Owner", cancellationToken);
+                .CountAsync(a => a.Role == "Owner" && !a.IsDelete, cancellationToken);
 
             // Lấy tổng số khách hàng
             var totalCustomer = await _dbContext.Accounts
-                .CountAsync(a => a.Role == "Customer", cancellationToken);
+                .CountAsync(a => a.Role == "Customer" && !a.IsDelete, cancellationToken);
 
-            // Khởi tạo dữ liệu cho tất cả các tháng
-            var allMonths = Enumerable.Range(1, 12).Select(month => new DashboardData
+            // Khởi tạo dữ liệu cho tất cả các tháng cho từng Dashboard
+            var allMonthsCustomer = Enumerable.Range(1, 12).Select(month => new DashboardData
             {
                 X = new DateTime(request.Year, month, 1),
-                Y = 0  
+                Y = 0
             }).ToList();
+
+            var allMonthsOwner = Enumerable.Range(1, 12).Select(month => new DashboardData
+            {
+                X = new DateTime(request.Year, month, 1),
+                Y = 0
+            }).ToList();
+
+            var allMonthsRevenue = Enumerable.Range(1, 12).Select(month => new DashboardData
+            {
+                X = new DateTime(request.Year, month, 1),
+                Y = 0
+            }).ToList();
+
 
             // Lấy dữ liệu đăng ký theo tháng từ cơ sở dữ liệu
             var registrationData = await _dbContext.Accounts
-                .Where(a => a.Role == "Customer" && a.Created.Year == request.Year)
+                .Where(a => a.Role == "Customer" && a.Created.Year == request.Year && !a.IsDelete)
+                .GroupBy(a => new { a.Created.Year, a.Created.Month })
+                .Select(g => new { g.Key.Month, Count = g.Count() })
+                .ToListAsync(cancellationToken);
+
+            // Lấy dữ liệu doanh thu theo từng tháng 
+            var revenueByMonth = await _dbContext.Bookings
+                .Where(b => b.BookingStatus == "Approved" && !b.IsDelete && b.BookingDate.Year == request.Year)
+                .GroupBy(b => new { Year = b.BookingDate.Year, Month = b.BookingDate.Month })
+                .Select(g => new
+                {
+                    g.Key.Month,
+                    TotalRevenue = g.Sum(b => b.TotalAmount) 
+                })
+                .ToListAsync(cancellationToken);
+
+            // Lấy dữ liệu chủ sân đăng kí theo từng tháng
+            var ownerRegisterByMonth = await _dbContext.Accounts
+                .Where(a => a.Role == "Owner" && a.Created.Year == request.Year && !a.IsDelete)
                 .GroupBy(a => new { a.Created.Year, a.Created.Month })
                 .Select(g => new { g.Key.Month, Count = g.Count() })
                 .ToListAsync(cancellationToken);
@@ -52,30 +83,49 @@ namespace BeatSportsAPI.Application.Features.Dashboards
             // Cập nhật danh sách allMonths với dữ liệu từ cơ sở dữ liệu
             foreach (var data in registrationData)
             {
-                var monthData = allMonths.FirstOrDefault(m => m.X.Month == data.Month);
+                var monthData = allMonthsCustomer.FirstOrDefault(m => m.X.Month == data.Month);
                 if (monthData != null)
                 {
                     monthData.Y = data.Count;
                 }
             }
 
-            // Tạo các response object
+            // Cập nhật danh sách allMonthsOwner với dữ liệu đăng ký chủ sân
+            foreach (var data in ownerRegisterByMonth)
+            {
+                var monthData = allMonthsOwner.FirstOrDefault(m => m.X.Month == data.Month);
+                if (monthData != null)
+                {
+                    monthData.Y = data.Count;
+                }
+            }
+
+            // Cập nhật danh sách allMonthsRevenue với dữ liệu doanh thu
+            foreach (var data in revenueByMonth)
+            {
+                var monthData = allMonthsRevenue.FirstOrDefault(m => m.X.Month == data.Month);
+                if (monthData != null)
+                {
+                    monthData.Y = data.TotalRevenue;
+                }
+            }
+
             var combinedResponse = new DashboardResponse
             {
                 RevenueDashboard = new DashboardRevenue
                 {
                     TotalBookingMoneyInApp = totalBookingMoneyInApp,
-                    Dashboard = allMonths
+                    Dashboard = allMonthsRevenue
                 },
                 OwnerDashboard = new DashboardTotalOwner
                 {
                     TotalOwner = totalOwner,
-                    Dashboard = allMonths
+                    Dashboard = allMonthsOwner
                 },
                 CustomerDashboard = new DashboardTotalCustomer
                 {
                     TotalCustomer = totalCustomer,
-                    Dashboard = allMonths
+                    Dashboard = allMonthsCustomer
                 }
             };
 
