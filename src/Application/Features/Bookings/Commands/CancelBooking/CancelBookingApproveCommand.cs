@@ -60,7 +60,7 @@ public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingA
                 TimeSpan timeDifference = playingStartDateTime - currentDateTime;*/
         // Lấy thời gian sẽ chơi trừ cho thời gian min có thể hủy, nếu nó nhỏ hơn 0 thì không thể hủy được do đã vô khung kh thể hủy
         TimeSpan timeDifference = DateTime.Now - datetimeFromUnix;
-        if (timeDifference <= TimeSpan.Zero)
+        if (timeDifference >= TimeSpan.Zero)
         {
             // Thời gian hủy nhỏ hơn hoặc bằng thời gian hiện tại
             throw new BadRequestException($"Không thể hủy đặt sân, thời gian tối thiểu để hủy lịch đặt sân đã trôi qua. Thời gian bị lệch: {timeDifference}");
