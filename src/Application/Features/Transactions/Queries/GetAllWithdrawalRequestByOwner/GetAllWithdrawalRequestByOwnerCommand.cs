@@ -10,7 +10,9 @@ using MediatR;
 namespace BeatSportsAPI.Application.Features.Transactions.Queries.GetAllWithdrawalRequestByOwner;
 public class GetAllWithdrawalRequestByOwnerCommand : IRequest<PaginatedTransactionResponseV2>
 {
+    [Required]
     public int PageIndex { get; set; }
+    [Required]
     public int PageSize { get; set; }
     public string? KeyWord { get; set; }
     public string? Filter { get; set; }
