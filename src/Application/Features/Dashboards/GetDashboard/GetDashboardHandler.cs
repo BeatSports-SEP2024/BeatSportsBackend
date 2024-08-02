@@ -35,21 +35,29 @@ namespace BeatSportsAPI.Application.Features.Dashboards
             var totalCustomer = await _dbContext.Accounts
                 .CountAsync(a => a.Role == "Customer", cancellationToken);
 
-            // Lấy số liệu đăng ký theo tháng
-            var registrationData = await _dbContext.Accounts
-                .Where(a => a.Role == "Customer")
-                .Select(a => new { a.Created.Year, a.Created.Month })
-                .ToListAsync(cancellationToken); 
+            // Khởi tạo dữ liệu cho tất cả các tháng
+            var allMonths = Enumerable.Range(1, 12).Select(month => new DashboardData
+            {
+                X = new DateTime(request.Year, month, 1),
+                Y = 0  
+            }).ToList();
 
-            var groupedData = registrationData
-                .GroupBy(a => new { a.Year, a.Month })
-                .Select(g => new DashboardData
+            // Lấy dữ liệu đăng ký theo tháng từ cơ sở dữ liệu
+            var registrationData = await _dbContext.Accounts
+                .Where(a => a.Role == "Customer" && a.Created.Year == request.Year)
+                .GroupBy(a => new { a.Created.Year, a.Created.Month })
+                .Select(g => new { g.Key.Month, Count = g.Count() })
+                .ToListAsync(cancellationToken);
+
+            // Cập nhật danh sách allMonths với dữ liệu từ cơ sở dữ liệu
+            foreach (var data in registrationData)
+            {
+                var monthData = allMonths.FirstOrDefault(m => m.X.Month == data.Month);
+                if (monthData != null)
                 {
-                    X = new DateTime(g.Key.Year, g.Key.Month, 1),
-                    Y = g.Count()
-                })
-                .OrderBy(d => d.X)
-                .ToList();  
+                    monthData.Y = data.Count;
+                }
+            }
 
             // Tạo các response object
             var combinedResponse = new DashboardResponse
@@ -57,17 +65,17 @@ namespace BeatSportsAPI.Application.Features.Dashboards
                 RevenueDashboard = new DashboardRevenue
                 {
                     TotalBookingMoneyInApp = totalBookingMoneyInApp,
-                    Dashboard = groupedData
+                    Dashboard = allMonths
                 },
                 OwnerDashboard = new DashboardTotalOwner
                 {
                     TotalOwner = totalOwner,
-                    Dashboard = groupedData
+                    Dashboard = allMonths
                 },
                 CustomerDashboard = new DashboardTotalCustomer
                 {
                     TotalCustomer = totalCustomer,
-                    Dashboard = groupedData
+                    Dashboard = allMonths
                 }
             };
 

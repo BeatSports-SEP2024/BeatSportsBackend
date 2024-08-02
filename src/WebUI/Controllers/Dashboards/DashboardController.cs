@@ -15,14 +15,12 @@ public class DashboardController : ApiControllerBase
     }
     [HttpGet]
     [Route("dashboard")]
-    public async Task<IActionResult> GetDashboard()
+    public async Task<IActionResult> GetDashboard([FromQuery] GetDashboardCommand request)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
-        // Tạo một instance của command nếu cần, không có tham số
-        var request = new GetDashboardCommand();
         var response = await _mediator.Send(request);
 
         return Ok(response);
