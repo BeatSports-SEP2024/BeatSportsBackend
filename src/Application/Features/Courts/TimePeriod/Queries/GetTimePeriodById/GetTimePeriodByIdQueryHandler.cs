@@ -3,6 +3,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -48,7 +49,7 @@ public class GetTimePeriodByIdQueryHandler : IRequestHandler<GetTimePeriodByIdQu
                                                                           where
                                                                           tp.Id == request.TimePeriodId &&
                                                                           !tp.IsDelete &&
-                                                                          !cs.IsDelete
+                                                                          !cs.IsDelete && cs.CreatedStatus == CourtSubdivisionCreatedStatus.Accepted
 
                                                                           group new { cs } by new
                                                                           {
