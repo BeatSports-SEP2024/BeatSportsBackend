@@ -48,7 +48,8 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                         throw new BadRequestException($"{request.CustomerId} is not existed");
                     }
                     var courtBookedList = _dbContext.Bookings
-                   .Where(x => x.CustomerId == request.CustomerId && x.CourtSubdivisionId == request.CourtSubdivisionId)
+                   .Where(x => x.CustomerId == request.CustomerId && x.CourtSubdivisionId == request.CourtSubdivisionId &&
+                   x.BookingStatus != BookingEnums.Cancel.ToString())
                    .ToList();
 
                     if (courtBookedList.Count > 0)
