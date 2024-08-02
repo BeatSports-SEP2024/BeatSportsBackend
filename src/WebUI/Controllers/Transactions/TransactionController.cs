@@ -4,6 +4,7 @@ using BeatSportsAPI.Application.Features.Transactions.Commands.CreateWithdrawalR
 using BeatSportsAPI.Application.Features.Transactions.Commands.RejectMoneyForOwner;
 using BeatSportsAPI.Application.Features.Transactions.Commands.RejectWithdrawalRequestByOwner;
 using BeatSportsAPI.Application.Features.Transactions.Commands.TransferMoneyInApp;
+using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactionByCustomerV1;
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactionByOwner;
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactions;
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactionsByCustomer;
@@ -65,6 +66,19 @@ public class TransactionController : ApiControllerBase
     [HttpGet]
     [Route("all-transaction-by-owner")]
     public async Task<IActionResult> GetAllTransactionByOwner([FromQuery] GetAllTransactionByOwner request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var response = await _mediator.Send(request);
+
+        return Ok(response);
+    }
+
+    [HttpGet]
+    [Route("all-transaction-by-customer")]
+    public async Task<IActionResult> GetAllTransactionByCustomer([FromQuery] GetAllTransactionByCustomerV1Query request)
     {
         if (!ModelState.IsValid)
         {

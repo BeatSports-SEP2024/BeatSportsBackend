@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactions;
+using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Transactions.Queries.GetAllWithdrawalRequestByOwner;
-public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithdrawalRequestByOwnerCommand, PaginatedTransactionResponseV2>
+public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithdrawalRequestByOwnerCommand, List<TransactionResponseV3>>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
 
@@ -19,7 +21,7 @@ public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithd
     {
         _beatSportsDbContext = beatSportsDbContext;
     }
-    public async Task<PaginatedTransactionResponseV2> Handle(GetAllWithdrawalRequestByOwnerCommand request, CancellationToken cancellationToken)
+    public Task<List<TransactionResponseV3>> Handle(GetAllWithdrawalRequestByOwnerCommand request, CancellationToken cancellationToken)
     {
         if (request.KeyWord == null)
         {
@@ -35,25 +37,10 @@ public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithd
             .Where(t => !t.IsDelete && t.TransactionType.Equals("Rút tiền") && t.AdminCheckStatus == AdminCheckEnums.Pending)
             .OrderByDescending(b => b.Created);
 
-        var a = query.Count();
-
-        if (request.Filter.Equals("TransactionStatus"))
+        if (request.Filter.Equals("TransactionType"))
         {
             query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && t.TransactionType.Equals("Rút tiền") && t.AdminCheckStatus == AdminCheckEnums.Pending && t.TransactionStatus.Contains(request.KeyWord))
-            .OrderByDescending(b => b.Created);
-
-        }
-        else if (request.Filter.Equals("AdminCheckStatus"))
-        {
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && t.TransactionType.Equals("Rút tiền") && t.AdminCheckStatus == AdminCheckEnums.Pending && t.AdminCheckStatus.ToString().Contains(request.KeyWord))
-            .OrderByDescending(b => b.Created);
-        }
-        else if (request.Filter.Equals("TransactionType"))
-        {
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && t.TransactionType.Equals("Rút tiền") && t.AdminCheckStatus == AdminCheckEnums.Pending && t.TransactionType.Contains(request.KeyWord))
+            .Where(t => !t.IsDelete && t.TransactionType.Contains(request.KeyWord) && t.AdminCheckStatus == AdminCheckEnums.Pending)
             .OrderByDescending(b => b.Created);
         }
         else if (request.Filter.Equals("From"))
@@ -62,36 +49,59 @@ public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithd
                          .Include(x => x.Account)
                          .ToList();
 
-            fromUser = fromUser.Where(x => (x.Account.FirstName + " " + x.Account.LastName).Contains(request.KeyWord)).ToList();
+            fromUser = fromUser.Where(x => RemoveDiacritics(x.Account.FirstName + " " + x.Account.LastName).ToLower().Contains(RemoveDiacritics(request.KeyWord).ToLower())).ToList();
 
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && t.TransactionType.Equals("Rút tiền") && t.AdminCheckStatus == AdminCheckEnums.Pending && fromUser.Any(x => x.Id == t.WalletId))
-            .OrderByDescending(b => b.Created);
+            var a = new Queue<Transaction>();
+
+            foreach (var user in fromUser)
+            {
+                var b = _beatSportsDbContext.Transactions
+                       .Where(t => !t.IsDelete && user.Id == t.WalletId && t.AdminCheckStatus == AdminCheckEnums.Pending)
+                       .FirstOrDefault();
+                if (b != null)
+                {
+                    a.Enqueue(b);
+                }
+
+            }
+
+            query = (IOrderedQueryable<Transaction>)a.AsQueryable();
 
         }
         else if (request.Filter.Equals("To"))
         {
-            var fromUser = _beatSportsDbContext.Wallets
+            var toUser = _beatSportsDbContext.Wallets
                          .Include(x => x.Account)
                          .ToList();
 
-            fromUser = fromUser.Where(x => (x.Account.FirstName + " " + x.Account.LastName).Contains(request.KeyWord)).ToList();
+            toUser = toUser.Where(x => RemoveDiacritics(x.Account.FirstName + " " + x.Account.LastName).ToLower().Contains(RemoveDiacritics(request.KeyWord).ToLower())).ToList();
 
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && t.TransactionType.Equals("Rút tiền") && t.AdminCheckStatus == AdminCheckEnums.Pending && fromUser.Any(x => x.Id == t.WalletTargetId))
-            .OrderByDescending(b => b.Created);
+            var a = new Queue<Transaction>();
+
+            foreach (var user in toUser)
+            {
+                var b = _beatSportsDbContext.Transactions
+                       .Where(t => !t.IsDelete && user.Id == t.WalletTargetId && t.AdminCheckStatus == AdminCheckEnums.Pending)
+                       .FirstOrDefault();
+                if (b != null)
+                {
+                    a.Enqueue(b);
+                }
+
+            }
+
+            query = (IOrderedQueryable<Transaction>)a.AsQueryable();
+
         }
 
-        var totalCount = await query.CountAsync(cancellationToken);
-
-        var pagedResult = await query
-            .Skip((request.PageIndex - 1) * request.PageSize)
-            .Take(request.PageSize)
-            .ToListAsync(cancellationToken);
+        if (request.StartTime.HasValue && request.EndTime.HasValue)
+        {
+            query = (IOrderedQueryable<Transaction>)query.Where(tp => tp.TransactionDate.Value.Date >= request.StartTime.Value.Date && tp.TransactionDate.Value.Date <= request.EndTime.Value.Date).AsQueryable();
+        }
 
         var result = new List<TransactionResponseV3>();
 
-        foreach (var transaction in pagedResult)
+        foreach (var transaction in query)
         {
             var userWallet = _beatSportsDbContext.Wallets
                          .Where(x => x.Id == transaction.WalletId)
@@ -108,11 +118,10 @@ public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithd
                 TransactionId = transaction.Id,
                 UserInfo = new UserInfo2()
                 {
-                    OwnerId = owner?.Id ?? Guid.Empty,
+                    OwnerId = owner.Id,
                     Name = userWallet.Account.FirstName + " " + userWallet.Account.LastName,
                     WalletId = transaction.WalletId,
-                    Role = userWallet.Account.Role,
-                    OwnerBankAccount = owner.BankAccount,
+                    Role = userWallet.Account.Role
                 },
                 TransactionAmount = transaction.TransactionAmount,
                 TransactionStatus = transaction.TransactionStatus,
@@ -123,14 +132,24 @@ public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithd
 
             result.Add(response);
         }
-        var paginatedResponse = new PaginatedTransactionResponseV2
-        {
-            PageNumber = request.PageIndex,
-            TotalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize),
-            TotalCount = totalCount,
-            Items = result
-        };
 
-        return paginatedResponse;
+        return Task.FromResult(result);
+    }
+
+    private static string RemoveDiacritics(string text)
+    {
+        var normalizedString = text.Normalize(NormalizationForm.FormD);
+        var stringBuilder = new StringBuilder();
+
+        foreach (var c in normalizedString)
+        {
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            {
+                stringBuilder.Append(c);
+            }
+        }
+
+        return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
     }
 }

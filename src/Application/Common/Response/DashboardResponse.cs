@@ -15,8 +15,8 @@ public class DashboardData
 {
     // Xét theo từng tháng
     public DateTime X { get; set; }
-    // Số lượng customer đăng kí trong tháng đó
-    public int Y { get; set; }
+    // Số lượng customer đăng kí trong tháng đó hoặc số tiền hoặc số owner đăng kí
+    public object? Y { get; set; }
 }
 
 public class DashboardRevenue : DashboardDataInside
