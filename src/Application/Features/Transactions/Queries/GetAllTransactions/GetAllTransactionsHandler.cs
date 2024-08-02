@@ -18,7 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 
 namespace BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactions;
-public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsCommand, List<TransactionResponseV2>>
+public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsCommand, PaginatedTransactionResponse>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
     private readonly IMapper _mapper;
@@ -29,9 +29,9 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
         _mapper = mapper;
     }
 
-    public Task<List<TransactionResponseV2>> Handle(GetAllTransactionsCommand request, CancellationToken cancellationToken)
+    public async Task<PaginatedTransactionResponse> Handle(GetAllTransactionsCommand request, CancellationToken cancellationToken)
     {
-        if(request.KeyWord == null)
+        if (request.KeyWord == null)
         {
             request.KeyWord = "";
         }
@@ -41,98 +41,95 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
             request.Filter = "";
         }
 
+        // Bước 1: Lấy tất cả các giao dịch mà không bị xóa
         var query = _beatSportsDbContext.Transactions
             .Where(t => !t.IsDelete)
             .OrderByDescending(b => b.Created);
 
+        // Bước 2: Lấy toàn bộ dữ liệu người dùng để lọc về phía client
+        var allWallets = _beatSportsDbContext.Wallets
+            .Include(x => x.Account)
+            .ToList();  // Tải toàn bộ dữ liệu vào bộ nhớ
+
+        var filteredTransactions = query.ToList();  // Tải toàn bộ giao dịch vào bộ nhớ
+
+        // Bước 3: Lọc dữ liệu giao dịch dựa trên filter
         if (request.Filter.Equals("TransactionType"))
         {
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && t.TransactionType.Contains(request.KeyWord))
-            .OrderByDescending(b => b.Created);
-        }else if (request.Filter.Equals("From"))
+            filteredTransactions = filteredTransactions
+                .Where(t => t.TransactionType.Contains(request.KeyWord))
+                .ToList();
+        }
+        else if (request.Filter.Equals("From"))
         {
-            var fromUser = _beatSportsDbContext.Wallets
-                         .Include(x => x.Account)
-                         .ToList();
+            var fromUserIds = allWallets
+                .Where(x => RemoveDiacritics(x.Account.FirstName + " " + x.Account.LastName)
+                    .ToLower().Contains(RemoveDiacritics(request.KeyWord).ToLower()))
+                .Select(x => x.Id)
+                .ToList();
 
-            fromUser = fromUser.Where(x => RemoveDiacritics(x.Account.FirstName + " " + x.Account.LastName).ToLower().Contains(RemoveDiacritics(request.KeyWord).ToLower())).ToList();
-
-            var a = new Queue<Transaction>();
-
-            foreach (var user in fromUser)
-            {
-                var b = _beatSportsDbContext.Transactions
-                       .Where(t => !t.IsDelete && user.Id == t.WalletId)
-                       .FirstOrDefault();
-                if (b != null)
-                {
-                    a.Enqueue(b);
-                }
-
-            }
-
-            query = (IOrderedQueryable<Transaction>)a.AsQueryable();
-
+            filteredTransactions = filteredTransactions
+                .Where(t => fromUserIds.Contains(t.WalletId))
+                .ToList();
         }
         else if (request.Filter.Equals("To"))
         {
-            var toUser = _beatSportsDbContext.Wallets
-                         .Include(x => x.Account)
-                         .ToList();
-            
-            toUser = toUser.Where(x => RemoveDiacritics(x.Account.FirstName + " " + x.Account.LastName).ToLower().Contains(RemoveDiacritics(request.KeyWord).ToLower())).ToList();
+            var toUserIds = allWallets
+                .Where(x => RemoveDiacritics(x.Account.FirstName + " " + x.Account.LastName)
+                    .ToLower().Contains(RemoveDiacritics(request.KeyWord).ToLower()))
+                .Select(x => x.Id)
+                .ToList();
 
-            var a = new Queue<Transaction>();
-
-            foreach(var user in toUser)
-            {
-                 var b = _beatSportsDbContext.Transactions
-                        .Where(t => !t.IsDelete && user.Id == t.WalletTargetId)
-                        .FirstOrDefault();
-                if(b != null)
-                {
-                    a.Enqueue(b);
-                }
-               
-            }
-
-            query = (IOrderedQueryable<Transaction>)a.AsQueryable();
-
+            filteredTransactions = filteredTransactions
+                .Where(t => toUserIds.Contains(t.WalletTargetId))
+                .ToList();
         }
 
         if (request.StartTime.HasValue && request.EndTime.HasValue)
         {
-            query = (IOrderedQueryable<Transaction>)query.Where(tp => tp.TransactionDate.Value.Date >= request.StartTime.Value.Date && tp.TransactionDate.Value.Date <= request.EndTime.Value.Date).AsQueryable();
+            filteredTransactions = filteredTransactions
+                .Where(t => t.TransactionDate >= request.StartTime.Value && t.TransactionDate <= request.EndTime.Value)
+                .ToList();
         }
-        var result = new List<TransactionResponseV2>();
 
-        foreach(var transaction in query)
+        // Bước 4: Tính toán phân trang
+        var totalCount = filteredTransactions.Count;
+        var totalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize);
+
+        var paginatedTransactions = filteredTransactions
+            .Skip((request.PageIndex - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .ToList();
+
+        // Bước 5: Tạo response phân trang
+        var result = new PaginatedTransactionResponse
         {
-            var fromUser = _beatSportsDbContext.Wallets
-                         .Where(x => x.Id == transaction.WalletId)
-                         .Include(x => x.Account)
-                         .FirstOrDefault();
+            PageNumber = request.PageIndex,
+            TotalPages = totalPages,
+            TotalCount = totalCount,
+            Items = new List<TransactionResponseV2>()
+        };
 
-            
-            var toUser = _beatSportsDbContext.Wallets
-                         .Where(x => x.Id == transaction.WalletTargetId)
-                         .Include(x => x.Account)
-                         .FirstOrDefault();
+        foreach (var transaction in paginatedTransactions)
+        {
+            var fromUser = allWallets
+                .FirstOrDefault(x => x.Id == transaction.WalletId);
+
+            var toUser = allWallets
+                .FirstOrDefault(x => x.Id == transaction.WalletTargetId);
 
             var toUserResponse = new UserInfo();
-
-            if(toUser != null)
+            if (toUser != null)
             {
                 toUserResponse.Name = toUser.Account.FirstName + " " + toUser.Account.LastName;
                 toUserResponse.WalletId = transaction.WalletTargetId;
                 toUserResponse.Role = toUser.Account.Role;
             }
 
-            var response = new TransactionResponseV2()
+            result.Items.Add(new TransactionResponseV2
             {
                 TransactionId = transaction.Id,
-                From = new UserInfo()
+                From = new UserInfo
                 {
                     Name = fromUser.Account.FirstName + " " + fromUser.Account.LastName,
                     WalletId = transaction.WalletId,
@@ -144,13 +141,12 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
                 AdminCheckStatus = transaction.AdminCheckStatus.ToString(),
                 TransactionDate = transaction.TransactionDate,
                 TransactionType = transaction.TransactionType
-            };
-
-            result.Add(response);
+            });
         }
 
-        return Task.FromResult(result);
+        return result;
     }
+
 
     private static string RemoveDiacritics(string text)
     {
