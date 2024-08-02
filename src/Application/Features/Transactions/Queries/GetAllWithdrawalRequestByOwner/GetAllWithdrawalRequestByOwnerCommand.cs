@@ -8,8 +8,10 @@ using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Transactions.Queries.GetAllWithdrawalRequestByOwner;
-public class GetAllWithdrawalRequestByOwnerCommand : IRequest<List<TransactionResponseV3>>
+public class GetAllWithdrawalRequestByOwnerCommand : IRequest<PaginatedTransactionResponseV2>
 {
+    public int PageIndex { get; set; }
+    public int PageSize { get; set; }
     public string? KeyWord { get; set; }
     public string? Filter { get; set; }
     public DateTime? StartTime { get; set; }
