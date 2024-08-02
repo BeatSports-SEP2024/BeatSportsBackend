@@ -64,7 +64,7 @@ public class CheckTimeJob
             DateTime playingStartDateTime = booking.PlayingDate.Date.Add(booking.StartTimePlaying);
 
             // So sánh thời gian hủy với thời gian hiện tại
-            TimeSpan timeDifference = playingStartDateTime - datetimeFromUnix;
+            TimeSpan timeDifference = DateTime.Now - datetimeFromUnix;
 
             if (timeDifference <= TimeSpan.Zero)
             {
