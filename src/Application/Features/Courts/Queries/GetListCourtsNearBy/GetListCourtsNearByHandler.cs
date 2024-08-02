@@ -14,6 +14,7 @@ using BeatSportsAPI.Application.Common.Response.CourtResponse;
 using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Application.Features.Courts.Queries.GetAllCourtsByOwnerId;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Services.MapBox;
@@ -143,18 +144,20 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
 
             if (c.CourtSubdivision.Count != 0)
             {
-                price = c.CourtSubdivision.MinBy(c => c.BasePrice).BasePrice;
+                price = c.CourtSubdivision.Where(x => x.CreatedStatus == CourtSubdivisionCreatedStatus.Accepted).MinBy(c => c.BasePrice).BasePrice;
                 rentalNumber = c.CourtSubdivision.Sum(x => x.Bookings.Where(c => c.BookingStatus.Equals("Approved")).Count());
             }
 
-            var listCourtSub = c.CourtSubdivision.Select(b => new CourtSubdivisionResponse
-            {
-                Id = b.Id,
-                CourtId = b.CourtId,
-                CourtSubdivisionName = b.CourtSubdivisionName,
-                BasePrice = b.BasePrice,
-                IsActive = b.IsActive,
-            }).ToList();
+            var listCourtSub = c.CourtSubdivision
+                .Where(x => x.CreatedStatus == CourtSubdivisionCreatedStatus.Accepted)
+                .Select(b => new CourtSubdivisionResponse
+                {
+                    Id = b.Id,
+                    CourtId = b.CourtId,
+                    CourtSubdivisionName = b.CourtSubdivisionName,
+                    BasePrice = b.BasePrice,
+                    IsActive = b.IsActive,
+                }).ToList();        
 
             var name = _dbContext.Accounts
                 .Where(x => x.Id == c.Owner.AccountId)
