@@ -59,7 +59,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                 RentingCount = c.Feedback.Select(f => f.Booking).Distinct().Count(),
                 FeedbackCount = c.Feedback.Count(),
                 FeedbackStarAvg = c.Feedback.Any() ? c.Feedback.Average(x => x.FeedbackStar) : (decimal?)null,
-                Price = c.CourtSubdivision.FirstOrDefault() != null ? c.CourtSubdivision.FirstOrDefault().BasePrice : (decimal?)null,
+                Price = c.CourtSubdivision.Any() ? c.CourtSubdivision.Select(x => x.BasePrice).Min() : (decimal?)null,
 
                 CourtSubSettingResponses = c.CourtSubdivision
                     .GroupBy(cs => cs.CourtSubdivisionSettings.Id)
@@ -84,7 +84,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                     }).ToList(),
 
                 CourtCampaignResponses = c.Campaigns
-                    .Where(c => !c.IsDelete)    
+                    .Where(c => !c.IsDelete)
                     .Select(c => new CampaignResponseV6
                     {
                         Id = c.Id,
@@ -93,7 +93,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                         ExpireCampaign = (c.EndDateApplying - DateTime.Now).ToString(),
                         MaxValueDiscount = c.MaxValueDiscount,
                         MinValueApply = c.MinValueApply,
-                        PercentDiscount = c.PercentDiscount, 
+                        PercentDiscount = c.PercentDiscount,
                     }).ToList(),
 
                 Feedbacks = c.Feedback
@@ -109,7 +109,6 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                     }).ToList(),
             })
             .FirstOrDefault();
-
         if (courtDetails == null)
         {
             throw new BadRequestException($"Court with ID {request.CourtId} not found.");

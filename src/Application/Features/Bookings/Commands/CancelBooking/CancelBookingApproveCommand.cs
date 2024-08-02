@@ -59,7 +59,7 @@ public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingA
                 // So sánh thời gian hủy với thời gian hiện tại
                 TimeSpan timeDifference = playingStartDateTime - currentDateTime;*/
         // Lấy thời gian sẽ chơi trừ cho thời gian min có thể hủy, nếu nó nhỏ hơn 0 thì không thể hủy được do đã vô khung kh thể hủy
-        TimeSpan timeDifference = playingStartDateTime - datetimeFromUnix;
+        TimeSpan timeDifference = DateTime.Now - datetimeFromUnix;
         if (timeDifference <= TimeSpan.Zero)
         {
             // Thời gian hủy nhỏ hơn hoặc bằng thời gian hiện tại
