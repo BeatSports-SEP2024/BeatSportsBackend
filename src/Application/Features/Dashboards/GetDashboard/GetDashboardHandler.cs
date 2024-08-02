@@ -1,61 +1,77 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Features.Dashboards.GetDashboard;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace BeatSportsAPI.Application.Features.Dashboards.GetDashboard;
-public class GetDashboardHandler : IRequestHandler<GetDashboardCommand, List<DashboardResponse>>
+namespace BeatSportsAPI.Application.Features.Dashboards
 {
-    private readonly IBeatSportsDbContext _dbContext;
-
-    public GetDashboardHandler(IBeatSportsDbContext dbContext)
+    public class GetDashboardHandler : IRequestHandler<GetDashboardCommand, DashboardResponse>
     {
-        _dbContext = dbContext;
-    }
+        private readonly IBeatSportsDbContext _dbContext;
 
-    public async Task<List<DashboardResponse>> Handle(GetDashboardCommand request, CancellationToken cancellationToken)
-    {
-        var response = new DashboardResponse();
+        public GetDashboardHandler(IBeatSportsDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
 
-        // Tổng số tiền Customer nạp
-        response.TotalAmountCustomer = await _dbContext.Transactions
-            .Where(t => t.TransactionType == "Nạp tiền")
-            .SumAsync(t => t.TransactionAmount, cancellationToken);
+        public async Task<DashboardResponse> Handle(GetDashboardCommand request, CancellationToken cancellationToken)
+        {
+            // Lấy tổng tiền đặt sân đã duyệt
+            var totalBookingMoneyInApp = await _dbContext.Bookings
+                .Where(b => b.BookingStatus == "Approved")
+                .SumAsync(b => b.TotalAmount, cancellationToken);
 
-        // Tổng số tiền Owner rút
-        response.TotalAmountOwnerWithdrawal = await _dbContext.Transactions
-            .Where(t => t.TransactionType == "Rút tiền")
-            .SumAsync(t => t.TransactionAmount, cancellationToken);
+            // Lấy tổng số chủ sân
+            var totalOwner = await _dbContext.Accounts
+                .CountAsync(a => a.Role == "Owner", cancellationToken);
 
-        response.TotalBookingMoneyInApp = await _dbContext.Bookings
-            .Where(t => t.BookingStatus == "Approved")
-            .SumAsync(t => t.TotalAmount, cancellationToken);
+            // Lấy tổng số khách hàng
+            var totalCustomer = await _dbContext.Accounts
+                .CountAsync(a => a.Role == "Customer", cancellationToken);
 
-        var accounts = await _dbContext.Accounts.ToListAsync(cancellationToken);
+            // Lấy số liệu đăng ký theo tháng
+            var registrationData = await _dbContext.Accounts
+                .Where(a => a.Role == "Customer")
+                .Select(a => new { a.Created.Year, a.Created.Month })
+                .ToListAsync(cancellationToken); 
 
-        // Thực hiện nhóm và tính toán dữ liệu trên client
-        response.Dashboard = accounts
-            .GroupBy(u => new
+            var groupedData = registrationData
+                .GroupBy(a => new { a.Year, a.Month })
+                .Select(g => new DashboardData
+                {
+                    X = new DateTime(g.Key.Year, g.Key.Month, 1),
+                    Y = g.Count()
+                })
+                .OrderBy(d => d.X)
+                .ToList();  
+
+            // Tạo các response object
+            var combinedResponse = new DashboardResponse
             {
-                Year = u.Created.Year,
-                Month = u.Created.Month
-            })
-            .Select(g => new DashboardData
-            {
-                X = new DateTime(g.Key.Year, g.Key.Month, 1),
-                Y1 = g.Count(u => u.Role == "Customer"),
-                Y2 = g.Count(u => u.Role == "Owner")
-            })
-            .OrderBy(d => d.X)
-            .ToList();
+                RevenueDashboard = new DashboardRevenue
+                {
+                    TotalBookingMoneyInApp = totalBookingMoneyInApp,
+                    Dashboard = groupedData
+                },
+                OwnerDashboard = new DashboardTotalOwner
+                {
+                    TotalOwner = totalOwner,
+                    Dashboard = groupedData
+                },
+                CustomerDashboard = new DashboardTotalCustomer
+                {
+                    TotalCustomer = totalCustomer,
+                    Dashboard = groupedData
+                }
+            };
 
-        var listResponse = new List<DashboardResponse> { response };
-
-        return listResponse;
+            return combinedResponse;
+        }
     }
 }

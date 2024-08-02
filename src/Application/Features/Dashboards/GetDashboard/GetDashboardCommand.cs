@@ -7,6 +7,6 @@ using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Dashboards.GetDashboard;
-public class GetDashboardCommand : IRequest<List<DashboardResponse>>
+public class GetDashboardCommand : IRequest<DashboardResponse>
 {
 }

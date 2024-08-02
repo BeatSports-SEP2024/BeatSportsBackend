@@ -5,17 +5,38 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BeatSportsAPI.Application.Common.Response;
-public class DashboardResponse
+
+public class DashboardDataInside
 {
-    public decimal? TotalAmountCustomer { get; set; }
-    public decimal? TotalAmountOwnerWithdrawal { get; set; }
-    public decimal? TotalBookingMoneyInApp { get; set; }
-    public List<DashboardData> Dashboard { get; set; }
+    public List<DashboardData>? Dashboard { get; set; }
 }
 
 public class DashboardData
 {
+    // Xét theo từng tháng
     public DateTime X { get; set; }
-    public int Y1 { get; set; }
-    public int Y2 { get; set; }
+    // Số lượng customer đăng kí trong tháng đó
+    public int Y { get; set; }
+}
+
+public class DashboardRevenue : DashboardDataInside
+{
+    public decimal? TotalBookingMoneyInApp { get; set; }   
+}
+
+public class DashboardTotalOwner : DashboardDataInside
+{
+    public int TotalOwner { get; set; }
+}
+
+public class DashboardTotalCustomer : DashboardDataInside
+{
+    public int TotalCustomer { get; set; }
+}
+
+public class DashboardResponse
+{
+    public DashboardRevenue RevenueDashboard { get; set; }
+    public DashboardTotalOwner OwnerDashboard { get; set; }
+    public DashboardTotalCustomer CustomerDashboard { get; set; }
 }
