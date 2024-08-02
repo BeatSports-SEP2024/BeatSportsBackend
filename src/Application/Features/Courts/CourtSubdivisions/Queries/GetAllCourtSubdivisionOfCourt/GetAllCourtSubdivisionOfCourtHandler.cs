@@ -33,7 +33,7 @@ public class GetAllCourtSubdivisionOfCourtHandler : IRequestHandler<GetAllCourtS
         var query = _dbContext.Courts
             .Where(c => !c.IsDelete && c.Id == request.CourtId)
             .SelectMany(c => c.CourtSubdivision)
-            .Where(c => c.CreatedStatus != CourtSubdivisionCreatedStatus.Pending)
+            .Where(c => c.CreatedStatus == CourtSubdivisionCreatedStatus.Accepted)
             .Select(cs => new {
                 Subdivision = cs,
                 Court = cs.Court,
