@@ -32,6 +32,10 @@ public class GetDashboardHandler : IRequestHandler<GetDashboardCommand, List<Das
             .Where(t => t.TransactionType == "Rút tiền")
             .SumAsync(t => t.TransactionAmount, cancellationToken);
 
+        response.TotalBookingMoneyInApp = await _dbContext.Bookings
+            .Where(t => t.BookingStatus == "Approved")
+            .SumAsync(t => t.TotalAmount, cancellationToken);
+
         var accounts = await _dbContext.Accounts.ToListAsync(cancellationToken);
 
         // Thực hiện nhóm và tính toán dữ liệu trên client

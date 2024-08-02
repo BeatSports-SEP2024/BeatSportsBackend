@@ -9,6 +9,7 @@ public class DashboardResponse
 {
     public decimal? TotalAmountCustomer { get; set; }
     public decimal? TotalAmountOwnerWithdrawal { get; set; }
+    public decimal? TotalBookingMoneyInApp { get; set; }
     public List<DashboardData> Dashboard { get; set; }
 }
 
