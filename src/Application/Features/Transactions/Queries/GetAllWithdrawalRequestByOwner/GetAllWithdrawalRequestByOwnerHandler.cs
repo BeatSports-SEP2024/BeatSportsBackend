@@ -99,7 +99,9 @@ public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithd
             query = (IOrderedQueryable<Transaction>)query.Where(tp => tp.TransactionDate.Value.Date >= request.StartTime.Value.Date && tp.TransactionDate.Value.Date <= request.EndTime.Value.Date).AsQueryable();
         }
 
-        var totalCount = await _beatSportsDbContext.Transactions.CountAsync(); // Ensure this query reflects the filtered count for correct pagination.
+        var totalCount = await _beatSportsDbContext.Transactions
+            .Where(t => !t.IsDelete && t.TransactionType.Equals("Rút tiền") && t.AdminCheckStatus == AdminCheckEnums.Pending)
+            .CountAsync();
 
         var pagedResult = await query
             .Skip((request.PageIndex - 1) * request.PageSize)
