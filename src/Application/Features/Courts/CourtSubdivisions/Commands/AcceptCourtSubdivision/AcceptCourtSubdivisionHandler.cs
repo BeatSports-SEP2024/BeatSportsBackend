@@ -17,7 +17,7 @@ public class AcceptCourtSubdivisionHandler : IRequestHandler<AcceptCourtSubdivis
     public Task<BeatSportsResponse> Handle(AcceptCourtSubdivisionCommand request, CancellationToken cancellationToken)
     {
         var courtSubs = _beatSportsDbContext.CourtSubdivisions
-            .Where(cs => !cs.IsDelete && cs.CourtId == request.CourtId)
+            .Where(cs => !cs.IsDelete && cs.CourtId == request.CourtId && cs.CreatedStatus == (CourtSubdivisionCreatedStatus)StatusEnums.Pending)
             .ToList();
 
         if (!courtSubs.Any())
