@@ -36,11 +36,11 @@ public class CheckTimeJob
                 if (timeChecking != null)
                 {
                     timeChecking.IsDelete = true;
-                    _beatSportsDbContext.TimeChecking.Update(timeChecking);
+                    _beatSportsDbContext.TimeChecking.Remove(timeChecking);
                     _beatSportsDbContext.SaveChanges();
 
                     booking.IsDelete = true;
-                    _beatSportsDbContext.Bookings.Update(booking);
+                    _beatSportsDbContext.Bookings.Remove(booking);
                     _beatSportsDbContext.SaveChanges();
 
                     Console.WriteLine($"Recurring job executed start for Booking ${booking.Id}");
