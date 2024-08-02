@@ -112,6 +112,48 @@ public class ProcessZaloPaymentReturnHandler : IRequestHandler<ProcessZaloPaymen
                         _dbContext.Wallets.Update(wallet);
                         await _dbContext.SaveChangesAsync();
                     }
+                    // mã lỗi : Giao dịch thất bại do người dùng đã từ chối xác nhận thanh toán.
+                    else if (request.status == -49)
+                    {
+                        resultData.PaymentStatus = "-1";
+                        resultData.PaymentMessage = "Tran error";
+
+                        /// Update database
+                        var transaction = new PaymentTransaction
+                        {
+                            TranMessage = resultData.PaymentMessage,
+                            TranPayload = JsonConvert.SerializeObject(request),
+                            TranStatus = resultData.PaymentStatus,
+                            TranAmount = request.amount,
+                            TranDate = DateTime.Now,
+                            PaymentId = Guid.Parse(paymentId),
+                            TranRefId = payment.PaymentRefId
+                        };
+                        _dbContext.PaymentTransactions.Add(transaction);
+                        await _dbContext.SaveChangesAsync();
+                        /// Confirm success
+                        var transactionExist = await _dbContext.PaymentTransactions
+                            .Where(t => t.Id == transaction.Id).SingleOrDefaultAsync();
+                        if (transactionExist == null)
+                        {
+                            throw new BadRequestException("04, Input required data");
+                        }
+                        /// after success update transaction for wallets
+                        var wallet = await _dbContext.Wallets.Where(w => w.AccountId == payment.AccountId).SingleOrDefaultAsync();
+                        var transactionWallet = new Domain.Entities.Transaction
+                        {
+                            WalletId = wallet.Id,
+                            TransactionMessage = transactionExist.TranMessage,
+                            TransactionPayload = transactionExist.TranPayload,
+                            TransactionStatus = transactionExist.TranStatus,
+                            TransactionAmount = transactionExist.TranAmount,
+                            TransactionDate = transactionExist.TranDate,
+                            TransactionType = payment.PaymentType,
+                            PaymentTransactionId = paymentId
+                        };
+                        _dbContext.Transactions.Add(transactionWallet);
+                        await _dbContext.SaveChangesAsync();
+                    }
                     else
                     {
                         resultData.PaymentStatus = "10";

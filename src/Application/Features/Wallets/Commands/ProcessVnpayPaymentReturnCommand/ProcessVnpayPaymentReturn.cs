@@ -123,6 +123,7 @@ public class ProcessVnpayPaymentReturnHandler : IRequestHandler<ProcessVnpayPaym
                                 _dbContext.Wallets.Update(wallet);
                                 await _dbContext.SaveChangesAsync();
                             }
+                            // mã lỗi : Giao dịch thất bại do người dùng đã từ chối xác nhận thanh toán.
                             else
                             {
                                 status = "-1";
@@ -134,7 +135,7 @@ public class ProcessVnpayPaymentReturnHandler : IRequestHandler<ProcessVnpayPaym
                                     TranMessage = message,
                                     TranPayload = JsonConvert.SerializeObject(request),
                                     TranStatus = status,
-                                    TranAmount = request.vnp_Amount,
+                                    TranAmount = request.vnp_Amount / 100,
                                     TranDate = DateTime.Now,
                                     PaymentId = Guid.Parse(request.vnp_TxnRef),
                                     TranRefId = payment.PaymentRefId
