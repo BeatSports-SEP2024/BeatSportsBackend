@@ -9,8 +9,10 @@ using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 
 namespace BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactions;
-public class GetAllTransactionsCommand : IRequest<List<TransactionResponseV2>>
+public class GetAllTransactionsCommand : IRequest<PaginatedTransactionResponse>
 {
+    public int PageIndex { get; set; }
+    public int PageSize { get; set; }
     public string? KeyWord { get; set; }
     public string? Filter { get; set; }
     public DateTime? StartTime { get; set; }
