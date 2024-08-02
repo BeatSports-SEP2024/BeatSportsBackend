@@ -56,7 +56,7 @@ public class GetTransactionByCusIdCommandHandler : IRequestHandler<GetTransactio
                     TransactionDate = transactionCusIdExist.TranDate,
                     PaymentId = transactionCusIdExist.PaymentId,
                     TransactionType = payment.PaymentType,
-                    CallbackStatus = "Success"
+                    //CallbackStatus = "Success"
                 };
                 listTransaction.Add(data);
             }
@@ -79,7 +79,7 @@ public class GetTransactionByCusIdCommandHandler : IRequestHandler<GetTransactio
                     TransactionDate = transactionCusIdExist.TranDate,
                     PaymentId = transactionCusIdExist.PaymentId,
                     TransactionType = payment.PaymentType,
-                    CallbackStatus = "Failed"
+                    //CallbackStatus = "Failed"
                 };
                 listTransaction.Add(data);
             }
