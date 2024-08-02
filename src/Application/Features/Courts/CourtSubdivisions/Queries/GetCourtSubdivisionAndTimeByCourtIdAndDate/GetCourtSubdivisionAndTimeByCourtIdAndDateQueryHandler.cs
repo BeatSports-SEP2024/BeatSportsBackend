@@ -51,7 +51,7 @@ public class ListTimeCheckingByCourtSubdivisionId
             MiniCourt = new List<ListCourtSubdivisionAndTimeDataByCourtSubdivisionId>()
         };
 
-        var listCourtSubdivision = await _dbContext.CourtSubdivisions.Where(x => x.CourtId == request.CourtId && !x.IsDelete).OrderBy(X => X.CourtSubdivisionName).ToListAsync();
+        var listCourtSubdivision = await _dbContext.CourtSubdivisions.Where(x => x.CourtId == request.CourtId && !x.IsDelete && x.CreatedStatus == CourtSubdivisionCreatedStatus.Accepted).OrderBy(X => X.CourtSubdivisionName).ToListAsync();
         foreach (var item in listCourtSubdivision)
         {
             var newMinicourt = new ListCourtSubdivisionAndTimeDataByCourtSubdivisionId()
