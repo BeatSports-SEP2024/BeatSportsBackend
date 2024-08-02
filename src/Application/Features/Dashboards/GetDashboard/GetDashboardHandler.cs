@@ -24,16 +24,16 @@ namespace BeatSportsAPI.Application.Features.Dashboards
         {
             // Lấy tổng tiền đặt sân đã duyệt
             var totalBookingMoneyInApp = await _dbContext.Bookings
-                .Where(b => b.BookingStatus == "Approved" && !b.IsDelete)
+                .Where(b => b.BookingStatus == "Approved" && !b.IsDelete && b.BookingDate.Year == request.Year)
                 .SumAsync(b => b.TotalAmount, cancellationToken);
 
             // Lấy tổng số chủ sân
             var totalOwner = await _dbContext.Accounts
-                .CountAsync(a => a.Role == "Owner" && !a.IsDelete, cancellationToken);
+                .CountAsync(a => a.Role == "Owner" && !a.IsDelete && a.Created.Year == request.Year, cancellationToken);
 
             // Lấy tổng số khách hàng
             var totalCustomer = await _dbContext.Accounts
-                .CountAsync(a => a.Role == "Customer" && !a.IsDelete, cancellationToken);
+                .CountAsync(a => a.Role == "Customer" && !a.IsDelete && a.Created.Year == request.Year, cancellationToken);
 
             // Khởi tạo dữ liệu cho tất cả các tháng cho từng Dashboard
             var allMonthsCustomer = Enumerable.Range(1, 12).Select(month => new DashboardData
