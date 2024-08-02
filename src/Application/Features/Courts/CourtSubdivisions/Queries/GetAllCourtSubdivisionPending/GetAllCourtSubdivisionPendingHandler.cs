@@ -27,7 +27,7 @@ public class GetAllCourtSubdivisionPendingHandler : IRequestHandler<GetAllCourtS
         var query = _beatSportsDbContext.CourtSubdivisions
             .Where(c => !c.IsDelete && c.CourtId == request.CourtId);
 
-        var checkPending = query.Where(c => c.CreatedStatus.Equals(CourtSubdivisionCreatedStatus.Pending.ToString()));
+        var checkPending = query.Where(c => c.CreatedStatus == CourtSubdivisionCreatedStatus.Pending);
 
         var listPending = checkPending.Select(x => new CourtSubdivisionResponseV3 
         {
