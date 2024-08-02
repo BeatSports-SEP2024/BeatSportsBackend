@@ -1,4 +1,5 @@
 ﻿using BeatSportsAPI.Application.Common.Interfaces;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,7 +24,7 @@ public class GetCourtSubSettingByCourtIdAndSportCategoryIdQueryHandler : IReques
 
                               where cs.CourtId == request.CourtId &&
                                     css.SportCategoryId == request.SportCategoryId &&
-                                    !cs.IsDelete && !css.IsDelete
+                                    !cs.IsDelete && !css.IsDelete && cs.CreatedStatus == CourtSubdivisionCreatedStatus.Accepted
                               group cs by new { css.Id, css.CourtType } into g
                               select new CourtSubSettingByCourtIdAndSportCategoryIdResponse
                               {
