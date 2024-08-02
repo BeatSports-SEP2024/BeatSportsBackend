@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,19 +45,7 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
             .Where(t => !t.IsDelete)
             .OrderByDescending(b => b.Created);
 
-        if (request.Filter.Equals("TransactionStatus"))
-        {
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && t.TransactionStatus.Contains(request.KeyWord))
-            .OrderByDescending(b => b.Created);
-
-        }else if (request.Filter.Equals("AdminCheckStatus"))
-        {
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && t.AdminCheckStatus.ToString().Contains(request.KeyWord))
-            .OrderByDescending(b => b.Created);
-        }
-        else if (request.Filter.Equals("TransactionType"))
+        if (request.Filter.Equals("TransactionType"))
         {
             query = _beatSportsDbContext.Transactions
             .Where(t => !t.IsDelete && t.TransactionType.Contains(request.KeyWord))
@@ -67,26 +56,55 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
                          .Include(x => x.Account)
                          .ToList();
 
-            fromUser = fromUser.Where(x => (x.Account.FirstName + " " + x.Account.LastName).Contains(request.KeyWord)).ToList();
+            fromUser = fromUser.Where(x => RemoveDiacritics(x.Account.FirstName + " " + x.Account.LastName).ToLower().Contains(RemoveDiacritics(request.KeyWord).ToLower())).ToList();
 
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && fromUser.Any(x => x.Id == t.WalletId))
-            .OrderByDescending(b => b.Created);
+            var a = new Queue<Transaction>();
 
-        }else if (request.Filter.Equals("To"))
+            foreach (var user in fromUser)
+            {
+                var b = _beatSportsDbContext.Transactions
+                       .Where(t => !t.IsDelete && user.Id == t.WalletId)
+                       .FirstOrDefault();
+                if (b != null)
+                {
+                    a.Enqueue(b);
+                }
+
+            }
+
+            query = (IOrderedQueryable<Transaction>)a.AsQueryable();
+
+        }
+        else if (request.Filter.Equals("To"))
         {
-            var fromUser = _beatSportsDbContext.Wallets
+            var toUser = _beatSportsDbContext.Wallets
                          .Include(x => x.Account)
                          .ToList();
+            
+            toUser = toUser.Where(x => RemoveDiacritics(x.Account.FirstName + " " + x.Account.LastName).ToLower().Contains(RemoveDiacritics(request.KeyWord).ToLower())).ToList();
 
-            fromUser = fromUser.Where(x => (x.Account.FirstName + " " + x.Account.LastName).Contains(request.KeyWord)).ToList();
+            var a = new Queue<Transaction>();
 
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && fromUser.Any(x => x.Id == t.WalletTargetId))
-            .OrderByDescending(b => b.Created);
+            foreach(var user in toUser)
+            {
+                 var b = _beatSportsDbContext.Transactions
+                        .Where(t => !t.IsDelete && user.Id == t.WalletTargetId)
+                        .FirstOrDefault();
+                if(b != null)
+                {
+                    a.Enqueue(b);
+                }
+               
+            }
+
+            query = (IOrderedQueryable<Transaction>)a.AsQueryable();
+
         }
 
-
+        if (request.StartTime.HasValue && request.EndTime.HasValue)
+        {
+            query = (IOrderedQueryable<Transaction>)query.Where(tp => tp.TransactionDate.Value.Date >= request.StartTime.Value.Date && tp.TransactionDate.Value.Date <= request.EndTime.Value.Date).AsQueryable();
+        }
         var result = new List<TransactionResponseV2>();
 
         foreach(var transaction in query)
@@ -132,5 +150,22 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
         }
 
         return Task.FromResult(result);
+    }
+
+    private static string RemoveDiacritics(string text)
+    {
+        var normalizedString = text.Normalize(NormalizationForm.FormD);
+        var stringBuilder = new StringBuilder();
+
+        foreach (var c in normalizedString)
+        {
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            {
+                stringBuilder.Append(c);
+            }
+        }
+
+        return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
     }
 }

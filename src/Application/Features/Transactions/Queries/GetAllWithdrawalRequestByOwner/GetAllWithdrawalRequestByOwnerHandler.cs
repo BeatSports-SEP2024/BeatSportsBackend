@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactions;
+using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -35,25 +37,10 @@ public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithd
             .Where(t => !t.IsDelete && t.TransactionType.Equals("Rút tiền") && t.AdminCheckStatus == AdminCheckEnums.Pending)
             .OrderByDescending(b => b.Created);
 
-        var a = query.Count();
-
-        if (request.Filter.Equals("TransactionStatus"))
+        if (request.Filter.Equals("TransactionType"))
         {
             query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && t.TransactionType.Equals("Rút tiền") && t.AdminCheckStatus == AdminCheckEnums.Pending && t.TransactionStatus.Contains(request.KeyWord))
-            .OrderByDescending(b => b.Created);
-
-        }
-        else if (request.Filter.Equals("AdminCheckStatus"))
-        {
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && t.TransactionType.Equals("Rút tiền") && t.AdminCheckStatus == AdminCheckEnums.Pending && t.AdminCheckStatus.ToString().Contains(request.KeyWord))
-            .OrderByDescending(b => b.Created);
-        }
-        else if (request.Filter.Equals("TransactionType"))
-        {
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && t.TransactionType.Equals("Rút tiền") && t.AdminCheckStatus == AdminCheckEnums.Pending && t.TransactionType.Contains(request.KeyWord))
+            .Where(t => !t.IsDelete && t.TransactionType.Contains(request.KeyWord) && t.AdminCheckStatus == AdminCheckEnums.Pending)
             .OrderByDescending(b => b.Created);
         }
         else if (request.Filter.Equals("From"))
@@ -62,26 +49,55 @@ public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithd
                          .Include(x => x.Account)
                          .ToList();
 
-            fromUser = fromUser.Where(x => (x.Account.FirstName + " " + x.Account.LastName).Contains(request.KeyWord)).ToList();
+            fromUser = fromUser.Where(x => RemoveDiacritics(x.Account.FirstName + " " + x.Account.LastName).ToLower().Contains(RemoveDiacritics(request.KeyWord).ToLower())).ToList();
 
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && t.TransactionType.Equals("Rút tiền") && t.AdminCheckStatus == AdminCheckEnums.Pending && fromUser.Any(x => x.Id == t.WalletId))
-            .OrderByDescending(b => b.Created);
+            var a = new Queue<Transaction>();
+
+            foreach (var user in fromUser)
+            {
+                var b = _beatSportsDbContext.Transactions
+                       .Where(t => !t.IsDelete && user.Id == t.WalletId && t.AdminCheckStatus == AdminCheckEnums.Pending)
+                       .FirstOrDefault();
+                if (b != null)
+                {
+                    a.Enqueue(b);
+                }
+
+            }
+
+            query = (IOrderedQueryable<Transaction>)a.AsQueryable();
 
         }
         else if (request.Filter.Equals("To"))
         {
-            var fromUser = _beatSportsDbContext.Wallets
+            var toUser = _beatSportsDbContext.Wallets
                          .Include(x => x.Account)
                          .ToList();
 
-            fromUser = fromUser.Where(x => (x.Account.FirstName + " " + x.Account.LastName).Contains(request.KeyWord)).ToList();
+            toUser = toUser.Where(x => RemoveDiacritics(x.Account.FirstName + " " + x.Account.LastName).ToLower().Contains(RemoveDiacritics(request.KeyWord).ToLower())).ToList();
 
-            query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete && t.TransactionType.Equals("Rút tiền") && t.AdminCheckStatus == AdminCheckEnums.Pending && fromUser.Any(x => x.Id == t.WalletTargetId))
-            .OrderByDescending(b => b.Created);
+            var a = new Queue<Transaction>();
+
+            foreach (var user in toUser)
+            {
+                var b = _beatSportsDbContext.Transactions
+                       .Where(t => !t.IsDelete && user.Id == t.WalletTargetId && t.AdminCheckStatus == AdminCheckEnums.Pending)
+                       .FirstOrDefault();
+                if (b != null)
+                {
+                    a.Enqueue(b);
+                }
+
+            }
+
+            query = (IOrderedQueryable<Transaction>)a.AsQueryable();
+
         }
 
+        if (request.StartTime.HasValue && request.EndTime.HasValue)
+        {
+            query = (IOrderedQueryable<Transaction>)query.Where(tp => tp.TransactionDate.Value.Date >= request.StartTime.Value.Date && tp.TransactionDate.Value.Date <= request.EndTime.Value.Date).AsQueryable();
+        }
 
         var result = new List<TransactionResponseV3>();
 
@@ -118,5 +134,22 @@ public class GetAllWithdrawalRequestByOwnerHandler : IRequestHandler<GetAllWithd
         }
 
         return Task.FromResult(result);
+    }
+
+    private static string RemoveDiacritics(string text)
+    {
+        var normalizedString = text.Normalize(NormalizationForm.FormD);
+        var stringBuilder = new StringBuilder();
+
+        foreach (var c in normalizedString)
+        {
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            {
+                stringBuilder.Append(c);
+            }
+        }
+
+        return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
     }
 }
