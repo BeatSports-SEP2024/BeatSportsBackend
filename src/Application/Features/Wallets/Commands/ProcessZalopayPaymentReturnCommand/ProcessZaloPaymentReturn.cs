@@ -156,6 +156,7 @@ public class ProcessZaloPaymentReturnHandler : IRequestHandler<ProcessZaloPaymen
                     }
                     else
                     {
+                        // handle mã lỗi chuyển tiền failed trong ví thirdparty, xong call api chuyển tiền ngược lại
                         resultData.PaymentStatus = "10";
                         resultData.PaymentMessage = "Payment process failed";
                     }

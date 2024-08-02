@@ -395,7 +395,7 @@ public class IdentityService : IIdentityService
             LastName = registerModelRequest.LastName,
             //DateOfBirth = registerModelRequest.DateOfBirth,
             //Gender = registerModelRequest.Gender.ToString(),
-            ProfilePictureURL = "https://res.cloudinary.com/dcbkmwm3v/image/upload/v1721128315/id6u4ckwjcayygtqgyze.png?fbclid=IwZXh0bgNhZW0CMTEAAR0sI4xkWU65yNpDq6FB6YHHK2qZVN_rlVuc8WkVxMkhKLfi8d7AgJGxDrc_aem_IqIxPGsb5bgLhTkZ_mkvEQ",
+            ProfilePictureURL = "https://i.pinimg.com/736x/0d/64/98/0d64989794b1a4c9d89bff571d3d5842.jpg",
             //Bio = registerModelRequest.Bio,
             PhoneNumber = registerModelRequest.PhoneNumber,
             Role = RoleEnums.Customer.ToString(),
@@ -433,6 +433,7 @@ public class IdentityService : IIdentityService
         {
             UserName = registerModelRequest.UserName,
             Password = combinedPassword,
+            ProfilePictureURL = "https://i.pinimg.com/736x/0d/64/98/0d64989794b1a4c9d89bff571d3d5842.jpg",
             FirstName = registerModelRequest.FirstName,
             LastName = registerModelRequest.LastName,
             Email = registerModelRequest.Email,

@@ -55,7 +55,7 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, BeatSports
             LatitudeDelta = 0.01,
             LongitudeDelta = 0.01,
             ImageUrls = String.Join(",", request.ImageUrls),
-            WallpaperUrls = "https://res.cloudinary.com/dcbkmwm3v/image/upload/v1721128315/id6u4ckwjcayygtqgyze.png",
+            WallpaperUrls = "https://vcdn1-vnexpress.vnecdn.net/2018/11/15/7-1542270964.jpg?w=460&h=0&q=100&dpr=2&fit=crop&s=STZjJ10bF4W6FflaUK3Jag",
             CourtAvatarImgUrls = "https://res.cloudinary.com/dcbkmwm3v/image/upload/v1721128315/id6u4ckwjcayygtqgyze.png",
             PlaceId = $"{latitude}, {longitude}",
             CourtSubdivision = new List<CourtSubdivision>()

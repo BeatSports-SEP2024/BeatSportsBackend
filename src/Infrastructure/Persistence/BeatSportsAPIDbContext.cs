@@ -13,6 +13,7 @@ using BeatSportsAPI.Infrastructure.Identity;
 using BeatSportsAPI.Infrastructure.Persistence.Interceptors;
 using Duende.IdentityServer.EntityFramework.Entities;
 using Duende.IdentityServer.EntityFramework.Options;
+using Google.Apis.Storage.v1.Data;
 using MediatR;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -138,32 +139,32 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
 
         builder.Entity<IdentityUserToken<string>>()
         .HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
+        /*
+                //var sanbongdanhantao7 = "a93c57bd-f6d5-414e-a4b2-5aa269729a43";
+                var sanbongdanhantao7 = Guid.NewGuid();
+                //var sanbongdanhantao5 = "457c955b-857d-483d-8e54-02c87dbcffa9";
+                //var sanbongdanhantao11 = "3593decc-3ace-451c-842d-3369cfe571c2";
+                //var sanbongdaco7 = "31689b32-b8d8-4993-98f5-33b436b4f293";
+                //var sanbongdaco11 = "089e939e-10ea-44b6-b7cd-f6d69cf6c06a";
 
-        //var sanbongdanhantao7 = "a93c57bd-f6d5-414e-a4b2-5aa269729a43";
-        var sanbongdanhantao7 = Guid.NewGuid();
-        //var sanbongdanhantao5 = "457c955b-857d-483d-8e54-02c87dbcffa9";
-        //var sanbongdanhantao11 = "3593decc-3ace-451c-842d-3369cfe571c2";
-        //var sanbongdaco7 = "31689b32-b8d8-4993-98f5-33b436b4f293";
-        //var sanbongdaco11 = "089e939e-10ea-44b6-b7cd-f6d69cf6c06a";
+                //var sanbongchuyencat = "41ae23f7-42fe-4a40-8c36-021dc7c1dd06";
+                var sanbongchuyencat = Guid.NewGuid();
+                //var sanbongchuyendat = "3fa63c52 - 80ee - 454a - a8b1 - 34e0c03633eb";
+                //var sanbongchuyenximang = "0c9e0496 - e891 - 468c - aca5 - 6c09c1a8f159";
+                //var sanbongchuyentrongnha = "effd5616 - ad35 - 4204 - 8c5e - 01ad289855e8";
+                var sanbongchuyentrongnha = Guid.NewGuid();
 
-        //var sanbongchuyencat = "41ae23f7-42fe-4a40-8c36-021dc7c1dd06";
-        var sanbongchuyencat = Guid.NewGuid();
-        //var sanbongchuyendat = "3fa63c52 - 80ee - 454a - a8b1 - 34e0c03633eb";
-        //var sanbongchuyenximang = "0c9e0496 - e891 - 468c - aca5 - 6c09c1a8f159";
-        //var sanbongchuyentrongnha = "effd5616 - ad35 - 4204 - 8c5e - 01ad289855e8";
-        var sanbongchuyentrongnha = Guid.NewGuid();
+                //var sancaulongtrongnha = "63998125 - 8cbd - 41b7 - 9123 - a6c7ca3ad63e";
+                var sancaulongtrongnha = Guid.NewGuid();
+                //var sancaulongngoaitroi = "9ce93f4d - b691 - 4622 - 95a5 - 3825916409f6";
+                var sancaulongngoaitroi = Guid.NewGuid();
 
-        //var sancaulongtrongnha = "63998125 - 8cbd - 41b7 - 9123 - a6c7ca3ad63e";
-        var sancaulongtrongnha = Guid.NewGuid();
-        //var sancaulongngoaitroi = "9ce93f4d - b691 - 4622 - 95a5 - 3825916409f6";
-        var sancaulongngoaitroi = Guid.NewGuid();
-
-        // Định nghĩa các GUID cố định
-        var ownerAccountId = new Guid("4a6fe7d8-efaa-4429-ada3-b8c4b5fb1d5f");
-        var owner1AccountId = new Guid("bd7ee2c3-5c10-4567-9a87-d071d6f8c3b2");
-        var customer1AccountId = new Guid("7e9fe0da-2abe-4e58-bdfd-5d64a6549d47");
-        var customer2AccountId = new Guid("91c2f231-c3e9-4a13-a4d6-1ab2ca2c9754");
-        var customer3AccountId = new Guid("9dca19fd-072c-4d2f-b7a7-1d0d273f9014");
+                // Định nghĩa các GUID cố định
+                var ownerAccountId = new Guid("4a6fe7d8-efaa-4429-ada3-b8c4b5fb1d5f");
+                var owner1AccountId = new Guid("bd7ee2c3-5c10-4567-9a87-d071d6f8c3b2");
+                var customer1AccountId = new Guid("7e9fe0da-2abe-4e58-bdfd-5d64a6549d47");
+                var customer2AccountId = new Guid("91c2f231-c3e9-4a13-a4d6-1ab2ca2c9754");
+                var customer3AccountId = new Guid("9dca19fd-072c-4d2f-b7a7-1d0d273f9014");*/
 
         base.OnModelCreating(builder);
 
@@ -172,20 +173,20 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             .HasData(
             new Account
             {
-                Id = ownerAccountId,
-                UserName = "owner1",
+                Id = new Guid("4a6fe7d8-efaa-4429-ada3-b8c4b5fb1d5f"),
+                UserName = "admin",
                 Password = CreatePasswordHash("123456"),
-                FirstName = "Nguyen",
-                LastName = "Minh",
+                FirstName = "Admin",
+                LastName = "Nguyen",
                 DateOfBirth = DateTime.UtcNow.AddYears(-22),
                 Gender = GenderEnums.Nam.ToString(),
                 ProfilePictureURL = "Avatar Picture",
-                Role = RoleEnums.Owner.ToString(),
+                Role = RoleEnums.Admin.ToString(),
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
-            },
-            new Account
+            }
+            /*new Account
             {
                 Id = owner1AccountId,
                 UserName = "owner12",
@@ -244,320 +245,330 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
-            });
+            }*/);
         #endregion
 
-        // Định nghĩa các GUID cố định cho ví
-        var walletId1 = new Guid("4b6fe7d8-efaa-4429-ada3-b8c4b5fb1d1f");
-        var walletId2 = new Guid("bd7ee2c3-5c10-4567-9a87-d071d6f8c312");
-        var walletId3 = new Guid("7e9fe0da-2abe-4e58-bdfd-5d64a6549347");
-        var walletId4 = new Guid("91c2f231-c3e9-4a13-a4d6-1ab2ca2c9765");
-        var walletId5 = new Guid("9dca19fd-072c-4d2f-b7a7-1d0d273f9034");
+        /*       // Định nghĩa các GUID cố định cho ví
+               var walletId1 = new Guid("4b6fe7d8-efaa-4429-ada3-b8c4b5fb1d1f");
+               var walletId2 = new Guid("bd7ee2c3-5c10-4567-9a87-d071d6f8c312");
+               var walletId3 = new Guid("7e9fe0da-2abe-4e58-bdfd-5d64a6549347");
+               var walletId4 = new Guid("91c2f231-c3e9-4a13-a4d6-1ab2ca2c9765");
+               var walletId5 = new Guid("9dca19fd-072c-4d2f-b7a7-1d0d273f9034");
 
-        base.OnModelCreating(builder);
+               base.OnModelCreating(builder);
 
-        #region Wallet
-        builder.Entity<Wallet>()
-            .HasData(
-            new Wallet
-            {
-                Id = walletId1,
-                AccountId = ownerAccountId,
-                Balance = 18000000,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            },
-            new Wallet
-            {
-                Id = walletId2,
-                AccountId = owner1AccountId,
-                Balance = 182000000,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            },
-            new Wallet
-            {
-                Id = walletId3,
-                AccountId = customer1AccountId,
-                Balance = 12000000,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            },
-            new Wallet
-            {
-                Id = walletId4,
-                AccountId = customer2AccountId,
-                Balance = 13000000,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            },
-            new Wallet
-            {
-                Id = walletId5,
-                AccountId = customer3AccountId,
-                Balance = 13000000,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            });
-        #endregion
-        var customer1Id = new Guid("123e4567-e89b-12d3-a456-426614174100");
-        var customer2Id = new Guid("123e4567-e89b-12d3-a456-426614174101");
-        var customer3Id = new Guid("123e4567-e89b-12d3-a456-426614174102");
-        #region Customer
-        builder.Entity<Customer>()
-            .HasData(new Customer
-            {
-                Id = customer1Id,
-                AccountId = customer1AccountId,
-                RewardPoints = 0,
-            },
-            new Customer
-            {
-                Id = customer2Id,
-                AccountId = customer2AccountId,
-                RewardPoints = 0,
-            },
-            new Customer
-            {
-                Id = customer3Id,
-                AccountId = customer3AccountId,
-                RewardPoints = 0,
-            });
-        #endregion
-        // Định nghĩa các GUID cố định cho các Owner hiện tại
-        var ownerId = new Guid("123e4567-e89b-12d3-a456-426614174000");
-        var owner1Id = new Guid("123e4567-e89b-12d3-a456-426614174001");
+               #region Wallet
+               builder.Entity<Wallet>()
+                   .HasData(
+                   new Wallet
+                   {
+                       Id = walletId1,
+                       AccountId = ownerAccountId,
+                       Balance = 18000000,
+                       Created = DateTime.UtcNow,
+                       LastModified = DateTime.UtcNow,
+                       IsDelete = false,
+                   },
+                   new Wallet
+                   {
+                       Id = walletId2,
+                       AccountId = owner1AccountId,
+                       Balance = 182000000,
+                       Created = DateTime.UtcNow,
+                       LastModified = DateTime.UtcNow,
+                       IsDelete = false,
+                   },
+                   new Wallet
+                   {
+                       Id = walletId3,
+                       AccountId = customer1AccountId,
+                       Balance = 12000000,
+                       Created = DateTime.UtcNow,
+                       LastModified = DateTime.UtcNow,
+                       IsDelete = false,
+                   },
+                   new Wallet
+                   {
+                       Id = walletId4,
+                       AccountId = customer2AccountId,
+                       Balance = 13000000,
+                       Created = DateTime.UtcNow,
+                       LastModified = DateTime.UtcNow,
+                       IsDelete = false,
+                   },
+                   new Wallet
+                   {
+                       Id = walletId5,
+                       AccountId = customer3AccountId,
+                       Balance = 13000000,
+                       Created = DateTime.UtcNow,
+                       LastModified = DateTime.UtcNow,
+                       IsDelete = false,
+                   });
+               #endregion
+               var customer1Id = new Guid("123e4567-e89b-12d3-a456-426614174100");
+               var customer2Id = new Guid("123e4567-e89b-12d3-a456-426614174101");
+               var customer3Id = new Guid("123e4567-e89b-12d3-a456-426614174102");
+               #region Customer
+               builder.Entity<Customer>()
+                   .HasData(new Customer
+                   {
+                       Id = customer1Id,
+                       AccountId = customer1AccountId,
+                       RewardPoints = 0,
+                   },
+                   new Customer
+                   {
+                       Id = customer2Id,
+                       AccountId = customer2AccountId,
+                       RewardPoints = 0,
+                   },
+                   new Customer
+                   {
+                       Id = customer3Id,
+                       AccountId = customer3AccountId,
+                       RewardPoints = 0,
+                   });
+               #endregion
+               // Định nghĩa các GUID cố định cho các Owner hiện tại
+               var ownerId = new Guid("123e4567-e89b-12d3-a456-426614174000");
+               var owner1Id = new Guid("123e4567-e89b-12d3-a456-426614174001");
 
-        // Định nghĩa các GUID cố định cho các Owner mới
-        var owner2Id = new Guid("123e4567-e89b-12d3-a456-426614174002");
-        var owner3Id = new Guid("123e4567-e89b-12d3-a456-426614174003");
-        var owner4Id = new Guid("123e4567-e89b-12d3-a456-426614174004");
-        base.OnModelCreating(builder);
+               // Định nghĩa các GUID cố định cho các Owner mới
+               var owner2Id = new Guid("123e4567-e89b-12d3-a456-426614174002");
+               var owner3Id = new Guid("123e4567-e89b-12d3-a456-426614174003");
+               var owner4Id = new Guid("123e4567-e89b-12d3-a456-426614174004");
+               base.OnModelCreating(builder);
 
-        #region Owner
-        builder.Entity<Owner>()
-            .HasData(
-            new Owner
-            {
-                Id = ownerId,
-                AccountId = ownerAccountId,
-            },
-            new Owner
-            {
-                Id = owner1Id,
-                AccountId = owner1AccountId,
-            });
-        #endregion
-        var courtId = new Guid("d2642e7e-9a72-4e28-9c79-1e8e80134c8f");
-        var court1Id = new Guid("ef2bd841-3214-434b-95aa-080165f5a2b2");
-        var court2Id = new Guid("5ab1f835-cf9f-4847-b4a7-d0d20b183b44");
-        var court3Id = new Guid("4f15e1fd-1f5c-40ef-9947-fa480a6859d1");
-        var court4Id = new Guid("58b1deaf-656b-4fe0-90d8-396c5479381f");
-        var court5Id = new Guid("72f0c66d-700a-4c05-9f78-8b9fdd3a7cda");
-        var court6Id = new Guid("22ac3f2e-5932-4062-9daf-aebf8c95b525");
-        #region Courts
-        builder.Entity<Court>()
-            .HasData(new Court
-            {
-                Id = courtId,
-                OwnerId = ownerId,
-                Description = "Sân bóng mini tiêu chuẩn cao (chuẩn FiFa) với hệ thống phụ trợ (nhà thay đồ, nhà tắm, nhà vệ sinh) sạch sẽ thoáng mát duy nhất.",
-                CourtName = "Sân bóng đá mini Long Trường Quận 9",
-                Address = "Số 45 Bùi Xương Trạch, phường Long Trường, Quận 9, Thành phố, Thủ Đức, Thành phố Hồ Chí Minh",
-                Latitude = 10.8032638,
-                Longitude = 106.8112683,
-                GoogleMapURLs = "https://maps.app.goo.gl/s6yWXEpDYU1DNjuF6",
-                TimeStart = new TimeSpan(04, 00, 00),
-                TimeEnd = new TimeSpan(23, 59, 59),
-                ImageUrls = "image1.jpge",
-                PlaceId = "10.805515145695411, 106.81088572205702",
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            },
-            new Court
-            {
-                Id = court1Id,
-                OwnerId = owner1Id,
-                Description = "Sân cầu lông trang bị tiện nghi đầy đủ, giữ xe an ninh",
-                CourtName = "Sân cầu lông B-ZONE 11",
-                Address = "40 Đ. Số 11, Trường Thọ, Thủ Đức, Thành phố Hồ Chí Minh, Vietnam",
-                Latitude = 10.8447102,
-                Longitude = 106.7530548,
-                GoogleMapURLs = "https://maps.app.goo.gl/cwrHGkHsM4769eSE7",
-                TimeStart = new TimeSpan(05, 00, 00),
-                TimeEnd = new TimeSpan(22, 00, 00),
-                ImageUrls = "image1.jpge",
-                PlaceId = "10.845057917596483, 106.75295823555061",
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            },
-            new Court
-            {
-                Id = court2Id,
-                OwnerId = owner1Id,
-                Description = "Sân đẹp, cỏ xịn, đèn sáng, có chỗ để xe oto, bóng xịn",
-                CourtName = "Sân bóng đá VNV",
-                Address = "Đ. Số 11/Hẻm 52 Tổ 1, Khu phố 9, Thủ Đức, Thành phố Hồ Chí Minh, Vietnam",
-                Latitude = 10.8445425,
-                Longitude = 106.7526029,
-                GoogleMapURLs = "https://maps.app.goo.gl/UUCSZm1p9ngEx7k79",
-                TimeStart = new TimeSpan(14, 30, 00),
-                TimeEnd = new TimeSpan(15, 30, 00),
-                ImageUrls = "image1.jpge",
-                PlaceId = "10.844905847478088, 106.75213708986735",
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            },
-            new Court
-            {
-                Id = court3Id,
-                OwnerId = owner1Id,
-                Description = "Sân cầu lông hiện đại với sàn gỗ, thuận tiện cho các hoạt động thi đấu và tập luyện.",
-                CourtName = "Sân cầu lông Marie Curie",
-                Address = "26 Lê Quý Đôn, Phường Võ Thị Sáu, Quận 3, Thành phố Hồ Chí Minh",
-                Latitude = 10.7821421,
-                Longitude = 106.6902650,
-                GoogleMapURLs = "https://maps.google.com/?q=26+Le+Quy+Don",
-                TimeStart = new TimeSpan(05, 00, 00),
-                TimeEnd = new TimeSpan(22, 00, 00),
-                ImageUrls = "image1.jpge",
-                PlaceId = "10.786887, 106.690193",
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false
-            }, new Court
-            {
-                Id = court4Id,
-                OwnerId = ownerId,
-                Description = "Sân bóng chuyền ngoài trời với không gian rộng rãi, phù hợp cho cả tập luyện và thi đấu.",
-                CourtName = "Sân bóng chuyền Tân Bình",
-                Address = "36/5 Luy Bán Bích, Phường Tân Thới Hòa, Quận Tân Phú, Thành phố Hồ Chí Minh",
-                Latitude = 10.7617930,
-                Longitude = 106.6328650,
-                GoogleMapURLs = "https://maps.google.com/?q=36/5+Luy+Bán+Bích",
-                TimeStart = new TimeSpan(06, 00, 00),
-                TimeEnd = new TimeSpan(21, 00, 00),
-                ImageUrls = "image1.jpge",
-                PlaceId = "10.768199, 106.628938",
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false
-            }, new Court
-            {
-                Id = court5Id,
-                OwnerId = owner1Id,
-                Description = "Sân bóng đá lớn với cỏ nhân tạo chất lượng cao, có khán đài và hệ thống chiếu sáng tốt.",
-                CourtName = "Sân bóng đá Phú Thọ",
-                Address = "219 Lý Thường Kiệt, Phường 15, Quận 11, Thành phố Hồ Chí Minh",
-                Latitude = 10.7675400,
-                Longitude = 106.6583560,
-                GoogleMapURLs = "https://maps.google.com/?q=219+Lý+Thường+Kiệt",
-                TimeStart = new TimeSpan(04, 00, 00),
-                TimeEnd = new TimeSpan(23, 30, 00),
-                ImageUrls = "image1.jpge",
-                PlaceId = "10.769555, 106.663338",
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false
-            });
-        #endregion
-        #region ID SAMPLE
-        var courtSubdivisionId1 = new Guid("20f46754-d281-44c6-aa5c-d97ac4f3d8cb");
-        var courtSubdivisionId2 = new Guid("7a62ef5e-fc97-48d3-a0a2-e9e290665f8d");
-        var courtSubdivisionId3 = new Guid("e72938fe-50a0-4b5e-a898-a5cbf5b2039c");
-        var courtSubdivisionId4 = new Guid("45ed7684-340d-414b-ae8c-fda358f62ac2");
-        var courtSubdivisionId5 = new Guid("b5a7f639-aaa7-412d-8bde-7767489e6839");
-        var courtSubdivisionId6 = new Guid("c7a8a07c-dd21-4323-bb8a-25c073fabcde");
-        var courtSubdivisionId7 = new Guid("d104a1db-67e3-4351-9b3c-037ec06c245e");
+               #region Owner
+               builder.Entity<Owner>()
+                   .HasData(
+                   new Owner
+                   {
+                       Id = ownerId,
+                       AccountId = ownerAccountId,
+                   },
+                   new Owner
+                   {
+                       Id = owner1Id,
+                       AccountId = owner1AccountId,
+                   });
+               #endregion
+               var courtId = new Guid("d2642e7e-9a72-4e28-9c79-1e8e80134c8f");
+               var court1Id = new Guid("ef2bd841-3214-434b-95aa-080165f5a2b2");
+               var court2Id = new Guid("5ab1f835-cf9f-4847-b4a7-d0d20b183b44");
+               var court3Id = new Guid("4f15e1fd-1f5c-40ef-9947-fa480a6859d1");
+               var court4Id = new Guid("58b1deaf-656b-4fe0-90d8-396c5479381f");
+               var court5Id = new Guid("72f0c66d-700a-4c05-9f78-8b9fdd3a7cda");
+               var court6Id = new Guid("22ac3f2e-5932-4062-9daf-aebf8c95b525");
+               #region Courts
+               builder.Entity<Court>()
+                   .HasData(new Court
+                   {
+                       Id = courtId,
+                       OwnerId = ownerId,
+                       Description = "Sân bóng mini tiêu chuẩn cao (chuẩn FiFa) với hệ thống phụ trợ (nhà thay đồ, nhà tắm, nhà vệ sinh) sạch sẽ thoáng mát duy nhất.",
+                       CourtName = "Sân bóng đá mini Long Trường Quận 9",
+                       Address = "Số 45 Bùi Xương Trạch, phường Long Trường, Quận 9, Thành phố, Thủ Đức, Thành phố Hồ Chí Minh",
+                       Latitude = 10.8032638,
+                       Longitude = 106.8112683,
+                       GoogleMapURLs = "https://maps.app.goo.gl/s6yWXEpDYU1DNjuF6",
+                       TimeStart = new TimeSpan(04, 00, 00),
+                       TimeEnd = new TimeSpan(23, 59, 59),
+                       ImageUrls = "image1.jpge",
+                       PlaceId = "10.805515145695411, 106.81088572205702",
+                       Created = DateTime.UtcNow,
+                       LastModified = DateTime.UtcNow,
+                       IsDelete = false,
+                   },
+                   new Court
+                   {
+                       Id = court1Id,
+                       OwnerId = owner1Id,
+                       Description = "Sân cầu lông trang bị tiện nghi đầy đủ, giữ xe an ninh",
+                       CourtName = "Sân cầu lông B-ZONE 11",
+                       Address = "40 Đ. Số 11, Trường Thọ, Thủ Đức, Thành phố Hồ Chí Minh, Vietnam",
+                       Latitude = 10.8447102,
+                       Longitude = 106.7530548,
+                       GoogleMapURLs = "https://maps.app.goo.gl/cwrHGkHsM4769eSE7",
+                       TimeStart = new TimeSpan(05, 00, 00),
+                       TimeEnd = new TimeSpan(22, 00, 00),
+                       ImageUrls = "image1.jpge",
+                       PlaceId = "10.845057917596483, 106.75295823555061",
+                       Created = DateTime.UtcNow,
+                       LastModified = DateTime.UtcNow,
+                       IsDelete = false,
+                   },
+                   new Court
+                   {
+                       Id = court2Id,
+                       OwnerId = owner1Id,
+                       Description = "Sân đẹp, cỏ xịn, đèn sáng, có chỗ để xe oto, bóng xịn",
+                       CourtName = "Sân bóng đá VNV",
+                       Address = "Đ. Số 11/Hẻm 52 Tổ 1, Khu phố 9, Thủ Đức, Thành phố Hồ Chí Minh, Vietnam",
+                       Latitude = 10.8445425,
+                       Longitude = 106.7526029,
+                       GoogleMapURLs = "https://maps.app.goo.gl/UUCSZm1p9ngEx7k79",
+                       TimeStart = new TimeSpan(14, 30, 00),
+                       TimeEnd = new TimeSpan(15, 30, 00),
+                       ImageUrls = "image1.jpge",
+                       PlaceId = "10.844905847478088, 106.75213708986735",
+                       Created = DateTime.UtcNow,
+                       LastModified = DateTime.UtcNow,
+                       IsDelete = false,
+                   },
+                   new Court
+                   {
+                       Id = court3Id,
+                       OwnerId = owner1Id,
+                       Description = "Sân cầu lông hiện đại với sàn gỗ, thuận tiện cho các hoạt động thi đấu và tập luyện.",
+                       CourtName = "Sân cầu lông Marie Curie",
+                       Address = "26 Lê Quý Đôn, Phường Võ Thị Sáu, Quận 3, Thành phố Hồ Chí Minh",
+                       Latitude = 10.7821421,
+                       Longitude = 106.6902650,
+                       GoogleMapURLs = "https://maps.google.com/?q=26+Le+Quy+Don",
+                       TimeStart = new TimeSpan(05, 00, 00),
+                       TimeEnd = new TimeSpan(22, 00, 00),
+                       ImageUrls = "image1.jpge",
+                       PlaceId = "10.786887, 106.690193",
+                       Created = DateTime.UtcNow,
+                       LastModified = DateTime.UtcNow,
+                       IsDelete = false
+                   }, new Court
+                   {
+                       Id = court4Id,
+                       OwnerId = ownerId,
+                       Description = "Sân bóng chuyền ngoài trời với không gian rộng rãi, phù hợp cho cả tập luyện và thi đấu.",
+                       CourtName = "Sân bóng chuyền Tân Bình",
+                       Address = "36/5 Luy Bán Bích, Phường Tân Thới Hòa, Quận Tân Phú, Thành phố Hồ Chí Minh",
+                       Latitude = 10.7617930,
+                       Longitude = 106.6328650,
+                       GoogleMapURLs = "https://maps.google.com/?q=36/5+Luy+Bán+Bích",
+                       TimeStart = new TimeSpan(06, 00, 00),
+                       TimeEnd = new TimeSpan(21, 00, 00),
+                       ImageUrls = "image1.jpge",
+                       PlaceId = "10.768199, 106.628938",
+                       Created = DateTime.UtcNow,
+                       LastModified = DateTime.UtcNow,
+                       IsDelete = false
+                   }, new Court
+                   {
+                       Id = court5Id,
+                       OwnerId = owner1Id,
+                       Description = "Sân bóng đá lớn với cỏ nhân tạo chất lượng cao, có khán đài và hệ thống chiếu sáng tốt.",
+                       CourtName = "Sân bóng đá Phú Thọ",
+                       Address = "219 Lý Thường Kiệt, Phường 15, Quận 11, Thành phố Hồ Chí Minh",
+                       Latitude = 10.7675400,
+                       Longitude = 106.6583560,
+                       GoogleMapURLs = "https://maps.google.com/?q=219+Lý+Thường+Kiệt",
+                       TimeStart = new TimeSpan(04, 00, 00),
+                       TimeEnd = new TimeSpan(23, 30, 00),
+                       ImageUrls = "image1.jpge",
+                       PlaceId = "10.769555, 106.663338",
+                       Created = DateTime.UtcNow,
+                       LastModified = DateTime.UtcNow,
+                       IsDelete = false
+                   });
+               #endregion
+               #region ID SAMPLE
+               var courtSubdivisionId1 = new Guid("20f46754-d281-44c6-aa5c-d97ac4f3d8cb");
+               var courtSubdivisionId2 = new Guid("7a62ef5e-fc97-48d3-a0a2-e9e290665f8d");
+               var courtSubdivisionId3 = new Guid("e72938fe-50a0-4b5e-a898-a5cbf5b2039c");
+               var courtSubdivisionId4 = new Guid("45ed7684-340d-414b-ae8c-fda358f62ac2");
+               var courtSubdivisionId5 = new Guid("b5a7f639-aaa7-412d-8bde-7767489e6839");
+               var courtSubdivisionId6 = new Guid("c7a8a07c-dd21-4323-bb8a-25c073fabcde");
+               var courtSubdivisionId7 = new Guid("d104a1db-67e3-4351-9b3c-037ec06c245e");
 
-        var courtSettings1 = new Guid("a93c57bd-f6d5-414e-a4b2-5aa269729a43");
-        var courtSettings2 = new Guid("457c955b-857d-483d-8e54-02c87dbcffa9");
-        var courtSettings3 = new Guid("3593decc-3ace-451c-842d-3369cfe571c2");
-        var courtSettings4 = new Guid("31689b32-b8d8-4993-98f5-33b436b4f293");
-        var courtSettings5 = new Guid("089e939e-10ea-44b6-b7cd-f6d69cf6c06a");
-        var courtSettings6 = new Guid("41ae23f7-42fe-4a40-8c36-021dc7c1dd06");
-        var courtSettings7 = new Guid("effd5616-ad35-4204-8c5e-01ad289855e8");
-        var courtSettings8 = new Guid("0c9e0496-e891-468c-aca5-6c09c1a8f159");
-        var courtSettings9 = new Guid("63998125-8cbd-41b7-9123-a6c7ca3ad63e");
-        var courtSettings10 = new Guid("9ce93f4d-b691-4622-95a5-3825916409f6");
-
-        var soccerId = new Guid("a781b595-6a4f-4d9a-b845-fb0f5c2c9a0a");
-        var volleyballId = new Guid("4a6b05bc-fc25-45fe-abe9-11a4d9380f07");
-        var badmintionId = new Guid("c01babc6-4047-47d5-bc9b-93c678b6342d");
-        #endregion
+              
+               #endregion*/
+                var courtSettings1 = new Guid("a93c57bd-f6d5-414e-a4b2-5aa269729a43");
+                var courtSettings2 = new Guid("457c955b-857d-483d-8e54-02c87dbcffa9");
+                var courtSettings3 = new Guid("3593decc-3ace-451c-842d-3369cfe571c2");
+                var courtSettings4 = new Guid("31689b32-b8d8-4993-98f5-33b436b4f293");
+                var courtSettings5 = new Guid("089e939e-10ea-44b6-b7cd-f6d69cf6c06a");
+                var courtSettings6 = new Guid("41ae23f7-42fe-4a40-8c36-021dc7c1dd06");
+                var courtSettings7 = new Guid("effd5616-ad35-4204-8c5e-01ad289855e8");
+                var courtSettings8 = new Guid("0c9e0496-e891-468c-aca5-6c09c1a8f159");
+                var courtSettings9 = new Guid("63998125-8cbd-41b7-9123-a6c7ca3ad63e");
+                var courtSettings10 = new Guid("9ce93f4d-b691-4622-95a5-3825916409f6");
+                var soccerId = new Guid("a781b595-6a4f-4d9a-b845-fb0f5c2c9a0a");
+                var volleyballId = new Guid("4a6b05bc-fc25-45fe-abe9-11a4d9380f07");
+                var badmintionId = new Guid("c01babc6-4047-47d5-bc9b-93c678b6342d");
         #region CourtSubdivisionSetting
         builder.Entity<CourtSubdivisionSetting>().HasData(
                 new CourtSubdivisionSetting
                 {
                     Id = courtSettings1,
                     SportCategoryId = soccerId,
-                    CourtType = "Sân bóng đá nhân tạo 7"
+                    CourtType = "Sân bóng đá nhân tạo 7",
+                    ShortName = "Sân 7"
                 },
                 new CourtSubdivisionSetting
                 {
                     Id = courtSettings2,
                     SportCategoryId = soccerId,
-                    CourtType = "Sân bóng đá nhân tạo 5"
+                    CourtType = "Sân bóng đá nhân tạo 5",
+                    ShortName = "Sân 5"
                 },
                 new CourtSubdivisionSetting
                 {
                     Id = courtSettings3,
                     SportCategoryId = soccerId,
-                    CourtType = "Sân bóng đá nhân tạo 11"
+                    CourtType = "Sân bóng đá nhân tạo 11",
+                    ShortName = "Sân 11"
                 },
                 new CourtSubdivisionSetting
                 {
                     Id = courtSettings4,
                     SportCategoryId = soccerId,
-                    CourtType = "Sân bóng đá cỏ tự nhiên 7"
+                    CourtType = "Sân bóng đá cỏ tự nhiên 7",
+                    ShortName = "Sân 7"
                 },
                 new CourtSubdivisionSetting
                 {
                     Id = courtSettings5,
                     SportCategoryId = soccerId,
-                    CourtType = "Sân bóng đá cỏ tự nhiên 11"
+                    CourtType = "Sân bóng đá cỏ tự nhiên 11",
+                    ShortName = "Sân 11"
                 },
                 new CourtSubdivisionSetting
                 {
                     Id = courtSettings6,
                     SportCategoryId = volleyballId,
-                    CourtType = "Sân bóng chuyền mặt cát"
+                    CourtType = "Sân bóng chuyền mặt cát",
+                    ShortName = "Sân chuyền"
                 },
                 new CourtSubdivisionSetting
                 {
                     Id = courtSettings7,
                     SportCategoryId = volleyballId,
-                    CourtType = "Sân bóng chuyền trong nhà"
+                    CourtType = "Sân bóng chuyền trong nhà",
+                    ShortName = "Sân chuyền"
                 },
                 new CourtSubdivisionSetting
                 {
                     Id = courtSettings8,
                     SportCategoryId = volleyballId,
-                    CourtType = "Sân bóng chuyền xi măng"
+                    CourtType = "Sân bóng chuyền xi măng",
+                    ShortName = "Sân chuyền"
                 },
                 new CourtSubdivisionSetting
                 {
                     Id = courtSettings9,
                     SportCategoryId = badmintionId,
-                    CourtType = "Sân cầu lông trong nhà"
+                    CourtType = "Sân cầu lông trong nhà",
+                    ShortName = "Sân cầu"
                 },
                 new CourtSubdivisionSetting
                 {
                     Id = courtSettings10,
                     SportCategoryId = badmintionId,
-                    CourtType = "Sân cầu lông ngoài trời"
+                    CourtType = "Sân cầu lông ngoài trời",
+                    ShortName = "Sân cầu"
                 }
             );
         #endregion
-        #region CourtSubdivision
+       /* #region CourtSubdivision
         builder.Entity<CourtSubdivision>().HasData(
             new CourtSubdivision
             {
@@ -658,7 +669,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 CreatedStatus = CourtSubdivisionCreatedStatus.Pending
             }
         );
-        #endregion
+        #endregion*/
         #region SportCategories
         builder.Entity<SportCategory>()
             .HasData(new SportCategory
@@ -714,7 +725,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         //    }
         //    );
         //#endregion
-        var discount20 = new Guid("d81fe96c-b8f4-4f64-b4f8-1a3bc9f41425");
+        /*var discount20 = new Guid("d81fe96c-b8f4-4f64-b4f8-1a3bc9f41425");
         var christmas = new Guid("7f34ee57-38bc-4852-a7d6-57f1b26ed5af");
         var birthday = new Guid("45a55f14-ac7d-4e58-b9a9-c830013d07f1");
         var lunarnewyear = new Guid("9de56f74-7834-4aeb-b774-e18abc1bcedd");
@@ -788,38 +799,6 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 QuantityOfCampaign = 10,
                 CampaignImageURL = "Campaign Image 4",
                 Status = StatusEnums.Accepted,
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            });
-        #endregion
-
-        var beginner = new Guid("1a2b3c4d-5e6f-4a5b-8c2d-3e4f567a89b1");
-        var medium = new Guid("2b3c4d5e-6f7a-4a5b-0d1e-2f3a4b5c6d7e");
-        var expert = new Guid("3c4d5e6f-7a8b-4a5b-1c2d-3e4f5a6b7c8d");
-
-        #region Level
-        builder.Entity<Level>()
-            .HasData(new Level
-            {
-                Id = beginner,
-                LevelName = "Beginner",
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            },
-            new Level
-            {
-                Id = medium,
-                LevelName = "Medium",
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow,
-                IsDelete = false,
-            },
-            new Level
-            {
-                Id = expert,
-                LevelName = "Expert",
                 Created = DateTime.UtcNow,
                 LastModified = DateTime.UtcNow,
                 IsDelete = false,
@@ -969,7 +948,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         #endregion
         #region TimePeriod      
 
-        /*builder.Entity<TimePeriod>().HasData(
+        *//*builder.Entity<TimePeriod>().HasData(
             new TimePeriod
             {
                 Id = timePeriodId1,
@@ -999,7 +978,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
                 StartTime = new TimeSpan(20, 30, 0),
                 EndTime = new TimeSpan(23, 0, 0),
                 RateMultiplier = 1.0M,
-            });*/
+            });*//*
         #endregion
         #region Room_Member
         builder.Entity<RoomMember>()
@@ -1078,6 +1057,36 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
             DateBooking = DateTime.UtcNow.AddDays(3)
         }
     );
+        #endregion*/
+        var beginner = new Guid("1a2b3c4d-5e6f-4a5b-8c2d-3e4f567a89b1");
+        var medium = new Guid("2b3c4d5e-6f7a-4a5b-0d1e-2f3a4b5c6d7e");
+        var expert = new Guid("3c4d5e6f-7a8b-4a5b-1c2d-3e4f5a6b7c8d");
+        #region Level
+        builder.Entity<Level>()
+            .HasData(new Level
+            {
+                Id = beginner,
+                LevelName = "Beginner",
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false,
+            },
+            new Level
+            {
+                Id = medium,
+                LevelName = "Medium",
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false,
+            },
+        new Level
+            {
+                Id = expert,
+                LevelName = "Expert",
+                Created = DateTime.UtcNow,
+                LastModified = DateTime.UtcNow,
+                IsDelete = false,
+            });
         #endregion
 
         #region merchant
@@ -1109,7 +1118,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
         builder.Entity<PaymentDestination>().HasData(
            new PaymentDestination
            {
-               Id = new Guid("281B0F0D-1B5F-4A54-A102-BE0AEAADDAF6"),
+               Id = new Guid("BF988D4B-58BB-48BE-8364-68A8C150CA5F"),
                DesName = "Cổng thanh toán VnPay",
                DesShortName = "VNPAY",
                DesParentId = "",
