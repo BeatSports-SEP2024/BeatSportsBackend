@@ -92,6 +92,22 @@ public class CheckTimeJob
 
             }
         }
+    }
 
+    public void CheckBookingPlayDateIfFinish()
+    {
+        var bookingList = _beatSportsDbContext.Bookings
+            .Where(x => !x.IsDelete && x.BookingStatus == BookingEnums.Approved.ToString())
+            .ToList();
+        
+        foreach(var booking in bookingList) 
+        {
+            var endDatePlaying = booking.PlayingDate.Add(booking.EndTimePlaying);
+            if(endDatePlaying <= DateTime.Now)
+            {
+                booking.BookingStatus = BookingEnums.Finished.ToString();
+            }
+        }
+        _beatSportsDbContext.SaveChanges();
     }
 }
