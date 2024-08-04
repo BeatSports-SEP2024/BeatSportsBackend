@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Features.Hubs;
 using BeatSportsAPI.Domain.Entities.Room;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Rooms.RoomRequests.Commands.UpdateRoomRequests;
@@ -21,10 +23,12 @@ public class UpdateRoomRequestCommand : IRequest<BeatSportsResponse>
 public class UpdateRoomRequestCommandHandler : IRequestHandler<UpdateRoomRequestCommand, BeatSportsResponse>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
+    private readonly IHubContext<RoomRequestHub> _hubContext;
 
-    public UpdateRoomRequestCommandHandler(IBeatSportsDbContext beatSportsDbContext)
+    public UpdateRoomRequestCommandHandler(IBeatSportsDbContext beatSportsDbContext, IHubContext<RoomRequestHub> hubContext)
     {
         _beatSportsDbContext = beatSportsDbContext;
+        _hubContext = hubContext;
     }
     public async Task<BeatSportsResponse> Handle(UpdateRoomRequestCommand request, CancellationToken cancellationToken)
     {
@@ -60,6 +64,9 @@ public class UpdateRoomRequestCommandHandler : IRequestHandler<UpdateRoomRequest
                 _beatSportsDbContext.RoomRequests.Remove(dataRoomRequest);
             }
             await _beatSportsDbContext.SaveChangesAsync();
+
+            // thành viên out room
+            await _hubContext.Clients.Group(roomMatch.Id.ToString()).SendAsync("UpdateRoom", "MemberLeft", customer.Id);
         }
         else
         {
@@ -79,6 +86,9 @@ public class UpdateRoomRequestCommandHandler : IRequestHandler<UpdateRoomRequest
 
             _beatSportsDbContext.RoomMatches.Remove(roomMatch);
             await _beatSportsDbContext.SaveChangesAsync();
+
+            // chủ phòng outrooom
+            await _hubContext.Clients.Group(roomMatch.Id.ToString()).SendAsync("UpdateRoom", "RoomClosed", customer.Id);
         }
 
         return new BeatSportsResponse

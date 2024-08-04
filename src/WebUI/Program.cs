@@ -199,6 +199,7 @@ app.MapGraphQL("/graphql");
 #region Khúc này đăng ký HUB cho SignalR
 app.MapHub<TimePeriodHub>("/timePeriodHub");
 app.MapHub<BookingHub>("/bookingHub");
+app.MapHub<RoomRequestHub>("/creatRoomRequestHub");
 
 #endregion
 //Hangfire Dashboard

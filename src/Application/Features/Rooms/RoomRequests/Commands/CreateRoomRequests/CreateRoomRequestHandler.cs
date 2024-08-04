@@ -5,18 +5,22 @@ using BeatSportsAPI.Domain.Enums;
 using BeatSportsAPI.Domain.Entities.Room;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
+using BeatSportsAPI.Application.Features.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BeatSportsAPI.Application.Features.Rooms.RoomRequests.Commands.CreateRoomRequests;
 public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand, BeatSportsResponse>
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
+    private readonly IHubContext<RoomRequestHub> _hubContext;
 
-    public CreateRoomRequestHandler(IBeatSportsDbContext beatSportsDbContext)
+    public CreateRoomRequestHandler(IBeatSportsDbContext beatSportsDbContext, IHubContext<RoomRequestHub> hubContext)
     {
         _beatSportsDbContext = beatSportsDbContext;
+        _hubContext = hubContext;
     }
 
-    public Task<BeatSportsResponse> Handle(CreateRoomRequestCommand request, CancellationToken cancellationToken)
+    public async Task<BeatSportsResponse> Handle(CreateRoomRequestCommand request, CancellationToken cancellationToken)
     {
         var roomMatch = _beatSportsDbContext.RoomMatches
             .Where(rm => rm.Id == request.RoomMatchId && !rm.IsDelete)
@@ -62,7 +66,7 @@ public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand
 
             if (flag > 0)
             {
-                return Task.FromResult(new BeatSportsResponse
+                return await Task.FromResult(new BeatSportsResponse
                 {
                     Message = "400"
                 });
@@ -89,7 +93,12 @@ public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand
         };
         _beatSportsDbContext.RoomRequests.Add(roomRequest);
         _beatSportsDbContext.SaveChangesAsync(cancellationToken);
-        return Task.FromResult(new BeatSportsResponse
+
+        // Notify all clients in the room's group
+        await _hubContext.Clients.Group(roomMatch.Id.ToString()).SendAsync("UpdateRoom", "NewRequest", customer.Id);
+
+
+        return await Task.FromResult(new BeatSportsResponse
         {
             Message = "Send Request To Joining Successful, Waiting for Room Master approve"
         });
