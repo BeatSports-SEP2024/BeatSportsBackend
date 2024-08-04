@@ -92,6 +92,45 @@ public class CheckTimeJob
 
             }
         }
+    }
 
+    public void CheckBookingPlayDateIfFinish()
+    {
+        var bookingList = _beatSportsDbContext.Bookings
+            .Where(x => !x.IsDelete && x.BookingStatus == BookingEnums.Approved.ToString())
+            .ToList();
+        
+        foreach(var booking in bookingList) 
+        {
+            var endDatePlaying = booking.PlayingDate.Add(booking.EndTimePlaying);
+            if(endDatePlaying <= DateTime.Now)
+            {
+                booking.BookingStatus = BookingEnums.Finished.ToString();
+            }
+        }
+        _beatSportsDbContext.SaveChanges();
+    }
+
+    public void RemoveRoomWhenExpired()
+    {
+        var expiredRooms = _beatSportsDbContext.RoomMatches
+            .Where(x => !x.IsDelete).ToList();
+
+        foreach (var room in expiredRooms)
+        {
+            // Lấy và xóa tất cả RoomMembers liên quan đến phòng hết hạn
+            var roomMembers = _beatSportsDbContext.RoomMembers
+                .Where(rm => rm.RoomMatchId == room.Id).ToList();
+            _beatSportsDbContext.RoomMembers.RemoveRange(roomMembers);
+
+            // Lấy và xóa tất cả RoomJoiningRequests liên quan đến phòng hết hạn
+            var roomJoiningRequests = _beatSportsDbContext.RoomRequests
+                .Where(rj => rj.RoomMatchId == room.Id).ToList();
+            _beatSportsDbContext.RoomRequests.RemoveRange(roomJoiningRequests);
+
+            // Xóa chính phòng đã hết hạn
+            _beatSportsDbContext.RoomMatches.Remove(room);
+        }
+        _beatSportsDbContext.SaveChanges();
     }
 }
