@@ -3,9 +3,9 @@
 namespace BeatSportsAPI.Application.Features.Hubs;
 public class RoomRequestHub : Hub
 {
-    public async Task UpdateRoom(string action, string customerId)
+    public async Task UpdateRoom(string action, string customerId, string roomId)
     {
-        await Clients.Group(Context.ConnectionId).SendAsync("UpdateRoom", action, customerId);
+        await Clients.Group(roomId).SendAsync("UpdateRoom", action, customerId);
     }
 
     public async Task JoinRoomGroup(string roomId)
