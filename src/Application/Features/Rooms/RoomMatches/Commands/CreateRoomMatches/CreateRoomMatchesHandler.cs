@@ -15,12 +15,13 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
 {
     private readonly IBeatSportsDbContext _dbContext;
     private readonly IHubContext<RoomRequestHub> _hubContext;
+    private readonly IEmailService _emailService;
 
-
-    public CreateRoomMatchesHandler(IBeatSportsDbContext dbContext, IHubContext<RoomRequestHub> hubContext)
+    public CreateRoomMatchesHandler(IBeatSportsDbContext dbContext, IHubContext<RoomRequestHub> hubContext, IEmailService emailService)
     {
         _dbContext = dbContext;
         _hubContext = hubContext;
+        _emailService = emailService;
     }
 
     public async Task<RoomMatchResponse> Handle(CreateRoomMatchesCommand request, CancellationToken cancellationToken)
@@ -109,7 +110,80 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
 
         _dbContext.Bookings.Update(booking);
         await _dbContext.SaveChangesAsync(cancellationToken);
+        // Gửi email thông báo tạo phòng thành công
+        var customer = await _dbContext.Customers
+            .Include(c => c.Account)
+            .Where(c => c.Id == booking.CustomerId && !c.IsDelete)
+            .FirstOrDefaultAsync();
 
+        if (customer != null && customer.Account != null)
+        {
+            var toEmail = customer.Account.Email;
+            var subject = "Xác nhận tạo phòng chơi thành công";
+            var body = $@"
+                <html>
+                <head>
+                    <style>
+                        body {{
+                            font-family: Montserrat, sans-serif;
+                            margin: 0;
+                            padding: 0;
+                            background-color: #f4f4f4;
+                        }}
+                        .container {{
+                            width: 100%;
+                            max-width: 600px;
+                            margin: 0 auto;
+                            background-color: #ffffff;
+                            padding: 20px;
+                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        }}
+                        .header {{
+                            background-color: #007bff;
+                            color: #ffffff;
+                            padding: 10px 0;
+                            text-align: center;
+                            font-size: 24px;
+                        }}
+                        .content {{
+                            margin: 20px 0;
+                            line-height: 1.6;
+                        }}
+                        .content p {{
+                            margin: 10px 0;
+                        }}
+                        .footer {{
+                            margin: 20px 0;
+                            text-align: center;
+                            color: #777;
+                            font-size: 12px;
+                        }}
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <div class='header'>
+                            Xác nhận tạo phòng chơi thành công
+                        </div>
+                        <div class='content'>
+                            <p>Kính gửi {customer.Account.FirstName} {customer.Account.LastName},</p>
+                            <p>Thông báo rằng phòng chơi của bạn đã được tạo thành công với các thông tin sau:</p>
+                            <p><strong>Tên phòng:</strong> {room.RoomName}</p>
+                            <p><strong>Thể loại thể thao:</strong> {sportCategoryName}</p>
+                            <p><strong>Thời gian bắt đầu:</strong> {room.StartTimeRoom:dd/MM/yyyy HH:mm}</p>
+                            <p><strong>Thời gian kết thúc:</strong> {room.EndTimeRoom:dd/MM/yyyy HH:mm}</p>
+                            <p><strong>Quy tắc phòng:</strong> {room.RuleRoom}</p>
+                            <p><strong>Ghi chú:</strong> {room.Note}</p>
+                        </div>
+                        <div class='footer'>
+                            <p>© 2024 BeatSports. All rights reserved.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>";
+
+            await _emailService.SendEmailAsync(toEmail, subject, body);
+        }
         await _hubContext.Clients.All.SendAsync("UpdateRoomList"/*, "NewRoomCreated", room.Id.ToString()*/);
 
         return new RoomMatchResponse
