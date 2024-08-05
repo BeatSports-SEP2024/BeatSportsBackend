@@ -44,21 +44,24 @@ public class GetTransactionByCusIdCommandHandler : IRequestHandler<GetTransactio
                 var transactionCusIdExist = await _beatSportsDbContext.PaymentTransactions.Where(pt => pt.PaymentId == payment.Id).FirstOrDefaultAsync();
                 //var transactionPayload = JsonConvert.DeserializeObject<TransactionPayload>(transactionCusIdExist.TranPayload!);
                 //JObject transactionPayload = JObject.Parse(transactionCusIdExist!.TranPayload!);
-                var transactionPayload = JsonConvert.DeserializeObject<ExpandoObject>(transactionCusIdExist!.TranPayload!)!;
-
-                var data = new TransactionThirdpartyResponse
+                if (transactionCusIdExist != null)
                 {
-                    TransactionId = transactionCusIdExist.Id,
-                    TransactionMessage = transactionCusIdExist!.TranMessage,
-                    TransactionPayload = transactionPayload,
-                    TransactionStatus = transactionCusIdExist.TranStatus,
-                    TransactionAmount = transactionCusIdExist.TranAmount,
-                    TransactionDate = transactionCusIdExist.TranDate,
-                    PaymentId = transactionCusIdExist.PaymentId,
-                    TransactionType = payment.PaymentType,
-                    //CallbackStatus = "Success"
-                };
-                listTransaction.Add(data);
+                    var transactionPayload = JsonConvert.DeserializeObject<ExpandoObject>(transactionCusIdExist!.TranPayload!)!;
+
+                    var data = new TransactionThirdpartyResponse
+                    {
+                        TransactionId = transactionCusIdExist.Id,
+                        TransactionMessage = transactionCusIdExist!.TranMessage,
+                        TransactionPayload = transactionPayload,
+                        TransactionStatus = transactionCusIdExist.TranStatus,
+                        TransactionAmount = transactionCusIdExist.TranAmount,
+                        TransactionDate = transactionCusIdExist.TranDate,
+                        PaymentId = transactionCusIdExist.PaymentId,
+                        TransactionType = payment.PaymentType,
+                        //CallbackStatus = "Success"
+                    };
+                    listTransaction.Add(data);
+                }
             }
 
             // call back thất bại => tức là paymentTransaction tồn tại nhưng transaction của ví ko tồn tại
@@ -67,21 +70,24 @@ public class GetTransactionByCusIdCommandHandler : IRequestHandler<GetTransactio
                 var transactionCusIdExist = await _beatSportsDbContext.PaymentTransactions.Where(pt => pt.PaymentId == payment.Id).FirstOrDefaultAsync();
                 //var transactionPayload = JsonConvert.DeserializeObject<TransactionPayload>(transactionCusIdExist.TranPayload!);
                 //JObject transactionPayload = JObject.Parse(transactionCusIdExist!.TranPayload!);
-                var transactionPayload = JsonConvert.DeserializeObject<ExpandoObject>(transactionCusIdExist!.TranPayload!)!;
-
-                var data = new TransactionThirdpartyResponse
+                if (transactionCusIdExist != null)
                 {
-                    TransactionId = transactionCusIdExist.Id,
-                    TransactionMessage = transactionCusIdExist!.TranMessage,
-                    TransactionPayload = transactionPayload,
-                    TransactionStatus = transactionCusIdExist.TranStatus,
-                    TransactionAmount = transactionCusIdExist.TranAmount,
-                    TransactionDate = transactionCusIdExist.TranDate,
-                    PaymentId = transactionCusIdExist.PaymentId,
-                    TransactionType = payment.PaymentType,
-                    //CallbackStatus = "Failed"
-                };
-                listTransaction.Add(data);
+                    var transactionPayload = JsonConvert.DeserializeObject<ExpandoObject>(transactionCusIdExist!.TranPayload!)!;
+
+                    var data = new TransactionThirdpartyResponse
+                    {
+                        TransactionId = transactionCusIdExist.Id,
+                        TransactionMessage = transactionCusIdExist!.TranMessage,
+                        TransactionPayload = transactionPayload,
+                        TransactionStatus = transactionCusIdExist.TranStatus,
+                        TransactionAmount = transactionCusIdExist.TranAmount,
+                        TransactionDate = transactionCusIdExist.TranDate,
+                        PaymentId = transactionCusIdExist.PaymentId,
+                        TransactionType = payment.PaymentType,
+                        //CallbackStatus = "Failed"
+                    };
+                    listTransaction.Add(data);
+                }
             }
         }
         return listTransaction.OrderByDescending(p => p.TransactionDate).ToList();

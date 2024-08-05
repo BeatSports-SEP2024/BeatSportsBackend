@@ -35,6 +35,11 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
             .Include(x => x.RoomRequests)
             .Include(x => x.Booking).ThenInclude(c => c.CourtSubdivision).FirstOrDefault();
 
+        if(query == null)
+        {
+            throw new NotFoundException();
+        }
+
         var court = _dbContext.Courts
                     .Where(x => x.Id == query.Booking.CourtSubdivision.CourtId).FirstOrDefault();
 
