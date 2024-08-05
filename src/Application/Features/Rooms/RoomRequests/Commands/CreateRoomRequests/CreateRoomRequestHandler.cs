@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using BeatSportsAPI.Application.Features.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Rooms.RoomRequests.Commands.CreateRoomRequests;
 public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand, BeatSportsResponse>
@@ -33,7 +34,15 @@ public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand
                                 .Where(x => x.CustomerId == customer.Id)
                                 .ToList();
 
-        if(roomMatchJoinedList.Count > 0)
+        // Kiểm tra số lượng thành viên trong phòng
+        var currentMemberCount = await _beatSportsDbContext.RoomMembers
+            .CountAsync(rm => rm.RoomMatchId == roomMatch.Id);
+        if (currentMemberCount >= roomMatch.MaximumMember)
+        {
+            throw new BadRequestException("The room has reached the maximum number of members.");
+        }
+
+        if (roomMatchJoinedList.Count > 0)
         {
             var flag = 0;
 
@@ -44,7 +53,7 @@ public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand
                                 .Where(x => x.Id == room.RoomMatchId)
                                 .FirstOrDefault();
 
-                if(roomMatch.StartTimeRoom.Date == roomMatchCheck.StartTimeRoom.Date)
+                if (roomMatch.StartTimeRoom.Date == roomMatchCheck.StartTimeRoom.Date)
                 {
                     if (roomMatch.StartTimeRoom <= roomMatchCheck.StartTimeRoom && roomMatch.EndTimeRoom >= roomMatchCheck.EndTimeRoom)
                     {
@@ -74,33 +83,64 @@ public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand
 
         }
 
-        if(roomMatch == null) 
+        if (roomMatch == null)
         {
             throw new NotFoundException($"{request.RoomMatchId} is not existed");
         }
 
-        if(customer == null)
+        if (customer == null)
         {
             throw new NotFoundException($"{request.CustomerId} is not existed");
         }
 
-        var roomRequest = new RoomRequest
+        if (roomMatch.IsPrivate == false)
         {
-            CustomerId = customer.Id,
-            RoomMatchId = roomMatch.Id,
-            JoinStatus = RoomRequestEnums.Pending,
-            DateRequest = DateTime.UtcNow,
-        };
-        _beatSportsDbContext.RoomRequests.Add(roomRequest);
-        _beatSportsDbContext.SaveChangesAsync(cancellationToken);
+            var roomRequest = new RoomRequest
+            {
+                CustomerId = customer.Id,
+                RoomMatchId = roomMatch.Id,
+                JoinStatus = RoomRequestEnums.Accepted,
+                DateRequest = DateTime.UtcNow,
+            };
+            _beatSportsDbContext.RoomRequests.Add(roomRequest);
 
-        // Notify all clients in the room's group
-        await _hubContext.Clients.Group(roomMatch.Id.ToString()).SendAsync("UpdateRoom", "NewRequest", customer.Id);
+            var roomMember = new RoomMember
+            {
+                CustomerId = customer.Id,
+                RoomMatchId = roomMatch.Id,
+                RoleInRoom = RoleInRoomEnums.Member,
+            };
+            _beatSportsDbContext.RoomMembers.Add(roomMember);
 
+            await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
 
-        return await Task.FromResult(new BeatSportsResponse
+            await _hubContext.Clients.Group(roomMatch.Id.ToString()).SendAsync("UpdateRoom", "NewMember", customer.Id);
+
+            return new BeatSportsResponse
+            {
+                Message = "Joined public room successfully."
+            };
+        }
+        else
         {
-            Message = "Send Request To Joining Successful, Waiting for Room Master approve"
-        });
+            var roomRequest = new RoomRequest
+            {
+                CustomerId = customer.Id,
+                RoomMatchId = roomMatch.Id,
+                JoinStatus = RoomRequestEnums.Pending,
+                DateRequest = DateTime.UtcNow,
+            };
+            _beatSportsDbContext.RoomRequests.Add(roomRequest);
+            await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
+
+            // Notify all clients in the room's group
+            await _hubContext.Clients.Group(roomMatch.Id.ToString()).SendAsync("UpdateRoom", "NewRequest", customer.Id);
+
+
+            return await Task.FromResult(new BeatSportsResponse
+            {
+                Message = "Send Request To Joining Successful, Waiting for Room Master approve"
+            });
+        }
     }
 }
