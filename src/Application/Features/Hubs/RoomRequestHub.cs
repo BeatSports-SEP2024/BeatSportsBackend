@@ -22,4 +22,9 @@ public class RoomRequestHub : Hub
     {
         await Clients.Group(roomRequestId).SendAsync("UpdateMemberStatus", customerId, status);
     }
+
+    public async Task UpdateRoomList(/*string action, string roomId*/)
+    {
+        await Clients.All.SendAsync("UpdateRoomList"/*, action, roomId*/);
+    }
 }

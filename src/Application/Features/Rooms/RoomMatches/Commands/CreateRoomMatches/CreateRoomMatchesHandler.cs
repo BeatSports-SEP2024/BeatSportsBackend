@@ -3,19 +3,24 @@ using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Ultilities;
+using BeatSportsAPI.Application.Features.Hubs;
 using BeatSportsAPI.Domain.Entities.Room;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Rooms.RoomMatches.Commands.CreateRoomMatches;
 public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand, RoomMatchResponse>
 {
     private readonly IBeatSportsDbContext _dbContext;
+    private readonly IHubContext<RoomRequestHub> _hubContext;
 
-    public CreateRoomMatchesHandler(IBeatSportsDbContext dbContext)
+
+    public CreateRoomMatchesHandler(IBeatSportsDbContext dbContext, IHubContext<RoomRequestHub> hubContext)
     {
         _dbContext = dbContext;
+        _hubContext = hubContext;
     }
 
     public async Task<RoomMatchResponse> Handle(CreateRoomMatchesCommand request, CancellationToken cancellationToken)
@@ -104,6 +109,8 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
 
         _dbContext.Bookings.Update(booking);
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        await _hubContext.Clients.All.SendAsync("UpdateRoomList"/*, "NewRoomCreated", room.Id.ToString()*/);
 
         return new RoomMatchResponse
         {
