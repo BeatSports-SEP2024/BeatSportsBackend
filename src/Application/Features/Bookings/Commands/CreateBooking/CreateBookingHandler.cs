@@ -365,8 +365,8 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                                     </div>
                                     <div class='content'>
                                         <p>Kính gửi {getCustomerByAccount.Account.FirstName + " " + getCustomerByAccount.Account.LastName},</p>
-                                        <p>Chúng tôi xin thông báo rằng việc đặt phòng của bạn đã thành công với các thông tin sau:</p>
-                                        <p><strong>Mã đặt phòng:</strong> {checkBookingInDB.Id}</p>
+                                        <p>Chúng tôi xin thông báo rằng việc đặt sân của bạn đã thành công với các thông tin sau:</p>
+                                        <p><strong>Mã đặt sân:</strong> {checkBookingInDB.Id}</p>
                                         <p><strong>Tên sân:</strong> {checkBookingInDB.CourtSubdivision.Court.CourtName}</p>
                                         <p><strong>Sân con:</strong> {checkBookingInDB.CourtSubdivision.CourtSubdivisionName}</p>
                                         <p><strong>Thời gian bắt đầu:</strong> {checkBookingInDB.StartTimePlaying}</p>
