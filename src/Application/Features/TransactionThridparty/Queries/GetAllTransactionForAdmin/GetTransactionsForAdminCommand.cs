@@ -105,7 +105,20 @@ public class GetTransactionsForAdminCommandHandler : IRequestHandler<GetTransact
           .Where(t => t.CallbackStatus == "Failed")
           .ToList();
 
+        //decimal totalCustomerDeposit = _beatSportsDbContext.Transactions
+        //    .Where(t => t.TransactionType == "Nạp tiền")
+        //    .Sum(t => t.TransactionAmount ?? 0);
+
+        decimal totalOwnerWithdrawal = _beatSportsDbContext.Transactions
+            .Where(t => t.TransactionType == "Rút tiền")
+            .Sum(t => t.TransactionAmount ?? 0);
+
+        // Chỗ này get tổng tiền customer nạp vào 
         decimal totalAdminMoney = successfulTransactions.Sum(t => t.TransactionAmount ?? 0);
+
+        // Chỗ này check số dư khả dĩ mà owner có thể rút
+        decimal totalMoneyCanWithdraw = totalAdminMoney - totalOwnerWithdrawal;
+        //decimal totalAdminMoney = totalCustomerDeposit - totalOwnerWithdrawal;
         var totalCountRecord = listTransaction.Count;
 
         return new TransactionThirdpartyForAdminResponse
@@ -114,8 +127,9 @@ public class GetTransactionsForAdminCommandHandler : IRequestHandler<GetTransact
             TotalCount = totalCountRecord,
             TotalSuccess = successfulTransactions.Count,
             TotalFailed = failedTransactions.Count,
-            TotalAdminMoney = totalAdminMoney
+            TotalAdminMoney = totalAdminMoney,
+            TotalOwnerWithdraw = totalOwnerWithdrawal,
+            TotalMoneyCanWithDraw = totalMoneyCanWithdraw,
         };
     }
 }
-

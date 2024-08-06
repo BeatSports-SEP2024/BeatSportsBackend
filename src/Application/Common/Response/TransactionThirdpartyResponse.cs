@@ -38,6 +38,14 @@ public class TransactionThirdpartyForAdminResponse
     /// Tổng tiền admin nhận được
     /// </summary>
     public decimal? TotalAdminMoney { get; set; }
+    /// <summary>
+    /// Tổng tiền mà owner rút ra
+    /// </summary>
+    public decimal? TotalOwnerWithdraw { get; set; }
+    /// <summary>
+    /// Số tiền mà owner có thể rút dựa trên Admin money và lệnh rút tiền
+    /// </summary>
+    public decimal? TotalMoneyCanWithDraw { get; set; }
 }
 
 
