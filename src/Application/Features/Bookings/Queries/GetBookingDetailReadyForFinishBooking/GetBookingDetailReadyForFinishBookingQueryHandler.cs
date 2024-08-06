@@ -244,8 +244,11 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
 
         TimeSpan periodStart = item.StartTime;
         TimeSpan periodEnd = item.EndTime;
-
-        if (currentStart < periodStart && periodStart < request.EndTimeWantToPlay)
+        // Kiểm tra xem nó có thuộc khung giờ kh
+        // Case 1, kh thuộc khung giờ tức là start trước period start và period
+        // if (currentStart < periodStart && periodStart < request.EndTimeWantToPlay)
+        // Vd current start 12, period start 13, end time want to play 18
+        if (currentStart < periodStart)
         {
             var newCourtSubResponse = new CourtDetailInBookingDetailReadyForFinishBookingReponse()
             {
@@ -261,7 +264,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
             totalPrice += courtSub.BasePrice * Convert.ToDecimal(timePlayInThisPeriod.TotalHours);
             currentStart = periodStart;
         }
-
+        // Case 2, thuộc khung giờ
         if (currentStart < periodEnd && periodEnd < request.EndTimeWantToPlay)
         {
             var newCourtSubResponse = new CourtDetailInBookingDetailReadyForFinishBookingReponse()
@@ -281,7 +284,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
             LocalListTimestampMinCancellation.Add(item.MinCancellationTime);
             listCourtSubInReponse.Add(newCourtSubResponse);
 
-            totalPrice += courtSub.BasePrice * Convert.ToDecimal(timePlayInThisPeriod.TotalHours) + item.PriceAdjustment ?? 0;
+            totalPrice += (courtSub.BasePrice + item.PriceAdjustment) * Convert.ToDecimal(timePlayInThisPeriod.TotalHours) ?? 0;
             currentStart = periodEnd;
         }
         else if (currentStart < periodEnd && request.EndTimeWantToPlay < periodEnd)
@@ -298,7 +301,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
             var timePlayInThisPeriod = request.EndTimeWantToPlay - currentStart;
             listCourtSubInReponse.Add(newCourtSubResponse);
             LocalListTimestampMinCancellation.Add(item.MinCancellationTime);
-            totalPrice += courtSub.BasePrice * Convert.ToDecimal(timePlayInThisPeriod.TotalHours) + item.PriceAdjustment ?? 0;
+            totalPrice += (courtSub.BasePrice + item.PriceAdjustment) * Convert.ToDecimal(timePlayInThisPeriod.TotalHours) ?? 0;
             currentStart = periodEnd;
         }
 
