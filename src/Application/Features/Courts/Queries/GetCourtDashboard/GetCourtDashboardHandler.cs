@@ -49,10 +49,11 @@ public class GetCourtDashboardHandler : IRequestHandler<GetCourtDashboardCommand
             foreach (var courtSub in courtSubList)
             {
                 var bookingsInGroup = courtSub.Bookings
-                .Where(b => b.Created.Month == month && b.Created.Year == year)
-                .ToList();
+                    .Where(b => b.Created.Month == month && b.Created.Year == year
+                                && (b.BookingStatus == "Approved" || b.BookingStatus == "Finished"))
+                    .ToList();
 
-                courtResponse.Y += bookingsInGroup.Sum(x => x.TotalAmount);
+                 courtResponse.Y += bookingsInGroup.Sum(x => x.TotalAmount);
             }
 
             //courtResponse.X = DateTime.Parse($"1/{month}/{request.Year}");
