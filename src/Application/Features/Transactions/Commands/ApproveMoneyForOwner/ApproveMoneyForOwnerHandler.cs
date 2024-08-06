@@ -8,6 +8,7 @@ using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Transactions.Commands.TransferMoneyInApp;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Transactions.Commands.ApproveMoneyForOwner;
 public class ApproveMoneyForOwnerHandler : IRequestHandler<ApproveMoneyForOwnerCommand, BeatSportsResponseV2>
@@ -33,7 +34,7 @@ public class ApproveMoneyForOwnerHandler : IRequestHandler<ApproveMoneyForOwnerC
             });
         }
 
-        if(transaction.Created.Date.AddDays(7) > DateTime.Now.Date)
+        if (transaction.Created.Date.AddDays(7) > DateTime.Now.Date)
         {
             return Task.FromResult(new BeatSportsResponseV2
             {
@@ -43,14 +44,15 @@ public class ApproveMoneyForOwnerHandler : IRequestHandler<ApproveMoneyForOwnerC
         }
 
         var owner = _dbContext.Owners
-                    .Where(x => x.Id == request.OwnerId)
-                    .FirstOrDefault();
+            .Include(c => c.Account)
+            .Where(x => x.Id == request.OwnerId)
+            .FirstOrDefault();
 
         var ownerWallet = _dbContext.Wallets
                             .Where(x => x.AccountId == owner.AccountId)
                             .FirstOrDefault();
 
-        if(transaction.WalletTargetId != ownerWallet.Id)
+        if (transaction.WalletTargetId != ownerWallet.Id)
         {
             return Task.FromResult(new BeatSportsResponseV2
             {
@@ -67,7 +69,7 @@ public class ApproveMoneyForOwnerHandler : IRequestHandler<ApproveMoneyForOwnerC
         ownerWallet.Balance += (int)transaction.TransactionAmount;
 
         _dbContext.Wallets.Update(ownerWallet);
-        _dbContext.SaveChanges();
+        _dbContext.SaveChanges();        
 
         return Task.FromResult(new BeatSportsResponseV2
         {
