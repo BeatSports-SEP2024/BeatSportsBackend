@@ -11,6 +11,12 @@ using System.Dynamic;
 namespace BeatSportsAPI.Application.Common.Response;
 public class TransactionThirdpartyResponse
 {
+    /// <summary>
+    /// Lấy thông tin của user
+    /// </summary>
+    public Guid CustomerId { get; set; }
+    public string? CustomerName { get; set; }
+    public string? CustomerUsername { get; set; }
     public Guid TransactionId { get; set; }
     public string? TransactionMessage { get; set; }
     public ExpandoObject? TransactionPayload { get; set; }
@@ -53,14 +59,6 @@ public class TransactionThirdpartyForAdminResponse
     //public List<DepositHistory> DepositHistoryResponse { get; set; }
     public List<WithdrawHistory> WithdrawHistoryResponse { get; set; } 
 }
-
-//public class DepositHistory
-//{
-//    public Guid CustomerId { get; set; }
-//    public decimal TotalAmount { get; set; }
-//    public DateTime TransactionDate { get; set; }
-//    public string? CustomerName { get; set; }
-//}
 
 public class WithdrawHistory
 {

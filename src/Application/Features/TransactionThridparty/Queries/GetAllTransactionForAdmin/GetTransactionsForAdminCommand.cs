@@ -42,6 +42,15 @@ public class GetTransactionsForAdminCommandHandler : IRequestHandler<GetTransact
             if (transactionWallet != null)
             {
                 var transactionCusIdExist = await _beatSportsDbContext.PaymentTransactions.Where(pt => pt.PaymentId == payment.Id).FirstOrDefaultAsync();
+
+                // Lấy các thông tin của user ra 
+                var customerInfo = await _beatSportsDbContext.Transactions
+                    .Include(t => t.Wallet)
+                        .ThenInclude(w => w.Account)
+                            .ThenInclude(a => a.Customer)
+                    .Where(t => t.PaymentTransactionId == payment.Id.ToString())
+                    .FirstOrDefaultAsync();
+
                 //var transactionPayload = JsonConvert.DeserializeObject<TransactionPayload>(transactionCusIdExist.TranPayload!);
                 //JObject transactionPayload = JObject.Parse(transactionCusIdExist!.TranPayload!);
                 if (transactionCusIdExist != null)
@@ -58,7 +67,10 @@ public class GetTransactionsForAdminCommandHandler : IRequestHandler<GetTransact
                         TransactionDate = transactionCusIdExist.TranDate,
                         PaymentId = transactionCusIdExist.PaymentId,
                         TransactionType = payment.PaymentType,
-                        CallbackStatus = "Success"
+                        CallbackStatus = "Success",
+                        CustomerId = customerInfo.Wallet.Account.Customer.Id,
+                        CustomerName = customerInfo.Wallet.Account.FirstName +" "+ customerInfo.Wallet.Account.LastName,
+                        CustomerUsername = customerInfo.Wallet.Account.UserName,
                     };
                     listTransaction.Add(data);
                 }
@@ -131,7 +143,7 @@ public class GetTransactionsForAdminCommandHandler : IRequestHandler<GetTransact
 
         // Chỗ này check số dư khả dĩ mà owner có thể rút
         decimal totalMoneyCanWithdraw = totalAdminMoney - totalOwnerWithdrawal;
-        //decimal totalAdminMoney = totalCustomerDeposit - totalOwnerWithdrawal;
+
         var totalCountRecord = listTransaction.Count;
 
         return new TransactionThirdpartyForAdminResponse
