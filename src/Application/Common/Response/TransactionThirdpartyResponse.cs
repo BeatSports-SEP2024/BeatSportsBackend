@@ -27,6 +27,13 @@ public class TransactionThirdpartyResponse
 public class TransactionThirdpartyForAdminResponse
 {
     public List<TransactionThirdpartyResponse> ListTransactionThirdpartyResponse { get; set; }
+    public int? TotalCount { get; set; }
+    /// <summary>
+    /// Những đơn nào chuyển khoản thành công
+    /// đơn nào failed
+    /// </summary>
+    public int? TotalSuccess { get; set; }
+    public int? TotalFailed { get; set; }
     /// <summary>
     /// Tổng tiền admin nhận được
     /// </summary>

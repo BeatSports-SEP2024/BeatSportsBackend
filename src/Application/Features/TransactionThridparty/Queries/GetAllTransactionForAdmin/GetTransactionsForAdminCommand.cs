@@ -95,12 +95,25 @@ public class GetTransactionsForAdminCommandHandler : IRequestHandler<GetTransact
         var successfulTransactions = listTransaction
             .Where(t => t.CallbackStatus == "Success" && t.TransactionStatus == "0")
             .ToList();
+        // từ chối ko nạp tiền
+        var failedTransactions = listTransaction
+           .Where(t => t.CallbackStatus == "Success" && t.TransactionStatus == "-1")
+           .ToList();
+
+        // bị 1ỗi gì đó, ko apply tiền vào ví chánh thức của customer nữa
+        var failedCallBackTransactions = listTransaction
+          .Where(t => t.CallbackStatus == "Failed")
+          .ToList();
 
         decimal totalAdminMoney = successfulTransactions.Sum(t => t.TransactionAmount ?? 0);
+        var totalCountRecord = listTransaction.Count;
 
         return new TransactionThirdpartyForAdminResponse
         {
             ListTransactionThirdpartyResponse = listTransaction.OrderByDescending(p => p.TransactionDate).ToList(),
+            TotalCount = totalCountRecord,
+            TotalSuccess = successfulTransactions.Count,
+            TotalFailed = failedTransactions.Count,
             TotalAdminMoney = totalAdminMoney
         };
     }
