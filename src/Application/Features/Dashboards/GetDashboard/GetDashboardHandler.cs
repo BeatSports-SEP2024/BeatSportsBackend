@@ -24,7 +24,7 @@ namespace BeatSportsAPI.Application.Features.Dashboards
         {
             // Lấy tổng tiền đặt sân đã duyệt
             var totalBookingMoneyInApp = await _dbContext.Bookings
-                .Where(b => b.BookingStatus == "Approved" && !b.IsDelete && b.BookingDate.Year == request.Year)
+                .Where(b => (b.BookingStatus == "Approved" || b.BookingStatus == "Finished") && !b.IsDelete && b.BookingDate.Year == request.Year)
                 .SumAsync(b => b.TotalAmount, cancellationToken);
 
             // Lấy tổng số chủ sân
@@ -64,7 +64,7 @@ namespace BeatSportsAPI.Application.Features.Dashboards
 
             // Lấy dữ liệu doanh thu theo từng tháng 
             var revenueByMonth = await _dbContext.Bookings
-                .Where(b => b.BookingStatus == "Approved" && !b.IsDelete && b.BookingDate.Year == request.Year)
+                .Where(b => (b.BookingStatus == "Approved" || b.BookingStatus == "Finished") && !b.IsDelete && b.BookingDate.Year == request.Year)
                 .GroupBy(b => new { Year = b.BookingDate.Year, Month = b.BookingDate.Month })
                 .Select(g => new
                 {

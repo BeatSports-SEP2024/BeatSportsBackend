@@ -25,7 +25,8 @@ public class GetBookingFinishForInvoiceHandler : IRequestHandler<GetBookingFinis
 
         var query = await (
             from booking in _beatSportsDbContext.Bookings
-            where !booking.IsDelete
+            where !booking.IsDelete   
+                && (booking.BookingStatus == "Approved" || booking.BookingStatus == "Finished")
                 && booking.CourtSubdivision.Court.Id == request.CourtId
                 && booking.BookingDate.Date >= request.DayStart.Date
                 && booking.BookingDate.Date <= request.DayEnd.Date
