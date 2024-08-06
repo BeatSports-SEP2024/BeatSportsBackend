@@ -144,26 +144,26 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                             }
                             else if (customerWallet.Balance < checkTotalMoney)
                             {
-                                /// TODO: cần check lại là có cần thiết phải hủy nếu kh đủ tiền kh
-                                checkBookingInDB.BookingStatus = BookingEnums.Cancel.ToString();
-                                _beatSportsDbContext.Bookings.Update(checkBookingInDB);
+                                ///// TODO: cần check lại là có cần thiết phải hủy nếu kh đủ tiền kh
+                                //checkBookingInDB.BookingStatus = BookingEnums.Cancel.ToString();
+                                //_beatSportsDbContext.Bookings.Update(checkBookingInDB);
 
-                                var transaction = new Transaction
-                                {
-                                    WalletId = customerWallet.Id,
-                                    WalletTargetId = ownerWallet.Id,
-                                    TransactionMessage = TransactionConstant.TransactionFailedInsufficientBalance,
-                                    TransactionPayload = "",
-                                    TransactionStatus = TransactionEnum.Cancel.ToString(),
-                                    AdminCheckStatus = 0,
-                                    TransactionAmount = checkTotalMoney,
-                                    TransactionDate = DateTime.UtcNow,
-                                    TransactionType = TransactionConstant.TransactionTypeInApp,
-                                    IsDelete = false
-                                };
-                                _beatSportsDbContext.Transactions.Add(transaction);
-                                checkBookingInDB.TransactionId = transaction.Id;
-                                await _beatSportsDbContext.SaveChangesAsync();
+                                //var transaction = new Transaction
+                                //{
+                                //    WalletId = customerWallet.Id,
+                                //    WalletTargetId = ownerWallet.Id,
+                                //    TransactionMessage = TransactionConstant.TransactionFailedInsufficientBalance,
+                                //    TransactionPayload = "",
+                                //    TransactionStatus = TransactionEnum.Cancel.ToString(),
+                                //    AdminCheckStatus = 0,
+                                //    TransactionAmount = checkTotalMoney,
+                                //    TransactionDate = DateTime.UtcNow,
+                                //    TransactionType = TransactionConstant.TransactionTypeInApp,
+                                //    IsDelete = false
+                                //};
+                                //_beatSportsDbContext.Transactions.Add(transaction);
+                                //checkBookingInDB.TransactionId = transaction.Id;
+                                //await _beatSportsDbContext.SaveChangesAsync();
                                 throw new BadRequestException("Balance is not enough for booking");
                             }
                         }
@@ -287,26 +287,26 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                             }
                             else if (customerWallet.Balance < checkBookingInDB.TotalAmount)
                             {
-                                /// TODO: cần check lại là có cần thiết phải hủy nếu kh đủ tiền kh
-                                checkBookingInDB.BookingStatus = BookingEnums.Cancel.ToString();
-                                _beatSportsDbContext.Bookings.Update(checkBookingInDB);
+                                ///// TODO: cần check lại là có cần thiết phải hủy nếu kh đủ tiền kh
+                                //checkBookingInDB.BookingStatus = BookingEnums.Cancel.ToString();
+                                //_beatSportsDbContext.Bookings.Update(checkBookingInDB);
 
-                                var transaction = new Transaction
-                                {
-                                    WalletId = customerWallet.Id,
-                                    WalletTargetId = ownerWallet.Id,
-                                    TransactionMessage = TransactionConstant.TransactionFailedInsufficientBalance,
-                                    TransactionPayload = null,
-                                    TransactionStatus = TransactionEnum.Cancel.ToString(),
-                                    AdminCheckStatus = 0,
-                                    TransactionAmount = checkBookingInDB.TotalAmount,
-                                    TransactionDate = DateTime.UtcNow,
-                                    TransactionType = TransactionConstant.TransactionTypeInApp,
-                                    IsDelete = false
-                                };
-                                _beatSportsDbContext.Transactions.Add(transaction);
-                                checkBookingInDB.TransactionId = transaction.Id;
-                                await _beatSportsDbContext.SaveChangesAsync();
+                                //var transaction = new Transaction
+                                //{
+                                //    WalletId = customerWallet.Id,
+                                //    WalletTargetId = ownerWallet.Id,
+                                //    TransactionMessage = TransactionConstant.TransactionFailedInsufficientBalance,
+                                //    TransactionPayload = null,
+                                //    TransactionStatus = TransactionEnum.Cancel.ToString(),
+                                //    AdminCheckStatus = 0,
+                                //    TransactionAmount = checkBookingInDB.TotalAmount,
+                                //    TransactionDate = DateTime.UtcNow,
+                                //    TransactionType = TransactionConstant.TransactionTypeInApp,
+                                //    IsDelete = false
+                                //};
+                                //_beatSportsDbContext.Transactions.Add(transaction);
+                                //checkBookingInDB.TransactionId = transaction.Id;
+                                //await _beatSportsDbContext.SaveChangesAsync();
                                 throw new BadRequestException("Balance is not enough for booking");
                             }
                         }
