@@ -1,5 +1,8 @@
-﻿using BeatSportsAPI.Application.Features.TransactionThridparty.Queries.GetTransactionByCusId;
+﻿using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Features.TransactionThridparty.Queries.GetAllTransactionForAdmin;
+using BeatSportsAPI.Application.Features.TransactionThridparty.Queries.GetTransactionByCusId;
 using BeatSportsAPI.Application.Features.Wallets.Queries.GetById;
+using BeatSportsAPI.Application.Features.Wallets.Queries.GetMerchantAndDestination;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,5 +29,12 @@ public class TransactionThirdpartyController : ApiControllerBase
         var response = await _mediator.Send(request);
 
         return Ok(response);
+    }
+
+    [HttpGet]
+    public async Task<TransactionThirdpartyForAdminResponse> GetTransactionsThridpartyByAdmin()
+    {
+        var response = await _mediator.Send(new GetTransactionsForAdminCommand());
+        return response;
     }
 }
