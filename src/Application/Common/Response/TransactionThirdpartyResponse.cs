@@ -24,6 +24,15 @@ public class TransactionThirdpartyResponse
     /// </summary>
     public string? CallbackStatus { get; set; }
 }
+public class TransactionThirdpartyForAdminResponse
+{
+    public List<TransactionThirdpartyResponse> ListTransactionThirdpartyResponse { get; set; }
+    /// <summary>
+    /// Tổng tiền admin nhận được
+    /// </summary>
+    public decimal? TotalAdminMoney { get; set; }
+}
+
 
 public class ResponseData
 {
