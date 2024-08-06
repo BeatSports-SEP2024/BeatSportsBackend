@@ -109,12 +109,13 @@ public class GetTransactionsForAdminCommandHandler : IRequestHandler<GetTransact
             .Where(t => t.TransactionType == "Nạp tiền")
             .Sum(t => t.TransactionAmount ?? 0);
 
+        // Kiểm tra xem tiền đó owner rút và đã được duyệt rồi
         decimal totalOwnerWithdrawal = _beatSportsDbContext.Transactions
-            .Where(t => t.TransactionType == "Rút tiền")
+            .Where(t => t.TransactionType == "Rút tiền" && (int)t.AdminCheckStatus == 1)
             .Sum(t => t.TransactionAmount ?? 0);
 
         var withdrawHistory = await _beatSportsDbContext.Transactions
-            .Where(t => t.TransactionType == "Rút tiền")
+            .Where(t => t.TransactionType == "Rút tiền" && (int)t.AdminCheckStatus == 1)
             .Select(t => new WithdrawHistory
             {
                 OwnerAccount = t.Wallet.Account.UserName,
