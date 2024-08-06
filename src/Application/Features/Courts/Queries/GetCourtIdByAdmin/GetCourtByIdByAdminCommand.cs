@@ -16,6 +16,9 @@ namespace BeatSportsAPI.Application.Features.Courts.Queries.GetCourtIdByAdmin;
 public class GetCourtByIdByAdminCommand : IRequest<CourtResponseV7>
 {
     public Guid CourtId { get; set; }
+    public string? UsernameFilter { get; set; }
+    public DateTime? FromTime { get; set; }
+    public DateTime? ToTime { get; set; }
 }
 
 public class GetCourtByIdByAdminCommandHandler : IRequestHandler<GetCourtByIdByAdminCommand, CourtResponseV7>
@@ -30,7 +33,7 @@ public class GetCourtByIdByAdminCommandHandler : IRequestHandler<GetCourtByIdByA
     }
     public Task<CourtResponseV7> Handle(GetCourtByIdByAdminCommand request, CancellationToken cancellationToken)
     {
-        var query = new List<Court>();
+        //svar query = new List<Court>();
 
         var courtDetails = _beatSportsDbContext.Courts
             .Where(c => c.Id == request.CourtId)
@@ -101,6 +104,7 @@ public class GetCourtByIdByAdminCommandHandler : IRequestHandler<GetCourtByIdByA
                         ProfilePictureUrl = c.Booking.Customer.Account.ProfilePictureURL,
                         FullName = c.Booking.Customer.Account.FirstName + " " + c.Booking.Customer.Account.LastName,
                         FeedbackSentTime = ParseTimeExtension.GetFormattedTime(DateTime.Now - c.Created),
+                        FeedbackDate = c.Created,
                     }).ToList(),
             })
             .FirstOrDefault();
