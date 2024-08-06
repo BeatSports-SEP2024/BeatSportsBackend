@@ -31,7 +31,7 @@ public class GetTransactionsForAdminCommandHandler : IRequestHandler<GetTransact
     public async Task<TransactionThirdpartyForAdminResponse> Handle(GetTransactionsForAdminCommand request, CancellationToken cancellationToken)
     {
         var listTransaction = new List<TransactionThirdpartyResponse>();
-        
+
         var paymentExist = await _beatSportsDbContext.Payments.ToListAsync();
         foreach (var payment in paymentExist)
         {
@@ -105,13 +105,25 @@ public class GetTransactionsForAdminCommandHandler : IRequestHandler<GetTransact
           .Where(t => t.CallbackStatus == "Failed")
           .ToList();
 
-        //decimal totalCustomerDeposit = _beatSportsDbContext.Transactions
-        //    .Where(t => t.TransactionType == "Nạp tiền")
-        //    .Sum(t => t.TransactionAmount ?? 0);
+        decimal totalCustomerDeposit = _beatSportsDbContext.Transactions
+            .Where(t => t.TransactionType == "Nạp tiền")
+            .Sum(t => t.TransactionAmount ?? 0);
 
         decimal totalOwnerWithdrawal = _beatSportsDbContext.Transactions
             .Where(t => t.TransactionType == "Rút tiền")
             .Sum(t => t.TransactionAmount ?? 0);
+
+        var withdrawHistory = await _beatSportsDbContext.Transactions
+            .Where(t => t.TransactionType == "Rút tiền")
+            .Select(t => new WithdrawHistory
+            {
+                OwnerAccount = t.Wallet.Account.UserName,
+                OwnerId = t.Wallet.Account.Owner.Id,
+                OwnerName = t.Wallet.Account.Owner.Account.FirstName + " " + t.Wallet.Account.Owner.Account.LastName,
+                TotalOwnerWithdraw = t.TransactionAmount ?? 0,
+                TransactionDate = t.TransactionDate ?? DateTime.Now
+            }).ToListAsync(cancellationToken);
+
 
         // Chỗ này get tổng tiền customer nạp vào 
         decimal totalAdminMoney = successfulTransactions.Sum(t => t.TransactionAmount ?? 0);
@@ -129,7 +141,9 @@ public class GetTransactionsForAdminCommandHandler : IRequestHandler<GetTransact
             TotalFailed = failedTransactions.Count,
             TotalAdminMoney = totalAdminMoney,
             TotalOwnerWithdraw = totalOwnerWithdrawal,
-            TotalMoneyCanWithDraw = totalMoneyCanWithdraw,
+            TotalMoneyCanWithdraw = totalMoneyCanWithdraw,
+            TotalMoneyCustomerDeposit = totalCustomerDeposit,
+            WithdrawHistoryResponse = withdrawHistory,
         };
     }
 }
