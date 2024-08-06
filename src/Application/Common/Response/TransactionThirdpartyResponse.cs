@@ -45,9 +45,31 @@ public class TransactionThirdpartyForAdminResponse
     /// <summary>
     /// Số tiền mà owner có thể rút dựa trên Admin money và lệnh rút tiền
     /// </summary>
-    public decimal? TotalMoneyCanWithDraw { get; set; }
+    public decimal? TotalMoneyCanWithdraw { get; set; }
+    /// <summary>
+    /// Số tiền mà khách hàng đã nạp vào ví
+    /// </summary>
+    public decimal? TotalMoneyCustomerDeposit { get; set; }
+    //public List<DepositHistory> DepositHistoryResponse { get; set; }
+    public List<WithdrawHistory> WithdrawHistoryResponse { get; set; } 
 }
 
+//public class DepositHistory
+//{
+//    public Guid CustomerId { get; set; }
+//    public decimal TotalAmount { get; set; }
+//    public DateTime TransactionDate { get; set; }
+//    public string? CustomerName { get; set; }
+//}
+
+public class WithdrawHistory
+{
+    public string? OwnerAccount { get; set; }
+    public Guid OwnerId { get; set; }
+    public string? OwnerName { get; set; }
+    public decimal? TotalOwnerWithdraw { get; set; }
+    public DateTime? TransactionDate { get; set; }
+}
 
 public class ResponseData
 {

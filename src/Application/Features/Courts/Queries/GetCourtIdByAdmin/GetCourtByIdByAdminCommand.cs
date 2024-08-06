@@ -16,9 +16,6 @@ namespace BeatSportsAPI.Application.Features.Courts.Queries.GetCourtIdByAdmin;
 public class GetCourtByIdByAdminCommand : IRequest<CourtResponseV7>
 {
     public Guid CourtId { get; set; }
-    public string? UsernameFilter { get; set; }
-    public DateTime? FromTime { get; set; }
-    public DateTime? ToTime { get; set; }
 }
 
 public class GetCourtByIdByAdminCommandHandler : IRequestHandler<GetCourtByIdByAdminCommand, CourtResponseV7>
