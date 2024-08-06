@@ -27,12 +27,49 @@ public class TransactionThirdpartyResponse
 public class TransactionThirdpartyForAdminResponse
 {
     public List<TransactionThirdpartyResponse> ListTransactionThirdpartyResponse { get; set; }
+    public int? TotalCount { get; set; }
+    /// <summary>
+    /// Những đơn nào chuyển khoản thành công
+    /// đơn nào failed
+    /// </summary>
+    public int? TotalSuccess { get; set; }
+    public int? TotalFailed { get; set; }
     /// <summary>
     /// Tổng tiền admin nhận được
     /// </summary>
     public decimal? TotalAdminMoney { get; set; }
+    /// <summary>
+    /// Tổng tiền mà owner rút ra
+    /// </summary>
+    public decimal? TotalOwnerWithdraw { get; set; }
+    /// <summary>
+    /// Số tiền mà owner có thể rút dựa trên Admin money và lệnh rút tiền
+    /// </summary>
+    public decimal? TotalMoneyCanWithdraw { get; set; }
+    /// <summary>
+    /// Số tiền mà khách hàng đã nạp vào ví
+    /// </summary>
+    public decimal? TotalMoneyCustomerDeposit { get; set; }
+    //public List<DepositHistory> DepositHistoryResponse { get; set; }
+    public List<WithdrawHistory> WithdrawHistoryResponse { get; set; } 
 }
 
+//public class DepositHistory
+//{
+//    public Guid CustomerId { get; set; }
+//    public decimal TotalAmount { get; set; }
+//    public DateTime TransactionDate { get; set; }
+//    public string? CustomerName { get; set; }
+//}
+
+public class WithdrawHistory
+{
+    public string? OwnerAccount { get; set; }
+    public Guid OwnerId { get; set; }
+    public string? OwnerName { get; set; }
+    public decimal? TotalOwnerWithdraw { get; set; }
+    public DateTime? TransactionDate { get; set; }
+}
 
 public class ResponseData
 {

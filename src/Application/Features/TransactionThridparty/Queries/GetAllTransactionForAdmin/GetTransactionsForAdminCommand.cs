@@ -31,7 +31,7 @@ public class GetTransactionsForAdminCommandHandler : IRequestHandler<GetTransact
     public async Task<TransactionThirdpartyForAdminResponse> Handle(GetTransactionsForAdminCommand request, CancellationToken cancellationToken)
     {
         var listTransaction = new List<TransactionThirdpartyResponse>();
-        
+
         var paymentExist = await _beatSportsDbContext.Payments.ToListAsync();
         foreach (var payment in paymentExist)
         {
@@ -95,14 +95,56 @@ public class GetTransactionsForAdminCommandHandler : IRequestHandler<GetTransact
         var successfulTransactions = listTransaction
             .Where(t => t.CallbackStatus == "Success" && t.TransactionStatus == "0")
             .ToList();
+        // từ chối ko nạp tiền
+        var failedTransactions = listTransaction
+           .Where(t => t.CallbackStatus == "Success" && t.TransactionStatus == "-1")
+           .ToList();
 
+        // bị 1ỗi gì đó, ko apply tiền vào ví chánh thức của customer nữa
+        var failedCallBackTransactions = listTransaction
+          .Where(t => t.CallbackStatus == "Failed")
+          .ToList();
+
+        decimal totalCustomerDeposit = _beatSportsDbContext.Transactions
+            .Where(t => t.TransactionType == "Nạp tiền")
+            .Sum(t => t.TransactionAmount ?? 0);
+
+        // Kiểm tra xem tiền đó owner rút và đã được duyệt rồi
+        decimal totalOwnerWithdrawal = _beatSportsDbContext.Transactions
+            .Where(t => t.TransactionType == "Rút tiền" && (int)t.AdminCheckStatus == 1)
+            .Sum(t => t.TransactionAmount ?? 0);
+
+        var withdrawHistory = await _beatSportsDbContext.Transactions
+            .Where(t => t.TransactionType == "Rút tiền" && (int)t.AdminCheckStatus == 1)
+            .Select(t => new WithdrawHistory
+            {
+                OwnerAccount = t.Wallet.Account.UserName,
+                OwnerId = t.Wallet.Account.Owner.Id,
+                OwnerName = t.Wallet.Account.Owner.Account.FirstName + " " + t.Wallet.Account.Owner.Account.LastName,
+                TotalOwnerWithdraw = t.TransactionAmount ?? 0,
+                TransactionDate = t.TransactionDate ?? DateTime.Now
+            }).ToListAsync(cancellationToken);
+
+
+        // Chỗ này get tổng tiền customer nạp vào 
         decimal totalAdminMoney = successfulTransactions.Sum(t => t.TransactionAmount ?? 0);
+
+        // Chỗ này check số dư khả dĩ mà owner có thể rút
+        decimal totalMoneyCanWithdraw = totalAdminMoney - totalOwnerWithdrawal;
+        //decimal totalAdminMoney = totalCustomerDeposit - totalOwnerWithdrawal;
+        var totalCountRecord = listTransaction.Count;
 
         return new TransactionThirdpartyForAdminResponse
         {
             ListTransactionThirdpartyResponse = listTransaction.OrderByDescending(p => p.TransactionDate).ToList(),
-            TotalAdminMoney = totalAdminMoney
+            TotalCount = totalCountRecord,
+            TotalSuccess = successfulTransactions.Count,
+            TotalFailed = failedTransactions.Count,
+            TotalAdminMoney = totalAdminMoney,
+            TotalOwnerWithdraw = totalOwnerWithdrawal,
+            TotalMoneyCanWithdraw = totalMoneyCanWithdraw,
+            TotalMoneyCustomerDeposit = totalCustomerDeposit,
+            WithdrawHistoryResponse = withdrawHistory,
         };
     }
 }
-
