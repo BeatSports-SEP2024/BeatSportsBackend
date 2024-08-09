@@ -114,7 +114,7 @@ public class CheckTimeJob
     public void RemoveRoomWhenExpired()
     {
         var expiredRooms = _beatSportsDbContext.RoomMatches
-            .Where(x => !x.IsDelete).ToList();
+            .Where(x => !x.IsDelete && x.EndTimeRoom >= DateTime.Now).ToList();
 
         foreach (var room in expiredRooms)
         {
