@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WebAPI.Controllers.ChatHubs;
 
-public sealed class ChatHub : Hub<IChatClient>
+public sealed class ChatHub : Hub
 {
     private IBeatSportsDbContext _dbContext;
 
@@ -17,7 +17,7 @@ public sealed class ChatHub : Hub<IChatClient>
     //thong bao co nguoi join server
     public override async Task OnConnectedAsync()
     {
-        await Clients.All.ReceiveMessage($"{Context.ConnectionId} has joined!");
+        await Clients.All.SendAsync($"{Context.ConnectionId} has joined!");
     }
 
     //gui tin nhan kenh the gioi
@@ -30,7 +30,7 @@ public sealed class ChatHub : Hub<IChatClient>
 
         var cusName = customer.Account.FirstName + " " + customer.Account.LastName;
 
-        await Clients.All.ReceiveMessage($"{cusName}: {message}");
+        await Clients.All.SendAsync($"{cusName}: {message}");
     }
 
     //tham gia group private
@@ -43,8 +43,8 @@ public sealed class ChatHub : Hub<IChatClient>
 
         var cusName = customer.Account.FirstName + " " + customer.Account.LastName;
 
-        await Groups.AddToGroupAsync(customer.Id.ToString(), group);
-        await Clients.Group(group).ReceiveMessage($"{cusName} joined {group}");
+        await Groups.AddToGroupAsync(Context.ConnectionId, group);
+        await Clients.Group(group).SendAsync($"{cusName} joined {group}");
     }
 
     //gui tin nhan group private
@@ -57,7 +57,7 @@ public sealed class ChatHub : Hub<IChatClient>
 
         var cusName = customer.Account.FirstName + " " + customer.Account.LastName;
 
-        await Clients.Group(group).ReceiveMessage($"{cusName}: {message}");
+        await Clients.Group(group).SendAsync($"{cusName}: {message}");
     }
     //out group private
     public async Task OutGroup(Guid customerId, string group)
@@ -69,7 +69,7 @@ public sealed class ChatHub : Hub<IChatClient>
 
         var cusName = customer.Account.FirstName + " " + customer.Account.LastName;
 
-        await Groups.RemoveFromGroupAsync(customer.Id.ToString(), group);
-        await Clients.Group(group).ReceiveMessage($"{cusName} out {group}");
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
+        await Clients.Group(group).SendAsync($"{cusName} out {group}");
     }
 }
