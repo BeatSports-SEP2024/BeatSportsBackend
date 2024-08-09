@@ -35,7 +35,7 @@ public sealed class ChatHub : Hub
     }
 
     //tham gia group private
-    public async Task JoinGroup(Guid customerId, string group)
+    public async Task JoinGroup(Guid customerId, Guid roomId)
     {
         var customer = _dbContext.Customers
                     .Where(x => x.Id == customerId)
@@ -44,12 +44,12 @@ public sealed class ChatHub : Hub
 
         var cusName = customer.Account.FirstName.Trim() + " " + customer.Account.LastName.Trim();
 
-        await Groups.AddToGroupAsync(Context.ConnectionId, group);
-        await Clients.Group(group).SendAsync("ReceiveMessage", $"{cusName} joined {group}");
+        await Groups.AddToGroupAsync(Context.ConnectionId, roomId.ToString());
+        await Clients.Group(roomId.ToString()).SendAsync("ReceiveMessage", $"{cusName} joined {roomId}", customerId.ToString());
     }
 
     //gui tin nhan group private
-    public async Task SendMessageToGroup(string group, Guid customerId, string message)
+    public async Task SendMessageToGroup(Guid roomId, Guid customerId, string message)
     {
         var customer = _dbContext.Customers
                     .Where(x => x.Id == customerId)
@@ -58,7 +58,7 @@ public sealed class ChatHub : Hub
 
         var cusName = customer.Account.FirstName.Trim() + " " + customer.Account.LastName.Trim();
 
-        await Clients.Group(group).SendAsync("ReceiveMessage", $"{cusName}: {message}", customerId.ToString());
+        await Clients.Group(roomId.ToString()).SendAsync("ReceiveMessage", $"{cusName}: {message}", customerId.ToString());
     }
     //out group private
     public async Task OutGroup(Guid customerId, string group)
