@@ -28,9 +28,9 @@ public sealed class ChatHub : Hub
                     .Include(x => x.Account)
                     .FirstOrDefault();
 
-        var cusName = customer.Account.FirstName + " " + customer.Account.LastName;
+        var cusName = customer.Account.FirstName.Trim() + " " + customer.Account.LastName.Trim();
 
-        await Clients.All.SendAsync("ReceiveMessage", $"{cusName}: {message}");
+        await Clients.All.SendAsync("ReceiveMessage", $"{cusName}: {message}", customerId.ToString());
     }
 
     //tham gia group private
