@@ -1,20 +1,17 @@
-﻿using BeatSportsAPI.Application.Common.Interfaces;
-using BeatSportsAPI.Application.Common.Response;
+﻿using BeatSportsAPI.Application.Common.Constants;
 using BeatSportsAPI.Application.Common.Exceptions;
-using MediatR;
+using BeatSportsAPI.Application.Common.Interfaces;
+using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Features.Cloudinaries;
+using BeatSportsAPI.Application.Features.Hubs;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Enums;
+using MediatR;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using QRCoder;
 using Services.Redis;
 using StackExchange.Redis;
-using BeatSportsAPI.Application.Common.Models;
-using Microsoft.EntityFrameworkCore;
-using BeatSportsAPI.Domain.Entities.CourtEntity;
-using BeatSportsAPI.Domain.Entities.Room;
-using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDashboard;
-using Newtonsoft.Json.Linq;
-using BeatSportsAPI.Application.Common.Constants;
-using BeatSportsAPI.Application.Features.Hubs;
-using Microsoft.AspNetCore.SignalR;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Commands.CreateBooking;
 public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, BookingSuccessResponse>
@@ -22,16 +19,38 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
     private readonly IBeatSportsDbContext _beatSportsDbContext;
     private readonly IDatabase _database;
     private readonly IHubContext<BookingHub> _hubContext;
+    private readonly IMediator _mediator;
     private readonly IEmailService _emailService;
 
-    public CreateBookingHandler(IBeatSportsDbContext beatSportsDbContext, IDatabase database, IHubContext<BookingHub> hubContext, IEmailService emailService)
+    public CreateBookingHandler(IBeatSportsDbContext beatSportsDbContext, IMediator mediator, IDatabase database, IHubContext<BookingHub> hubContext, IEmailService emailService)
     {
         _beatSportsDbContext = beatSportsDbContext;
+        _mediator = mediator;
         _database = database;
         _hubContext = hubContext;
         _emailService = emailService;
     }
+    private async Task<string> CreateAndUploadQRCode(string bookingId)
+    {
+        // Tạo QR code
+        using var qrGenerator = new QRCodeGenerator();
+        var qrCodeData = qrGenerator.CreateQrCode(bookingId, QRCodeGenerator.ECCLevel.Q);
+        using var qrCode = new PngByteQRCode(qrCodeData);
+        var qrCodeBytes = qrCode.GetGraphic(20);
 
+        // Chuyển QR code bytes thành Stream
+        await using var qrStream = new MemoryStream(qrCodeBytes);
+
+        // Tạo ImageUploadCommand và gửi qua MediatR
+        var command = new ImageUploadCommand
+        {
+            ImageStream = qrStream,
+            FileName = $"booking_{bookingId}_qr.png"
+        };
+
+        var imageUrl = await _mediator.Send(command);
+        return imageUrl;
+    }
     public async Task<BookingSuccessResponse> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
     {
 
@@ -145,25 +164,6 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                             else if (customerWallet.Balance < checkTotalMoney)
                             {
                                 ///// TODO: cần check lại là có cần thiết phải hủy nếu kh đủ tiền kh
-                                //checkBookingInDB.BookingStatus = BookingEnums.Cancel.ToString();
-                                //_beatSportsDbContext.Bookings.Update(checkBookingInDB);
-
-                                //var transaction = new Transaction
-                                //{
-                                //    WalletId = customerWallet.Id,
-                                //    WalletTargetId = ownerWallet.Id,
-                                //    TransactionMessage = TransactionConstant.TransactionFailedInsufficientBalance,
-                                //    TransactionPayload = "",
-                                //    TransactionStatus = TransactionEnum.Cancel.ToString(),
-                                //    AdminCheckStatus = 0,
-                                //    TransactionAmount = checkTotalMoney,
-                                //    TransactionDate = DateTime.UtcNow,
-                                //    TransactionType = TransactionConstant.TransactionTypeInApp,
-                                //    IsDelete = false
-                                //};
-                                //_beatSportsDbContext.Transactions.Add(transaction);
-                                //checkBookingInDB.TransactionId = transaction.Id;
-                                //await _beatSportsDbContext.SaveChangesAsync();
                                 throw new BadRequestException("Balance is not enough for booking");
                             }
                         }
@@ -181,73 +181,84 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                         await _beatSportsDbContext.SaveChangesAsync();
                         Console.WriteLine($"Booking {checkBookingInDB.CustomerId} is complete.");
 
+                        // tạo hình ảnh 
+                        var qrCodeUrl = await CreateAndUploadQRCode(checkBookingInDB.Id.ToString());
+
                         await _emailService.SendEmailAsync(
                             getCustomerByAccount.Account.Email,
                             "Hóa đơn đặt sân chi tiết",
-                            $@"
-                            <html>
-                            <head>
-                                <style>
-                                    body {{
-                                        font-family: Montserrat, sans-serif;
-                                        margin: 0;
-                                        padding: 0;
-                                        background-color: #f4f4f4;
-                                    }}
-                                    .container {{
-                                        width: 100%;
-                                        max-width: 600px;
-                                        margin: 0 auto;
-                                        background-color: #ffffff;
-                                        padding: 20px;
-                                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                                    }}
-                                    .header {{
-                                        background-color: #007bff;
-                                        color: #ffffff;
-                                        padding: 10px 0;
-                                        text-align: center;
-                                        font-size: 24px;
-                                    }}
-                                    .content {{
-                                        margin: 20px 0;
-                                        line-height: 1.6;
-                                    }}
-                                    .content p {{
-                                        margin: 10px 0;
-                                    }}
-                                    .footer {{
-                                        margin: 20px 0;
-                                        text-align: center;
-                                        color: #777;
-                                        font-size: 12px;
-                                    }}
-                                </style>
-                            </head>
-                            <body>
-                                <div class='container'>
-                                    <div class='header'>
-                                        Thông tin tài khoản chủ sân
-                                    </div>
-                                    <div class='content'>
-                                        <p>Kính gửi {getCustomerByAccount.Account.FirstName + " " + getCustomerByAccount.Account.LastName},</p>
-                                        <p>Chúng tôi xin thông báo rằng việc đặt phòng của bạn đã thành công với các thông tin sau:</p>
-                                        <p><strong>Mã đặt phòng:</strong> {checkBookingInDB.Id}</p>
-                                        <p><strong>Tên sân:</strong> {checkBookingInDB.CourtSubdivision.Court.CourtName}</p>
-                                        <p><strong>Sân con:</strong> {checkBookingInDB.CourtSubdivision.CourtSubdivisionName}</p>
-                                        <p><strong>Thời gian bắt đầu:</strong> {checkBookingInDB.StartTimePlaying}</p>
-                                        <p><strong>Thời gian kết thúc:</strong> {checkBookingInDB.EndTimePlaying}</p>
-                                        <p><strong>Tổng số tiền thanh toán:</strong> {checkBookingInDB.TotalAmount} VND</p>
-                                        <p><strong>Số tiền đã giảm giá từ voucher:</strong> {checkBookingInDB.TotalPriceDiscountCampaign} VND</p>
-                                        <p><strong>Trạng thái:</strong> {checkBookingInDB.BookingStatus}</p>
-                                        <p><strong>Thông tin chủ sân:</strong> {checkBookingInDB.CourtSubdivision.Court.Owner.Account.FirstName} {checkBookingInDB.CourtSubdivision.Court.Owner.Account.LastName}</p>
-                                    </div>
-                                    <div class='footer'>
-                                        <p>© 2024 BeatSports. All rights reserved.</p>
-                                    </div>
-                                </div>
-                            </body>
-                            </html>"
+                                                   $@"<html>
+<head>
+    <style>
+        body {{
+            font-family: Montserrat, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }}
+        .container {{
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }}
+        .header {{
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 24px;
+        }}
+        .content {{
+            margin: 20px 0;
+            line-height: 1.6;
+            text-align: center;
+        }}
+        .content img {{
+            max-width: 50%; /* Giới hạn kích thước tối đa của ảnh là 50% chiều rộng của container */
+            height: auto; /* Đảm bảo tỷ lệ chiều cao phù hợp */
+            margin-top: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }}
+        .footer {{
+            margin: 20px 0;
+            text-align: center;
+            color: #777;
+            font-size: 12px;
+        }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            Thông tin tài khoản chủ sân
+        </div>
+        <div class='content'>
+            <p>Kính gửi {getCustomerByAccount.Account.FirstName + " " + getCustomerByAccount.Account.LastName},</p>
+            <p>Chúng tôi xin thông báo rằng việc đặt phòng của bạn đã thành công với các thông tin sau:</p>
+            <p><strong>Mã đặt phòng:</strong> {checkBookingInDB.Id}</p>
+            <p><strong>Tên sân:</strong> {checkBookingInDB.CourtSubdivision.Court.CourtName}</p>
+            <p><strong>Sân con:</strong> {checkBookingInDB.CourtSubdivision.CourtSubdivisionName}</p>
+            <p><strong>Thời gian bắt đầu:</strong> {checkBookingInDB.StartTimePlaying}</p>
+            <p><strong>Thời gian kết thúc:</strong> {checkBookingInDB.EndTimePlaying}</p>
+            <p><strong>Tổng số tiền thanh toán:</strong> {checkBookingInDB.TotalAmount} VND</p>
+            <p><strong>Số tiền đã giảm giá từ voucher:</strong> {checkBookingInDB.TotalPriceDiscountCampaign} VND</p>
+            <p><strong>Trạng thái:</strong> {checkBookingInDB.BookingStatus}</p>
+            <p><strong>Thông tin chủ sân:</strong> {checkBookingInDB.CourtSubdivision.Court.Owner.Account.FirstName} {checkBookingInDB.CourtSubdivision.Court.Owner.Account.LastName}</p>
+            <img src='{qrCodeUrl}' alt='QR Code for your booking' />
+            <p>Vui lòng đến sân và check-in trong vòng 30 phút kể từ thời gian bắt đầu. Nếu không check-in, đặt sân sẽ bị hủy và không hoàn trả tiền.</p>
+        </div>
+        <div class='footer'>
+            <p>© 2024 BeatSports. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
+"
                         );
                         return new BookingSuccessResponse
                         {
@@ -314,74 +325,83 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                         _beatSportsDbContext.Bookings.Update(checkBookingInDB);
                         await _beatSportsDbContext.SaveChangesAsync();
                         Console.WriteLine($"Booking {checkBookingInDB.CustomerId} is complete.");
+                        var qrCodeUrl = await CreateAndUploadQRCode(checkBookingInDB.Id.ToString());
 
                         await _emailService.SendEmailAsync(
                             getCustomerByAccount.Account.Email,
                             "Hóa đơn đặt sân chi tiết",
-                            $@"
-                            <html>
-                            <head>
-                                <style>
-                                    body {{
-                                        font-family: Montserrat, sans-serif;
-                                        margin: 0;
-                                        padding: 0;
-                                        background-color: #f4f4f4;
-                                    }}
-                                    .container {{
-                                        width: 100%;
-                                        max-width: 600px;
-                                        margin: 0 auto;
-                                        background-color: #ffffff;
-                                        padding: 20px;
-                                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                                    }}
-                                    .header {{
-                                        background-color: #007bff;
-                                        color: #ffffff;
-                                        padding: 10px 0;
-                                        text-align: center;
-                                        font-size: 24px;
-                                    }}
-                                    .content {{
-                                        margin: 20px 0;
-                                        line-height: 1.6;
-                                    }}
-                                    .content p {{
-                                        margin: 10px 0;
-                                    }}
-                                    .footer {{
-                                        margin: 20px 0;
-                                        text-align: center;
-                                        color: #777;
-                                        font-size: 12px;
-                                    }}
-                                </style>
-                            </head>
-                            <body>
-                                <div class='container'>
-                                    <div class='header'>
-                                        Thông tin đơn đặt sân
-                                    </div>
-                                    <div class='content'>
-                                        <p>Kính gửi {getCustomerByAccount.Account.FirstName + " " + getCustomerByAccount.Account.LastName},</p>
-                                        <p>Chúng tôi xin thông báo rằng việc đặt sân của bạn đã thành công với các thông tin sau:</p>
-                                        <p><strong>Mã đặt sân:</strong> {checkBookingInDB.Id}</p>
-                                        <p><strong>Tên sân:</strong> {checkBookingInDB.CourtSubdivision.Court.CourtName}</p>
-                                        <p><strong>Sân con:</strong> {checkBookingInDB.CourtSubdivision.CourtSubdivisionName}</p>
-                                        <p><strong>Thời gian bắt đầu:</strong> {checkBookingInDB.StartTimePlaying}</p>
-                                        <p><strong>Thời gian kết thúc:</strong> {checkBookingInDB.EndTimePlaying}</p>
-                                        <p><strong>Tổng số tiền thanh toán:</strong> {checkBookingInDB.TotalAmount} VND</p>
-                                        <p><strong>Số tiền đã giảm giá từ voucher:</strong> {checkBookingInDB.TotalPriceDiscountCampaign} VND</p>
-                                        <p><strong>Trạng thái:</strong> {checkBookingInDB.BookingStatus}</p>
-                                        <p><strong>Thông tin chủ sân:</strong> {checkBookingInDB.CourtSubdivision.Court.Owner.Account.FirstName} {checkBookingInDB.CourtSubdivision.Court.Owner.Account.LastName}</p>
-                                    </div>
-                                    <div class='footer'>
-                                        <p>© 2024 BeatSports. All rights reserved.</p>
-                                    </div>
-                                </div>
-                            </body>
-                            </html>"
+                                                   $@"<html>
+<head>
+    <style>
+        body {{
+            font-family: Montserrat, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }}
+        .container {{
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }}
+        .header {{
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 24px;
+        }}
+        .content {{
+            margin: 20px 0;
+            line-height: 1.6;
+            text-align: center;
+        }}
+        .content img {{
+            max-width: 50%; /* Giới hạn kích thước tối đa của ảnh là 50% chiều rộng của container */
+            height: auto; /* Đảm bảo tỷ lệ chiều cao phù hợp */
+            margin-top: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }}
+        .footer {{
+            margin: 20px 0;
+            text-align: center;
+            color: #777;
+            font-size: 12px;
+        }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            Thông tin tài khoản chủ sân
+        </div>
+        <div class='content'>
+            <p>Kính gửi {getCustomerByAccount.Account.FirstName + " " + getCustomerByAccount.Account.LastName},</p>
+            <p>Chúng tôi xin thông báo rằng việc đặt phòng của bạn đã thành công với các thông tin sau:</p>
+            <p><strong>Mã đặt phòng:</strong> {checkBookingInDB.Id}</p>
+            <p><strong>Tên sân:</strong> {checkBookingInDB.CourtSubdivision.Court.CourtName}</p>
+            <p><strong>Sân con:</strong> {checkBookingInDB.CourtSubdivision.CourtSubdivisionName}</p>
+            <p><strong>Thời gian bắt đầu:</strong> {checkBookingInDB.StartTimePlaying}</p>
+            <p><strong>Thời gian kết thúc:</strong> {checkBookingInDB.EndTimePlaying}</p>
+            <p><strong>Tổng số tiền thanh toán:</strong> {checkBookingInDB.TotalAmount} VND</p>
+            <p><strong>Số tiền đã giảm giá từ voucher:</strong> {checkBookingInDB.TotalPriceDiscountCampaign} VND</p>
+            <p><strong>Trạng thái:</strong> {checkBookingInDB.BookingStatus}</p>
+            <p><strong>Thông tin chủ sân:</strong> {checkBookingInDB.CourtSubdivision.Court.Owner.Account.FirstName} {checkBookingInDB.CourtSubdivision.Court.Owner.Account.LastName}</p>
+            <img src='{qrCodeUrl}' alt='QR Code for your booking' />
+            <p>Vui lòng đến sân và check-in trong vòng 30 phút kể từ thời gian bắt đầu. Nếu không check-in, đặt sân sẽ bị hủy và không hoàn trả tiền.</p>
+        </div>
+        <div class='footer'>
+            <p>© 2024 BeatSports. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
+"
                         );
 
                         return new BookingSuccessResponse

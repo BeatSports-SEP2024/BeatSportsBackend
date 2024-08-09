@@ -19,6 +19,8 @@ using WebAPI.Controllers.ChatHubs;
 using BeatSportsAPI.Application.Features.Jobs;
 using Newtonsoft.Json;
 using BeatSportsAPI.Application.Features.Hubs;
+using CloudinaryDotNet;
+using dotenv.net;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -94,7 +96,7 @@ builder.Services.AddSignalR();
 //GraphQl
 builder.Services.AddGraphQLServer()
     .AddQueryType<QueryDatas>()
-    .AddType<Account>();
+    .AddType<BeatSportsAPI.Domain.Entities.Account>();
 
 // Configure Redis connection
 var redisConnectionString = GetJsonInAppSettingsExtension.GetJson("Redis:RedisConnectionStrings");
