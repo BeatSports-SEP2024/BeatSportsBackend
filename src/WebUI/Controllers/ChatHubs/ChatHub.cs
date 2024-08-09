@@ -17,7 +17,7 @@ public sealed class ChatHub : Hub
     //thong bao co nguoi join server
     public override async Task OnConnectedAsync()
     {
-        await Clients.All.SendAsync($"{Context.ConnectionId} has joined!");
+        await Clients.All.SendAsync("ReceiveMessage", $"{Context.ConnectionId} has joined!");
     }
 
     //gui tin nhan kenh the gioi
@@ -30,7 +30,7 @@ public sealed class ChatHub : Hub
 
         var cusName = customer.Account.FirstName + " " + customer.Account.LastName;
 
-        await Clients.All.SendAsync($"{cusName}: {message}");
+        await Clients.All.SendAsync("ReceiveMessage", $"{cusName}: {message}");
     }
 
     //tham gia group private
@@ -44,7 +44,7 @@ public sealed class ChatHub : Hub
         var cusName = customer.Account.FirstName + " " + customer.Account.LastName;
 
         await Groups.AddToGroupAsync(Context.ConnectionId, group);
-        await Clients.Group(group).SendAsync($"{cusName} joined {group}");
+        await Clients.Group(group).SendAsync("ReceiveMessage", $"{cusName} joined {group}");
     }
 
     //gui tin nhan group private
@@ -57,7 +57,7 @@ public sealed class ChatHub : Hub
 
         var cusName = customer.Account.FirstName + " " + customer.Account.LastName;
 
-        await Clients.Group(group).SendAsync($"{cusName}: {message}");
+        await Clients.Group(group).SendAsync("ReceiveMessage", $"{cusName}: {message}");
     }
     //out group private
     public async Task OutGroup(Guid customerId, string group)
@@ -70,6 +70,6 @@ public sealed class ChatHub : Hub
         var cusName = customer.Account.FirstName + " " + customer.Account.LastName;
 
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
-        await Clients.Group(group).SendAsync($"{cusName} out {group}");
+        await Clients.Group(group).SendAsync("ReceiveMessage", $"{cusName} out {group}");
     }
 }
