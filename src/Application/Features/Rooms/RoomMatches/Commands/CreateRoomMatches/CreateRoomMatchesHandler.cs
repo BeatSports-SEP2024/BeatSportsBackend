@@ -63,21 +63,21 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
             throw new ArgumentException($"Invalid sport category: {sportCategoryName}");
         }
 
-        string dateFormat = "dd/MM/yyyy HH:mm";
+        //string dateFormat = "dd/MM/yyyy HH:mm";
 
-        DateTime startTimeRoom;
-        bool isValidDate = DateTime.TryParseExact(
-            request.StartTimeRoom, 
-            dateFormat,          
-            CultureInfo.InvariantCulture, 
-            DateTimeStyles.None,   
-            out startTimeRoom      
-        );
+        //DateTime startTimeRoom;
+        //bool isValidDate = DateTime.TryParseExact(
+        //    request.StartTimeRoom, 
+        //    dateFormat,          
+        //    CultureInfo.InvariantCulture, 
+        //    DateTimeStyles.None,   
+        //    out startTimeRoom      
+        //);
 
-        if (!isValidDate)
-        {
-            throw new ArgumentException("Invalid date format for StartTimeRoom. Please use 'day/month/year hours:minutes' format.");
-        }
+        //if (!isValidDate)
+        //{
+        //    throw new ArgumentException("Invalid date format for StartTimeRoom. Please use 'day/month/year hours:minutes' format.");
+        //}
 
         var room = new RoomMatch()
         {
@@ -86,8 +86,8 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
             RoomName = request.RoomName,
             BookingId = request.BookingId,
             LevelId = request.LevelId,
-            StartTimeRoom = startTimeRoom,
-            EndTimeRoom = booking.PlayingDate + booking.StartTimePlaying,
+            StartTimeRoom = booking.PlayingDate.Add(booking.StartTimePlaying),
+            EndTimeRoom = booking.PlayingDate.Add(booking.EndTimePlaying),
             MaximumMember = request.MaximumMember,
             RuleRoom = request.RuleRoom,
             Note = request.Note
