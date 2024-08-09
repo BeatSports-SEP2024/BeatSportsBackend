@@ -17,7 +17,8 @@ public sealed class ChatHub : Hub
     //thong bao co nguoi join server
     public override async Task OnConnectedAsync()
     {
-        await Clients.All.SendAsync("ReceiveMessage", $"{Context.ConnectionId} has joined!");
+        //await Clients.All.SendAsync("ReceiveMessage", $"{Context.ConnectionId} has joined!");
+        await base.OnConnectedAsync();
     }
 
     //gui tin nhan kenh the gioi
@@ -41,7 +42,7 @@ public sealed class ChatHub : Hub
                     .Include(x => x.Account)
                     .FirstOrDefault();
 
-        var cusName = customer.Account.FirstName + " " + customer.Account.LastName;
+        var cusName = customer.Account.FirstName.Trim() + " " + customer.Account.LastName.Trim();
 
         await Groups.AddToGroupAsync(Context.ConnectionId, group);
         await Clients.Group(group).SendAsync("ReceiveMessage", $"{cusName} joined {group}");
@@ -55,9 +56,9 @@ public sealed class ChatHub : Hub
                     .Include(x => x.Account)
                     .FirstOrDefault();
 
-        var cusName = customer.Account.FirstName + " " + customer.Account.LastName;
+        var cusName = customer.Account.FirstName.Trim() + " " + customer.Account.LastName.Trim();
 
-        await Clients.Group(group).SendAsync("ReceiveMessage", $"{cusName}: {message}");
+        await Clients.Group(group).SendAsync("ReceiveMessage", $"{cusName}: {message}", customerId.ToString());
     }
     //out group private
     public async Task OutGroup(Guid customerId, string group)
