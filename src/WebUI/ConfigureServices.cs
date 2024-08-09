@@ -1,5 +1,7 @@
 ﻿using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Infrastructure.Persistence;
+using CloudinaryDotNet;
+using dotenv.net;
 using FirebaseAdmin;
 using FluentValidation.AspNetCore;
 using Google.Apis.Auth.OAuth2;
@@ -15,6 +17,13 @@ public static class ConfigureServices
         services.AddDatabaseDeveloperPageExceptionFilter();
 
         services.AddSingleton<ICurrentUserService, CurrentUserService>();
+        // Set your Cloudinary credentials
+        //=================================
+
+        DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
+        Cloudinary cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
+        cloudinary.Api.Secure = true;
+        services.AddSingleton(cloudinary);
 
         services.AddHttpContextAccessor();
 
