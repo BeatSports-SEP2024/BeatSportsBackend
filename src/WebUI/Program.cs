@@ -29,7 +29,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy =>
                       {
-                          policy.WithOrigins("*").AllowAnyHeader().AllowAnyMethod();
+                          policy.WithOrigins("*").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
                       });
 });
 // Add services to the container.
@@ -163,9 +163,6 @@ else
     app.UseHsts();
 }
 
-//SignalR Hub
-app.MapHub<ChatHub>("chat-hub");
-
 //app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 app.UseCors(MyAllowSpecificOrigins);
 app.UseDefaultFiles();
@@ -200,6 +197,7 @@ app.MapGraphQL("/graphql");
 app.MapHub<TimePeriodHub>("/timePeriodHub");
 app.MapHub<BookingHub>("/bookingHub");
 app.MapHub<RoomRequestHub>("/creatRoomRequestHub");
+app.MapHub<ChatHub>("chatHub");
 
 #endregion
 //Hangfire Dashboard
