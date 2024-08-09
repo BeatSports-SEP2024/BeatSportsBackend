@@ -45,7 +45,7 @@ public sealed class ChatHub : Hub
         var cusName = customer.Account.FirstName.Trim() + " " + customer.Account.LastName.Trim();
 
         await Groups.AddToGroupAsync(Context.ConnectionId, roomId.ToString());
-        await Clients.Group(roomId.ToString()).SendAsync("ReceiveMessage",/* $"{cusName} joined {roomId}",*/ customerId.ToString());
+        //await Clients.Group(roomId.ToString()).SendAsync("ReceiveMessage",/* $"{cusName} joined {roomId}",*/ customerId.ToString());
     }
 
     //gui tin nhan group private
