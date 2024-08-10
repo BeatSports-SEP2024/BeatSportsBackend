@@ -20,6 +20,10 @@ public class Account : BaseAuditableEntity
     public string? Bio { get; set; }
     public string? PhoneNumber { get; set; }
     public string Role { get; set; } = null!;
+    /// <summary>
+    /// Expo Push Token để lưu token
+    /// </summary>
+    public string? ExpoPushToken { get; set; }   
 
     public virtual Wallet? Wallet { get; set; }
     public virtual Customer? Customer { get; set; }

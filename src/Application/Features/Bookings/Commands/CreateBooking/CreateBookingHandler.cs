@@ -21,14 +21,17 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
     private readonly IHubContext<BookingHub> _hubContext;
     private readonly IMediator _mediator;
     private readonly IEmailService _emailService;
+    private readonly IPushNotificationService _pushNotificationService;
 
-    public CreateBookingHandler(IBeatSportsDbContext beatSportsDbContext, IMediator mediator, IDatabase database, IHubContext<BookingHub> hubContext, IEmailService emailService)
+    public CreateBookingHandler(IBeatSportsDbContext beatSportsDbContext, IMediator mediator, 
+        IDatabase database, IHubContext<BookingHub> hubContext, IEmailService emailService, IPushNotificationService pushNotificationService)
     {
         _beatSportsDbContext = beatSportsDbContext;
         _mediator = mediator;
         _database = database;
         _hubContext = hubContext;
         _emailService = emailService;
+        _pushNotificationService = pushNotificationService;
     }
     private async Task<string> CreateAndUploadQRCode(string bookingId)
     {
@@ -403,6 +406,18 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
 </html>
 "
                         );
+
+                        // Gửi thông báo đẩy đến khách hàng
+                        var customerPushToken = getCustomerByAccount.Account.ExpoPushToken;
+                        if (!string.IsNullOrEmpty(customerPushToken))
+                        {
+                            await _pushNotificationService.SendPushNotification(
+                                customerPushToken,
+                                "Đặt sân thành công",
+                                $"Đặt lịch cho {checkBookingInDB.CourtSubdivision.Court.CourtName} đã được xác nhận thành công!",
+                                new { bookingId = checkBookingInDB.Id, screen = "notifications" }
+                            );
+                        }
 
                         return new BookingSuccessResponse
                         {
