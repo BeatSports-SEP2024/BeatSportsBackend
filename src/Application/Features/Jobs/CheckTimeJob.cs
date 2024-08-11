@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Exceptions;
@@ -151,13 +152,12 @@ public class CheckTimeJob
         _beatSportsDbContext.SaveChanges();
     }
 
-    public async void NotificationForOwnerPayFee()
+    public void NotificationForOwnerPayFee()
     {
         var today = DateTime.Now;
-        if (today.Day == 11)
+        if (today.Day == 10)
         {
-            var owners = _beatSportsDbContext.Owners
-                .ToList();
+            var owners = _beatSportsDbContext.Owners.ToList();
             foreach (var owner in owners)
             {
                 var notification = new Notification
@@ -168,14 +168,17 @@ public class CheckTimeJob
                     IsRead = false,
                     Type = "PayFee"
                 };
+                _beatSportsDbContext.Notifications.Add(notification);
 
-                var emailAddress = owner.Account.Email;
-                if (!string.IsNullOrEmpty(emailAddress))
+                var account = _beatSportsDbContext.Accounts.Where(a => a.Id == owner.AccountId).SingleOrDefault();
+                if (account != null)
                 {
-                    await _emailService.SendEmailAsync(
-                    emailAddress,
-                    "Thanh toán phí dịch vụ - BeatSports",
-                    $@"<html>
+                    if (!string.IsNullOrEmpty(account.Email))
+                    {
+                        _emailService.SendEmailAsync(
+                        account.Email,
+                        "Thanh toán phí dịch vụ - BeatSports",
+                        $@"<html>
                         <head>
                             <style>
                                 body {{
@@ -218,7 +221,7 @@ public class CheckTimeJob
                                     Thanh toán phí dịch vụ
                                 </div>
                                 <div class='content'>
-                                    <p>Kính gửi {owner.Account.FirstName + " " + owner.Account.LastName},</p>
+                                    <p>Kính gửi {account.FirstName + " " + account.LastName},</p>
                                     <p>{notification.Message}</p>
                                     <p>Vui lòng đăng nhập vào hệ thống và hoàn tất thanh toán để tránh bất kỳ sự gián đoạn nào trong việc sử dụng dịch vụ.</p>
                                 </div>
@@ -228,10 +231,9 @@ public class CheckTimeJob
                             </div>
                         </body>
                         </html>"
-                    );
+                        );
+                    }
                 }
-
-                _beatSportsDbContext.Notifications.Add(notification);
             }
             _beatSportsDbContext.SaveChanges();
         }

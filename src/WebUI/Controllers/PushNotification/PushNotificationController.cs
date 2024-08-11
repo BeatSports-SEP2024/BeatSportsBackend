@@ -47,6 +47,7 @@ public class PushNotificationController : ControllerBase
         if (user != null)
         {
             user.ExpoPushToken = request.Token;
+            _beatSportsDbContext.Accounts.Update(user);
             _beatSportsDbContext.SaveChanges();
             return Ok(new { Message = "Push token registered successfully." });
         }
