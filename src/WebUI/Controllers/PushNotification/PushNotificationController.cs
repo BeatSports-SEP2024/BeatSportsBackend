@@ -1,4 +1,11 @@
 ﻿using BeatSportsAPI.Application.Common.Interfaces;
+using BeatSportsAPI.Application.Common.Models;
+using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Features.Feedbacks.Commands.UpdateFeedback;
+using BeatSportsAPI.Application.Features.Feedbacks.Queries.GetAllFeedbacksByCourtId;
+using BeatSportsAPI.Application.Features.Notifications.Commands.Update;
+using BeatSportsAPI.Application.Features.Notifications.Queries.GetNotificationsByAccount;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,13 +17,29 @@ namespace WebAPI.Controllers.PushNotification;
 public class PushNotificationController : ControllerBase
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
+    private readonly IMediator _mediator;
 
-    public PushNotificationController(IBeatSportsDbContext beatSportsDbContext)
+    public PushNotificationController(IBeatSportsDbContext beatSportsDbContext, IMediator mediator)
     {
         _beatSportsDbContext = beatSportsDbContext;
+        _mediator = mediator;
     }
 
-    [HttpPost("register-push-token")]
+    [HttpGet]
+    [Route("get-by-account")]
+    public async Task<List<NotificationResponse>> GetNotificationByAccount([FromQuery] GetNotificationByAccountCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+    [HttpPut]
+    [Route("is-readed")]
+    public async Task<BeatSportsResponse> Update(UpdateNotificationIsReadCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+
+    [HttpPost]
+    [Route("register-push-token")]
     public IActionResult RegisterPushToken([FromBody] RegisterPushTokenRequest request)
     {
         

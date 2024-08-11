@@ -112,9 +112,10 @@ public class CheckTimeJob
                 var customer = _beatSportsDbContext.Customers.Where(a => a.Id == booking.CustomerId).SingleOrDefault();
                 var notification = new Notification
                 {
-                    AccountId = customer.AccountId,  
+                    AccountId = customer.AccountId,
+                    BookingId = booking.Id.ToString(),
                     Title = "Đánh giá sân",
-                    Message = $"Hãy để lại phản hồi cho sân {booking.CourtSubdivision.Court.CourtName} mà bạn đã chơi.",
+                    Message = $"hãy để lại phản hồi cho sân {booking.CourtSubdivision.Court.CourtName} mà bạn đã chơi.",
                     IsRead = false,
                     Type = "Feedback"
                 };
