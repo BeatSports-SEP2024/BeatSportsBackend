@@ -187,8 +187,9 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                         var notification = new Notification
                         {
                             AccountId = accountId,
+                            BookingId = checkBookingInDB.Id.ToString(),
                             Title = "Đặt lịch thành công",
-                            Message = $"Bạn đã đặt lịch {checkBookingInDB.CourtSubdivision.Court.CourtName} thành công",
+                            Message = $"đã đặt lịch {checkBookingInDB.CourtSubdivision.Court.CourtName} thành công",
                             IsRead = false,
                             Type = "Booking"
                         };
@@ -357,8 +358,9 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                         var notification = new Notification
                         {
                             AccountId = accountId,
+                            BookingId = checkBookingInDB.Id.ToString(),
                             Title = "Đặt lịch thành công",
-                            Message = $"Bạn đã đặt lịch {checkBookingInDB.CourtSubdivision.Court.CourtName} thành công",
+                            Message = $"đã đặt lịch {checkBookingInDB.CourtSubdivision.Court.CourtName} thành công",
                             IsRead = false,
                             Type = "Booking"
                         };

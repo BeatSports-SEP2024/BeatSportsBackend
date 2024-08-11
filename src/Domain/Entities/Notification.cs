@@ -20,5 +20,6 @@ public class Notification : BaseAuditableEntity
     /// Loại thông báo (ví dụ: Booking, Check-in, Feedback). trước tiên 3 loại này trước đi
     /// </summary>
     public string? Type { get; set; }
+    public string? BookingId { get; set; }
     public virtual Account Accounts { get; set; }    
 }
