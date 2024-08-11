@@ -40,7 +40,7 @@ public class GetCourtSubdivisionByIdHandler : IRequestHandler<GetCourtSubdivisio
             CourtSubDescription = c.CourtSubdivisionDescription,
             ImgUrls = ImageUrlSplitter.SplitImageUrls(c.Court.ImageUrls),
             SportCategories = c.CourtSubdivisionSettings.SportCategories.Name,
-            Status = c.CreatedStatus.Equals(CourtSubdivisionCreatedStatus.Pending.ToString()) ? "Pending" :
+            Status = c.CreatedStatus.Equals(CourtSubdivisionCreatedStatus.Pending) ? "Pending" :
                     !c.IsActive ? "Đang bảo trì" :
                     !c.TimeCheckings.Any() ? "Chưa có lịch" :
                     (c.TimeCheckings.Any(tc => tc.StartTime <= currentDate && tc.EndTime >= currentDate) ? "Đang cho thuê" :
