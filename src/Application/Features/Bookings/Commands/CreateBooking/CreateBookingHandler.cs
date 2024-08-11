@@ -211,6 +211,12 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
 
                         // tạo hình ảnh 
                         var qrCodeUrl = await CreateAndUploadQRCode(checkBookingInDB.Id.ToString());
+                        if (qrCodeUrl != null)
+                        {
+                            checkBookingInDB.QRUrlForCheckIn = qrCodeUrl;
+                        }
+                        _beatSportsDbContext.Bookings.Update(checkBookingInDB);
+                        await _beatSportsDbContext.SaveChangesAsync();
 
                         await _emailService.SendEmailAsync(
                             getCustomerByAccount.Account.Email,
@@ -379,11 +385,21 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
 
                         Console.WriteLine($"Booking {checkBookingInDB.CustomerId} is complete.");
                         var qrCodeUrl = await CreateAndUploadQRCode(checkBookingInDB.Id.ToString());
+                        if (qrCodeUrl != null)
+                        {
+                            checkBookingInDB.QRUrlForCheckIn = qrCodeUrl;
+                        }
+                        checkBookingInDB.BookingStatus = BookingEnums.Approved.ToString();
 
-                        await _emailService.SendEmailAsync(
-                            getCustomerByAccount.Account.Email,
-                            "Hóa đơn đặt sân chi tiết",
-                                                   $@"<html>
+                        _beatSportsDbContext.Bookings.Update(checkBookingInDB);
+                        await _beatSportsDbContext.SaveChangesAsync();
+
+                        if (getCustomerByAccount.Account.Email != null)
+                        {
+                            await _emailService.SendEmailAsync(
+    getCustomerByAccount.Account.Email,
+    "Hóa đơn đặt sân chi tiết",
+                           $@"<html>
 <head>
     <style>
         body {{
@@ -455,7 +471,9 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
 </body>
 </html>
 "
-                        );
+);
+                        }
+
 
                         return new BookingSuccessResponse
                         {

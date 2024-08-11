@@ -134,10 +134,12 @@ public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingA
         _beatSportsDbContext.Bookings.Update(bookingApprove);
         await _beatSportsDbContext.SaveChangesAsync();
         await _hubContext.Clients.All.SendAsync("DeleteBooking");
-        await _emailService.SendEmailAsync(
-                            getCustomerByAccount.Account.Email,
-                            "Thông báo hủy đơn đặt sân",
-                            $@"
+        if(getCustomerByAccount.Account.Email != null)
+        {
+            await _emailService.SendEmailAsync(
+                    getCustomerByAccount.Account.Email,
+                    "Thông báo hủy đơn đặt sân",
+                    $@"
                             <html>
                             <head>
                                 <style>
@@ -201,7 +203,9 @@ public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingA
                                 </div>
                             </body>
                             </html>"
-                        );
+                );
+        }
+
 
         return new BeatSportsResponse
         {

@@ -21,6 +21,7 @@ public class Booking : BaseAuditableEntity
     public decimal TotalPriceInTimePeriod { get; set; }
     public decimal TotalPriceDiscountCampaign { get; set; }
     public string? PayloadDescriptionPriceOfTimePeriod { get; set; }
+    public string? QRUrlForCheckIn { get; set; }
     public bool IsRoomBooking { get; set; }
     /// <summary>
     /// Dùng để lưu thời gian cần thể nó hủy
