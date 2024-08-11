@@ -7,6 +7,7 @@ using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Jobs;
 public class CheckTimeJob
@@ -100,26 +101,26 @@ public class CheckTimeJob
         var bookingList = _beatSportsDbContext.Bookings
             .Where(x => !x.IsDelete && x.BookingStatus == BookingEnums.Approved.ToString())
             .ToList();
-        
-        foreach(var booking in bookingList) 
+
+        foreach (var booking in bookingList)
         {
             var endDatePlaying = booking.PlayingDate.Add(booking.EndTimePlaying);
-            if(endDatePlaying <= DateTime.Now)
+            if (endDatePlaying <= DateTime.Now)
             {
                 booking.BookingStatus = BookingEnums.Finished.ToString();
 
                 // Tạo thông báo feedback
                 var customer = _beatSportsDbContext.Customers.Where(a => a.Id == booking.CustomerId).SingleOrDefault();
-                var notification = new Notification
+                var notification = _beatSportsDbContext.Notifications.Where(n => n.BookingId == booking.Id.ToString()).SingleOrDefault();
+                if (notification != null)
                 {
-                    AccountId = customer.AccountId,
-                    BookingId = booking.Id.ToString(),
-                    Title = "Đánh giá sân",
-                    Message = $"hãy để lại phản hồi cho sân {booking.CourtSubdivision.Court.CourtName} mà bạn đã chơi.",
-                    IsRead = false,
-                    Type = "Feedback"
-                };
-                _beatSportsDbContext.Notifications.Add(notification);
+                    notification.Title = "Đánh giá sân";
+                    notification.Message = $"hãy để lại phản hồi cho sân {booking.CourtSubdivision.Court.CourtName} mà bạn đã chơi.";
+                    notification.IsRead = false;
+                    notification.Type = "Feedback";
+
+                    _beatSportsDbContext.Notifications.Update(notification);
+                }
             }
         }
         _beatSportsDbContext.SaveChanges();
@@ -146,5 +147,27 @@ public class CheckTimeJob
             _beatSportsDbContext.RoomMatches.Remove(room);
         }
         _beatSportsDbContext.SaveChanges();
+    }
+
+    public void NotificationForOwnerPayFee()
+    {
+        var today = DateTime.Now;
+        if (today.Day == 11)
+        {
+            var owners = _beatSportsDbContext.Owners.ToList();
+            foreach (var owner in owners)
+            {
+                var notification = new Notification
+                {
+                    AccountId = owner.Id,
+                    Title = "Thanh toán phí dịch vụ",
+                    Message = "đã đến ngày 10, vui lòng thanh toán phí dịch vụ quản lý sân.",
+                    IsRead = false,
+                    Type = "PayFee"
+                };
+                _beatSportsDbContext.Notifications.Add(notification);
+            }
+            _beatSportsDbContext.SaveChanges();
+        }
     }
 }
