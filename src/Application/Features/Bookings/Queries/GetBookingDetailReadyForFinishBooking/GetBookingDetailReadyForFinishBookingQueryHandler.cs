@@ -213,7 +213,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                         DateBooking = request.DayWantToPlay,// :))))))))
                         StartTime = startTime,
                         EndTime = endTime,
-                        IsLock = true
+                        IsLock = false
                     };
                     _dbContext.TimeChecking.Add(courtSubLock);
                     await _dbContext.SaveChangesAsync();

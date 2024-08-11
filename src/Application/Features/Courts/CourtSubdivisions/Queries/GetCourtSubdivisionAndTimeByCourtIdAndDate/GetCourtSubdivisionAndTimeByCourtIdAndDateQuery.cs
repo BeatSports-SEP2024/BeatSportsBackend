@@ -22,6 +22,7 @@ public class ListCourtSubdivisionAndTimeDataByCourtSubdivisionId
 public class ListTimeCheckingByCourtSubdivisionId
 {
     public string TimeCheckingId { get; set; } = null!;
+    public string? BookingStatusAtThisTime { get; set; }
     public string StartTimeBooking { get; set; } = null!;
     public string EndBooking { get; set; } = null!;
 }
