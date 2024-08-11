@@ -21,14 +21,17 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
     private readonly IHubContext<BookingHub> _hubContext;
     private readonly IMediator _mediator;
     private readonly IEmailService _emailService;
+    private readonly IPushNotificationService _pushNotificationService;
 
-    public CreateBookingHandler(IBeatSportsDbContext beatSportsDbContext, IMediator mediator, IDatabase database, IHubContext<BookingHub> hubContext, IEmailService emailService)
+    public CreateBookingHandler(IBeatSportsDbContext beatSportsDbContext, IMediator mediator,
+        IDatabase database, IHubContext<BookingHub> hubContext, IEmailService emailService, IPushNotificationService pushNotificationService)
     {
         _beatSportsDbContext = beatSportsDbContext;
         _mediator = mediator;
         _database = database;
         _hubContext = hubContext;
         _emailService = emailService;
+        _pushNotificationService = pushNotificationService;
     }
     private async Task<string> CreateAndUploadQRCode(string bookingId)
     {
@@ -179,86 +182,118 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                         _beatSportsDbContext.Campaigns.Update(campaignIfExist);
                         _beatSportsDbContext.Bookings.Update(checkBookingInDB);
                         await _beatSportsDbContext.SaveChangesAsync();
+
+                        // tạo thông báo cho table notification
+                        var notification = new Notification
+                        {
+                            AccountId = accountId,
+                            BookingId = checkBookingInDB.Id.ToString(),
+                            Title = "Đặt lịch thành công",
+                            Message = $"đã đặt lịch {checkBookingInDB.CourtSubdivision.Court.CourtName} thành công",
+                            IsRead = false,
+                            Type = "Booking"
+                        };
+                        _beatSportsDbContext.Notifications.Add(notification);
+                        await _beatSportsDbContext.SaveChangesAsync();
+
+                        // Gửi thông báo đẩy đến khách hàng
+                        var customerPushToken = getCustomerByAccount.Account.ExpoPushToken;
+                        if (!string.IsNullOrEmpty(customerPushToken))
+                        {
+                            await _pushNotificationService.SendPushNotification(
+                                customerPushToken,
+                                "Đặt sân thành công",
+                                $"Đặt lịch cho {checkBookingInDB.CourtSubdivision.Court.CourtName} đã được xác nhận thành công!",
+                                new { bookingId = checkBookingInDB.Id, screen = "notifications" }
+                            );
+                        }
+
                         Console.WriteLine($"Booking {checkBookingInDB.CustomerId} is complete.");
 
                         // tạo hình ảnh 
                         var qrCodeUrl = await CreateAndUploadQRCode(checkBookingInDB.Id.ToString());
+                        if (qrCodeUrl != null)
+                        {
+                            checkBookingInDB.QRUrlForCheckIn = qrCodeUrl;
+                        }
+                        _beatSportsDbContext.Bookings.Update(checkBookingInDB);
+                        await _beatSportsDbContext.SaveChangesAsync();
 
                         await _emailService.SendEmailAsync(
                             getCustomerByAccount.Account.Email,
                             "Hóa đơn đặt sân chi tiết",
                                                    $@"<html>
-<head>
-    <style>
-        body {{
-            font-family: Montserrat, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }}
-        .container {{
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }}
-        .header {{
-            background-color: #007bff;
-            color: #ffffff;
-            padding: 10px 0;
-            text-align: center;
-            font-size: 24px;
-        }}
-        .content {{
-            margin: 20px 0;
-            line-height: 1.6;
-            text-align: center;
-        }}
-        .content img {{
-            max-width: 50%; /* Giới hạn kích thước tối đa của ảnh là 50% chiều rộng của container */
-            height: auto; /* Đảm bảo tỷ lệ chiều cao phù hợp */
-            margin-top: 10px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }}
-        .footer {{
-            margin: 20px 0;
-            text-align: center;
-            color: #777;
-            font-size: 12px;
-        }}
-    </style>
-</head>
-<body>
-    <div class='container'>
-        <div class='header'>
-            Thông tin tài khoản chủ sân
-        </div>
-        <div class='content'>
-            <p>Kính gửi {getCustomerByAccount.Account.FirstName + " " + getCustomerByAccount.Account.LastName},</p>
-            <p>Chúng tôi xin thông báo rằng việc đặt phòng của bạn đã thành công với các thông tin sau:</p>
-            <p><strong>Mã đặt phòng:</strong> {checkBookingInDB.Id}</p>
-            <p><strong>Tên sân:</strong> {checkBookingInDB.CourtSubdivision.Court.CourtName}</p>
-            <p><strong>Sân con:</strong> {checkBookingInDB.CourtSubdivision.CourtSubdivisionName}</p>
-            <p><strong>Thời gian bắt đầu:</strong> {checkBookingInDB.StartTimePlaying}</p>
-            <p><strong>Thời gian kết thúc:</strong> {checkBookingInDB.EndTimePlaying}</p>
-            <p><strong>Tổng số tiền thanh toán:</strong> {checkBookingInDB.TotalAmount} VND</p>
-            <p><strong>Số tiền đã giảm giá từ voucher:</strong> {checkBookingInDB.TotalPriceDiscountCampaign} VND</p>
-            <p><strong>Trạng thái:</strong> {checkBookingInDB.BookingStatus}</p>
-            <p><strong>Thông tin chủ sân:</strong> {checkBookingInDB.CourtSubdivision.Court.Owner.Account.FirstName} {checkBookingInDB.CourtSubdivision.Court.Owner.Account.LastName}</p>
-            <img src='{qrCodeUrl}' alt='QR Code for your booking' />
-            <p>Vui lòng đến sân và check-in trong vòng 30 phút kể từ thời gian bắt đầu. Nếu không check-in, đặt sân sẽ bị hủy và không hoàn trả tiền.</p>
-        </div>
-        <div class='footer'>
-            <p>© 2024 BeatSports. All rights reserved.</p>
-        </div>
-    </div>
-</body>
-</html>
-"
+                                                        <head>
+                                                            <style>
+                                                                body {{
+                                                                    font-family: Montserrat, sans-serif;
+                                                                    margin: 0;
+                                                                    padding: 0;
+                                                                    background-color: #f4f4f4;
+                                                                }}
+                                                                .container {{
+                                                                    width: 100%;
+                                                                    max-width: 600px;
+                                                                    margin: 0 auto;
+                                                                    background-color: #ffffff;
+                                                                    padding: 20px;
+                                                                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                                                                }}
+                                                                .header {{
+                                                                    background-color: #007bff;
+                                                                    color: #ffffff;
+                                                                    padding: 10px 0;
+                                                                    text-align: center;
+                                                                    font-size: 24px;
+                                                                }}
+                                                                .content {{
+                                                                    margin: 20px 0;
+                                                                    line-height: 1.6;
+                                                                    text-align: center;
+                                                                }}
+                                                                .content img {{
+                                                                    max-width: 50%; /* Giới hạn kích thước tối đa của ảnh là 50% chiều rộng của container */
+                                                                    height: auto; /* Đảm bảo tỷ lệ chiều cao phù hợp */
+                                                                    margin-top: 10px;
+                                                                    display: block;
+                                                                    margin-left: auto;
+                                                                    margin-right: auto;
+                                                                }}
+                                                                .footer {{
+                                                                    margin: 20px 0;
+                                                                    text-align: center;
+                                                                    color: #777;
+                                                                    font-size: 12px;
+                                                                }}
+                                                            </style>
+                                                        </head>
+                                                        <body>
+                                                            <div class='container'>
+                                                                <div class='header'>
+                                                                    Thông tin tài khoản chủ sân
+                                                                </div>
+                                                                <div class='content'>
+                                                                    <p>Kính gửi {getCustomerByAccount.Account.FirstName + " " + getCustomerByAccount.Account.LastName},</p>
+                                                                    <p>Chúng tôi xin thông báo rằng việc đặt phòng của bạn đã thành công với các thông tin sau:</p>
+                                                                    <p><strong>Mã đặt phòng:</strong> {checkBookingInDB.Id}</p>
+                                                                    <p><strong>Tên sân:</strong> {checkBookingInDB.CourtSubdivision.Court.CourtName}</p>
+                                                                    <p><strong>Sân con:</strong> {checkBookingInDB.CourtSubdivision.CourtSubdivisionName}</p>
+                                                                    <p><strong>Thời gian bắt đầu:</strong> {checkBookingInDB.StartTimePlaying}</p>
+                                                                    <p><strong>Thời gian kết thúc:</strong> {checkBookingInDB.EndTimePlaying}</p>
+                                                                    <p><strong>Tổng số tiền thanh toán:</strong> {checkBookingInDB.TotalAmount} VND</p>
+                                                                    <p><strong>Số tiền đã giảm giá từ voucher:</strong> {checkBookingInDB.TotalPriceDiscountCampaign} VND</p>
+                                                                    <p><strong>Trạng thái:</strong> {checkBookingInDB.BookingStatus}</p>
+                                                                    <p><strong>Thông tin chủ sân:</strong> {checkBookingInDB.CourtSubdivision.Court.Owner.Account.FirstName} {checkBookingInDB.CourtSubdivision.Court.Owner.Account.LastName}</p>
+                                                                    <img src='{qrCodeUrl}' alt='QR Code for your booking' />
+                                                                    <p>Vui lòng đến sân và check-in trong vòng 30 phút kể từ thời gian bắt đầu. Nếu không check-in, đặt sân sẽ bị hủy và không hoàn trả tiền.</p>
+                                                                </div>
+                                                                <div class='footer'>
+                                                                    <p>© 2024 BeatSports. All rights reserved.</p>
+                                                                </div>
+                                                            </div>
+                                                        </body>
+                                                        </html>
+                                                        "
                         );
                         return new BookingSuccessResponse
                         {
@@ -324,13 +359,49 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                         checkBookingInDB.BookingStatus = BookingEnums.Approved.ToString();
                         _beatSportsDbContext.Bookings.Update(checkBookingInDB);
                         await _beatSportsDbContext.SaveChangesAsync();
+
+                        // tạo thông báo cho table notification
+                        var notification = new Notification
+                        {
+                            AccountId = accountId,
+                            BookingId = checkBookingInDB.Id.ToString(),
+                            Title = "Đặt lịch thành công",
+                            Message = $"đã đặt lịch {checkBookingInDB.CourtSubdivision.Court.CourtName} thành công",
+                            IsRead = false,
+                            Type = "Booking"
+                        };
+                        _beatSportsDbContext.Notifications.Add(notification);
+                        await _beatSportsDbContext.SaveChangesAsync();
+
+                        // Gửi thông báo đẩy đến khách hàng
+                        var customerPushToken = getCustomerByAccount.Account.ExpoPushToken;
+                        if (!string.IsNullOrEmpty(customerPushToken))
+                        {
+                            await _pushNotificationService.SendPushNotification(
+                                customerPushToken,
+                                "Đặt sân thành công",
+                                $"Đặt lịch cho {checkBookingInDB.CourtSubdivision.Court.CourtName} đã được xác nhận thành công!",
+                                new { bookingId = checkBookingInDB.Id, screen = "notifications" }
+                            );
+                        }
+
                         Console.WriteLine($"Booking {checkBookingInDB.CustomerId} is complete.");
                         var qrCodeUrl = await CreateAndUploadQRCode(checkBookingInDB.Id.ToString());
+                        if (qrCodeUrl != null)
+                        {
+                            checkBookingInDB.QRUrlForCheckIn = qrCodeUrl;
+                        }
+                        checkBookingInDB.BookingStatus = BookingEnums.Approved.ToString();
 
-                        await _emailService.SendEmailAsync(
-                            getCustomerByAccount.Account.Email,
-                            "Hóa đơn đặt sân chi tiết",
-                                                   $@"<html>
+                        _beatSportsDbContext.Bookings.Update(checkBookingInDB);
+                        await _beatSportsDbContext.SaveChangesAsync();
+
+                        if (getCustomerByAccount.Account.Email != null)
+                        {
+                            await _emailService.SendEmailAsync(
+    getCustomerByAccount.Account.Email,
+    "Hóa đơn đặt sân chi tiết",
+                           $@"<html>
 <head>
     <style>
         body {{
@@ -402,7 +473,9 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
 </body>
 </html>
 "
-                        );
+);
+                        }
+
 
                         return new BookingSuccessResponse
                         {

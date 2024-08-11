@@ -6,6 +6,7 @@ using BeatSportsAPI.Infrastructure.Notification;
 using BeatSportsAPI.Infrastructure.Persistence;
 using BeatSportsAPI.Infrastructure.Persistence.Interceptors;
 using BeatSportsAPI.Infrastructure.Services;
+using BeatSportsAPI.Infrastructure.Services.PushNotification;
 using BeatSportsAPI.Infrastructure.Services.SendEmail;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -53,6 +54,8 @@ public static class ConfigureServices
         services.AddTransient<IImageUploadService, ImageUploadService>();
         services.AddTransient<INotificationService, NotificationService>();
         services.AddTransient<IEmailService, EmailService>();
+
+        services.AddHttpClient<IPushNotificationService, PushNotificationService>();
 
         services.AddAuthentication()
             .AddIdentityServerJwt();

@@ -17,6 +17,7 @@ public interface IBeatSportsDbContext
     public DbSet<PaymentDestination> PaymentsDestinations { get; set; }
     public DbSet<PaymentNotification> PaymentNotifications { get; set; }
     public DbSet<PaymentSignature> PaymentSignatures { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
     //public DbSet<PaymentMethod> PaymentMethods { get; set; }
     public DbSet<Level> Levels { get; set; }
     public DbSet<RoomMember> RoomMembers { get; set; }

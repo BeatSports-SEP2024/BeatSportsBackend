@@ -18,6 +18,7 @@ using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetVenueBarchartByRangeDate;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingByCourtId;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetIncomeByBookingByCourtId;
+using BeatSportsAPI.Application.Features.Bookings.Commands.CheckInBooking;
 
 namespace WebAPI.Controllers.Bookings;
 
@@ -37,6 +38,12 @@ public class BookingController : ApiControllerBase
     [HttpGet]
     [Route("dashboard")]
     public async Task<BookingDashboardResult> DashboardResult([FromQuery] GetBookingDashboardCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+    [HttpPost]
+    [Route("check-in")]
+    public async Task<BeatSportsResponse> CheckInBooking([FromBody] CheckInBookingCommand request)
     {
         return await _mediator.Send(request);
     }
@@ -99,6 +106,13 @@ public class BookingController : ApiControllerBase
     [HttpGet]
     [Route("get-detail-history-by-booking-id")]
     public async Task<BookingHistoryDetailByCustomerId> GetDetailHistoryByBookingId([FromQuery] GetDetailBookingHistoryByBookingIdCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+
+    [HttpGet]
+    [Route("get-detail-history-by-booking-id-and-owner-id")]
+    public async Task<BookingHistoryDetailByCustomerId> GetDetailHistoryByBookingIdAndOwnerId([FromQuery] GetDetailBookingHistoryByBookingIdAndOwnerIdCommand request)
     {
         return await _mediator.Send(request);
     }

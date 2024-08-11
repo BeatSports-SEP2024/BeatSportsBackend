@@ -7,33 +7,35 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Queries.GetDetailBookingHistoryByCustomerId;
-public class GetDetailBookingHistoryByBookingIdCommand : IRequest<BookingHistoryDetailByCustomerId>
+public class GetDetailBookingHistoryByBookingIdAndOwnerIdCommand : IRequest<BookingHistoryDetailByCustomerId>
 {
     public Guid BookingId { get; set; }
+    public Guid OwnerId { get; set; }
 }
-
-public class GetDetailBookingHistoryByBookingIdCommandHandler : IRequestHandler<GetDetailBookingHistoryByBookingIdCommand, BookingHistoryDetailByCustomerId>
+public class GetDetailBookingHistoryByBookingIdAndOwnerIdCommandHandler : IRequestHandler<GetDetailBookingHistoryByBookingIdAndOwnerIdCommand, BookingHistoryDetailByCustomerId>
 {
     private readonly IBeatSportsDbContext _dbContext;
 
-    public GetDetailBookingHistoryByBookingIdCommandHandler(IBeatSportsDbContext dbContext)
+    public GetDetailBookingHistoryByBookingIdAndOwnerIdCommandHandler(IBeatSportsDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public async Task<BookingHistoryDetailByCustomerId> Handle(GetDetailBookingHistoryByBookingIdCommand request, CancellationToken cancellationToken)
+    public async Task<BookingHistoryDetailByCustomerId> Handle(GetDetailBookingHistoryByBookingIdAndOwnerIdCommand request, CancellationToken cancellationToken)
     {
         try
         {
             var bookingExist = await (
             from booking in _dbContext.Bookings
-            where !booking.IsDelete && booking.Id == request.BookingId
             join customer in _dbContext.Customers on booking.CustomerId equals customer.Id
             join account in _dbContext.Accounts on customer.AccountId equals account.Id
             join subCourt in _dbContext.CourtSubdivisions on booking.CourtSubdivisionId equals subCourt.Id
             join court in _dbContext.Courts on subCourt.CourtId equals court.Id
             join campaign in _dbContext.Campaigns on booking.CampaignId equals campaign.Id into campaignJoin
             from campaign in campaignJoin.DefaultIfEmpty()
+
+            where !booking.IsDelete && booking.Id == request.BookingId
+            && court.OwnerId == request.OwnerId
             select new BookingHistoryDetailByCustomerId
             {
                 BookingId = booking.Id,
@@ -79,7 +81,7 @@ public class GetDetailBookingHistoryByBookingIdCommandHandler : IRequestHandler<
             }).FirstOrDefaultAsync();
             if (bookingExist == null)
             {
-                throw new NotFoundException("Not Found");
+                return null;
             }
             return bookingExist;
         }

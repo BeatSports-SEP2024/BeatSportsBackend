@@ -45,6 +45,7 @@ public class GetDetailBookingHistoryByCusIdCommandHandler : IRequestHandler<GetD
                 BookingId = booking.Id,
                 CustomerId = customer.Id,
                 FirstName = account.FirstName,
+                QRUrl = booking.QRUrlForCheckIn,
                 LastName = account.LastName,
                 PhoneNumber = account.PhoneNumber,
                 CustomerAddress = customer.Address,

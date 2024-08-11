@@ -1,7 +1,5 @@
 ﻿using System.Reflection;
-using System.Reflection.Emit;
 using BeatSportsAPI.Application.Common.Interfaces;
-using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
@@ -9,17 +7,11 @@ using BeatSportsAPI.Domain.Entities.CourtEntity.TimePeriod;
 using BeatSportsAPI.Domain.Entities.PaymentEntity;
 using BeatSportsAPI.Domain.Entities.Room;
 using BeatSportsAPI.Domain.Enums;
-using BeatSportsAPI.Infrastructure.Identity;
 using BeatSportsAPI.Infrastructure.Persistence.Interceptors;
 using Duende.IdentityServer.EntityFramework.Entities;
-using Duende.IdentityServer.EntityFramework.Options;
-using Google.Apis.Storage.v1.Data;
 using MediatR;
-using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace BeatSportsAPI.Infrastructure.Persistence;
 public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
@@ -39,6 +31,7 @@ public class BeatSportsAPIDbContext : DbContext, IBeatSportsDbContext
     public DbSet<Merchant> Merchants { get; set; }
     public DbSet<SportCategory> SportsCategories { get; set; }
     public DbSet<Court> Courts { get; set; }
+    public DbSet<BeatSportsAPI.Domain.Entities.Notification> Notifications { get; set; }
     //public DbSet<CourtSportCategory> CourtSportCategories { get; set; }
     public DbSet<CourtSubdivisionSetting> CourtSubdivisionSettings { get; set; }
     public DbSet<CourtSubdivision> CourtSubdivisions { get; set; }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
+using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Enums;
 
 namespace BeatSportsAPI.Application.Features.Jobs;
@@ -106,6 +107,19 @@ public class CheckTimeJob
             if(endDatePlaying <= DateTime.Now)
             {
                 booking.BookingStatus = BookingEnums.Finished.ToString();
+
+                // Tạo thông báo feedback
+                var customer = _beatSportsDbContext.Customers.Where(a => a.Id == booking.CustomerId).SingleOrDefault();
+                var notification = new Notification
+                {
+                    AccountId = customer.AccountId,
+                    BookingId = booking.Id.ToString(),
+                    Title = "Đánh giá sân",
+                    Message = $"hãy để lại phản hồi cho sân {booking.CourtSubdivision.Court.CourtName} mà bạn đã chơi.",
+                    IsRead = false,
+                    Type = "Feedback"
+                };
+                _beatSportsDbContext.Notifications.Add(notification);
             }
         }
         _beatSportsDbContext.SaveChanges();

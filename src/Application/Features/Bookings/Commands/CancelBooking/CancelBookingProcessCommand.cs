@@ -38,8 +38,8 @@ public class CancelBookingProcessCommandHandler : IRequestHandler<CancelBookingP
     public async Task<BeatSportsResponse> Handle(CancelBookingProcessCommand request, CancellationToken cancellationToken)
     {
         var bookingProcess = await _beatSportsDbContext.Bookings
-            .Where(x => x.BookingStatus == BookingEnums.Process.ToString() 
-            && x.Id == request.BookingId 
+            .Where(x => x.BookingStatus == BookingEnums.Process.ToString()
+            && x.Id == request.BookingId
             && x.CustomerId == request.CustomerId).FirstOrDefaultAsync();
         if (bookingProcess == null)
         {
@@ -91,10 +91,12 @@ public class CancelBookingProcessCommandHandler : IRequestHandler<CancelBookingP
             _beatSportsDbContext.Bookings.Remove(bookingProcess);
             _beatSportsDbContext.SaveChanges();
             await _hubContext.Clients.All.SendAsync("DeleteBookingProcess");
-            await _emailService.SendEmailAsync(
-                            getCustomerByAccount.Account.Email,
-                            "Thông báo hủy đơn đặt sân",
-                            $@"
+            if (getCustomerByAccount.Account.Email != null)
+            {
+                await _emailService.SendEmailAsync(
+                getCustomerByAccount.Account.Email,
+                "Thông báo hủy đơn đặt sân",
+                $@"
                             <html>
                             <head>
                                 <style>
@@ -158,7 +160,9 @@ public class CancelBookingProcessCommandHandler : IRequestHandler<CancelBookingP
                                 </div>
                             </body>
                             </html>"
-                        );
+            );
+            }
+
         }
 
         return new BeatSportsResponse
