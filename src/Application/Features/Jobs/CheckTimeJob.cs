@@ -13,10 +13,12 @@ namespace BeatSportsAPI.Application.Features.Jobs;
 public class CheckTimeJob
 {
     private readonly IBeatSportsDbContext _beatSportsDbContext;
+    private readonly IEmailService _emailService;
 
-    public CheckTimeJob(IBeatSportsDbContext beatSportsDbContext)
+    public CheckTimeJob(IBeatSportsDbContext beatSportsDbContext, IEmailService emailService)
     {
         _beatSportsDbContext = beatSportsDbContext;
+        _emailService = emailService;
     }
     public void CheckTimeOfCourt()
     {
@@ -149,22 +151,86 @@ public class CheckTimeJob
         _beatSportsDbContext.SaveChanges();
     }
 
-    public void NotificationForOwnerPayFee()
+    public async void NotificationForOwnerPayFee()
     {
         var today = DateTime.Now;
         if (today.Day == 11)
         {
-            var owners = _beatSportsDbContext.Owners.ToList();
+            var owners = _beatSportsDbContext.Owners
+                .ToList();
             foreach (var owner in owners)
             {
                 var notification = new Notification
                 {
-                    AccountId = owner.Id,
+                    AccountId = owner.AccountId,
                     Title = "Thanh toán phí dịch vụ",
                     Message = "đã đến ngày 10, vui lòng thanh toán phí dịch vụ quản lý sân.",
                     IsRead = false,
                     Type = "PayFee"
                 };
+
+                var emailAddress = owner.Account.Email;
+                if (!string.IsNullOrEmpty(emailAddress))
+                {
+                    await _emailService.SendEmailAsync(
+                    emailAddress,
+                    "Thanh toán phí dịch vụ - BeatSports",
+                    $@"<html>
+                        <head>
+                            <style>
+                                body {{
+                                    font-family: Montserrat, sans-serif;
+                                    margin: 0;
+                                    padding: 0;
+                                    background-color: #f4f4f4;
+                                }}
+                                .container {{
+                                    width: 100%;
+                                    max-width: 600px;
+                                    margin: 0 auto;
+                                    background-color: #ffffff;
+                                    padding: 20px;
+                                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                                }}
+                                .header {{
+                                    background-color: #007bff;
+                                    color: #ffffff;
+                                    padding: 10px 0;
+                                    text-align: center;
+                                    font-size: 24px;
+                                }}
+                                .content {{
+                                    margin: 20px 0;
+                                    line-height: 1.6;
+                                    text-align: center;
+                                }}
+                                .footer {{
+                                    margin: 20px 0;
+                                    text-align: center;
+                                    color: #777;
+                                    font-size: 12px;
+                                }}
+                            </style>
+                        </head>
+                        <body>
+                            <div class='container'>
+                                <div class='header'>
+                                    Thanh toán phí dịch vụ
+                                </div>
+                                <div class='content'>
+                                    <p>Kính gửi {owner.Account.FirstName + " " + owner.Account.LastName},</p>
+                                    <p>{notification.Message}</p>
+                                    <p>Vui lòng đăng nhập vào hệ thống và hoàn tất thanh toán để tránh bất kỳ sự gián đoạn nào trong việc sử dụng dịch vụ.</p>
+                                </div>
+                                <div class='footer'>
+                                    <p>© 2024 BeatSports. All rights reserved.</p>
+                                </div>
+                            </div>
+                        </body>
+                        </html>"
+                    );
+                }
+
                 _beatSportsDbContext.Notifications.Add(notification);
             }
             _beatSportsDbContext.SaveChanges();
