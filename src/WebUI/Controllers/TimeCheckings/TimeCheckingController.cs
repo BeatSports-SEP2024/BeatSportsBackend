@@ -1,5 +1,7 @@
 ﻿using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Features.Courts.TimeCheckings.Commands;
 using BeatSportsAPI.Application.Features.Courts.TimeCheckings.Queries;
+using BeatSportsAPI.Application.Features.Courts.TimePeriod.Command.CreateTimePeriod;
 using BeatSportsAPI.Application.Features.Feedbacks.Commands.CreateFeedback;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
@@ -13,6 +15,12 @@ public class TimeCheckingController : ApiControllerBase
     public TimeCheckingController(IMediator mediator)
     {
         _mediator = mediator;
+    }
+
+    [HttpPost]
+    public async Task<BeatSportsResponse> CreateTimeCheckingForCourtSub(CreateLockCourtSubdivisionCommand request)
+    {
+        return await _mediator.Send(request);
     }
 
     [HttpGet]

@@ -65,8 +65,31 @@ public class ListTimeCheckingByCourtSubdivisionId
                                                   && x.StartTime.Day == request.DateCheck.Day)).ToListAsync();
             foreach (var timecheck in listTimecheck)
             {
+                var bookingStatus = await _dbContext.Bookings
+                            .Include(b => b.CourtSubdivision)
+                            .Where(b => b.CourtSubdivisionId == timecheck.CourtSubdivisionId &&
+                                 b.PlayingDate.Date == timecheck.DateBooking.Date &&
+                                 b.StartTimePlaying == timecheck.StartTime.TimeOfDay &&
+                                 b.EndTimePlaying == timecheck.EndTime.TimeOfDay)
+                            .FirstOrDefaultAsync();
+                var bookingStatusString = "";
+
+                if (timecheck.IsLock)
+                {
+                    bookingStatusString = "Locked";
+                }
+                else if (bookingStatus != null)
+                {
+                    bookingStatusString = bookingStatus.BookingStatus.ToString();
+                }
+                else
+                {
+                    bookingStatusString = "Empty";
+
+                }
                 var newTimeCheck = new ListTimeCheckingByCourtSubdivisionId
                 {
+                    BookingStatusAtThisTime = bookingStatusString,
                     TimeCheckingId = timecheck.Id.ToString(),
                     StartTimeBooking = timecheck.StartTime.ToString("HH:mm"),
                     EndBooking = timecheck.EndTime.ToString("HH:mm")
