@@ -20,8 +20,7 @@ public class CreateWithdrawalRequestByOwnerHandler : IRequestHandler<CreateWithd
         _dbContext = dbContext;
     }
     public Task<BeatSportsResponseV2> Handle(CreateWithdrawalRequestByOwnerCommand request, CancellationToken cancellationToken)
-    {
-       
+    {      
         var owner = _dbContext.Owners
                     .Where(x => x.Id == request.OwnerId)
                     .FirstOrDefault();
@@ -54,7 +53,7 @@ public class CreateWithdrawalRequestByOwnerHandler : IRequestHandler<CreateWithd
             return Task.FromResult(new BeatSportsResponseV2
             {
                 Status = 400,
-                Message = "Số dư tối thiểu trong ví không được dưới 70000VND"
+                Message = $"Số dư tối thiểu trong ví không được dưới 70000VND, số dư có thể rút {request.TransactionAmount - 70000}"
             });
         }
 

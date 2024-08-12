@@ -1,6 +1,7 @@
 ﻿using BeatSportsAPI.Application.Features.Transactions.Commands.ApproveMoneyForOwner;
 using BeatSportsAPI.Application.Features.Transactions.Commands.ApproveWithdrawalRequestByOwner;
 using BeatSportsAPI.Application.Features.Transactions.Commands.CreateWithdrawalRequestByOwner;
+using BeatSportsAPI.Application.Features.Transactions.Commands.PayFeeMonthlyForOwner;
 using BeatSportsAPI.Application.Features.Transactions.Commands.RejectMoneyForOwner;
 using BeatSportsAPI.Application.Features.Transactions.Commands.RejectWithdrawalRequestByOwner;
 using BeatSportsAPI.Application.Features.Transactions.Commands.TransferMoneyInApp;
@@ -197,4 +198,22 @@ public class TransactionController : ApiControllerBase
         return Ok(response);
     }
 
+    [HttpPost]
+    [Route("pay-monthly-fee")]
+    public async Task<IActionResult> PayMonthlyFee([FromBody] PayFeeMonthlyForOwnerCommand request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var response = await _mediator.Send(request);
+
+        if (response.Status == 400)
+        {
+            return BadRequest(response);
+        }
+
+        return Ok(response);
+    }
 }

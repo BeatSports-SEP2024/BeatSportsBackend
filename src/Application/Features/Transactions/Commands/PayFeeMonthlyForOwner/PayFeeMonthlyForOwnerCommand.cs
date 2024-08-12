@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Response;
 using MediatR;
 
-namespace BeatSportsAPI.Application.Features.Transactions.Commands.CreateWithdrawalRequestByOwner;
-public class CreateWithdrawalRequestByOwnerCommand : IRequest<BeatSportsResponseV2>
+namespace BeatSportsAPI.Application.Features.Transactions.Commands.PayFeeMonthlyForOwner;
+public class PayFeeMonthlyForOwnerCommand : IRequest<BeatSportsResponseV2>
 {
-    public Guid OwnerId { get; set; }
+    public Guid? OwnerId { get; set; }
     [Range(1, double.MaxValue, ErrorMessage = "Số tiền phải lớn hơn 0.")]
-    public decimal? TransactionAmount { get; set; }
+    public decimal? FeeMonthlyForOwner { get; set; }
 }
