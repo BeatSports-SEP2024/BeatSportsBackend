@@ -212,6 +212,6 @@ RecurringJob.AddOrUpdate<CheckTimeJob>("checking-time-for-booking", job => job.C
 RecurringJob.AddOrUpdate<CheckTimeJob>("check-booking-if-expired", job => job.CheckBookingPlayDateIfFinish(), Cron.MinuteInterval(30));
 RecurringJob.AddOrUpdate<CheckTimeJob>("remove-room-match-if-expired", job => job.RemoveRoomWhenExpired(), Cron.MinuteInterval(30));
 RecurringJob.AddOrUpdate<CheckTimeJob>("send-owner-pay-fee-notification",
-    job => job.NotificationForOwnerPayFee(), Cron.Monthly(11, 20, 12)); // 9h30 sáng ngày 10
+    job => job.NotificationForOwnerPayFee(), Cron.Monthly(10, 9-7, 0)); // 9h00 sáng ngày 10
 
 app.Run();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,5 +11,5 @@ namespace BeatSportsAPI.Application.Features.Transactions.Commands.CreateWithdra
 public class CreateWithdrawalRequestByOwnerCommand : IRequest<BeatSportsResponseV2>
 {
     public Guid OwnerId { get; set; }
-    public decimal? TransactionAmount { get; set; }
+    public decimal TransactionAmount { get; set; }
 }

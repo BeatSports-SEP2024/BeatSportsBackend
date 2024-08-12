@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
-using BeatSportsAPI.Application.Features.Transactions.Commands.TransferMoneyInApp;
+using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
@@ -20,8 +20,12 @@ public class CreateWithdrawalRequestByOwnerHandler : IRequestHandler<CreateWithd
         _dbContext = dbContext;
     }
     public Task<BeatSportsResponseV2> Handle(CreateWithdrawalRequestByOwnerCommand request, CancellationToken cancellationToken)
-    {
-       
+    {      
+        if (request.TransactionAmount < 0)
+        {
+            throw new BadRequestException("Số tiền yêu cầu rút phải lớn hơn 0");
+        }
+
         var owner = _dbContext.Owners
                     .Where(x => x.Id == request.OwnerId)
                     .FirstOrDefault();
@@ -45,6 +49,19 @@ public class CreateWithdrawalRequestByOwnerHandler : IRequestHandler<CreateWithd
             {
                 Status = 400,
                 Message = "Yêu cầu rút tiền thất bại, số dư không đủ để thực hiện!"
+            });
+        }
+
+        // Chặn rút tiền nếu số dư còn lại không đủ
+        if (ownerWallet.Balance - request.TransactionAmount < 70000)
+        {
+            decimal withdrawableAmount = request.TransactionAmount - 70000;
+            string formattedWithdrawableAmount = withdrawableAmount.ToString("N0");
+
+            return Task.FromResult(new BeatSportsResponseV2
+            {
+                Status = 400,
+                Message = $"Số dư tối thiểu trong ví không được dưới 70.000VND, số dư có thể rút {formattedWithdrawableAmount} VND"
             });
         }
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace BeatSportsAPI.Application.Common.Response;
 
+#region Main Dashboard
 public class DashboardDataInside
 {
     public List<DashboardData>? Dashboard { get; set; }
@@ -40,3 +41,37 @@ public class DashboardResponse
     public DashboardTotalOwner OwnerDashboard { get; set; }
     public DashboardTotalCustomer CustomerDashboard { get; set; }
 }
+#endregion
+#region SubDashboard
+public class PaidOwner
+{
+    public string? OwnerAccount { get; set; }
+    public Guid OwnerId { get; set; }
+    public string? OwnerName { get; set; }
+    public decimal? TotalFeePaid { get; set; }
+    public DateTime? TransactionDate { get; set; }
+}
+
+public class UnpaidOwner
+{
+    public string? OwnerAccount { get; set; }
+    public Guid OwnerId { get; set; }
+    public string? OwnerName { get; set; }
+    public decimal? TotalFeeNeedToPaid { get; set; }
+    public DateTime? TransactionDate { get; set; }
+}
+public class OwnerPayFeeOverviewResponse
+{
+    public int TotalActiveOwners { get; set; }
+    /// <summary>
+    /// Tổng tiền mà owner đã đóng trong tháng đó
+    /// </summary>
+    public decimal TotalPaidThisMonth { get; set; }
+    /// <summary>
+    /// Tổng tiền đã thu từ trước tới giờ
+    /// </summary>
+    public decimal TotalPaidOverall { get; set; }
+    public List<PaidOwner>? PaidOwnerList { get; set; }
+    public List<UnpaidOwner>? UnpaidOwnerList { get; set; }
+}
+#endregion
