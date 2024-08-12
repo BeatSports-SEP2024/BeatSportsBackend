@@ -8,6 +8,7 @@ using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Domain.Entities.PaymentEntity;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Transactions.Commands.OwnerPayFeeOverview;
@@ -42,7 +43,9 @@ public class OwnerPayFeeOverviewHandler : IRequestHandler<OwnerPayFeeOverviewCom
 
         var activeOwners = await _beatSportsDbContext.Owners
             .Include(o => o.Account)
-            .Where(o => !o.Account.IsDelete)
+                    .Where(o => !o.Account.IsDelete
+                    && o.Created.Month == month 
+                    && o.Created.Year == year)
             .ToListAsync();
 
         var paidOwners = new List<PaidOwner>();
