@@ -71,6 +71,10 @@ public class OwnerPayFeeOverviewResponse
     /// Tổng tiền đã thu từ trước tới giờ
     /// </summary>
     public decimal TotalPaidOverall { get; set; }
+    /// <summary>
+    /// Tổng số tiền mà các owner chưa thanh toán
+    /// </summary>
+    public decimal TotalNotPaidFee { get; set; }
     public List<PaidOwner>? PaidOwnerList { get; set; }
     public List<UnpaidOwner>? UnpaidOwnerList { get; set; }
 }
