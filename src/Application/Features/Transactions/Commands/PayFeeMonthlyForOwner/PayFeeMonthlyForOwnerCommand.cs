@@ -11,6 +11,5 @@ namespace BeatSportsAPI.Application.Features.Transactions.Commands.PayFeeMonthly
 public class PayFeeMonthlyForOwnerCommand : IRequest<BeatSportsResponseV2>
 {
     public Guid? OwnerId { get; set; }
-    [Range(1, double.MaxValue, ErrorMessage = "Số tiền phải lớn hơn 0.")]
     public decimal? FeeMonthlyForOwner { get; set; }
 }
