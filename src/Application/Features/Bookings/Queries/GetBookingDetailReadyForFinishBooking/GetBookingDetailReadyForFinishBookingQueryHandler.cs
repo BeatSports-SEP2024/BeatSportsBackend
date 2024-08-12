@@ -94,7 +94,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                     var dateTimeStartTimeWantToPlay = request.DayWantToPlay + request.StartTimeWantToPlay;
                     var dateTimeEndTimeWantToPlay = request.DayWantToPlay + request.EndTimeWantToPlay;
 
-                    // Giờ dô time check check nè
+/*                    // Giờ dô time check check nè
                     var timeCheckFlag = await _dbContext.TimeChecking.Where(x => x.CourtSubdivisionId == request.CourtSubdivisionId && !x.IsDelete &&
                                                                          (
                                                                          (dateTimeStartTimeWantToPlay <= x.EndTime && dateTimeStartTimeWantToPlay >= x.StartTime) ||
@@ -104,7 +104,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                     if (timeCheckFlag.Any())
                     {
                         throw new BadRequestException("Sân bạn muốn đặt đã được đặt trước đó! Vui lòng lựa sân khác nhé");
-                    }
+                    }*/
 
                     // B2. Lấy các TimePeriods áp dụng cho CourtSubdivisionId
                     var timePeriods = await (from tp in _dbContext.TimePeriods
