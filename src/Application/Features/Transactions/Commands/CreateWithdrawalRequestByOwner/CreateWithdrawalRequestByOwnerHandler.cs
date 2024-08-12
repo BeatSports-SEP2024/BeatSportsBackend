@@ -49,7 +49,7 @@ public class CreateWithdrawalRequestByOwnerHandler : IRequestHandler<CreateWithd
         }
 
         // Chặn ở mức 70000VND để tự động thu theo tháng
-        if (ownerWallet.Balance < 70000)
+        if (ownerWallet.Balance - request.TransactionAmount < 70000)
         {
             return Task.FromResult(new BeatSportsResponseV2
             {
