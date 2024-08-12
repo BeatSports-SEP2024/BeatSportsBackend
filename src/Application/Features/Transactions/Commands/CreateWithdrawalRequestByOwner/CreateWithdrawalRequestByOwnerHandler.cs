@@ -48,6 +48,16 @@ public class CreateWithdrawalRequestByOwnerHandler : IRequestHandler<CreateWithd
             });
         }
 
+        // Chặn ở mức 70000VND để tự động thu theo tháng
+        if (ownerWallet.Balance < 70000)
+        {
+            return Task.FromResult(new BeatSportsResponseV2
+            {
+                Status = 400,
+                Message = "Số dư tối thiểu trong ví không được dưới 70000VND"
+            });
+        }
+
         var transaction = new Transaction()
         {
             WalletId = ownerWallet.Id,
