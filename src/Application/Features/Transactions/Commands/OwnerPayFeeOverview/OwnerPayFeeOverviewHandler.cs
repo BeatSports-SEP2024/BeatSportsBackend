@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BeatSportsAPI.Application.Common.Interfaces;
+﻿using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
-using BeatSportsAPI.Domain.Entities.PaymentEntity;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Transactions.Commands.OwnerPayFeeOverview;
@@ -101,12 +94,15 @@ public class OwnerPayFeeOverviewHandler : IRequestHandler<OwnerPayFeeOverviewCom
             .Where(transaction => !transaction.IsDelete && transaction.TransactionType == TransactionEnum.Payfee.ToString())
             .SumAsync(transaction => transaction.TransactionAmount);
 
+        var totalNotPaidFee = unpaidOwners.Count * 70000;
+
         // Trả về kết quả
         return new OwnerPayFeeOverviewResponse
         {
             TotalActiveOwners = activeOwners.Count,
             TotalPaidThisMonth = (decimal)totalPaidThisMonth,
             TotalPaidOverall = (decimal)totalPaidOverall,
+            TotalNotPaidFee = totalNotPaidFee,
             PaidOwnerList = paidOwners,
             UnpaidOwnerList = unpaidOwners
         };
