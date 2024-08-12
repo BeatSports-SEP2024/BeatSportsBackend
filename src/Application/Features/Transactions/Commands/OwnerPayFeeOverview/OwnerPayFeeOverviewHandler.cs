@@ -31,6 +31,9 @@ public class OwnerPayFeeOverviewHandler : IRequestHandler<OwnerPayFeeOverviewCom
 
         // Lấy tất cả các giao dịch trong tháng/năm đã chỉ định và không bị xóa
         var transactions = await _beatSportsDbContext.Transactions
+            .Include(c => c.Wallet)
+            .ThenInclude(c => c.Account)
+            .ThenInclude(c => c.Owner)
             .Where(transaction => !transaction.IsDelete
                                   && transaction.TransactionDate.HasValue
                                   && transaction.TransactionDate.Value.Month == month
