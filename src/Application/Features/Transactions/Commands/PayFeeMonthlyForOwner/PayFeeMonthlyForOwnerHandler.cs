@@ -23,8 +23,9 @@ public class PayFeeMonthlyForOwnerHandler : IRequestHandler<PayFeeMonthlyForOwne
             throw new BadRequestException("Số tiền phí không đúng với thực tế");
         }
 
+        // Chỉ thu phí những account owner đang hoạt động
         var owner = _beatSportsDbContext.Owners
-                    .Where(x => x.Id == request.OwnerId)
+                    .Where(x => x.Id == request.OwnerId && !x.IsDelete)
                     .FirstOrDefault();
 
         if (owner == null)
