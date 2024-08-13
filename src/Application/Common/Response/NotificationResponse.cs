@@ -10,6 +10,7 @@ public class NotificationResponse
     public Guid NotificationId { get; set; }
     public Guid AccountId { get; set; }
     public string BookingId { get; set; }
+    public string RoomMatchId { get; set; }
     public string FullName { get; set; }
     public string AccountImage { get; set; }
     public string Title { get; set; }

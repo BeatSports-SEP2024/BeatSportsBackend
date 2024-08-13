@@ -34,7 +34,7 @@ public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand
             .FirstOrDefault();
 
         var roomMatchJoinedList = _beatSportsDbContext.RoomRequests
-                                .Where(x => x.CustomerId == customer.Id)
+                                .Where(x => x.CustomerId == customer.Id && x.JoinStatus == RoomRequestEnums.Accepted)
                                 .ToList();
 
         // Kiểm tra số lượng thành viên trong phòng
