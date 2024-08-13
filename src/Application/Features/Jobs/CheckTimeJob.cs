@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
-using BeatSportsAPI.Application.Common.Exceptions;
-using BeatSportsAPI.Application.Common.Interfaces;
+﻿using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -102,6 +95,8 @@ public class CheckTimeJob
     public void CheckBookingPlayDateIfFinish()
     {
         var bookingList = _beatSportsDbContext.Bookings
+            .Include(cs => cs.CourtSubdivision)
+            .ThenInclude(c => c.Court)
             .Where(x => !x.IsDelete && x.BookingStatus == BookingEnums.Approved.ToString())
             .ToList();
 
