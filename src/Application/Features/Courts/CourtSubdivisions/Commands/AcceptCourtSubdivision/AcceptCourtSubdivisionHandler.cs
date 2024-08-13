@@ -22,6 +22,7 @@ public class AcceptCourtSubdivisionHandler : IRequestHandler<AcceptCourtSubdivis
         var courtSubs = _beatSportsDbContext.CourtSubdivisions
             .Include(c => c.Court)
                 .ThenInclude(o => o.Owner)
+                    .ThenInclude(a => a.Account)
             .Where(cs => !cs.IsDelete && cs.CourtId == request.CourtId && cs.CreatedStatus == (CourtSubdivisionCreatedStatus)StatusEnums.Pending)
             .ToList();
 
