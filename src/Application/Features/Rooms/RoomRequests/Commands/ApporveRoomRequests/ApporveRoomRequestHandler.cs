@@ -6,6 +6,7 @@ using BeatSportsAPI.Application.Features.Rooms.RoomRequests.Commands.UpdateRoomR
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Entities.Room;
 using BeatSportsAPI.Domain.Enums;
+using CloudinaryDotNet;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -62,6 +63,31 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
                     RoleInRoom = RoleInRoomEnums.Member,
                 };
                 _beatSportsDbContext.RoomMembers.Add(roomMember);
+
+                var customer = _beatSportsDbContext.Customers
+                                .Where(x => x.Id == request.CustomerId).FirstOrDefault();
+
+                var roomMatchJoinedList = _beatSportsDbContext.RoomRequests
+                                .Where(x => x.CustomerId == request.CustomerId && x.JoinStatus == RoomRequestEnums.Pending)
+                                .ToList();
+
+                foreach(var roomReq in roomMatchJoinedList)
+                {
+                    roomReq.JoinStatus = RoomRequestEnums.Declined;
+                    _beatSportsDbContext.RoomRequests.Update(roomReq);
+                }
+
+                var notification = new Notification
+                {
+                    AccountId = customer.AccountId,
+                    Title = "Yêu cầu tham gia phòng",
+                    Message = $" đã được chấp thuận!",
+                    RoomMatchId = roomRequest.RoomMatchId.ToString(),
+                    IsRead = false,
+                    Type = "RoomRequestAccepted"
+                };
+                _beatSportsDbContext.Notifications.Add(notification);
+
                 // Gửi sự kiện SignalR
                 await _hubContext.Clients.Group(roomRequest.RoomMatchId.ToString()).SendAsync("UpdateRoom", "RequestAccepted", roomRequest.CustomerId);
                 // Gửi email cho khách hàng
