@@ -70,13 +70,14 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
                 var roomMatchJoinedList = _beatSportsDbContext.RoomRequests
                                 .Where(x => x.CustomerId == request.CustomerId && x.JoinStatus == RoomRequestEnums.Pending)
                                 .ToList();
-
-                foreach(var roomReq in roomMatchJoinedList)
+                if(roomMatchJoinedList.Count > 0)
                 {
-                    roomReq.JoinStatus = RoomRequestEnums.Declined;
-                    _beatSportsDbContext.RoomRequests.Update(roomReq);
+                    foreach (var roomReq in roomMatchJoinedList)
+                    {
+                        _beatSportsDbContext.RoomRequests.Remove(roomReq);
+                    }
                 }
-
+                
                 var notification = new Notification
                 {
                     AccountId = customer.AccountId,
