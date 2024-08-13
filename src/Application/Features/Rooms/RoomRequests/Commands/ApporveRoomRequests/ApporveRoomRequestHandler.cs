@@ -64,30 +64,7 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
                 };
                 _beatSportsDbContext.RoomMembers.Add(roomMember);
 
-                var customer = _beatSportsDbContext.Customers
-                                .Where(x => x.Id == request.CustomerId).FirstOrDefault();
-
-                var roomMatchJoinedList = _beatSportsDbContext.RoomRequests
-                                .Where(x => x.CustomerId == request.CustomerId && x.JoinStatus == RoomRequestEnums.Pending)
-                                .ToList();
-                if(roomMatchJoinedList.Count > 0)
-                {
-                    foreach (var roomReq in roomMatchJoinedList)
-                    {
-                        _beatSportsDbContext.RoomRequests.Remove(roomReq);
-                    }
-                }
                 
-                var notification = new Notification
-                {
-                    AccountId = customer.AccountId,
-                    Title = "Yêu cầu tham gia phòng",
-                    Message = $" đã được chấp thuận!",
-                    RoomMatchId = roomRequest.RoomMatchId.ToString(),
-                    IsRead = false,
-                    Type = "RoomRequestAccepted"
-                };
-                _beatSportsDbContext.Notifications.Add(notification);
 
                 // Gửi sự kiện SignalR
                 await _hubContext.Clients.Group(roomRequest.RoomMatchId.ToString()).SendAsync("UpdateRoom", "RequestAccepted", roomRequest.CustomerId);
@@ -169,6 +146,33 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
         }
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
 
+        var customer = _beatSportsDbContext.Customers
+                                .Where(x => x.Id == request.CustomerId).FirstOrDefault();
+
+        var roomMatchJoinedList = _beatSportsDbContext.RoomRequests
+                        .Where(x => x.CustomerId == request.CustomerId && x.JoinStatus == RoomRequestEnums.Pending)
+                        .ToList();
+        if (roomMatchJoinedList.Count > 0)
+        {
+            foreach (var roomReq in roomMatchJoinedList)
+            {
+                _beatSportsDbContext.RoomRequests.Remove(roomReq);
+            }
+        }
+
+        var notification = new Notification
+        {
+            AccountId = customer.AccountId,
+            Title = "Yêu cầu tham gia phòng",
+            Message = $" đã được chấp thuận!",
+            RoomMatchId = roomRequest.RoomMatchId.ToString(),
+            IsRead = false,
+            Type = "RoomRequestAccepted"
+        };
+        _beatSportsDbContext.Notifications.Add(notification);
+
+        await _beatSportsDbContext.SaveChangesAsync();
+        
         return new BeatSportsResponse
         {
             Message = roomRequest.JoinStatus == RoomRequestEnums.Accepted ? "Room request approved successfully." : "Room request declined."
