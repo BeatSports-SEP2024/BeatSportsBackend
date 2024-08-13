@@ -36,6 +36,7 @@ public class GetNotificationByAccountHandler : IRequestHandler<GetNotificationBy
                 NotificationId = notification.Id,
                 AccountId = notification.AccountId,
                 BookingId = notification.BookingId,
+                RoomMatchId = notification.RoomMatchId,
                 FullName = account.FirstName.Trim() + " " + account.LastName.Trim(),
                 AccountImage = account.ProfilePictureURL,
                 Title = notification.Title,
