@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Mappings;
@@ -40,6 +41,8 @@ public class CampaignResponseV2
     public string SportTypeApply { get; set; }
     public DateTime Created { get; set; }
     public string? Status { get; set; }
+    public string? CourtNameApply { get; set; }
+    public decimal PercentDiscount { get; set; }
 }
 
 public class CampaignResponseV3
