@@ -26,7 +26,9 @@ public class CheckInBookingCommandHandler : IRequestHandler<CheckInBookingComman
         var booking = _dbContext.Bookings.Where(x => x.Id == request.BookingId).SingleOrDefault();
         if (booking != null)
         {
-            booking.BookingStatus = BookingEnums.Finished.ToString();
+            // Như đã định nghĩa trong Booking Entity, Chỉ đổi trạng thái check in, còn lại để Cronjob quét
+            booking.IsCheckIn = true;
+            //booking.BookingStatus = BookingEnums.Finished.ToString();
             _dbContext.Bookings.Update(booking);
             await _dbContext.SaveChangesAsync();
         }
@@ -36,4 +38,3 @@ public class CheckInBookingCommandHandler : IRequestHandler<CheckInBookingComman
         };
     }
 }
-
