@@ -11,15 +11,15 @@ public static class ParseTimeExtension
     {
         if (timeSpan.TotalHours < 1)
         {
-            return $"{timeSpan.TotalMinutes} minutes ago";
+            return $"{timeSpan.TotalMinutes} phút trước";
         }
         else if (timeSpan.TotalDays < 1)
         {
-            return $"{(int)timeSpan.TotalHours} hours ago";
+            return $"{(int)timeSpan.TotalHours} giờ trước";
         }
         else
         {
-            return $"{(int)timeSpan.TotalDays} days ago";
+            return $"{(int)timeSpan.TotalDays} ngày trước";
         }
     }
 }
