@@ -28,9 +28,9 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
     public Task<CourtResponseV5> Handle(GetCourtByIdCommand request, CancellationToken cancellationToken)
     {
         var courtDetails = _beatSportsDbContext.Courts
-            .Where(c => c.Id == request.CourtId)
+            .Where(c => c.Id == request.CourtId && !c.IsDelete)
             .Include(c => c.Campaigns)
-            .Include(cs => cs.CourtSubdivision)
+            .Include(cs => cs.CourtSubdivision.Where(cs => cs.IsActive))
                 .ThenInclude(cs => cs.CourtSubdivisionSettings)
             .Include(f => f.Feedback)
             .ThenInclude(f => f.Booking)
