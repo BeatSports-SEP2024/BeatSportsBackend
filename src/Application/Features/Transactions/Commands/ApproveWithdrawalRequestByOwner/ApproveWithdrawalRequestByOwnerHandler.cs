@@ -63,6 +63,7 @@ public class ApproveWithdrawalRequestByOwnerHandler : IRequestHandler<ApproveWit
             });
         }
 
+        transaction.TransactionStatus = TransactionEnum.Approved.ToString();
         transaction.AdminCheckStatus = AdminCheckEnums.Accepted;
         transaction.ImageOfInvoice = request.ImageOfInvoice;
 

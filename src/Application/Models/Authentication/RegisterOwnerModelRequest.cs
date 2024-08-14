@@ -25,4 +25,5 @@ public class RegisterOwnerModelRequest : IRequest<BeatSportsResponse>
     [EnumDataType(typeof(GenderEnums))]
     public GenderEnums Gender { get; set; }
     public string PhoneNumber { get; set; } = null!;
+    public string BankAccount { get; set; }
 }
