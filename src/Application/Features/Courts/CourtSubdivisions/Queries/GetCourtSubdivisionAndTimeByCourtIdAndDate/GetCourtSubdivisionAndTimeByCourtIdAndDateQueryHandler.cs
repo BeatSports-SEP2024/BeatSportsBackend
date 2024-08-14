@@ -58,6 +58,7 @@ public class ListTimeCheckingByCourtSubdivisionId
             {
                 CourtSubdivisionId = item.Id.ToString(),
                 NameMiniCourt = item.CourtSubdivisionName,
+                BasePrice = item.BasePrice,
                 TimeListBooked = new List<ListTimeCheckingByCourtSubdivisionId>()
             };
             var listTimecheck = await _dbContext.TimeChecking.Where(x => x.CourtSubdivisionId == item.Id && (x.StartTime.Year == request.DateCheck.Year

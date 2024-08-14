@@ -94,17 +94,17 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                     var dateTimeStartTimeWantToPlay = request.DayWantToPlay + request.StartTimeWantToPlay;
                     var dateTimeEndTimeWantToPlay = request.DayWantToPlay + request.EndTimeWantToPlay;
 
-/*                    // Giờ dô time check check nè
-                    var timeCheckFlag = await _dbContext.TimeChecking.Where(x => x.CourtSubdivisionId == request.CourtSubdivisionId && !x.IsDelete &&
-                                                                         (
-                                                                         (dateTimeStartTimeWantToPlay <= x.EndTime && dateTimeStartTimeWantToPlay >= x.StartTime) ||
-                                                                         (dateTimeEndTimeWantToPlay <= x.EndTime && dateTimeEndTimeWantToPlay >= x.StartTime) ||
-                                                                         (dateTimeStartTimeWantToPlay <= x.StartTime && dateTimeEndTimeWantToPlay >= x.EndTime)
-                                                                         )).ToListAsync();
-                    if (timeCheckFlag.Any())
-                    {
-                        throw new BadRequestException("Sân bạn muốn đặt đã được đặt trước đó! Vui lòng lựa sân khác nhé");
-                    }*/
+                    /*                    // Giờ dô time check check nè
+                                        var timeCheckFlag = await _dbContext.TimeChecking.Where(x => x.CourtSubdivisionId == request.CourtSubdivisionId && !x.IsDelete &&
+                                                                                             (
+                                                                                             (dateTimeStartTimeWantToPlay <= x.EndTime && dateTimeStartTimeWantToPlay >= x.StartTime) ||
+                                                                                             (dateTimeEndTimeWantToPlay <= x.EndTime && dateTimeEndTimeWantToPlay >= x.StartTime) ||
+                                                                                             (dateTimeStartTimeWantToPlay <= x.StartTime && dateTimeEndTimeWantToPlay >= x.EndTime)
+                                                                                             )).ToListAsync();
+                                        if (timeCheckFlag.Any())
+                                        {
+                                            throw new BadRequestException("Sân bạn muốn đặt đã được đặt trước đó! Vui lòng lựa sân khác nhé");
+                                        }*/
 
                     // B2. Lấy các TimePeriods áp dụng cho CourtSubdivisionId
                     var timePeriods = await (from tp in _dbContext.TimePeriods
@@ -250,19 +250,42 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
         // Vd current start 12, period start 13, end time want to play 18
         if (currentStart < periodStart)
         {
-            var newCourtSubResponse = new CourtDetailInBookingDetailReadyForFinishBookingReponse()
+            if (request.EndTimeWantToPlay <= periodStart)
             {
-                TimePeriodId = null,
-                PriceInTimePeriod = courtSub.BasePrice,
-                TimePeriodDescription = "Khung giờ thường từ "
-                + currentStart.ToString(@"hh\:mm")
-                + " đến "
-                + periodStart.ToString(@"hh\:mm")
-            };
-            var timePlayInThisPeriod = periodStart - currentStart;
-            listCourtSubInReponse.Add(newCourtSubResponse);
-            totalPrice += courtSub.BasePrice * Convert.ToDecimal(timePlayInThisPeriod.TotalHours);
+                var newCourtSubResponse = new CourtDetailInBookingDetailReadyForFinishBookingReponse()
+                {
+                    TimePeriodId = null,
+                    PriceInTimePeriod = courtSub.BasePrice,
+                    TimePeriodDescription = "Khung giờ thường từ "
+                    + currentStart.ToString(@"hh\:mm")
+                    + " đến "
+                    + request.EndTimeWantToPlay.ToString(@"hh\:mm")
+                };
+                listCourtSubInReponse.Add(newCourtSubResponse);
+                var timePlayInThisPeriod = request.EndTimeWantToPlay - currentStart;
+                totalPrice += courtSub.BasePrice * Convert.ToDecimal(timePlayInThisPeriod.TotalHours);
+                currentStart += timePlayInThisPeriod;
+                return totalPrice;
+            }
+            else
+            {
+                var newCourtSubResponse = new CourtDetailInBookingDetailReadyForFinishBookingReponse()
+                {
+                    TimePeriodId = null,
+                    PriceInTimePeriod = courtSub.BasePrice,
+                    TimePeriodDescription = "Khung giờ thường từ "
+                    + currentStart.ToString(@"hh\:mm")
+                    + " đến "
+                    + periodStart.ToString(@"hh\:mm")
+                };
+                listCourtSubInReponse.Add(newCourtSubResponse);
+                var timePlayInThisPeriod = new TimeSpan();
+                timePlayInThisPeriod = periodStart - currentStart;
+                totalPrice += courtSub.BasePrice * Convert.ToDecimal(timePlayInThisPeriod.TotalHours);
+
+            }
             currentStart = periodStart;
+
         }
         // Case 2, thuộc khung giờ
         if (currentStart < periodEnd && periodEnd < request.EndTimeWantToPlay)

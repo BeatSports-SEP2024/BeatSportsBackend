@@ -47,7 +47,8 @@ public class GetCourtSubAndSportTypeAndTimeCheckingByCourtIdQueryHandler : IRequ
                                                                 CourtType = courtSubSetting.CourtType,
                                                                 ShortName = courtSubSetting.ShortName,
                                                                 CourtSubdivisionId = cs.Id,
-                                                                CourtSubdivisionName = cs.CourtSubdivisionName
+                                                                CourtSubdivisionName = cs.CourtSubdivisionName,
+                                                                BasePrice = cs.BasePrice
                                                             } into courtSubSettings
                                                             group courtSubSettings by new { courtSubSettings.Id, courtSubSettings.SportCategoryId, courtSubSettings.SportCategoryName, courtSubSettings.CourtType, courtSubSettings.ShortName } into groupedCourtSubSettings
                                                             select new CourtSubSettingResponseV2
@@ -61,6 +62,7 @@ public class GetCourtSubAndSportTypeAndTimeCheckingByCourtIdQueryHandler : IRequ
                                                                 {
                                                                     CourtSubdivisionId = sub.CourtSubdivisionId.ToString(),
                                                                     NameMiniCourt = sub.CourtSubdivisionName,
+                                                                    BasePrice = sub.BasePrice,
                                                                     TimeListBooked = (from timeChecking in _dbContext.TimeChecking
                                                                                       where timeChecking.CourtSubdivisionId == sub.CourtSubdivisionId
                                                                                       && (timeChecking.StartTime.Year == request.DateCheck.Year
