@@ -101,7 +101,8 @@ public class GetDetailWithdrawalRequestByOwnerHandler : IRequestHandler<GetDetai
             },
             OwnerBankNumber = owner.BankAccount,
             TransactionDate = transactionRequest.TransactionDate,
-            TransactionStatus = transactionRequest.TransactionStatus,
+            // Lấy admin check
+            TransactionStatus = transactionRequest.AdminCheckStatus.ToString(),
             TransactionList = result,
             TotalAmountReceived = totalAmountReceived,
             TotalAmountWithdrawn = totalAmountWithdrawn,
