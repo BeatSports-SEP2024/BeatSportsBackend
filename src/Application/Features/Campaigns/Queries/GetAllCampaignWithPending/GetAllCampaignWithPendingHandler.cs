@@ -59,6 +59,8 @@ public class GetAllCampaignWithPendingHandler : IRequestHandler<GetAllCampaignWi
             SportTypeApply = c.SportTypeApply,
             Created = c.Created,
             Status = c.Status.ToString(),
+            CourtNameApply = c.Court.CourtName,
+            PercentDiscount = c.PercentDiscount
         })
         .PaginatedListAsync(request.PageIndex, request.PageSize);
 

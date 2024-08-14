@@ -48,9 +48,15 @@ public class OwnerPayFeeOverviewHandler : IRequestHandler<OwnerPayFeeOverviewCom
         foreach (var owner in activeOwners)
         {
             var ownerTransactions = transactions
-                .Where(transaction => transaction.Wallet.Account.Owner.Id == owner.Id
-                                      && transaction.TransactionType == TransactionEnum.Payfee.ToString())
+                .Where(transaction =>
+                       transaction.Wallet?.Account?.Owner?.Id == owner.Id
+                       && transaction.TransactionType == TransactionEnum.Payfee.ToString())
                 .ToList();
+
+            if (ownerTransactions == null || !ownerTransactions.Any())
+            {
+                continue;
+            }
 
             if (ownerTransactions.Any())
             {

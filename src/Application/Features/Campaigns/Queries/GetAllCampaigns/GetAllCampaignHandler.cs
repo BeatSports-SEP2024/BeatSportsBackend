@@ -15,6 +15,7 @@ using BeatSportsAPI.Application.Features.Courts.Queries.GetAll;
 using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Entities.CourtEntity;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Campaigns.Queries.GetAllCampaigns;
 public class GetAllCampaignHandler : IRequestHandler<GetAllCampaignsCommand, PaginatedList<CampaignResponseV2>>
@@ -36,6 +37,7 @@ public class GetAllCampaignHandler : IRequestHandler<GetAllCampaignsCommand, Pag
         }
 
         var query = _dbContext.Campaigns
+            .Include(c => c.Court)
             .Where(x => !x.IsDelete);
 
         if (request.StartDate.HasValue && request.EndDate.HasValue)
@@ -62,6 +64,8 @@ public class GetAllCampaignHandler : IRequestHandler<GetAllCampaignsCommand, Pag
             SportTypeApply = c.SportTypeApply,
             Created = c.Created,
             Status = c.Status.ToString(),
+            CourtNameApply = c.Court.CourtName,
+            PercentDiscount = c.PercentDiscount
         })
         .PaginatedListAsync(request.PageIndex, request.PageSize); 
 
