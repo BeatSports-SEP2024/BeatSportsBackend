@@ -35,7 +35,7 @@ public class GetAllAccountHandler : IRequestHandler<GetAllAccountCommand, Pagina
 
         var query = _beatSportsDbContext.Accounts
             .Include(c => c.Customer)
-            .Where(tp => !tp.IsDelete);
+            .Where(tp => !tp.IsDelete && !tp.Customer.IsDelete);
 
         if (!string.IsNullOrEmpty(request.Query))
         {

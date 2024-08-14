@@ -25,18 +25,18 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
         _mapper = mapper;
     }
 
-    public Task<CourtResponseV5> Handle(GetCourtByIdCommand request, CancellationToken cancellationToken)
+    public async Task<CourtResponseV5> Handle(GetCourtByIdCommand request, CancellationToken cancellationToken)
     {
-        var courtDetails = _beatSportsDbContext.Courts
+        var courtDetails = await _beatSportsDbContext.Courts
             .Where(c => c.Id == request.CourtId && !c.IsDelete)
             .Include(c => c.Campaigns)
-            .Include(cs => cs.CourtSubdivision.Where(cs => cs.IsActive))
+            .Include(c => c.CourtSubdivision)
                 .ThenInclude(cs => cs.CourtSubdivisionSettings)
             .Include(f => f.Feedback)
-            .ThenInclude(f => f.Booking)
-                .ThenInclude(b => b.Customer)
-                    .Include(c => c.Owner)
-                        .ThenInclude(c => c.Account)
+                .ThenInclude(f => f.Booking)
+                    .ThenInclude(b => b.Customer)
+            .Include(c => c.Owner)
+                .ThenInclude(o => o.Account)
             .Select(c => new CourtResponseV5
             {
                 Id = c.Id,
@@ -53,15 +53,18 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                 GoogleMapURLs = c.GoogleMapURLs,
                 TimeStart = c.TimeStart,
                 TimeEnd = c.TimeEnd,
-                CourtSubCount = c.CourtSubdivision.Count(),
-                CoverImgUrls = c.CourtAvatarImgUrls, // Chuỗi gốc cho ảnh bìa
+                CourtSubCount = c.CourtSubdivision.Count(cs => cs.IsActive && (int)cs.CreatedStatus == 1),
+                CoverImgUrls = c.CourtAvatarImgUrls,
                 CourtImgsList = ImageUrlSplitter.SplitImageUrls(c.ImageUrls),
                 RentingCount = c.Feedback.Select(f => f.Booking).Distinct().Count(),
                 FeedbackCount = c.Feedback.Count(),
                 FeedbackStarAvg = c.Feedback.Any() ? c.Feedback.Average(x => x.FeedbackStar) : (decimal?)null,
-                Price = c.CourtSubdivision.Any() ? c.CourtSubdivision.Select(x => x.BasePrice).Min() : (decimal?)null,
+                Price = c.CourtSubdivision
+                    .Where(cs => cs.IsActive && (int)cs.CreatedStatus == 1)
+                    .Select(x => x.BasePrice).Min(),
 
                 CourtSubSettingResponses = c.CourtSubdivision
+                    .Where(cs => cs.IsActive && (int)cs.CreatedStatus == 1)
                     .GroupBy(cs => cs.CourtSubdivisionSettings.Id)
                     .Select(g => new CourtSubSettingV2
                     {
@@ -71,16 +74,15 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                         SportCategoryId = g.First().CourtSubdivisionSettings.SportCategories.Id,
                         SportCategoryName = g.First().CourtSubdivisionSettings.SportCategories.Name,
                         CourtSubdivision = g
-                        .Select(subCourt => new CourtSubdivisionV4
-                        {
-                            CourtSubdivisionId = subCourt.Id,
-                            CourtSubdivisionName = subCourt.CourtSubdivisionName,
-                            //CourtSubType = subCourt.CourtSubdivisionDescription,
-                            BasePrice = subCourt.BasePrice,
-                            StartTime = c.TimeStart,
-                            EndTime = c.TimeEnd,
-                            CreatedStatus = subCourt.CreatedStatus
-                        }).ToList()
+                            .Select(subCourt => new CourtSubdivisionV4
+                            {
+                                CourtSubdivisionId = subCourt.Id,
+                                CourtSubdivisionName = subCourt.CourtSubdivisionName,
+                                BasePrice = subCourt.BasePrice,
+                                StartTime = c.TimeStart,
+                                EndTime = c.TimeEnd,
+                                CreatedStatus = subCourt.CreatedStatus
+                            }).ToList()
                     }).ToList(),
 
                 CourtCampaignResponses = c.Campaigns
@@ -108,11 +110,14 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdCommand, CourtRes
                         FeedbackSentTime = ParseTimeExtension.GetFormattedTime(DateTime.Now - c.Created),
                     }).ToList(),
             })
-            .FirstOrDefault();
+            .FirstOrDefaultAsync(cancellationToken);
+
         if (courtDetails == null)
         {
             throw new BadRequestException($"Court with ID {request.CourtId} not found.");
         }
-        return Task.FromResult(courtDetails);
+
+        return courtDetails;
     }
+
 }
