@@ -19,6 +19,9 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.AccountId, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Created, opt => opt.MapFrom(src => src.Created));
 
+        CreateMap<Account, AccountResponse>()
+            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Customer.Address));
+
         CreateMap<Customer, CustomerResponse>()
             .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.Id));
         CreateMap<Customer, AccountResponse>()
