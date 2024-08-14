@@ -41,5 +41,6 @@ public class OwnerResponseV2 : IMapFrom<Owner>
     public string? Bio { get; set; }
     public string PhoneNumber { get; set; }
     //public string Address { get; set; }
+    public string? Address { get; set; }
     public IList<CourtResponseV4> Court { get; set; }
 }
