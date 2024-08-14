@@ -37,7 +37,6 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
 
         if (query == null || !query.Any())
         {
-            ///throw new NotFoundException("Customer Id does not have any room request");
             response.PendingRoomList = new List<RoomRequestResponseForCustomer>();
         }
 
@@ -62,36 +61,39 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
         var pendingResult = roomRequests.Select(c =>
         {
             var roomMatch = roomMatches.FirstOrDefault(rm => rm.Id == c.RoomMatchId);
+            if (roomMatch == null) return null;
 
             var masterMember = roomMembers.FirstOrDefault(rm => rm.RoomMatchId == c.RoomMatchId && rm.RoleInRoom == 0);
             var masterName = masterMember != null
-                ? $"{masterMember.Customer?.Account?.FirstName} {masterMember.Customer?.Account?.LastName}"
+                ? $"{masterMember.Customer.Account.FirstName} {masterMember.Customer.Account.LastName}"
                 : "Unknown Master Name";
 
             return new RoomRequestResponseForCustomer
             {
                 MasterName = masterName,
-                Address = roomMatch?.Booking?.CourtSubdivision?.Court?.Address ?? "Unknown Address",
+                Address = roomMatch.Booking.CourtSubdivision.Court.Address,
                 CourtName = c.RoomMatch.Booking.CourtSubdivision.Court.CourtName,
                 RoomName = c.RoomMatch.RoomName,
-                LevelId = roomMatch?.LevelId ?? default(Guid),
+                LevelId = roomMatch.LevelId,
                 DatePlaying = roomMatch.Booking.PlayingDate,
                 DateRequest = c.DateRequest,
                 StartTimePlaying = c.RoomMatch.Booking.StartTimePlaying,
                 EndTimePlaying = c.RoomMatch.Booking.EndTimePlaying,
-                LevelName = roomMatch?.Level?.LevelName ?? "Unknown Level",
-                Price = roomMatch?.Booking?.CourtSubdivision?.BasePrice ?? default(decimal),
-                NumberOfMember = roomMatch?.RoomMembers?.Count() ?? 0,
+                LevelName = roomMatch.Level.LevelName,
+                Price = roomMatch.Booking.CourtSubdivision.BasePrice,
+                NumberOfMember = roomMatch.RoomMembers.Count(),
                 MaxMember = c.RoomMatch.MaximumMember,
                 RoomRequestId = c.Id,
                 RoomMatchId = c.RoomMatch.Id,
             };
         })
+        .Where(x => x != null)
         .OrderBy(x => x.DatePlaying)
         .ToList();
         response.PendingRoomList = pendingResult;
 
         #endregion
+
         #region Join List 
         // Danh sách phòng đang tham gia (JoiningStatus = 1 và có data trong table roomMember)
         var joinedRoomRequests = query.Where(rr => rr.CustomerId == request.CustomerId && (int)rr.JoinStatus == 1);
@@ -127,30 +129,31 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
         var joinedResult = allRoomMatchIds.Select(id =>
         {
             var roomMatch = roomMatchesForJoined.FirstOrDefault(rm => rm.Id == id);
+            if (roomMatch == null) return null;
+
             var masterMember = roomMembersForJoined.FirstOrDefault(rm => rm.RoomMatchId == id && rm.RoleInRoom == 0);
             var masterName = masterMember != null
-                ? $"{masterMember.Customer?.Account?.FirstName} {masterMember.Customer?.Account?.LastName}"
+                ? $"{masterMember.Customer.Account.FirstName} {masterMember.Customer.Account.LastName}"
                 : "Unknown Master Name";
 
             return new JoinListResponse
             {
                 MasterName = masterName,
-                Address = roomMatch?.Booking?.CourtSubdivision?.Court?.Address ?? "Unknown Address",
-                CourtName = roomMatch?.Booking?.CourtSubdivision?.Court?.CourtName ?? "Unknown Court Name",
-                RoomName = roomMatch?.RoomName ?? "Unknown Room Name",
-                LevelId = roomMatch?.LevelId ?? default(Guid),
-                DatePlaying = roomMatch?.Booking?.PlayingDate ?? DateTime.MinValue,
-                StartTimePlaying = roomMatch?.Booking?.StartTimePlaying ?? TimeSpan.Zero,
-                EndTimePlaying = roomMatch?.Booking?.EndTimePlaying ?? TimeSpan.Zero,
-                //DateRequest = DateTime.MinValue, // Update this to the correct DateRequest if needed
-                LevelName = roomMatch?.Level?.LevelName ?? "Unknown Level",
-                Price = roomMatch?.Booking?.CourtSubdivision?.BasePrice ?? default(decimal),
+                Address = roomMatch.Booking.CourtSubdivision.Court.Address,
+                CourtName = roomMatch.Booking.CourtSubdivision.Court.CourtName,
+                RoomName = roomMatch.RoomName,
+                LevelId = roomMatch.LevelId,
+                DatePlaying = roomMatch.Booking.PlayingDate,
+                StartTimePlaying = roomMatch.Booking.StartTimePlaying,
+                EndTimePlaying = roomMatch.Booking.EndTimePlaying,
+                LevelName = roomMatch.Level.LevelName,
+                Price = roomMatch.Booking.CourtSubdivision.BasePrice,
                 NumberOfMember = roomMembersForJoined.Count(rm => rm.RoomMatchId == id),
-                MaxMember = roomMatch?.MaximumMember ?? 0,
-                //RoomRequestId = Guid.Empty, // Update this to the correct RoomRequestId if needed
+                MaxMember = roomMatch.MaximumMember,
                 RoomMatchId = id,
             };
         })
+        .Where(x => x != null)
         .OrderBy(x => x.DatePlaying)
         .ToList();
         response.JoinedRoomList = joinedResult;
@@ -159,21 +162,20 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
         #region Public Room
         // Lấy danh sách phòng đang public (IsPrivate = false)
         var welcomeRoomMatches = await _beatSportsDbContext.RoomMatches
-        //.Where(rm => rm.IsPrivate == false)
-        .Where(rm => !allRoomMatchIds.Contains(rm.Id) && (rm.Booking.PlayingDate.Date > DateTime.Now.Date
-                                                        || (rm.Booking.PlayingDate.Date == DateTime.Now.Date
-                                                            && rm.Booking.StartTimePlaying > DateTime.Now.TimeOfDay)))
-        .Include(rm => rm.Booking)
-            .ThenInclude(b => b.CourtSubdivision)
-                .ThenInclude(cs => cs.Court)
-        .Include(rm => rm.Level)
-        .Include(rm => rm.RoomMembers)
-            .ThenInclude(rm => rm.Customer)
-                .ThenInclude(c => c.Account)
-        .ToListAsync(cancellationToken);
+            .Where(rm => !allRoomMatchIds.Contains(rm.Id) && (rm.Booking.PlayingDate.Date > DateTime.Now.Date
+                                                            || (rm.Booking.PlayingDate.Date == DateTime.Now.Date
+                                                                && rm.Booking.StartTimePlaying > DateTime.Now.TimeOfDay)))
+            .Include(rm => rm.Booking)
+                .ThenInclude(b => b.CourtSubdivision)
+                    .ThenInclude(cs => cs.Court)
+            .Include(rm => rm.Level)
+            .Include(rm => rm.RoomMembers)
+                .ThenInclude(rm => rm.Customer)
+                    .ThenInclude(c => c.Account)
+            .ToListAsync(cancellationToken);
 
-        string sportFilter = request.sportFilter.ToString()?? string.Empty;
-        if(!string.IsNullOrEmpty(sportFilter))
+        string sportFilter = request.sportFilter.ToString() ?? string.Empty;
+        if (!string.IsNullOrEmpty(sportFilter))
         {
             switch (sportFilter)
             {
@@ -189,32 +191,38 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
                     welcomeRoomMatches = welcomeRoomMatches.Where(c => (int)c.SportCategory == 2).ToList();
                     break;
             }
-        }   
+        }
 
         var welcomeResult = welcomeRoomMatches
             .GroupBy(rm => rm.Id)
             .Select(group =>
             {
                 var firstRoomMatch = group.First();
+                if (firstRoomMatch == null) return null;
+
                 var masterMember = group.SelectMany(rm => rm.RoomMembers).FirstOrDefault(rm => rm.RoleInRoom == 0);
+                var masterName = masterMember != null
+                    ? $"{masterMember.Customer.Account.FirstName} {masterMember.Customer.Account.LastName}"
+                    : "Unknown Master Name";
 
                 return new PublicRoomResponse
                 {
-                    MasterName = masterMember != null ? $"{masterMember.Customer.Account.FirstName} {masterMember.Customer.Account.LastName}" : "Unknown Master Name",
-                    Address = firstRoomMatch.Booking?.CourtSubdivision?.Court?.Address ?? "Unknown Address",
+                    MasterName = masterName,
+                    Address = firstRoomMatch.Booking.CourtSubdivision.Court.Address,
                     LevelId = firstRoomMatch.LevelId,
                     CourtName = firstRoomMatch.Booking.CourtSubdivision.Court.CourtName,
                     RoomName = firstRoomMatch.RoomName,
                     DatePlaying = firstRoomMatch.Booking.PlayingDate,
                     StartTimePlaying = firstRoomMatch.Booking.StartTimePlaying,
                     EndTimePlaying = firstRoomMatch.Booking.EndTimePlaying,
-                    LevelName = firstRoomMatch.Level?.LevelName ?? "Unknown Level",
-                    Price = firstRoomMatch.Booking?.CourtSubdivision?.BasePrice ?? default(decimal),
+                    LevelName = firstRoomMatch.Level.LevelName,
+                    Price = firstRoomMatch.Booking.CourtSubdivision.BasePrice,
                     NumberOfMember = group.SelectMany(rm => rm.RoomMembers).Count(),
                     MaxMember = firstRoomMatch.MaximumMember,
                     RoomMatchId = firstRoomMatch.Id,
                 };
             })
+            .Where(x => x != null)
             .OrderBy(x => x.DatePlaying)
             .ToList();
 
