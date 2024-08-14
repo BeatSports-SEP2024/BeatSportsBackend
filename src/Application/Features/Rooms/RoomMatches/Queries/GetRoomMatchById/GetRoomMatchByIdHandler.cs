@@ -147,8 +147,8 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
             Note = query.Note,
 
             // Thêm thông tin chủ phòng
-            MasterName = masterMember != null ? $"{masterMember.FirstName} {masterMember.LastName}" : "Unknown Master",
-            MasterAvatar = masterMember?.ProfilePictureURL ?? "No Avatar"
+            MasterName = $"{masterMember.FirstName} {masterMember.LastName}" ,
+            MasterAvatar = masterMember.ProfilePictureURL
         };
 
         return Task.FromResult(room);
