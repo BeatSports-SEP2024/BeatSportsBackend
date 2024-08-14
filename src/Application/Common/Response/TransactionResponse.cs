@@ -85,4 +85,7 @@ public class TransactionResponseV4
     public decimal? TotalAmountWithdrawn { get; set; }
     public decimal? TotalAmountAvailableForWithdrawal { get; set; }
     public decimal? TotalAmountWithdrawalRequestByOwner { get; set; }
+    public string? TransactionStatus { get; set; }
+    public DateTime? TransactionDate { get; set; }
+    public string? OwnerBankNumber { get; set; }
 }

@@ -439,7 +439,7 @@ public class IdentityService : IIdentityService
             Email = registerModelRequest.Email,
             DateOfBirth = registerModelRequest.DateOfBirth,
             Gender = registerModelRequest.Gender.ToString(),
-            PhoneNumber = registerModelRequest.PhoneNumber,            
+            PhoneNumber = registerModelRequest.PhoneNumber,
             Role = RoleEnums.Owner.ToString(),
         };
 
@@ -449,7 +449,8 @@ public class IdentityService : IIdentityService
         var newOwner = new Owner
         {
             Account = newUser,
-            Address = registerModelRequest.Address
+            Address = registerModelRequest.Address,
+            BankAccount = registerModelRequest.BankAccount
         };
         await _beatSportsDbContext.Owners.AddAsync(newOwner, cancellationToken);
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
