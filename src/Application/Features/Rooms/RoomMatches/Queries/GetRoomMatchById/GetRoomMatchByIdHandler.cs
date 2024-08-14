@@ -32,18 +32,23 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
             .Where(x => x.Id == request.RoomMatchId && !x.IsDelete)
             .Include(x => x.Level)
             .Include(x => x.RoomMembers)
+                .ThenInclude(rm => rm.Customer)
+                    .ThenInclude(c => c.Account)
             .Include(x => x.RoomRequests)
-            .Include(x => x.Booking).ThenInclude(c => c.CourtSubdivision).FirstOrDefault();
+            .Include(x => x.Booking)
+                .ThenInclude(c => c.CourtSubdivision)
+            .FirstOrDefault();
 
-        if(query == null)
+        if (query == null)
         {
             throw new NotFoundException();
         }
 
         var court = _dbContext.Courts
-                    .Where(x => x.Id == query.Booking.CourtSubdivision.CourtId).FirstOrDefault();
+                    .Where(x => x.Id == query.Booking.CourtSubdivision.CourtId)
+                    .FirstOrDefault();
 
-        var courtImgList = court.ImageUrls.Split(",");
+        var courtImgList = court?.ImageUrls.Split(",") ?? Array.Empty<string>();
 
         var customer = _dbContext.Customers
                     .Where(x => x.Id == request.CustomerId)
@@ -52,6 +57,16 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
 
         var roomRequests = new List<RoomRequestInRoom>();
         var roomMembers = new List<RoomMemberInRoomResponse>();
+
+        var masterMember = query.RoomMembers
+            .Where(x => x.RoleInRoom == Domain.Enums.RoleInRoomEnums.Master)
+            .Select(rm => new
+            {
+                rm.Customer.Account.FirstName,
+                rm.Customer.Account.LastName,
+                rm.Customer.Account.ProfilePictureURL
+            })
+            .FirstOrDefault();
 
         if (query.RoomMembers.Any(x => x.RoleInRoom == Domain.Enums.RoleInRoomEnums.Master
                                     && x.CustomerId == request.CustomerId))
@@ -92,15 +107,19 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
                 CustomerId = cus.Id,
                 CustomerImage = cus.Account.ProfilePictureURL,
                 CustomerName = cus.Account.FirstName + " " + cus.Account.LastName,
-                RoleInRoom =  roomMember.RoleInRoom.GetDescriptionFromEnum()
+                RoleInRoom = roomMember.RoleInRoom.GetDescriptionFromEnum()
             };
 
             roomMembers.Add(result);
         }
 
-        var findingStatusOfRoom = _dbContext.RoomRequests.Where(rq => rq.CustomerId == request.CustomerId && rq.RoomMatchId == request.RoomMatchId).SingleOrDefault();
+        var findingStatusOfRoom = _dbContext.RoomRequests
+            .Where(rq => rq.CustomerId == request.CustomerId && rq.RoomMatchId == request.RoomMatchId)
+            .SingleOrDefault();
+
         var master = query.RoomMembers.Any(x => x.RoleInRoom == Domain.Enums.RoleInRoomEnums.Master
                                     && x.CustomerId == request.CustomerId);
+
         var room = new RoomMatchesDetailResponse()
         {
             RoomMatchId = request.RoomMatchId,
@@ -126,12 +145,11 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
             IsPrivate = query.IsPrivate,
             MaximumMember = query.MaximumMember,
             Note = query.Note,
-        };
 
-        if (room == null)
-        {
-            throw new NotFoundException($"Do not find RoomMatch with RoomMatch ID: {request.RoomMatchId}");
-        }
+            // Thêm thông tin chủ phòng
+            MasterName = $"{masterMember.FirstName} {masterMember.LastName}" ,
+            MasterAvatar = masterMember.ProfilePictureURL
+        };
 
         return Task.FromResult(room);
     }

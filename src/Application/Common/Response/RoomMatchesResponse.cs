@@ -61,6 +61,8 @@ public class RoomMatchesDetailResponse
     public IList<RoomMemberInRoomResponse>? RoomMembers { get; set; }
     public string? JoinedIfPendingStatus { get; set; }
     public bool? IsPrivate { get; set; }
+    public string? MasterName { get; set; }
+    public string? MasterAvatar { get; set; }
 }
 
 public class RoomMemberInRoomResponse

@@ -210,7 +210,7 @@ app.UseHangfireDashboard();
 RecurringJob.AddOrUpdate<CheckTimeJob>("my-recurring-job", job => job.CheckTimeOfCourt(), Cron.MinuteInterval(2));
 RecurringJob.AddOrUpdate<CheckTimeJob>("checking-time-for-booking", job => job.CheckTimeOfBooking(), Cron.Minutely);
 RecurringJob.AddOrUpdate<CheckTimeJob>("check-booking-if-expired", job => job.CheckBookingPlayDateIfFinish(), Cron.MinuteInterval(30));
-RecurringJob.AddOrUpdate<CheckTimeJob>("remove-room-match-if-expired", job => job.RemoveRoomWhenExpired(), Cron.MinuteInterval(30));
+RecurringJob.AddOrUpdate<CheckTimeJob>("remove-room-match-if-expired", job => job.RemoveRoomWhenExpired(), Cron.Minutely);
 RecurringJob.AddOrUpdate<CheckTimeJob>("send-owner-pay-fee-notification",
     job => job.NotificationForOwnerPayFee(), Cron.Monthly(10, 9-7, 0)); // 9h00 sáng ngày 10
 
