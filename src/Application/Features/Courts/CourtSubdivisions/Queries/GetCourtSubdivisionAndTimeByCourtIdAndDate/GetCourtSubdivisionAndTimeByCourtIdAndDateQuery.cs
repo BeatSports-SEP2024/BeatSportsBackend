@@ -16,6 +16,7 @@ public class ListCourtSubdivisionAndTimeDataByCourtSubdivisionId
 {
     public string CourtSubdivisionId { get; set; } = null!;
     public string NameMiniCourt { get; set; } = null!;
+    public decimal? BasePrice { get; set; }  
     public List<ListTimeCheckingByCourtSubdivisionId>? TimeListBooked { get; set; }
 
 }

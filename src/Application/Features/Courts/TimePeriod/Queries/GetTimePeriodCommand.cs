@@ -11,5 +11,5 @@ namespace BeatSportsAPI.Application.Features.Courts.TimePeriod.Queries;
 public class GetTimePeriodCommand : IRequest<List<TimePeriodResponse>>
 {
     public Guid CourtId { get; set; }
-    public Guid SportCategoryId { get; set; }   
+    public Guid? SportCategoryId { get; set; }   
 }

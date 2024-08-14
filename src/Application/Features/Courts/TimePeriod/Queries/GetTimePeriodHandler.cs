@@ -27,58 +27,122 @@ public class GetTimePeriodHandler : IRequestHandler<GetTimePeriodCommand, List<T
 
     public async Task<List<TimePeriodResponse>> Handle(GetTimePeriodCommand request, CancellationToken cancellationToken)
     {
-        var response = await (from tp in _dbContext.TimePeriods
-                              join tpcs in _dbContext.TimePeriodCourtSubdivisions on tp.Id equals tpcs.TimePeriodId
-                              join cs in _dbContext.CourtSubdivisions on tpcs.CourtSubdivisionId equals cs.Id
-                              join css in _dbContext.CourtSubdivisionSettings on cs.CourtSubdivisionSettingId equals css.Id
-                              join sc in _dbContext.SportsCategories on css.SportCategoryId equals sc.Id
-                              join c in _dbContext.Courts on cs.CourtId equals c.Id
-                              where
-                              c.Id == request.CourtId &&
-                              sc.Id == request.SportCategoryId &&
-                              !tp.IsDelete &&
-                              !cs.IsDelete &&
-                              !css.IsDelete &&
-                              !sc.IsDelete &&
-                              !c.IsDelete &&
-                              (tp.StartDayApply.HasValue && tp.EndDayApply.HasValue ? tp.StartDayApply >= DateTime.Now || tp.EndDayApply >= DateTime.Now : true)
-                              group new { tp, css, sc } by new
-                              {
-                                  TimePeriodId = tp.Id,
-                                  tp.IsNormalDay,
-                                  tp.StartDayApply,
-                                  CourtSubdivisionSettingId = css.Id,
-                                  css.CourtType,
-                                  tp.MinCancellationTime,
-                                  tp.Description,
-                                  tp.StartTime,
-                                  tp.EndTime,
-                                  tp.EndDayApply,
-                                  tp.ListDayByString,
-                                  tp.PriceAdjustment
-                              } into g
-                              orderby g.Key.CourtSubdivisionSettingId, g.Key.CourtType, g.Key.IsNormalDay,  g.Key.StartDayApply
-                              select new TimePeriodResponse
-                              {
-                                  TimePeriodId = g.Key.TimePeriodId,
-                                  CourtSubdivisionSettingId = g.Key.CourtSubdivisionSettingId,
-                                  CourtSubdivisionSettingType = g.Key.CourtType,
-                                  MinCancellationTime = g.Key.MinCancellationTime.ToString(@"hh\:mm\:ss"),
-                                  Description = g.Key.Description,
-                                  StartTime = g.Key.StartTime.ToString(@"hh\:mm\:ss"),
-                                  EndTime = g.Key.EndTime.ToString(@"hh\:mm\:ss"),
-                                  IsNormalDay = g.Key.IsNormalDay,
-                                  DayStartApply = g.Key.StartDayApply.HasValue ? g.Key.StartDayApply.Value.ToString("yyyy-MM-dd") : null,
-                                  DayEndApply = g.Key.EndDayApply.HasValue ? g.Key.EndDayApply.Value.ToString("yyyy-MM-dd") : null,
-                                  StringListDayInWeekApply = g.Key.ListDayByString,
-                                  PriceAdjustment = (decimal)g.Key.PriceAdjustment
-                              }).ToListAsync();
-
-        foreach (var item in response)
+        var response = new List<TimePeriodResponse>();
+        if (request.SportCategoryId == null)
         {
-            item.StringListDayInWeekApplyDescription = ProcessRequest(item.StringListDayInWeekApply);
+            //Lấy list SportCategoryId
+            var listSportCategoryId = _dbContext.SportsCategories.Where(x => !x.IsDelete).Select(x => x.Id).ToList();
+            foreach(var SportCategoryId in listSportCategoryId)
+            {
+                response = await (from tp in _dbContext.TimePeriods
+                                      join tpcs in _dbContext.TimePeriodCourtSubdivisions on tp.Id equals tpcs.TimePeriodId
+                                      join cs in _dbContext.CourtSubdivisions on tpcs.CourtSubdivisionId equals cs.Id
+                                      join css in _dbContext.CourtSubdivisionSettings on cs.CourtSubdivisionSettingId equals css.Id
+                                      join sc in _dbContext.SportsCategories on css.SportCategoryId equals sc.Id
+                                      join c in _dbContext.Courts on cs.CourtId equals c.Id
+                                      where
+                                      c.Id == request.CourtId &&
+                                      sc.Id == SportCategoryId &&
+                                      !tp.IsDelete &&
+                                      !cs.IsDelete &&
+                                      !css.IsDelete &&
+                                      !sc.IsDelete &&
+                                      !c.IsDelete &&
+                                      (tp.StartDayApply.HasValue && tp.EndDayApply.HasValue ? tp.StartDayApply >= DateTime.Now || tp.EndDayApply >= DateTime.Now : true)
+                                      group new { tp, css, sc } by new
+                                      {
+                                          TimePeriodId = tp.Id,
+                                          tp.IsNormalDay,
+                                          tp.StartDayApply,
+                                          CourtSubdivisionSettingId = css.Id,
+                                          css.CourtType,
+                                          tp.MinCancellationTime,
+                                          tp.Description,
+                                          tp.StartTime,
+                                          tp.EndTime,
+                                          tp.EndDayApply,
+                                          tp.ListDayByString,
+                                          tp.PriceAdjustment
+                                      } into g
+                                      orderby g.Key.CourtSubdivisionSettingId, g.Key.CourtType, g.Key.IsNormalDay, g.Key.StartDayApply
+                                      select new TimePeriodResponse
+                                      {
+                                          TimePeriodId = g.Key.TimePeriodId,
+                                          CourtSubdivisionSettingId = g.Key.CourtSubdivisionSettingId,
+                                          CourtSubdivisionSettingType = g.Key.CourtType,
+                                          MinCancellationTime = g.Key.MinCancellationTime.ToString(@"hh\:mm\:ss"),
+                                          Description = g.Key.Description,
+                                          StartTime = g.Key.StartTime.ToString(@"hh\:mm\:ss"),
+                                          EndTime = g.Key.EndTime.ToString(@"hh\:mm\:ss"),
+                                          IsNormalDay = g.Key.IsNormalDay,
+                                          DayStartApply = g.Key.StartDayApply.HasValue ? g.Key.StartDayApply.Value.ToString("yyyy-MM-dd") : null,
+                                          DayEndApply = g.Key.EndDayApply.HasValue ? g.Key.EndDayApply.Value.ToString("yyyy-MM-dd") : null,
+                                          StringListDayInWeekApply = g.Key.ListDayByString,
+                                          PriceAdjustment = (decimal)g.Key.PriceAdjustment
+                                      }).ToListAsync();
+
+                foreach (var item in response)
+                {
+                    item.StringListDayInWeekApplyDescription = ProcessRequest(item.StringListDayInWeekApply);
+                }
+            }
+        }
+        else
+        {
+             response = await (from tp in _dbContext.TimePeriods
+                                  join tpcs in _dbContext.TimePeriodCourtSubdivisions on tp.Id equals tpcs.TimePeriodId
+                                  join cs in _dbContext.CourtSubdivisions on tpcs.CourtSubdivisionId equals cs.Id
+                                  join css in _dbContext.CourtSubdivisionSettings on cs.CourtSubdivisionSettingId equals css.Id
+                                  join sc in _dbContext.SportsCategories on css.SportCategoryId equals sc.Id
+                                  join c in _dbContext.Courts on cs.CourtId equals c.Id
+                                  where
+                                  c.Id == request.CourtId &&
+                                  sc.Id == request.SportCategoryId &&
+                                  !tp.IsDelete &&
+                                  !cs.IsDelete &&
+                                  !css.IsDelete &&
+                                  !sc.IsDelete &&
+                                  !c.IsDelete &&
+                                  (tp.StartDayApply.HasValue && tp.EndDayApply.HasValue ? tp.StartDayApply >= DateTime.Now || tp.EndDayApply >= DateTime.Now : true)
+                                  group new { tp, css, sc } by new
+                                  {
+                                      TimePeriodId = tp.Id,
+                                      tp.IsNormalDay,
+                                      tp.StartDayApply,
+                                      CourtSubdivisionSettingId = css.Id,
+                                      css.CourtType,
+                                      tp.MinCancellationTime,
+                                      tp.Description,
+                                      tp.StartTime,
+                                      tp.EndTime,
+                                      tp.EndDayApply,
+                                      tp.ListDayByString,
+                                      tp.PriceAdjustment
+                                  } into g
+                                  orderby g.Key.CourtSubdivisionSettingId, g.Key.CourtType, g.Key.IsNormalDay, g.Key.StartDayApply
+                                  select new TimePeriodResponse
+                                  {
+                                      TimePeriodId = g.Key.TimePeriodId,
+                                      CourtSubdivisionSettingId = g.Key.CourtSubdivisionSettingId,
+                                      CourtSubdivisionSettingType = g.Key.CourtType,
+                                      MinCancellationTime = g.Key.MinCancellationTime.ToString(@"hh\:mm\:ss"),
+                                      Description = g.Key.Description,
+                                      StartTime = g.Key.StartTime.ToString(@"hh\:mm\:ss"),
+                                      EndTime = g.Key.EndTime.ToString(@"hh\:mm\:ss"),
+                                      IsNormalDay = g.Key.IsNormalDay,
+                                      DayStartApply = g.Key.StartDayApply.HasValue ? g.Key.StartDayApply.Value.ToString("yyyy-MM-dd") : null,
+                                      DayEndApply = g.Key.EndDayApply.HasValue ? g.Key.EndDayApply.Value.ToString("yyyy-MM-dd") : null,
+                                      StringListDayInWeekApply = g.Key.ListDayByString,
+                                      PriceAdjustment = (decimal)g.Key.PriceAdjustment
+                                  }).ToListAsync();
+
+            foreach (var item in response)
+            {
+                item.StringListDayInWeekApplyDescription = ProcessRequest(item.StringListDayInWeekApply);
+            }
         }
         return response;
+
     }
     private string? ProcessRequest(string? request)
     {
