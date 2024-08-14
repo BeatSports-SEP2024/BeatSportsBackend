@@ -34,7 +34,8 @@ public class GetAllAccountHandler : IRequestHandler<GetAllAccountCommand, Pagina
         }
 
         var query = _beatSportsDbContext.Accounts
-            .Where(tp => !tp.IsDelete);
+            .Include(c => c.Customer)
+            .Where(tp => !tp.IsDelete && !tp.Customer.IsDelete);
 
         if (!string.IsNullOrEmpty(request.Query))
         {
@@ -72,7 +73,6 @@ public class GetAllAccountHandler : IRequestHandler<GetAllAccountCommand, Pagina
 
         query = query.OrderByDescending(tp => tp.Created);
 
-        // Thực hiện truy vấn với ProjectTo và PaginatedListAsync
         var response = await query
             .ProjectTo<AccountResponse>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(request.PageIndex, request.PageSize);

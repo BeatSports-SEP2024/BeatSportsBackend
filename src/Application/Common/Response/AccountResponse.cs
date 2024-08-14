@@ -24,4 +24,5 @@ public class AccountResponse : IMapFrom<Account>
     public string? PhoneNumber { get; set; }
     public string Role { get; set; } = null!;
     public DateTime Created { get; set; }
+    public string? Address { get; set; }
 }
