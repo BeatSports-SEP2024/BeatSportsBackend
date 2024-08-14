@@ -75,7 +75,7 @@ public class GetDetailBookingHistoryByBookingIdCommandHandler : IRequestHandler<
                 StartTimePlaying = booking.StartTimePlaying,
                 EndTimePlaying = booking.EndTimePlaying,
                 BookingStatus = booking.BookingStatus,
-
+                IsCheckIn = booking.IsCheckIn,
             }).FirstOrDefaultAsync();
             if (bookingExist == null)
             {

@@ -146,6 +146,7 @@ public class BookingHistoryDetailByCustomerId
     public TimeSpan StartTimePlaying { get; set; }
     public TimeSpan EndTimePlaying { get; set; }
     public string? BookingStatus { get; set; }
+    public bool IsCheckIn { get; set; }
 
 }
 

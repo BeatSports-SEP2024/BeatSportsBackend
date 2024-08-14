@@ -22,6 +22,11 @@ public class Booking : BaseAuditableEntity
     public decimal TotalPriceDiscountCampaign { get; set; }
     public string? PayloadDescriptionPriceOfTimePeriod { get; set; }
     public string? QRUrlForCheckIn { get; set; }
+    /// <summary>
+    /// kh còn đụng tới chỗ booking status => kh đụng tới việc tiền tự động chui vào ví owner
+    /// Cronjob tự check để đổi BookingStatus
+    /// </summary>
+    public bool IsCheckIn { get; set; } = false;
     public bool IsRoomBooking { get; set; }
     /// <summary>
     /// Dùng để lưu thời gian cần thể nó hủy
