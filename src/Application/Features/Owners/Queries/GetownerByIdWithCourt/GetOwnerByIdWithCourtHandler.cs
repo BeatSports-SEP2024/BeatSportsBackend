@@ -56,6 +56,7 @@ public class GetOwnerByIdWithCourtHandler : IRequestHandler<GetOwnerByIdWithCour
             DateOfBirth = query.Account.DateOfBirth,
             Bio = query.Account.Bio,
             Court = listCourt,
+            Address = query.Address,
         };
 
         return Task.FromResult(ownerInfo);
