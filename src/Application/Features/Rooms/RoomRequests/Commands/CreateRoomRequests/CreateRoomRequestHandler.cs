@@ -63,12 +63,12 @@ public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand
                         flag++;
                         break;
                     }
-                    else if (((roomMatch.StartTimeRoom <= roomMatchCheck.StartTimeRoom) && (roomMatchCheck.StartTimeRoom < roomMatchCheck.EndTimeRoom)))
+                    else if (((roomMatch.StartTimeRoom <= roomMatchCheck.StartTimeRoom) && (roomMatchCheck.StartTimeRoom < roomMatch.EndTimeRoom)))
                     {
                         flag++;
                         break;
                     }
-                    else if (((roomMatch.StartTimeRoom < roomMatchCheck.EndTimeRoom) && (roomMatchCheck.EndTimeRoom <= roomMatchCheck.EndTimeRoom)))
+                    else if (((roomMatch.StartTimeRoom < roomMatchCheck.EndTimeRoom) && (roomMatchCheck.EndTimeRoom <= roomMatch.EndTimeRoom)))
                     {
                         flag++;
                         break;
