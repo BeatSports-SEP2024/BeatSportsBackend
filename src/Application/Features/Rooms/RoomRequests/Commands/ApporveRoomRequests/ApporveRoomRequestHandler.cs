@@ -1,6 +1,7 @@
 ﻿using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Application.Features.Hubs;
 using BeatSportsAPI.Application.Features.Rooms.RoomRequests.Commands.UpdateRoomRequests;
 using BeatSportsAPI.Domain.Entities;
@@ -121,7 +122,7 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
                                     <p>Chào {roomRequest.Customer.Account.FirstName} {roomRequest.Customer.Account.LastName},</p>
                                     <p>Yêu cầu tham gia phòng của bạn đã được chấp nhận với các thông tin sau:</p>
                                     <p><strong>Tên phòng:</strong> {roomMatch.RoomName}</p>
-                                    <p><strong>Thể loại:</strong> {roomMatch.SportCategory}</p>
+                                    <p><strong>Thể loại:</strong> {roomMatch.SportCategory.GetDescriptionFromEnum()}</p>
                                     <p><strong>Thời gian bắt đầu:</strong> {roomMatch.StartTimeRoom}</p>
                                     <p><strong>Thời gian kết thúc:</strong> {roomMatch.EndTimeRoom}</p>
                                 </div>
