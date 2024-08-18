@@ -55,7 +55,7 @@ public class CreateWithdrawalRequestByOwnerHandler : IRequestHandler<CreateWithd
         // Chặn rút tiền nếu số dư còn lại không đủ
         if (ownerWallet.Balance - request.TransactionAmount < 70000)
         {
-            decimal withdrawableAmount = request.TransactionAmount - 70000;
+            decimal withdrawableAmount = Math.Max(request.TransactionAmount - 70000, 0);
             string formattedWithdrawableAmount = withdrawableAmount.ToString("N0");
 
             return Task.FromResult(new BeatSportsResponseV2
