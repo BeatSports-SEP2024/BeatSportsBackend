@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using BeatSportsAPI.Application.Features.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using BeatSportsAPI.Application.Common.Ultilities;
 
 namespace BeatSportsAPI.Application.Features.Rooms.RoomRequests.Commands.CreateRoomRequests;
 public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand, BeatSportsResponse>
@@ -192,7 +193,7 @@ public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand
                                 <p>Chào {customer.Account.FirstName} {customer.Account.LastName},</p>
                                 <p>Bạn đã gửi yêu cầu tham gia phòng với các thông tin sau:</p>
                                 <p><strong>Tên phòng:</strong> {roomMatch.RoomName}</p>
-                                <p><strong>Thể loại:</strong> {roomMatch.SportCategory}</p>
+                                <p><strong>Thể loại:</strong> {roomMatch.SportCategory.GetDescriptionFromEnum()}</p>
                                 <p><strong>Thời gian bắt đầu:</strong> {roomMatch.StartTimeRoom}</p>
                                 <p><strong>Thời gian kết thúc:</strong> {roomMatch.EndTimeRoom}</p>
                                 <p>Vui lòng chờ quản trị viên duyệt yêu cầu của bạn.</p>
