@@ -152,6 +152,8 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
                         </body>
                         </html>"
                     );
+
+                await _hubContext.Clients.Group(roomRequest.RoomMatchId.ToString()).SendAsync("UpdateRoom", "RequestAccepted", roomRequest.CustomerId);
                 break;
 
             case "Declined":
@@ -159,21 +161,21 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
                 //roomRequest.DateApprove = DateTime.UtcNow;
 
                 _beatSportsDbContext.RoomRequests.Remove(roomRequest);
-                //// Gửi sự kiện SignalR
-                //await _hubContext.Clients.Group(roomRequest.RoomMatchId.ToString()).SendAsync("UpdateRoom", "RequestDeclined", roomRequest.CustomerId);
+                // Gửi sự kiện SignalR
+                await _hubContext.Clients.Group(roomRequest.RoomMatchId.ToString()).SendAsync("UpdateRoom", "RequestDeclined", roomRequest.CustomerId);
 
                 break;
         }
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
 
-        if (request.RoomRequest.ToString() == "Accepted")
-        {
-            await _hubContext.Clients.Group(roomRequest.RoomMatchId.ToString()).SendAsync("UpdateRoom", "RequestAccepted", roomRequest.CustomerId);
-        }
-        else if (request.RoomRequest.ToString() == "Declined")
-        {
-            await _hubContext.Clients.Group(roomRequest.RoomMatchId.ToString()).SendAsync("UpdateRoom", "RequestDeclined", roomRequest.CustomerId);
-        }
+        //if (request.RoomRequest.ToString() == "Accepted")
+        //{
+        //    await _hubContext.Clients.Group(roomRequest.RoomMatchId.ToString()).SendAsync("UpdateRoom", "RequestAccepted", roomRequest.CustomerId);
+        //}
+        //else if (request.RoomRequest.ToString() == "Declined")
+        //{
+        //    await _hubContext.Clients.Group(roomRequest.RoomMatchId.ToString()).SendAsync("UpdateRoom", "RequestDeclined", roomRequest.CustomerId);
+        //}
 
         var roomMatchJoinedList = _beatSportsDbContext.RoomRequests
                         .Where(x => x.CustomerId == request.CustomerId && x.JoinStatus == RoomRequestEnums.Pending)
