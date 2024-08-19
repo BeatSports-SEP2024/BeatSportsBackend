@@ -48,6 +48,16 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
             throw new NotFoundException($"Room match {roomRequest.RoomMatchId} does not exist");
         }
 
+        var customer = _beatSportsDbContext.Customers
+                        .Where(x => x.Id == request.CustomerId).FirstOrDefault();
+
+        var email = roomRequest.Customer?.Account?.Email;
+        if (email == null)
+        {
+            // Log lỗi hoặc xử lý trường hợp email bị null
+            throw new BadRequestException("Email address is missing");
+        }
+
         switch (request.RoomRequest.ToString())
         {
             case "Accepted":
@@ -65,13 +75,22 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
                 };
                 _beatSportsDbContext.RoomMembers.Add(roomMember);
 
-                
+                var notification = new Notification
+                {
+                    AccountId = customer.AccountId,
+                    Title = "Yêu cầu tham gia phòng",
+                    Message = $" đã được chấp thuận!",
+                    RoomMatchId = roomRequest.RoomMatchId.ToString(),
+                    IsRead = false,
+                    Type = "RoomRequestAccepted"
+                };
+                _beatSportsDbContext.Notifications.Add(notification);
 
-                // Gửi sự kiện SignalR
-                await _hubContext.Clients.Group(roomRequest.RoomMatchId.ToString()).SendAsync("UpdateRoom", "RequestAccepted", roomRequest.CustomerId);
+                //// Gửi sự kiện SignalR
+                //await _hubContext.Clients.Group(roomRequest.RoomMatchId.ToString()).SendAsync("UpdateRoom", "RequestAccepted", roomRequest.CustomerId);
                 // Gửi email cho khách hàng
                 await _emailService.SendEmailAsync(
-                    roomRequest.Customer.Account.Email,
+                    email,
                     "Yêu cầu tham gia phòng đã được chấp nhận",
                     $@"
                         <html>
@@ -132,7 +151,7 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
                             </div>
                         </body>
                         </html>"
-                );
+                    );
                 break;
 
             case "Declined":
@@ -140,15 +159,21 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
                 //roomRequest.DateApprove = DateTime.UtcNow;
 
                 _beatSportsDbContext.RoomRequests.Remove(roomRequest);
-                // Gửi sự kiện SignalR
-                await _hubContext.Clients.Group(roomRequest.RoomMatchId.ToString()).SendAsync("UpdateRoom", "RequestDeclined", roomRequest.CustomerId);
+                //// Gửi sự kiện SignalR
+                //await _hubContext.Clients.Group(roomRequest.RoomMatchId.ToString()).SendAsync("UpdateRoom", "RequestDeclined", roomRequest.CustomerId);
 
                 break;
         }
         await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
 
-        var customer = _beatSportsDbContext.Customers
-                                .Where(x => x.Id == request.CustomerId).FirstOrDefault();
+        if (request.RoomRequest.ToString() == "Accepted")
+        {
+            await _hubContext.Clients.Group(roomRequest.RoomMatchId.ToString()).SendAsync("UpdateRoom", "RequestAccepted", roomRequest.CustomerId);
+        }
+        else if (request.RoomRequest.ToString() == "Declined")
+        {
+            await _hubContext.Clients.Group(roomRequest.RoomMatchId.ToString()).SendAsync("UpdateRoom", "RequestDeclined", roomRequest.CustomerId);
+        }
 
         var roomMatchJoinedList = _beatSportsDbContext.RoomRequests
                         .Where(x => x.CustomerId == request.CustomerId && x.JoinStatus == RoomRequestEnums.Pending)
@@ -160,20 +185,21 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
                 _beatSportsDbContext.RoomRequests.Remove(roomReq);
             }
         }
+        await _beatSportsDbContext.SaveChangesAsync(cancellationToken);
 
-        var notification = new Notification
-        {
-            AccountId = customer.AccountId,
-            Title = "Yêu cầu tham gia phòng",
-            Message = $" đã được chấp thuận!",
-            RoomMatchId = roomRequest.RoomMatchId.ToString(),
-            IsRead = false,
-            Type = "RoomRequestAccepted"
-        };
-        _beatSportsDbContext.Notifications.Add(notification);
+        //var notification = new Notification
+        //{
+        //    AccountId = customer.AccountId,
+        //    Title = "Yêu cầu tham gia phòng",
+        //    Message = $" đã được chấp thuận!",
+        //    RoomMatchId = roomRequest.RoomMatchId.ToString(),
+        //    IsRead = false,
+        //    Type = "RoomRequestAccepted"
+        //};
+        //_beatSportsDbContext.Notifications.Add(notification);
 
-        await _beatSportsDbContext.SaveChangesAsync();
-        
+        //await _beatSportsDbContext.SaveChangesAsync();
+
         return new BeatSportsResponse
         {
             Message = roomRequest.JoinStatus == RoomRequestEnums.Accepted ? "Room request approved successfully." : "Room request declined."
