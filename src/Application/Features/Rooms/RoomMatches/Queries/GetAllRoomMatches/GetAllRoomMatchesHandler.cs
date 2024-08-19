@@ -3,6 +3,7 @@ using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Ultilities;
+using BeatSportsAPI.Domain.Entities;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -179,16 +180,16 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
         {
             switch (sportFilter)
             {
-                case "Football":
-                    welcomeRoomMatches = welcomeRoomMatches.Where(c => c.SportCategory == 0).ToList();
+                case "Soccer":
+                    welcomeRoomMatches = welcomeRoomMatches.Where(c => c.SportCategory == SportCategoriesEnums.Soccer).ToList();
                     break;
 
                 case "Volleyball":
-                    welcomeRoomMatches = welcomeRoomMatches.Where(c => (int)c.SportCategory == 1).ToList();
+                    welcomeRoomMatches = welcomeRoomMatches.Where(c => c.SportCategory == SportCategoriesEnums.Volleyball).ToList();
                     break;
 
                 case "Badminton":
-                    welcomeRoomMatches = welcomeRoomMatches.Where(c => (int)c.SportCategory == 2).ToList();
+                    welcomeRoomMatches = welcomeRoomMatches.Where(c => c.SportCategory == SportCategoriesEnums.Badminton).ToList();
                     break;
             }
         }
