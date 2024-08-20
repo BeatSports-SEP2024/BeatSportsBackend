@@ -9,9 +9,13 @@ public static class ParseTimeExtension
 {
     public static string GetFormattedTime(TimeSpan timeSpan)
     {
+        if (timeSpan.TotalMinutes < 1)
+        {
+            return "Vừa mới đây";
+        }
         if (timeSpan.TotalHours < 1)
         {
-            return $"{timeSpan.TotalMinutes} phút trước";
+            return $"{(int)timeSpan.TotalMinutes} phút trước";
         }
         else if (timeSpan.TotalDays < 1)
         {
