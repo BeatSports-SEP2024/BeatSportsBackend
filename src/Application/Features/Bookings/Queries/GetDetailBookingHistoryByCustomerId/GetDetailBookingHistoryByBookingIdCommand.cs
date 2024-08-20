@@ -58,6 +58,7 @@ public class GetDetailBookingHistoryByBookingIdCommandHandler : IRequestHandler<
                 BasePrice = subCourt.BasePrice,
                 CourtId = court.Id,
                 CourtName = court.CourtName,
+                CourtImageUrl = court.ImageUrls,
                 CourtAddress = court.Address,
                 CourtWallImage = court.WallpaperUrls,
                 CourtAvatarImage = court.CourtAvatarImgUrls,
@@ -89,5 +90,6 @@ public class GetDetailBookingHistoryByBookingIdCommandHandler : IRequestHandler<
 
         }
     }
+
 }
 

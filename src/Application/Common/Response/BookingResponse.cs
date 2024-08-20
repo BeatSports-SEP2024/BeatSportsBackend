@@ -131,6 +131,7 @@ public class BookingHistoryDetailByCustomerId
     public string? CourtSubName { get; set; }
     public Guid CourtId { get; set; }
     public string? CourtName { get; set; }
+    public string? CourtImageUrl { get; set; }
     public string? CourtAddress { get; set; }
     public string? CourtWallImage { get; set; }
     public string? CourtAvatarImage { get; set; }
