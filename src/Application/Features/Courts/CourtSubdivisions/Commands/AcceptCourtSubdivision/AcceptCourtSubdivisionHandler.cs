@@ -88,7 +88,7 @@ public class AcceptCourtSubdivisionHandler : IRequestHandler<AcceptCourtSubdivis
                         <body>
                             <div class='container'>
                                 <div class='header'>
-                                    Thông tin đơn đặt sân
+                                    Thông tin đơn tạo sân nhỏ
                                 </div>
                                 <div class='content'>
                                     <p>Kính gửi {ownerName},</p>
@@ -159,7 +159,7 @@ public class AcceptCourtSubdivisionHandler : IRequestHandler<AcceptCourtSubdivis
                         <body>
                             <div class='container'>
                                 <div class='header'>
-                                    Thông tin đơn đặt sân
+                                    Thông tin đơn tạo sân nhỏ
                                 </div>
                                 <div class='content'>
                                     <p>Kính gửi {ownerName},</p>
