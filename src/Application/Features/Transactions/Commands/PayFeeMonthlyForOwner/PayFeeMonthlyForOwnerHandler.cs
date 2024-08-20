@@ -18,7 +18,11 @@ public class PayFeeMonthlyForOwnerHandler : IRequestHandler<PayFeeMonthlyForOwne
 
     public async Task<BeatSportsResponseV2> Handle(PayFeeMonthlyForOwnerCommand request, CancellationToken cancellationToken)
     {
-        if (request.FeeMonthlyForOwner < 70000 || request.FeeMonthlyForOwner % 70000 != 0)
+        if (request.FeeMonthlyForOwner <= 0)
+        {
+            throw new BadRequestException("Số tiền phí phải lớn hơn 0");
+        }
+        else if (request.FeeMonthlyForOwner % 70000 != 0)
         {
             throw new BadRequestException("Số tiền phí không đúng với thực tế");
         }
