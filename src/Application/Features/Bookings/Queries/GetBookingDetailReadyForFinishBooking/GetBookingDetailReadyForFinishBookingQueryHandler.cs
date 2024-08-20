@@ -210,7 +210,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                     var courtSubLock = new TimeChecking
                     {
                         CourtSubdivisionId = newBooking.CourtSubdivisionId,
-                        DateBooking = request.DayWantToPlay,// :))))))))
+                        DateBooking = request.DayWantToPlay,
                         StartTime = startTime,
                         EndTime = endTime,
                         IsLock = false

@@ -270,7 +270,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
                                                         <body>
                                                             <div class='container'>
                                                                 <div class='header'>
-                                                                    Thông tin tài khoản chủ sân
+                                                                    Thông tin đơn đặt sân
                                                                 </div>
                                                                 <div class='content'>
                                                                     <p>Kính gửi {getCustomerByAccount.Account.FirstName + " " + getCustomerByAccount.Account.LastName},</p>

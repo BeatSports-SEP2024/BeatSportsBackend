@@ -63,6 +63,7 @@ public class GetDetailBookingHistoryByCusIdCommandHandler : IRequestHandler<GetD
                 BasePrice = subCourt.BasePrice,
                 CourtId = court.Id,
                 CourtName = court.CourtName,
+                IsCheckIn = booking.IsCheckIn,
                 CourtAddress = court.Address,
                 CourtWallImage = court.WallpaperUrls,
                 CourtAvatarImage = court.CourtAvatarImgUrls,
