@@ -32,6 +32,7 @@ public class GetBookingHistoryByCusIdCommandHandler : IRequestHandler<GetBooking
             join court in _dbContext.Courts on subCourt.CourtId equals court.Id
             join feedback in _dbContext.Feedbacks on booking.Id equals feedback.BookingId into feedbackJoin
             from feedback in feedbackJoin.DefaultIfEmpty()
+
             select new BookingHistoryByCustomerId
             {
                 BookingId = booking.Id,
@@ -41,7 +42,7 @@ public class GetBookingHistoryByCusIdCommandHandler : IRequestHandler<GetBooking
                 CourtSubName = subCourt.CourtSubdivisionName,
                 CourtName = court.CourtName,
                 CourtAddress = court.Address,
-                CourtImage = court.WallpaperUrls,
+                CourtImage = court.ImageUrls,
                 BookingDate = booking.BookingDate,
                 TotalAmount = booking.TotalAmount,
                 IsRoomBooking = booking.IsRoomBooking,

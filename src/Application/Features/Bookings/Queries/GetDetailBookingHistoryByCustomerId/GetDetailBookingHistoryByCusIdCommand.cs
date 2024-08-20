@@ -62,6 +62,7 @@ public class GetDetailBookingHistoryByCusIdCommandHandler : IRequestHandler<GetD
                 CourtSubName = subCourt.CourtSubdivisionName,
                 BasePrice = subCourt.BasePrice,
                 CourtId = court.Id,
+                CourtImageUrl = court.ImageUrls,
                 CourtName = court.CourtName,
                 IsCheckIn = booking.IsCheckIn,
                 CourtAddress = court.Address,
@@ -94,6 +95,5 @@ public class GetDetailBookingHistoryByCusIdCommandHandler : IRequestHandler<GetD
             throw new NotFoundException("Not Found exception: " + ex.Message);
 
         }
-
     }
 }

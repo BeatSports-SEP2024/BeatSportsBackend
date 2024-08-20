@@ -119,7 +119,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                     {
                         CourtId = courtSub.CourtId,
                         CourtName = court.CourtName,
-                        ImageCourtURL = court.CourtAvatarImgUrls,
+                        ImageCourtURL = court.ImageUrls,
                     };
                     var listCourtSubInReponse = new List<CourtDetailInBookingDetailReadyForFinishBookingReponse>();
                     decimal totalPrice = 0;

@@ -59,6 +59,7 @@ public class GetDetailBookingHistoryByBookingIdAndOwnerIdCommandHandler : IReque
                 CourtSubName = subCourt.CourtSubdivisionName,
                 BasePrice = subCourt.BasePrice,
                 CourtId = court.Id,
+                CourtImageUrl = court.ImageUrls,
                 CourtName = court.CourtName,
                 CourtAddress = court.Address,
                 CourtWallImage = court.WallpaperUrls,
@@ -91,5 +92,6 @@ public class GetDetailBookingHistoryByBookingIdAndOwnerIdCommandHandler : IReque
 
         }
     }
+
 }
 
