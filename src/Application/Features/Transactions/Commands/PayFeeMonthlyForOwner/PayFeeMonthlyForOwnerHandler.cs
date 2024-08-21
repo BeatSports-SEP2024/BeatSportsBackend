@@ -45,14 +45,14 @@ public class PayFeeMonthlyForOwnerHandler : IRequestHandler<PayFeeMonthlyForOwne
                             .Where(x => x.AccountId == owner.AccountId)
                             .FirstOrDefault();
 
-        //if (ownerWallet.Balance < request.FeeMonthlyForOwner)
-        //{
-        //    return await Task.FromResult(new BeatSportsResponseV2
-        //    {
-        //        Status = 400,
-        //        Message = "Vui lòng duy trì số dư tối thiểu 70000VND"
-        //    });
-        //}
+        if (ownerWallet.Balance < request.FeeMonthlyForOwner)
+        {
+            return await Task.FromResult(new BeatSportsResponseV2
+            {
+                Status = 400,
+                Message = "Số dư tối thiểu không đủ để đóng phí"
+            });
+        }
 
         // Kiểm tra tháng này owner đó đã thu chưa, thu rồi thì không thu nữa
         var currentMonth = DateTime.Now.Month;
