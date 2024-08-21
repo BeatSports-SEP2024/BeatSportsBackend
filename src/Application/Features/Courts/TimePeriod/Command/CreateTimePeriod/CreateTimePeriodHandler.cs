@@ -59,7 +59,10 @@ public class CreateTimePeriodHandler : IRequestHandler<CreateTimePeriodCommand, 
             // Check dựa vào court setting trước
             foreach (var item in request.ListCourtSettingId)
             {
-                var courtSubs = _dbContext.CourtSubdivisions.Where(x => x.CourtSubdivisionSettingId == item && !x.IsDelete).ToList();
+                var courtSubs = _dbContext.CourtSubdivisions.Where(x => x.CourtSubdivisionSettingId == item && 
+                                                                        !x.IsDelete && 
+                                                                        x.CourtId == request.CourtId &&
+                                                                        x.CreatedStatus == Domain.Enums.CourtSubdivisionCreatedStatus.Accepted).ToList();
                 foreach (var courtSub in courtSubs)
                 {
                     var courtSubdivisionId = courtSub.Id;
@@ -74,16 +77,6 @@ public class CreateTimePeriodHandler : IRequestHandler<CreateTimePeriodCommand, 
                                        && !tp.IsDelete
                                        && !cs.IsDelete
                                        select tp).ToList();
-                    var tesdst = (from tpcs in _dbContext.TimePeriodCourtSubdivisions
-                                       join tp in _dbContext.TimePeriods on tpcs.TimePeriodId equals tp.Id
-                                       join cs in _dbContext.CourtSubdivisions on tpcs.CourtSubdivisionId equals cs.Id
-                                       where
-                                       tpcs.CourtSubdivisionId == courtSubdivisionId
-                                       && cs.CourtSubdivisionSettingId == item
-                                       && tp.IsNormalDay
-                                       && !tp.IsDelete
-                                       && !cs.IsDelete
-                                       select cs).ToList();
                     /*   if (timePeriods.Any(tp => !(request.EndTime <= tp.StartTime || request.StartTime >= tp.EndTime)))
                        {
                            throw new BadRequestException("Time period overlaps with existing period. Please check and try again.");
