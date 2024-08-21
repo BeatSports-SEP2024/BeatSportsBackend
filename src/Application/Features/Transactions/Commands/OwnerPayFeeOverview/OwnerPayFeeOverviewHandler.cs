@@ -63,7 +63,7 @@ public class OwnerPayFeeOverviewHandler : IRequestHandler<OwnerPayFeeOverviewCom
                     OwnerId = owner.Id,
                     OwnerName = $"{owner.Account.FirstName} {owner.Account.LastName}",
                     TotalFeeNeedToPaid = 70000,
-                    TransactionDate = new DateTime(1, month, year)
+                    TransactionDate = new DateTime(year, month, 1)
                 });
             }
 
