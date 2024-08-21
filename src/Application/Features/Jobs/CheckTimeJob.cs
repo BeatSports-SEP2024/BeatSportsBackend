@@ -150,7 +150,7 @@ public class CheckTimeJob
     public void NotificationForOwnerPayFee()
     {
         var today = DateTime.Now;
-        if (today.Day == 10)
+        if (today.Day == 1)
         {
             var owners = _beatSportsDbContext.Owners.ToList();
             foreach (var owner in owners)
