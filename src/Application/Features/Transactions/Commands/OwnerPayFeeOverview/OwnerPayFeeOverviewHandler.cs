@@ -37,8 +37,9 @@ public class OwnerPayFeeOverviewHandler : IRequestHandler<OwnerPayFeeOverviewCom
         var activeOwners = await _beatSportsDbContext.Owners
             .Include(o => o.Account)
                     .Where(o => !o.Account.IsDelete
-                    && o.Created.Month == month 
-                    && o.Created.Year == year)
+                    && o.Created.Month <= month
+                    && o.Created.Year == year
+                    )
             .ToListAsync();
 
         var paidOwners = new List<PaidOwner>();
@@ -55,7 +56,15 @@ public class OwnerPayFeeOverviewHandler : IRequestHandler<OwnerPayFeeOverviewCom
 
             if (ownerTransactions == null || !ownerTransactions.Any())
             {
-                continue;
+                // Chưa thanh toán
+                unpaidOwners.Add(new UnpaidOwner
+                {
+                    OwnerAccount = owner.Account.UserName,
+                    OwnerId = owner.Id,
+                    OwnerName = $"{owner.Account.FirstName} {owner.Account.LastName}",
+                    TotalFeeNeedToPaid = 70000,
+                    TransactionDate = null
+                });
             }
 
             if (ownerTransactions.Any())
@@ -76,14 +85,14 @@ public class OwnerPayFeeOverviewHandler : IRequestHandler<OwnerPayFeeOverviewCom
             else
             {
                 // Chưa thanh toán
-                unpaidOwners.Add(new UnpaidOwner
+/*                unpaidOwners.Add(new UnpaidOwner
                 {
                     OwnerAccount = owner.Account.UserName,
                     OwnerId = owner.Id,
                     OwnerName = $"{owner.Account.FirstName} {owner.Account.LastName}",
                     TotalFeeNeedToPaid = 70000, 
                     TransactionDate = null
-                });
+                });*/
             }
         }
 
