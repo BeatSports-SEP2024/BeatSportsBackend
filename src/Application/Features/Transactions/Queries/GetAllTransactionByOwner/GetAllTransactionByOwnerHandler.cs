@@ -33,7 +33,10 @@ public class GetAllTransactionByOwnerHandler : IRequestHandler<GetAllTransaction
                                                                       x.AdminCheckStatus == AdminCheckEnums.Accepted)
                                                                       ||
                                                                       (x.WalletId == wallet.Id &&
-                                                                      x.TransactionType.Trim() == "Rút tiền"))
+                                                                      x.TransactionType.Trim() == "Rút tiền")
+                                                                      ||
+                                                                      (x.WalletId == wallet.Id &&
+                                                                      x.TransactionType.Trim() == "Payfee"))
             .OrderByDescending(x => x.LastModified).ThenByDescending(x => x.Created).ToListAsync();
         /*        var query = await _beatSportsDbContext.Transactions
                     .Include(t => t.Wallet)
