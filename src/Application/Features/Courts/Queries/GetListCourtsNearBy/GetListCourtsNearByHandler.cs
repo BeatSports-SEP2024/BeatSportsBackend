@@ -145,7 +145,7 @@ public class GetListCourtsNearByHandler : IRequestHandler<GetListCourtsNearByCom
             if (c.CourtSubdivision.Count != 0)
             {
                 price = c.CourtSubdivision.Where(x => x.CreatedStatus == CourtSubdivisionCreatedStatus.Accepted).MinBy(c => c.BasePrice).BasePrice;
-                rentalNumber = c.CourtSubdivision.Sum(x => x.Bookings.Where(c => c.BookingStatus.Equals("Approved")).Count());
+                rentalNumber = c.CourtSubdivision.Sum(x => x.Bookings.Where(c => c.BookingStatus.Equals("Finished")).Count());
             }
 
             var listCourtSub = c.CourtSubdivision
