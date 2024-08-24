@@ -48,6 +48,10 @@ public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingA
         {
             throw new NotFoundException("Not Found");
         }
+        if (bookingApprove.IsRoomBooking == true)
+        {
+            throw new BadRequestException("Bạn đang tạo 1 phòng mới, không thể hủy được. Bạn phải hủy cái phòng đấu đó thì mới hủy đơn hàng này được");
+        }
 
         // Chuyển đổi Unix timestamp ngược lại thành DateTime
         // DateTimeOffset dateTimeOffsetFromUnix = DateTimeOffset.FromUnixTimeSeconds(bookingApprove.UnixTimestampMinCancellation);
