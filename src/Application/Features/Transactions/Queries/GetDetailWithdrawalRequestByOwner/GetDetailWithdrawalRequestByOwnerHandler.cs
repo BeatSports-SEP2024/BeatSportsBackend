@@ -42,7 +42,7 @@ public class GetDetailWithdrawalRequestByOwnerHandler : IRequestHandler<GetDetai
                             .ToList();
 
         var totalAmountReceived = transactionList.Where(x => x.TransactionType.Equals("Nạp tiền") || (x.TransactionType.Equals("Giao dịch trong App") && x.AdminCheckStatus == AdminCheckEnums.Accepted)).Sum(x => x.TransactionAmount);
-        var totalAmountWithdrawn = transactionList.Where(x => x.TransactionType.Equals("Rút tiền") && x.AdminCheckStatus == AdminCheckEnums.Accepted).Sum(x => x.TransactionAmount);
+        var totalAmountWithdrawn = transactionList.Where(x => x.TransactionType.Equals("Rút tiền") || (x.TransactionType.Equals("Payfee") && x.AdminCheckStatus == AdminCheckEnums.Accepted)).Sum(x => x.TransactionAmount);
         var totalAmountAvailableForWithdrawal = totalAmountReceived - totalAmountWithdrawn;
 
         var result = new List<TransactionResponseV2>();
