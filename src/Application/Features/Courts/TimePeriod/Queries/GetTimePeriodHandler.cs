@@ -34,7 +34,7 @@ public class GetTimePeriodHandler : IRequestHandler<GetTimePeriodCommand, List<T
             var listSportCategoryId = _dbContext.SportsCategories.Where(x => !x.IsDelete).Select(x => x.Id).ToList();
             foreach(var SportCategoryId in listSportCategoryId)
             {
-                response = await (from tp in _dbContext.TimePeriods
+                var flag = await (from tp in _dbContext.TimePeriods
                                       join tpcs in _dbContext.TimePeriodCourtSubdivisions on tp.Id equals tpcs.TimePeriodId
                                       join cs in _dbContext.CourtSubdivisions on tpcs.CourtSubdivisionId equals cs.Id
                                       join css in _dbContext.CourtSubdivisionSettings on cs.CourtSubdivisionSettingId equals css.Id
@@ -81,9 +81,10 @@ public class GetTimePeriodHandler : IRequestHandler<GetTimePeriodCommand, List<T
                                           PriceAdjustment = (decimal)g.Key.PriceAdjustment
                                       }).ToListAsync();
 
-                foreach (var item in response)
+                foreach (var item in flag)
                 {
                     item.StringListDayInWeekApplyDescription = ProcessRequest(item.StringListDayInWeekApply);
+                    response.Add(item);
                 }
             }
         }
