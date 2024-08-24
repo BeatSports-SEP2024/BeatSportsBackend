@@ -57,7 +57,7 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
         if (request.Filter.Equals("TransactionType"))
         {
             filteredTransactions = filteredTransactions
-                .Where(t => t.TransactionType.Contains(request.KeyWord))
+                .Where(t => t.TransactionType.ToLower().Contains(request.KeyWord.ToLower()))
                 .ToList();
         }
         else if (request.Filter.Equals("From"))
