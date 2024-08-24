@@ -71,7 +71,8 @@ public class ListTimeCheckingByCourtSubdivisionId
                             .Where(b => b.CourtSubdivisionId == timecheck.CourtSubdivisionId &&
                                  b.PlayingDate.Date == timecheck.DateBooking.Date &&
                                  b.StartTimePlaying == timecheck.StartTime.TimeOfDay &&
-                                 b.EndTimePlaying == timecheck.EndTime.TimeOfDay)
+                                 b.EndTimePlaying == timecheck.EndTime.TimeOfDay &&
+                                 b.BookingStatus != BookingEnums.Cancel.ToString())
                             .FirstOrDefaultAsync();
                 var bookingStatusString = "";
 
