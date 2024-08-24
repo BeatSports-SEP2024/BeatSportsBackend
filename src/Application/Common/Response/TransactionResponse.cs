@@ -83,6 +83,7 @@ public class TransactionResponseV4
     public List<TransactionResponseV2> TransactionList { get; set; }
     public decimal? TotalAmountReceived { get; set; }
     public decimal? TotalAmountWithdrawn { get; set; }
+    public decimal? totalAmountPayfee { get; set; }
     public decimal? TotalAmountAvailableForWithdrawal { get; set; }
     public decimal? TotalAmountWithdrawalRequestByOwner { get; set; }
     public string? TransactionStatus { get; set; }
