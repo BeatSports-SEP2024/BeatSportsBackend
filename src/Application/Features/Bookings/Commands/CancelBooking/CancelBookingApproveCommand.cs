@@ -118,9 +118,7 @@ public class CancelBookingApproveCommandHandler : IRequestHandler<CancelBookingA
                     // Decimal trong trường hợp này kh có null được đâu. Khỏi lo
                     customerWallet.Balance += (decimal)transaction.TransactionAmount!;
                     _beatSportsDbContext.Wallets.Update(customerWallet);
-                    // Trừ tiền tương đương trong ví owner với số tiền customer đặt đơn
-                    ownerWallet.Balance -= (decimal)transaction.TransactionAmount!;
-                    _beatSportsDbContext.Wallets.Update(ownerWallet);
+                   
                     // Hủy transaction đó
                     transaction.TransactionMessage = TransactionConstant.TransactionCancel;
                     transaction.TransactionStatus = TransactionEnum.Cancel.ToString();
