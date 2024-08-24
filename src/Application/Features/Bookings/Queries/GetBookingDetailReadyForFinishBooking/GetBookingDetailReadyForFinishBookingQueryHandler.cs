@@ -128,7 +128,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                     // Kiểm tra các TimePeriods có IsNormalDay = false trước
                     var specialDayPeriods = timePeriods.Where(tp => !tp.IsNormalDay &&
                                                                     tp.StartDayApply <= request.DayWantToPlay &&
-                                                                    tp.EndDayApply >= request.DayWantToPlay).ToList();
+                                                                    tp.EndDayApply >= request.DayWantToPlay && !tp.IsDelete).ToList();
 
                     // Áp dụng các TimePeriod đặc biệt
                     foreach (var item in specialDayPeriods)
@@ -141,7 +141,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                     {
                         // Kiểm tra các TimePeriods có IsNormalDay = true
                         var weekday = (int)request.DayWantToPlay.DayOfWeek;
-                        var normalDayPeriods = timePeriods.Where(tp => tp.IsNormalDay && tp.ListDayByString.Split(',').Contains(weekday.ToString())).ToList();
+                        var normalDayPeriods = timePeriods.Where(tp => tp.IsNormalDay && !tp.IsDelete && tp.ListDayByString.Split(',').Contains(weekday.ToString())).ToList();
 
                         foreach (var item in normalDayPeriods)
                         {
@@ -174,7 +174,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
                     {
                         var maxTimeSpanInlist = LocalListTimestampMinCancellation.Max();
                         DateTime playingDateTime = request.DayWantToPlay.Date.Add(request.StartTimeWantToPlay);
-                        var minTimeCancellationDateTime = playingDateTime - maxTimeSpanInlist;
+                            var minTimeCancellationDateTime = playingDateTime - maxTimeSpanInlist;
                         unixTimestampMinCancellationFlag = minTimeCancellationDateTime;
                     }
                     else
@@ -248,6 +248,10 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
         // Case 1, kh thuộc khung giờ tức là start trước period start và period
         // if (currentStart < periodStart && periodStart < request.EndTimeWantToPlay)
         // Vd current start 12, period start 13, end time want to play 18
+        if (currentStart >= request.EndTimeWantToPlay)
+        {
+            return 0;
+        }
         if (currentStart < periodStart)
         {
             if (request.EndTimeWantToPlay <= periodStart)
@@ -325,7 +329,7 @@ public class GetBookingDetailReadyForFinishBookingQueryHandler : IRequestHandler
             listCourtSubInReponse.Add(newCourtSubResponse);
             LocalListTimestampMinCancellation.Add(item.MinCancellationTime);
             totalPrice += (courtSub.BasePrice + item.PriceAdjustment) * Convert.ToDecimal(timePlayInThisPeriod.TotalHours) ?? 0;
-            currentStart = periodEnd;
+            currentStart = request.EndTimeWantToPlay;
         }
 
         return totalPrice;
