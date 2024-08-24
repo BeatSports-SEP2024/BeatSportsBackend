@@ -67,11 +67,6 @@ public class CancelBookingProcessCommandHandler : IRequestHandler<CancelBookingP
             var customerWallet = _beatSportsDbContext.Wallets
                 .Where(x => x.AccountId == accountId && !x.IsDelete).SingleOrDefault();
 
-            if (customerWallet != null)
-            {
-                customerWallet.Balance += bookingProcess.TotalAmount;
-                _beatSportsDbContext.Wallets.Update(customerWallet);
-            }
 
             if (bookingProcess.TransactionId.HasValue)
             {
@@ -84,6 +79,12 @@ public class CancelBookingProcessCommandHandler : IRequestHandler<CancelBookingP
                     transaction.TransactionMessage = TransactionConstant.TransactionCancel;
                     transaction.TransactionStatus = TransactionEnum.Cancel.ToString();
                     _beatSportsDbContext.Transactions.Update(transaction);
+                }
+
+                if (customerWallet != null)
+                {
+                    customerWallet.Balance += bookingProcess.TotalAmount;
+                    _beatSportsDbContext.Wallets.Update(customerWallet);
                 }
             }
 
