@@ -43,6 +43,8 @@ public class ProcessVnpayPaymentReturnHandler : IRequestHandler<ProcessVnpayPaym
     public async Task<(PaymentReturnDtos, string)> Handle(ProcessVnpayPaymentReturn request, CancellationToken cancellationToken)
     {
         string returnUrl = string.Empty;
+        string message = "";
+        string status = "";
         var result = (new PaymentReturnDtos(), "");
         try
         {
@@ -66,9 +68,6 @@ public class ProcessVnpayPaymentReturnHandler : IRequestHandler<ProcessVnpayPaym
                     {
                         if (payment.PaymentStatus != "0")
                         {
-                            string message = "";
-                            string status = "";
-
                             if (request.vnp_ResponseCode == "00" &&
                                request.vnp_TransactionStatus == "00")
                             {
@@ -174,7 +173,7 @@ public class ProcessVnpayPaymentReturnHandler : IRequestHandler<ProcessVnpayPaym
                             throw new BadRequestException("04, Invalid amount");
                         }
                     }
-                    returnUrl = merchant?.MerchantReturnUrl ?? string.Empty;
+                    returnUrl = (merchant?.MerchantReturnUrl + $"?payment={status}") ?? string.Empty;
                 }
                 else
                 {
