@@ -1,4 +1,6 @@
-﻿using BeatSportsAPI.Application.Features.Accounts.Queries;
+﻿using BeatSportsAPI.Application.Common.Middlewares;
+using BeatSportsAPI.Application.Features.Accounts.Queries;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +14,7 @@ public class AccountController : ApiControllerBase
         _mediator = mediator;
     }
     [HttpGet]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> GetAllUser([FromQuery] GetAllAccountCommand request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
