@@ -63,7 +63,8 @@ public class ProcessMomoPaymentReturnHandler : IRequestHandler<ProcessMomoPaymen
 
                     if (request.resultCode == 0)
                     {
-                        resultData.PaymentStatus = "00";
+                        //resultData.PaymentStatus = "00";
+                        resultData.PaymentStatus = "0";
 
                         resultData.PaymentId = payment.Id.ToString();
 
@@ -72,7 +73,7 @@ public class ProcessMomoPaymentReturnHandler : IRequestHandler<ProcessMomoPaymen
                         {
                             TranMessage = MessageConstants.OK,
                             TranPayload = JsonConvert.SerializeObject(request),
-                            TranStatus = "0",
+                            TranStatus = resultData.PaymentStatus,
                             TranAmount = request.amount,
                             TranDate = DateTime.Now,
                             PaymentId = Guid.Parse(request.orderId),
@@ -162,7 +163,7 @@ public class ProcessMomoPaymentReturnHandler : IRequestHandler<ProcessMomoPaymen
                         resultData.PaymentMessage = "Payment process failed";
                     }
 
-                    returnUrl = merchant?.MerchantReturnUrl ?? string.Empty;
+                    returnUrl = (merchant?.MerchantReturnUrl + $"?payment={resultData.PaymentStatus}") ?? string.Empty;
 
                     result.Success = true;
                     result.Message = MessageConstants.OK;
