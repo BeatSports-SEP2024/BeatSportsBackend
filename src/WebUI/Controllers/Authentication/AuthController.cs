@@ -1,4 +1,5 @@
 ﻿using BeatSportsAPI.Application.Common.Interfaces;
+using BeatSportsAPI.Application.Common.Middlewares;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Authentication.Command.AuthGoogle;
 using BeatSportsAPI.Application.Features.Authentication.Command.ResetPassword.ChangePassword;
@@ -6,6 +7,7 @@ using BeatSportsAPI.Application.Features.Authentication.Command.ResetPassword.Re
 using BeatSportsAPI.Application.Features.Authentication.Command.ResetPassword.SendOTPToEmail;
 using BeatSportsAPI.Application.Features.Authentication.Queries;
 using BeatSportsAPI.Application.Models.Authentication;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -161,6 +163,7 @@ public class AuthController : ApiControllerBase
     [HttpPost]
     [Route("register/owner")]
     [SwaggerOperation("Create new owner with default wallet")]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> RegisterOwner([FromBody] RegisterOwnerModelRequest request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
