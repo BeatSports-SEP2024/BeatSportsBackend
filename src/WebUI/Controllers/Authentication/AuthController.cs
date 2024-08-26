@@ -163,7 +163,7 @@ public class AuthController : ApiControllerBase
     [HttpPost]
     [Route("register/owner")]
     [SwaggerOperation("Create new owner with default wallet")]
-    [CustomAuthorize(RoleEnums.Admin)]
+    //[CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> RegisterOwner([FromBody] RegisterOwnerModelRequest request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
