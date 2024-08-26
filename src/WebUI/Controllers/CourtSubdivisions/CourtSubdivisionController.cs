@@ -88,7 +88,7 @@ public class CourtSubdivisionController : ApiControllerBase
     }
     [HttpPut]
     [Route("accept-courtsub")]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<BeatSportsResponse> UpdateStatus(AcceptCourtSubdivisionCommand request)
     {
         return await _mediator.Send(request);

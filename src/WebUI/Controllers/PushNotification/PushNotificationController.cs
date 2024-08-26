@@ -44,7 +44,7 @@ public class PushNotificationController : ControllerBase
 
     [HttpPost]
     [Route("register-push-token")]
-    [CustomAuthorize(RoleEnums.Customer, RoleEnums.Owner)]
+    [CustomAuthorize(RoleEnums.Customer)]
     public IActionResult RegisterPushToken([FromBody] RegisterPushTokenRequest request)
     {
         

@@ -40,7 +40,7 @@ public class OwnerController : ApiControllerBase
     }
     [HttpGet]
     [SwaggerOperation("Get list of owners")]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<PaginatedList<OwnerResponse>> GetAll([FromQuery] GetAllOwnersCommand request)
     {
         return await _mediator.Send(request);
@@ -56,7 +56,7 @@ public class OwnerController : ApiControllerBase
     }
     [HttpGet("owner-id")]
     [SwaggerOperation("Get owner with relative court by Id")]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> GetCourtRelativeOwner([FromQuery] GetOwnerByIdWithCourtCommand request)
     {
         var response = await _mediator.Send(request);

@@ -44,7 +44,7 @@ public class CourtController : ApiControllerBase
     }
 
     [HttpPost]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<BeatSportsResponse> Create(CreateCourtCommand request)
     {
         return await _mediator.Send(request);
@@ -80,7 +80,7 @@ public class CourtController : ApiControllerBase
     }
     [HttpGet]
     [Route("all")]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<PaginatedList<CourtResponseV2>> GetAllCourt([FromQuery] GetAllCourtCommand request)
     {
         return await _mediator.Send(request);
@@ -96,14 +96,14 @@ public class CourtController : ApiControllerBase
 
     [HttpGet]
     [Route("get-by-court-id-by-admin")]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<CourtResponseV7> GetByCourtIdByAdmin([FromQuery] GetCourtByIdByAdminCommand request)
     {
         return await _mediator.Send(request);
     }
     [HttpGet]
     [Route("get-court-pending-court-subdivision")]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<PaginatedList<CourtResponseV6>> GetListCourtPending([FromQuery] GetListCourtPendingCommand request)
     {
         return await _mediator.Send(request);
@@ -124,7 +124,7 @@ public class CourtController : ApiControllerBase
     }
     [HttpGet]
     [Route("court-with-courtsub-pending")]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<CourtResponseV8> GetAllCourtWithCourtSubPending([FromQuery] GetAllCourtWithCourtSubPendingCommand request)
     {
         return await _mediator.Send(request);
@@ -132,7 +132,7 @@ public class CourtController : ApiControllerBase
 
     [HttpGet]
     [Route("dashboard")]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<List<CourtDashboardResponse>> DashboardResult([FromQuery] GetCourtDashboardCommand request)
     {
         return await _mediator.Send(request);

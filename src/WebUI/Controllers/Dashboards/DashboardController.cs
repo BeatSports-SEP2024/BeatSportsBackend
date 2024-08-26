@@ -17,7 +17,7 @@ public class DashboardController : ApiControllerBase
     }
     [HttpGet]
     [Route("dashboard")]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> GetDashboard([FromQuery] GetDashboardCommand request)
     {
         if (!ModelState.IsValid)
