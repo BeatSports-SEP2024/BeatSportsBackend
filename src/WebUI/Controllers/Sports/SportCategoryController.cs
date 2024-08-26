@@ -1,4 +1,5 @@
-﻿using BeatSportsAPI.Application.Features.Sports.Commands;
+﻿using BeatSportsAPI.Application.Common.Middlewares;
+using BeatSportsAPI.Application.Features.Sports.Commands;
 using BeatSportsAPI.Application.Features.Sports.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ public class SportCategoryController : ApiControllerBase
         _mediator = mediator;
     }
     [HttpGet]
+    [CustomAuthorize]
     public async Task<IActionResult> GetSportCategory([FromQuery] GetSportCategoriesCommand request)
     {
         if (!ModelState.IsValid)
@@ -25,6 +27,7 @@ public class SportCategoryController : ApiControllerBase
         return Ok(response);
     }
     [HttpGet("id")]
+    [CustomAuthorize]
     public async Task<IActionResult> GetSportCategoryById([FromQuery] GetSportCategoryByIdCommand request)
     {
         if (!ModelState.IsValid)
@@ -36,6 +39,7 @@ public class SportCategoryController : ApiControllerBase
         return Ok(response);
     }
     [HttpPost]
+    [CustomAuthorize]
     public async Task<IActionResult> CreateSportCategory(CreateSportCategoriesCommand request)
     {
         if (!ModelState.IsValid)
@@ -47,6 +51,7 @@ public class SportCategoryController : ApiControllerBase
         return Ok(response);
     }
     [HttpPut]
+    [CustomAuthorize]
     public async Task<IActionResult> UpdateSportCategory(UpdateSportCategoriesCommand request)
     {
         if (!ModelState.IsValid)
@@ -58,6 +63,7 @@ public class SportCategoryController : ApiControllerBase
         return Ok(response);
     }
     [HttpDelete]
+    [CustomAuthorize]
     public async Task<IActionResult> DeleteSportCategory([FromQuery] DeleteSportCategoriesCommand request)
     {
         if (!ModelState.IsValid)

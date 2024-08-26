@@ -1,7 +1,9 @@
-﻿using BeatSportsAPI.Application.Features.Rooms.Levels.Commands;
+﻿using BeatSportsAPI.Application.Common.Middlewares;
+using BeatSportsAPI.Application.Features.Rooms.Levels.Commands;
 using BeatSportsAPI.Application.Features.Rooms.Levels.Queries;
 using BeatSportsAPI.Application.Features.Sports.Commands;
 using BeatSportsAPI.Application.Features.Sports.Queries;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +19,7 @@ public class LevelController : ApiControllerBase
     }
 
     [HttpGet]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<IActionResult> GetAllLevel([FromQuery] GetAllLevelCommand request)
     {
         if (!ModelState.IsValid)
