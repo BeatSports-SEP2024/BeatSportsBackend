@@ -9,6 +9,7 @@ using BeatSportsAPI.Application.Features.Authentication.Queries;
 using BeatSportsAPI.Application.Models.Authentication;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
@@ -85,6 +86,7 @@ public class AuthController : ApiControllerBase
     [HttpPost]
     [Route("register/customer")]
     [SwaggerOperation("Create new customer with default wallet")]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<IActionResult> RegisterCustomer([FromForm] RegisterCustomerModelRequest request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
@@ -98,6 +100,7 @@ public class AuthController : ApiControllerBase
     [HttpPost]
     [Route("change-password")]
     [SwaggerOperation("Change password")]
+    [CustomAuthorize(RoleEnums.Customer, RoleEnums.Owner)]
     public async Task<IActionResult> ChangePassword([FromQuery] ChangePasswordCommand request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
@@ -112,6 +115,7 @@ public class AuthController : ApiControllerBase
     [HttpPost]
     [Route("reset-password")]
     [SwaggerOperation("Recovery password by OTP")]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordByOTPCommand request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
@@ -126,6 +130,7 @@ public class AuthController : ApiControllerBase
     [HttpPost]
     [Route("otp")]
     [SwaggerOperation("Send OTP to user gmail")]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<IActionResult> SendOTP([FromForm] SendOTPToEmailRequest request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
@@ -163,7 +168,7 @@ public class AuthController : ApiControllerBase
     [HttpPost]
     [Route("register/owner")]
     [SwaggerOperation("Create new owner with default wallet")]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> RegisterOwner([FromBody] RegisterOwnerModelRequest request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)

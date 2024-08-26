@@ -1,4 +1,5 @@
-﻿using BeatSportsAPI.Application.Features.Transactions.Commands.ApproveMoneyForOwner;
+﻿using BeatSportsAPI.Application.Common.Middlewares;
+using BeatSportsAPI.Application.Features.Transactions.Commands.ApproveMoneyForOwner;
 using BeatSportsAPI.Application.Features.Transactions.Commands.ApproveWithdrawalRequestByOwner;
 using BeatSportsAPI.Application.Features.Transactions.Commands.CreateWithdrawalRequestByOwner;
 using BeatSportsAPI.Application.Features.Transactions.Commands.OwnerPayFeeOverview;
@@ -14,6 +15,7 @@ using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllWithdrawalRe
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetDetailWithdrawalRequestByOwner;
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetDetailWithdrawWhenAccept;
 using BeatSportsAPI.Application.Features.Wallets.Queries;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,6 +31,7 @@ public class TransactionController : ApiControllerBase
     }
 
     [HttpGet]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> GetAllTransactions([FromQuery] GetAllTransactionsCommand request)
     {
         if (!ModelState.IsValid)
@@ -42,6 +45,7 @@ public class TransactionController : ApiControllerBase
 
     [HttpGet]
     [Route("request-withdraw-money-in-app")]
+    [CustomAuthorize(RoleEnums.Owner)]
     public async Task<IActionResult> WithdrawalRequestMoneyInApp([FromQuery] GetAllWithdrawalRequestByOwnerCommand request)
     {
         if (!ModelState.IsValid)
@@ -55,6 +59,7 @@ public class TransactionController : ApiControllerBase
 
     [HttpGet]
     [Route("request-withdraw-money-in-app-detail")]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> WithdrawalRequestMoneyInAppDetail([FromQuery] GetDetailWithdrawalRequestByOwnerCommand request)
     {
         if (!ModelState.IsValid)
@@ -68,6 +73,7 @@ public class TransactionController : ApiControllerBase
 
     [HttpGet]
     [Route("all-transaction-by-owner")]
+    [CustomAuthorize(RoleEnums.Owner)]
     public async Task<IActionResult> GetAllTransactionByOwner([FromQuery] GetAllTransactionByOwner request)
     {
         if (!ModelState.IsValid)
@@ -81,6 +87,7 @@ public class TransactionController : ApiControllerBase
 
     [HttpGet]
     [Route("all-transaction-by-customer")]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<IActionResult> GetAllTransactionByCustomer([FromQuery] GetAllTransactionByCustomerV1Query request)
     {
         if (!ModelState.IsValid)
@@ -94,6 +101,7 @@ public class TransactionController : ApiControllerBase
 
     [HttpGet]
     [Route("accountId")]
+    [CustomAuthorize(RoleEnums.Admin, RoleEnums.Owner)]
     public async Task<IActionResult> GetAllTransactionsById([FromQuery] GetAllTransactionByAccountCommand request)
     {
         if (!ModelState.IsValid)
@@ -107,6 +115,7 @@ public class TransactionController : ApiControllerBase
 
     [HttpPost]
     [Route("transfer-money-in-app")]
+    [CustomAuthorize(RoleEnums.Owner)]
     public async Task<IActionResult> TransferMoneyInApp([FromBody] TransferMoneyInAppCommand request)
     {
         if (!ModelState.IsValid)
@@ -145,6 +154,7 @@ public class TransactionController : ApiControllerBase
 
     [HttpPost]
     [Route("withdraw-money-in-app")]
+    [CustomAuthorize(RoleEnums.Owner)]
     public async Task<IActionResult> WithdrawMoneyInApp([FromBody] CreateWithdrawalRequestByOwnerCommand request)
     {
         if (!ModelState.IsValid)
@@ -164,6 +174,7 @@ public class TransactionController : ApiControllerBase
 
     [HttpPost]
     [Route("approve-withdrawal-money-for-owner")]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> ApproveWithdrawalMoneyForOwner([FromBody] ApproveWithdrawalRequestByOwnerCommand request)
     {
         if (!ModelState.IsValid)
@@ -183,6 +194,7 @@ public class TransactionController : ApiControllerBase
 
     [HttpPost]
     [Route("reject-withdrawal-money-for-owner")]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> RejectWithdrawalMoneyForOwner([FromBody] RejectWithdrawalRequestByOwnerCommand request)
     {
         if (!ModelState.IsValid)
@@ -202,6 +214,7 @@ public class TransactionController : ApiControllerBase
 
     [HttpPost]
     [Route("pay-monthly-fee")]
+    [CustomAuthorize(RoleEnums.Owner)]
     public async Task<IActionResult> PayMonthlyFee([FromBody] PayFeeMonthlyForOwnerCommand request)
     {
         if (!ModelState.IsValid)
@@ -221,6 +234,7 @@ public class TransactionController : ApiControllerBase
 
     [HttpGet]
     [Route("monthly-fee-overview")]
+    [CustomAuthorize(RoleEnums.Owner, RoleEnums.Admin)]
     public async Task<IActionResult> MonthlyFeeOverview([FromQuery] OwnerPayFeeOverviewCommand request)
     {
         if (!ModelState.IsValid)

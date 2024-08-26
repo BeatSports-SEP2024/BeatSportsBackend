@@ -1,5 +1,7 @@
-﻿using BeatSportsAPI.Application.Features.Dashboards.GetDashboard;
+﻿using BeatSportsAPI.Application.Common.Middlewares;
+using BeatSportsAPI.Application.Features.Dashboards.GetDashboard;
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllWithdrawalRequestByOwner;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +17,7 @@ public class DashboardController : ApiControllerBase
     }
     [HttpGet]
     [Route("dashboard")]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> GetDashboard([FromQuery] GetDashboardCommand request)
     {
         if (!ModelState.IsValid)
