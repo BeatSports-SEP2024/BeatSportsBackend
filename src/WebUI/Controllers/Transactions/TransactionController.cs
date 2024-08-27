@@ -31,7 +31,7 @@ public class TransactionController : ApiControllerBase
     }
 
     [HttpGet]
-    [CustomAuthorize(RoleEnums.Admin)]
+    //[CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> GetAllTransactions([FromQuery] GetAllTransactionsCommand request)
     {
         if (!ModelState.IsValid)
@@ -59,7 +59,7 @@ public class TransactionController : ApiControllerBase
 
     [HttpGet]
     [Route("request-withdraw-money-in-app-detail")]
-    [CustomAuthorize(RoleEnums.Admin)]
+    //[CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> WithdrawalRequestMoneyInAppDetail([FromQuery] GetDetailWithdrawalRequestByOwnerCommand request)
     {
         if (!ModelState.IsValid)
@@ -101,7 +101,8 @@ public class TransactionController : ApiControllerBase
 
     [HttpGet]
     [Route("accountId")]
-    [CustomAuthorize(RoleEnums.Admin, RoleEnums.Owner)]
+    //[CustomAuthorize(RoleEnums.Admin, RoleEnums.Owner)]
+    [CustomAuthorize(RoleEnums.Owner)]
     public async Task<IActionResult> GetAllTransactionsById([FromQuery] GetAllTransactionByAccountCommand request)
     {
         if (!ModelState.IsValid)
@@ -174,7 +175,7 @@ public class TransactionController : ApiControllerBase
 
     [HttpPost]
     [Route("approve-withdrawal-money-for-owner")]
-    [CustomAuthorize(RoleEnums.Admin)]
+    //[CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> ApproveWithdrawalMoneyForOwner([FromBody] ApproveWithdrawalRequestByOwnerCommand request)
     {
         if (!ModelState.IsValid)
@@ -194,7 +195,7 @@ public class TransactionController : ApiControllerBase
 
     [HttpPost]
     [Route("reject-withdrawal-money-for-owner")]
-    [CustomAuthorize(RoleEnums.Admin)]
+    //[CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> RejectWithdrawalMoneyForOwner([FromBody] RejectWithdrawalRequestByOwnerCommand request)
     {
         if (!ModelState.IsValid)
@@ -234,7 +235,8 @@ public class TransactionController : ApiControllerBase
 
     [HttpGet]
     [Route("monthly-fee-overview")]
-    [CustomAuthorize(RoleEnums.Owner, RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Owner)]
+    //[CustomAuthorize(RoleEnums.Owner, RoleEnums.Admin)]
     public async Task<IActionResult> MonthlyFeeOverview([FromQuery] OwnerPayFeeOverviewCommand request)
     {
         if (!ModelState.IsValid)
