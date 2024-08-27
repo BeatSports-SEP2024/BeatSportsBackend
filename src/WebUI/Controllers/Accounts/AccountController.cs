@@ -14,7 +14,7 @@ public class AccountController : ApiControllerBase
         _mediator = mediator;
     }
     [HttpGet]
-    [CustomAuthorize(RoleEnums.Admin)]
+    //[CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> GetAllUser([FromQuery] GetAllAccountCommand request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
