@@ -91,11 +91,16 @@ public class TransactionResponseV4
     public string? OwnerBankNumber { get; set; }
 }
 
+public class OwnerInfoDetail : UserInfo2
+{
+    public string? OwnerPhoneNumber { get; set; }
+    public string? OwnerAddress { get; set; }
+}
 public class GetDetailWithdrawWhenAcceptResponse
 {
     public Guid TransactionId { get; set; }
     public string? TransactionStatus { get; set; }
-    public UserInfo2? OwnerInfo { get; set; }
+    public OwnerInfoDetail? OwnerInfo { get; set; }
     public DateTime? TransactionDate { get; set; }
     //public string? OwnerBankNumber { get; set; }
     public decimal? TotalAmountReceived { get; set; }
