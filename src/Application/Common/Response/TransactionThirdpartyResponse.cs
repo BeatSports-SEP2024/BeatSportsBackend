@@ -62,6 +62,7 @@ public class TransactionThirdpartyForAdminResponse
 
 public class WithdrawHistory
 {
+    public Guid TransactionId { get; set; }
     public string? OwnerAccount { get; set; }
     public Guid OwnerId { get; set; }
     public string? OwnerName { get; set; }
