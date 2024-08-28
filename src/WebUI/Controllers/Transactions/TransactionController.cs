@@ -234,7 +234,7 @@ public class TransactionController : ApiControllerBase
 
     [HttpGet]
     [Route("monthly-fee-overview")]
-    [CustomAuthorize(RoleEnums.Owner)]
+    //[CustomAuthorize(RoleEnums.Owner)]
     //[CustomAuthorize(RoleEnums.Owner, RoleEnums.Admin)]
     public async Task<IActionResult> MonthlyFeeOverview([FromQuery] OwnerPayFeeOverviewCommand request)
     {

@@ -15,7 +15,7 @@ public class SportCategoryController : ApiControllerBase
         _mediator = mediator;
     }
     [HttpGet]
-    [CustomAuthorize]
+    //[CustomAuthorize]
     public async Task<IActionResult> GetSportCategory([FromQuery] GetSportCategoriesCommand request)
     {
         if (!ModelState.IsValid)
@@ -27,7 +27,7 @@ public class SportCategoryController : ApiControllerBase
         return Ok(response);
     }
     [HttpGet("id")]
-    [CustomAuthorize]
+    //[CustomAuthorize]
     public async Task<IActionResult> GetSportCategoryById([FromQuery] GetSportCategoryByIdCommand request)
     {
         if (!ModelState.IsValid)
