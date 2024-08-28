@@ -8,6 +8,7 @@ using AutoMapper;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.TransactionThridparty.Queries.GetTransactionByCusId;
+using BeatSportsAPI.Application.Features.Wallets.Commands.CreateDeposits;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -130,6 +131,7 @@ public class GetTransactionsForAdminCommandHandler : IRequestHandler<GetTransact
             .Where(t => t.TransactionType == "Rút tiền" && (int)t.AdminCheckStatus == 1)
             .Select(t => new WithdrawHistory
             {
+                TransactionId = t.Id,
                 OwnerAccount = t.Wallet.Account.UserName,
                 OwnerId = t.Wallet.Account.Owner.Id,
                 OwnerName = t.Wallet.Account.Owner.Account.FirstName + " " + t.Wallet.Account.Owner.Account.LastName,
