@@ -122,8 +122,8 @@ public class ApproveWithdrawalRequestByOwnerHandler : IRequestHandler<ApproveWit
                             <p>Chào {owner.Account.FirstName} {owner.Account.LastName},</p>
                             <p>Yêu cầu chuyển tiền của bạn đã được chấp thuận thành công với các thông tin sau:</p>
                             <p><strong>Số tiền:</strong> {transaction.TransactionAmount} VND</p>
-                            <p><strong>Ngày giao dịch:</strong> {transaction.TransactionDate}</p>
-                            <p><strong>Hình ảnh chứng minh giao dịch: </strong> {transaction.ImageOfInvoice}</p>
+                            <p><strong>Hình ảnh chứng minh giao dịch:</strong></p>
+                            <img src=""{transaction.ImageOfInvoice}"" alt=""Hình ảnh chứng minh giao dịch"" />
                         </div>
                         <div class='footer'>
                             <p>© 2024 BeatSports. All rights reserved.</p>
