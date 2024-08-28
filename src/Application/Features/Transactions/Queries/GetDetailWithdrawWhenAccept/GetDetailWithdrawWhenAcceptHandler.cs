@@ -37,7 +37,7 @@ public class GetDetailWithdrawWhenAcceptHandler : IRequestHandler<GetDetailWithd
                 Name = transaction.Wallet.Account.FirstName + " " + transaction.Wallet.Account.LastName,
                 OwnerBankAccount = transaction.Wallet.Account.Owner.BankAccount,
                 Role = transaction.Wallet.Account.Role,
-                WalletId = transaction.Wallet.Account.Wallet.Id,
+                WalletId = transaction.Wallet.Id,
             },
             AdminCheckStatus = transaction.AdminCheckStatus.ToString(),
             ImageOfInvoice = transaction.ImageOfInvoice,
