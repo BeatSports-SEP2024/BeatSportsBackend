@@ -12,6 +12,7 @@ using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactions
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactionsByCustomer;
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllWithdrawalRequestByOwner;
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetDetailWithdrawalRequestByOwner;
+using BeatSportsAPI.Application.Features.Transactions.Queries.GetDetailWithdrawWhenAccept;
 using BeatSportsAPI.Application.Features.Wallets.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -221,6 +222,18 @@ public class TransactionController : ApiControllerBase
     [HttpGet]
     [Route("monthly-fee-overview")]
     public async Task<IActionResult> MonthlyFeeOverview([FromQuery] OwnerPayFeeOverviewCommand request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var response = await _mediator.Send(request);
+
+        return Ok(response);
+    }
+    [HttpGet]
+    [Route("transaction-withdraw-detail")]
+    public async Task<IActionResult> GetTransactionWithdrawWhenAccept([FromQuery] GetDetailWithdrawWhenAcceptCommand request)
     {
         if (!ModelState.IsValid)
         {

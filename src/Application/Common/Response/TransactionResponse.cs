@@ -90,3 +90,15 @@ public class TransactionResponseV4
     public DateTime? TransactionDate { get; set; }
     public string? OwnerBankNumber { get; set; }
 }
+
+public class GetDetailWithdrawWhenAcceptResponse
+{
+    public Guid TransactionId { get; set; }
+    public string? TransactionStatus { get; set; }
+    public UserInfo2? OwnerInfo { get; set; }
+    public DateTime? TransactionDate { get; set; }
+    //public string? OwnerBankNumber { get; set; }
+    public decimal? TotalAmountReceived { get; set; }
+    public string? AdminCheckStatus { get; set; }
+    public string? ImageOfInvoice { get; set; }
+}
