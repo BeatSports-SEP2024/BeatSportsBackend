@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using MediatR;
@@ -27,6 +23,10 @@ public class GetDetailWithdrawWhenAcceptHandler : IRequestHandler<GetDetailWithd
             .Where(transaction => transaction.Id == request.TransactionId && transaction.TransactionType.Equals("Rút tiền"))
             .FirstOrDefault();
 
+        if (transaction == null)
+        {
+            throw new BadRequestException("Khong tim thay transaction theo yeu cau");
+        }
         var response = new GetDetailWithdrawWhenAcceptResponse()
         {
             TransactionId = transaction.Id,
