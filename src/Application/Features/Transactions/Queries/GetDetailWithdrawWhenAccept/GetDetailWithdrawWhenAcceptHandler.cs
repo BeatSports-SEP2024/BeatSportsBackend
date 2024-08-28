@@ -20,24 +20,30 @@ public class GetDetailWithdrawWhenAcceptHandler : IRequestHandler<GetDetailWithd
             .Include(c => c.Wallet)
                 .ThenInclude(a => a.Account)
                     .ThenInclude(o => o.Owner)
-            .Where(transaction => transaction.Id == request.TransactionId && transaction.TransactionType.Equals("Rút tiền"))
+            .Where(transaction => transaction.Id == request.TransactionId 
+                    && transaction.TransactionType.Equals("Rút tiền")
+                    && transaction.TransactionStatus.Equals("Approved")
+                    && transaction.AdminCheckStatus == Domain.Enums.AdminCheckEnums.Accepted)
             .FirstOrDefault();
 
         if (transaction == null)
         {
             throw new BadRequestException("Khong tim thay transaction theo yeu cau");
         }
+
         var response = new GetDetailWithdrawWhenAcceptResponse()
         {
             TransactionId = transaction.Id,
             TransactionStatus = transaction.TransactionStatus,
-            OwnerInfo = new UserInfo2
+            OwnerInfo = new OwnerInfoDetail
             {
                 OwnerId = transaction.Wallet.Account.Owner.Id,
                 Name = transaction.Wallet.Account.FirstName + " " + transaction.Wallet.Account.LastName,
                 OwnerBankAccount = transaction.Wallet.Account.Owner.BankAccount,
                 Role = transaction.Wallet.Account.Role,
                 WalletId = transaction.Wallet.Id,
+                OwnerAddress = transaction.Wallet.Account.Owner.Address,
+                OwnerPhoneNumber = transaction.Wallet.Account.PhoneNumber,
             },
             AdminCheckStatus = transaction.AdminCheckStatus.ToString(),
             ImageOfInvoice = transaction.ImageOfInvoice,
