@@ -21,7 +21,8 @@ public interface IBeatSportsDbContext
     //public DbSet<PaymentMethod> PaymentMethods { get; set; }
     public DbSet<Level> Levels { get; set; }
     public DbSet<RoomMember> RoomMembers { get; set; }
-    public DbSet<RoomMatch> RoomMatches { get; set; }   
+    public DbSet<RatingRoom> RatingRooms { get; set; }
+    public DbSet<RoomMatch> RoomMatches { get; set; }
     public DbSet<Campaign> Campaigns { get; set; }
     public DbSet<Feedback> Feedbacks { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
@@ -32,6 +33,7 @@ public interface IBeatSportsDbContext
     public DbSet<Merchant> Merchants { get; set; }
     public DbSet<SportCategory> SportsCategories { get; set; }
     public DbSet<Court> Courts { get; set; }
+    public DbSet<SportSettingsMatchType> SportSettingsMatchTypes { get; set; }
     //public DbSet<CourtSportCategory> CourtSportCategories { get; set; }
     public DbSet<CourtSubdivisionSetting> CourtSubdivisionSettings { get; set; }
     public DbSet<CourtSubdivision> CourtSubdivisions { get; set; }

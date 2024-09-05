@@ -66,14 +66,43 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
                 roomRequest.DateApprove = DateTime.UtcNow;
 
                 _beatSportsDbContext.RoomRequests.Update(roomRequest);
+
+                //Kiểm tra roomatch tối đa bao nhiêu thành viên trong 1 đội
+                var teamMemberCount = roomMatch.MaximumMember / 2;
+                // kiểm tra xem dựa theo số teamMemberCount thì team A được bao nhiêu rồi
+                // nếu đầy rồi thì appove thì th kia xuống teamB, còn chưa đầy thì cho dô A
+                var roomMemberTeamA = _beatSportsDbContext.RoomMembers
+                    .Where(rm => rm.RoomMatchId == request.RoomRequestId && rm.Team == "A")
+                    .ToList()
+                    .Count();
+                var roomMemberTeamB = _beatSportsDbContext.RoomMembers
+                    .Where(rm => rm.RoomMatchId == request.RoomRequestId && rm.Team == "B")
+                    .ToList()
+                    .Count();
+
                 // Khi được chấp nhận, thì RoomMatch có thêm thành viên
-                var roomMember = new RoomMember
+                if (roomMemberTeamA < teamMemberCount)
                 {
-                    CustomerId = roomRequest.CustomerId,
-                    RoomMatchId = roomRequest.RoomMatchId,
-                    RoleInRoom = RoleInRoomEnums.Member,
-                };
-                _beatSportsDbContext.RoomMembers.Add(roomMember);
+                    var roomMember = new RoomMember
+                    {
+                        CustomerId = roomRequest.CustomerId,
+                        RoomMatchId = roomRequest.RoomMatchId,
+                        RoleInRoom = RoleInRoomEnums.Member,
+                        Team = "A"
+                    };
+                    _beatSportsDbContext.RoomMembers.Add(roomMember);
+                }
+                else if (roomMemberTeamB < teamMemberCount)
+                {
+                    var roomMember = new RoomMember
+                    {
+                        CustomerId = roomRequest.CustomerId,
+                        RoomMatchId = roomRequest.RoomMatchId,
+                        RoleInRoom = RoleInRoomEnums.Member,
+                        Team = "B"
+                    };
+                    _beatSportsDbContext.RoomMembers.Add(roomMember);
+                }
 
                 var notification = new Notification
                 {

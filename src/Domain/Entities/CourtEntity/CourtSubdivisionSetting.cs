@@ -16,4 +16,5 @@ public class CourtSubdivisionSetting : BaseAuditableEntity
     public string? ShortName { get; set; }
     public virtual SportCategory SportCategories { get; set; }
     public virtual IList<CourtSubdivision> CourtSubdivisions { get; set; }
+    public virtual IList<SportSettingsMatchType> SportSettingsMatchType { get; set; }
 }

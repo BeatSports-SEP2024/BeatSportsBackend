@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using BeatSportsAPI.Application.Common.Mappings;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingDetailReadyForFinishBooking;
 using BeatSportsAPI.Domain.Entities;
+using BeatSportsAPI.Domain.Entities.CourtEntity;
 
 namespace BeatSportsAPI.Application.Common.Response;
 public class BookingResponse : IMapFrom<Booking>
@@ -36,6 +37,11 @@ public class BookingByCustomerId : IMapFrom<Booking>
     public Guid CourtSubdivisionId { get; set; }
     public string? CourtSubName { get; set; }
     public string? CourtName { get; set; }
+
+    public string? SportType { get; set; }
+    public string? CourtTypeSettings { get; set; }
+    public List<SportSettingsMatchesTypeResponse>? ListSportSettingMatchesType { get; set; }
+
     public DateTime BookingDate { get; set; }
     public decimal TotalAmount { get; set; }
     public bool IsRoomBooking { get; set; }
@@ -44,6 +50,12 @@ public class BookingByCustomerId : IMapFrom<Booking>
     public TimeSpan StartTimePlaying { get; set; }
     public TimeSpan EndTimePlaying { get; set; }
     public string BookingStatus { get; set; }
+}
+public class SportSettingsMatchesTypeResponse
+{
+    public Guid SportSettingsMatchesTypeId { get; set; }
+    public string? MatchTypeName { get; set; }
+    public int? TotalMember { get; set; }
 }
 
 public class BookingDashboard : IMapFrom<Booking>

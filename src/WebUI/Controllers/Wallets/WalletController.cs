@@ -9,7 +9,7 @@ namespace WebAPI.Controllers.Wallets;
 
 public class WalletController : ApiControllerBase
 {
-   private readonly IMediator _mediator;
+    private readonly IMediator _mediator;
 
     public WalletController(IMediator mediator)
     {

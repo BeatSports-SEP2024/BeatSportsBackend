@@ -86,6 +86,8 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
             RoomName = request.RoomName,
             BookingId = request.BookingId,
             LevelId = request.LevelId,
+            RatingRoomId = request.RatingRoomId,
+            RoomMatchTypeName = request.RoomMatchTypeName,
             StartTimeRoom = booking.PlayingDate.Add(booking.StartTimePlaying),
             EndTimeRoom = booking.PlayingDate.Add(booking.EndTimePlaying),
             MaximumMember = request.MaximumMember,
@@ -100,7 +102,8 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
         {
             CustomerId = booking.CustomerId,
             RoomMatchId = room.Id,
-            RoleInRoom = RoleInRoomEnums.Master
+            RoleInRoom = RoleInRoomEnums.Master,
+            Team = "A" // chủ phòng auto team A, nếu swap thì mới đổi team khác
         };
 
         _dbContext.RoomMembers.Add(roomMember);

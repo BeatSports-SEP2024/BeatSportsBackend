@@ -63,6 +63,13 @@ public class RoomMatchesDetailResponse
     public bool? IsPrivate { get; set; }
     public string? MasterName { get; set; }
     public string? MasterAvatar { get; set; }
+
+    public string? SportName { get; set; }
+    public string? SportCourtTypeName { get; set; }
+    public string? RoomMatchTypeName { get; set; }
+    public string? DescriptionRating { get; set; }
+    public double? WinRatePercent { get; set; }
+    public double? LoseRatePercent { get; set; }
 }
 
 public class RoomMemberInRoomResponse
@@ -71,5 +78,5 @@ public class RoomMemberInRoomResponse
     public string CustomerName { get; set; }
     public string CustomerImage { get; set; }
     public string RoleInRoom { get; set; }
-
+    public string? Team {  get; set; }
 }
