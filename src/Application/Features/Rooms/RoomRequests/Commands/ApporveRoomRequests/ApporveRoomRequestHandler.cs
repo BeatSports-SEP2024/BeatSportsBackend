@@ -72,11 +72,11 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
                 // kiểm tra xem dựa theo số teamMemberCount thì team A được bao nhiêu rồi
                 // nếu đầy rồi thì appove thì th kia xuống teamB, còn chưa đầy thì cho dô A
                 var roomMemberTeamA = _beatSportsDbContext.RoomMembers
-                    .Where(rm => rm.RoomMatchId == request.RoomRequestId && rm.Team == "A")
+                    .Where(rm => rm.RoomMatchId == roomRequest.RoomMatchId && rm.Team == "A")
                     .ToList()
                     .Count();
                 var roomMemberTeamB = _beatSportsDbContext.RoomMembers
-                    .Where(rm => rm.RoomMatchId == request.RoomRequestId && rm.Team == "B")
+                    .Where(rm => rm.RoomMatchId == roomRequest.RoomMatchId && rm.Team == "B")
                     .ToList()
                     .Count();
 

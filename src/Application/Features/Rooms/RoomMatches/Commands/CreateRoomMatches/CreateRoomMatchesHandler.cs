@@ -9,6 +9,7 @@ using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BeatSportsAPI.Application.Features.Rooms.RoomMatches.Commands.CreateRoomMatches;
 public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand, RoomMatchResponse>
@@ -35,9 +36,9 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
 
         //check booking
         var booking = await _dbContext.Bookings
-            .Include(b => b.CourtSubdivision) 
-            .ThenInclude(cs => cs.CourtSubdivisionSettings) 
-            .ThenInclude(css => css.SportCategories) 
+            .Include(b => b.CourtSubdivision)
+            .ThenInclude(cs => cs.CourtSubdivisionSettings)
+            .ThenInclude(css => css.SportCategories)
             .Where(b => b.Id == request.BookingId && !b.IsDelete && b.BookingStatus == BookingEnums.Approved.ToString() && b.IsRoomBooking == false)
             .FirstOrDefaultAsync();
 
@@ -79,6 +80,12 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
         //    throw new ArgumentException("Invalid date format for StartTimeRoom. Please use 'day/month/year hours:minutes' format.");
         //}
 
+        var ratingRoomExist = await _dbContext.RatingRooms.Where(r => r.Id == request.RatingRoomId).SingleOrDefaultAsync();
+
+        // chia tiền
+        var teamSize = (decimal)request.MaximumMember / 2;
+        var teamCost = (booking.TotalAmount * (decimal)(ratingRoomExist?.WinRatePercent ?? 0));
+
         var room = new RoomMatch()
         {
             IsPrivate = request.IsPrivate,
@@ -91,6 +98,7 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
             StartTimeRoom = booking.PlayingDate.Add(booking.StartTimePlaying),
             EndTimeRoom = booking.PlayingDate.Add(booking.EndTimePlaying),
             MaximumMember = request.MaximumMember,
+            TotalCostEachMember = (double)(teamCost / teamSize),
             RuleRoom = request.RuleRoom,
             Note = request.Note
         };

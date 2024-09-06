@@ -16,6 +16,7 @@ public class RoomMatch : BaseAuditableEntity
     public string? RoomMatchTypeName { get; set; }
     public int MaximumMember { get; set; }
     public string? RoomName { get; set; }
+    public double? TotalCostEachMember { get; set; }
     public string? RuleRoom { get; set; }
     public string? Note { get; set; }
     public bool? IsPrivate { get; set; }

@@ -1,18 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
+﻿using AutoMapper;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Ultilities;
-using BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignById;
-using BeatSportsAPI.Domain.Entities;
-using BeatSportsAPI.Domain.Entities.Room;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -127,9 +117,8 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
         var sport = _dbContext.SportsCategories.Where(c => c.Id == courtSubSetting!.SportCategoryId).SingleOrDefault();
 
         // chia tiền
-        var teamSize = query.MaximumMember / 2;
-        var teamCost = (int)((query.Booking.TotalAmount / teamSize) * (decimal)(query.RatingRoom?.WinRatePercent ?? 0)
-                                        + (query.Booking.TotalAmount / teamSize));
+        var teamSize = (decimal)query.MaximumMember / 2;
+        var teamCost = (query.Booking.TotalAmount * (decimal)(query.RatingRoom?.WinRatePercent ?? 0));
 
         var room = new RoomMatchesDetailResponse()
         {
@@ -148,7 +137,7 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
             StartTimeRoom = query.StartTimeRoom,
             EndTimeRoom = query.EndTimeRoom,
             CountMember = query.RoomMembers.Count,
-            PlayingCosts = teamCost / teamSize,
+            PlayingCosts = (double)(teamCost / teamSize),
             RuleRoom = query.RuleRoom,
             JoiningRequest = roomRequests,
             RoomMembers = roomMembers,
