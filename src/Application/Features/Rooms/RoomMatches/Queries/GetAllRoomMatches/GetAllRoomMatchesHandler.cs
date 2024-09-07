@@ -44,9 +44,10 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
         var roomMatchIds = roomRequests.Select(rr => rr.RoomMatchId).ToList();
 
         var roomMatches = await _beatSportsDbContext.RoomMatches
-            .Where(rm => roomMatchIds.Contains(rm.Id) && (rm.Booking.PlayingDate.Date > DateTime.Now.Date
+            .Where(rm => roomMatchIds.Contains(rm.Id)) 
+                                                        /*&& (rm.Booking.PlayingDate.Date > DateTime.Now.Date
                                                         || (rm.Booking.PlayingDate.Date == DateTime.Now.Date
-                                                            && rm.Booking.StartTimePlaying > DateTime.Now.TimeOfDay)))
+                                                            && rm.Booking.StartTimePlaying > DateTime.Now.TimeOfDay)))*/
             .Include(rm => rm.Booking)
                 .ThenInclude(b => b.CourtSubdivision)
                     .ThenInclude(cs => cs.Court)
@@ -112,9 +113,10 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
         var allRoomMatchIds = joinedRoomMatchIds.Concat(initialMembersRoomMatchIds).Distinct().ToList();
 
         var roomMatchesForJoined = await _beatSportsDbContext.RoomMatches
-            .Where(rm => allRoomMatchIds.Contains(rm.Id) && (rm.Booking.PlayingDate.Date > DateTime.Now.Date
+            .Where(rm => allRoomMatchIds.Contains(rm.Id)) 
+                                                            /*&& (rm.Booking.PlayingDate.Date > DateTime.Now.Date
                                                             || (rm.Booking.PlayingDate.Date == DateTime.Now.Date
-                                                                && rm.Booking.StartTimePlaying > DateTime.Now.TimeOfDay)))
+                                                                && rm.Booking.StartTimePlaying > DateTime.Now.TimeOfDay)))*/
             .Include(rm => rm.Booking)
                 .ThenInclude(b => b.CourtSubdivision)
                     .ThenInclude(cs => cs.Court)
