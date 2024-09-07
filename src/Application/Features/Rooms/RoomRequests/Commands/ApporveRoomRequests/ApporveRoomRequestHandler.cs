@@ -88,7 +88,8 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
                         CustomerId = roomRequest.CustomerId,
                         RoomMatchId = roomRequest.RoomMatchId,
                         RoleInRoom = RoleInRoomEnums.Member,
-                        Team = "A"
+                        Team = "A",
+                        MatchingResultStatus = "NoResult" // 1. Tạo phòng chưa có kết quả (NoResult)
                     };
                     _beatSportsDbContext.RoomMembers.Add(roomMember);
                 }
@@ -99,7 +100,8 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
                         CustomerId = roomRequest.CustomerId,
                         RoomMatchId = roomRequest.RoomMatchId,
                         RoleInRoom = RoleInRoomEnums.Member,
-                        Team = "B"
+                        Team = "B",
+                        MatchingResultStatus = "NoResult" // 1. Tạo phòng chưa có kết quả (NoResult)
                     };
                     _beatSportsDbContext.RoomMembers.Add(roomMember);
                 }

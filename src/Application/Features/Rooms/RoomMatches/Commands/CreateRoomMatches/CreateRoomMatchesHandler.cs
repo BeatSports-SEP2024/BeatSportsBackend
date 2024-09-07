@@ -111,7 +111,8 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
             CustomerId = booking.CustomerId,
             RoomMatchId = room.Id,
             RoleInRoom = RoleInRoomEnums.Master,
-            Team = "A" // chủ phòng auto team A, nếu swap thì mới đổi team khác
+            Team = "A", // chủ phòng auto team A, nếu swap thì mới đổi team khác
+            MatchingResultStatus = "NoResult" // 1. Tạo phòng chưa có kết quả (NoResult)
         };
 
         _dbContext.RoomMembers.Add(roomMember);

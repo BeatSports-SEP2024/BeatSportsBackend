@@ -84,7 +84,7 @@ public class UpdateRoomRequestCommandHandler : IRequestHandler<UpdateRoomRequest
                 }
                 // update transaction trước xong mới cộng tiền
                 transactionJoinExist.TransactionStatus = "Cancel"; // hoàn trả(Cancel) thoát khỏi phòng trả tiền lại cho member thì update lại transaction
-                transactionJoinExist.TransactionType = "RefundRoom"; // thành viên thoát phòng thì loại này, nếu chủ phòng thoát thì tiền sẽ cộng lai với type khác
+                transactionJoinExist.TransactionType = "OutRoom"; 
                 transactionJoinExist.TransactionDate = DateTime.Now;
                 transactionJoinExist.TransactionMessage = "Rời phòng thành công";
                 transactionJoinExist.Created = DateTime.Now;

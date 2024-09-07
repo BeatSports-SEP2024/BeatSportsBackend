@@ -26,7 +26,8 @@ public class Transaction : BaseAuditableEntity
     public DateTime? TransactionDate { get; set; }
     /// <summary>
     /// Đang có tổng cộng là 
-    /// Giao dịch trong App, Payfee, Nạp tiền, Rút tiền, Đóng tiền, JoinRoom, OutRoom(Chủ phòng out), RefundRoom (Thành viên out)
+    /// Giao dịch trong App, Payfee, Nạp tiền, Rút tiền, Đóng tiền, JoinRoom, 
+    /// OutRoom(Chủ phòng out, thành viên out đều là ...), RefundRoomMaster, RefundRoomMember (Sau khi cập nhật kết quả, trả tiền cho thành viên team win)
     /// </summary>
     public string? TransactionType { get; set; } 
     public string? ImageOfInvoice { get; set; }
