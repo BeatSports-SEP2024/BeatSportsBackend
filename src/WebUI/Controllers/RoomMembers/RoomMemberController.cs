@@ -3,6 +3,7 @@ using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Response.RoomMemberResponse;
 using BeatSportsAPI.Application.Features.Rooms.RoomMatches.Queries.GetAllMembersById;
 using BeatSportsAPI.Application.Features.Rooms.RoomMatches.Queries.GetAllRoomMatches;
+using BeatSportsAPI.Application.Features.Rooms.RoomMatchesUpdateResult;
 using BeatSportsAPI.Application.Features.Rooms.RoomMembers.Commands.CreateRoomMembers;
 using BeatSportsAPI.Application.Features.Rooms.RoomMembers.Commands.DeleteRoomMembers;
 using BeatSportsAPI.Application.Features.Rooms.RoomMembers.Commands.SwapTeamInRoomMembers;
@@ -45,6 +46,13 @@ public class RoomMemberController : ApiControllerBase
     [HttpPost]
     [Route("swap-team")]
     public async Task<BeatSportsResponse> CreateSwapTeam(SwapTeamInRoomMembersCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+
+    [HttpPost]
+    [Route("vote-team-win")]
+    public async Task<BeatSportsResponse> VoteTeam(RoomMatchesUpdateResultCommand request)
     {
         return await _mediator.Send(request);
     }

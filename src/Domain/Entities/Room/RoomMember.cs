@@ -12,8 +12,8 @@ public class RoomMember
     public string? Team { get; set; }
     /// <summary>
     /// 1. Tạo phòng chưa có kết quả (NoResult)
-    /// 2. Thắng (Win)
-    /// 3. Thua (Lose)
+    /// 2. Thắng (VotedTeamA)
+    /// 3. Thua (VotedTeamB)
     /// </summary>
     public string? MatchingResultStatus {  get; set; } 
 

@@ -162,7 +162,7 @@ public class CheckTimeJob
 
                     var account = _beatSportsDbContext.Accounts.Where(a => a.Id == customer.AccountId).SingleOrDefault();
                     var bookingRoomMatch = _beatSportsDbContext.Bookings.Where(rm => rm.Id == room.BookingId).SingleOrDefault();
-                    if(bookingRoomMatch == null)
+                    if (bookingRoomMatch == null)
                     {
                         throw new NotFoundException("Đã có lỗi, đơn hàng không tồn tại trong phòng đấu.");
                     }
@@ -269,114 +269,362 @@ public class CheckTimeJob
                             );
                         }
                     }
-
                 }
             }
             else
             {
                 // 3. Nếu cập nhật đầy đủ rồi thì cộng tiền đó vào ví cho chủ phòng, trả tiền thừa của thành viên đội thắng
-                // đội thắng
-                var roomMemberWin = _beatSportsDbContext.RoomMembers
+                // tính tổng phiếu vote cho team A
+                var voteTeamA = _beatSportsDbContext.RoomMembers
                                                     .Where(rm => rm.RoomMatchId == room.Id
-                                                                && rm.MatchingResultStatus == "Win")
+                                                                && rm.MatchingResultStatus == "VotedTeamA")
                                                     .ToList();
-                // đội thua
-                var roomMemberLose = _beatSportsDbContext.RoomMembers
+                // tính tổng phiếu vote cho team B
+                var voteTeamB = _beatSportsDbContext.RoomMembers
                                                     .Where(rm => rm.RoomMatchId == room.Id
-                                                                && rm.MatchingResultStatus == "Lose")
+                                                                && rm.MatchingResultStatus == "VotedTeamB")
                                                     .ToList();
-
-                // chia tiền thắng
-                var bookingRoomMatch = _beatSportsDbContext.Bookings.Where(rm => rm.Id == room.BookingId).SingleOrDefault();
-                var ratingRoomExist = _beatSportsDbContext.RatingRooms.Where(rm => rm.Id == room.RatingRoomId).SingleOrDefault();
-                var teamSize = (decimal)room.MaximumMember / 2;
-                var teamCost = (bookingRoomMatch.TotalAmount * (decimal)(ratingRoomExist?.LoseRatePercent ?? 0));
-                var costTeamWin = teamCost / teamSize;
-
-                decimal totalAmountRefund = 0;
-                decimal amountMemberReceiveRefund = 0;
-                decimal totalAmountWin = 0;
-                decimal totalAmountLose = 0;
-
-                // lấy danh sách transaction thua
-                foreach (var memberLose in roomMemberLose)
+                // kiểm tra nếu vote == nhau thì reset gửi mail, thông báo cho các thành viên vote lại
+                if (voteTeamA.Count == voteTeamB.Count)
                 {
-                    var customer = _beatSportsDbContext.Customers.Where(c => c.Id == memberLose.CustomerId).SingleOrDefault();
-                    var wallet = _beatSportsDbContext.Wallets.Where(a => a.AccountId == customer.AccountId).SingleOrDefault();
-
-                    var transactionJoinRoomMatch = _beatSportsDbContext.Transactions
-                                                   .Where(t => t.RoomMatchId == room.Id
-                                                               && t.WalletId == wallet.Id
-                                                               && t.TransactionType == "JoinRoom")
-                                                   // [TransactionStatus] == Pending đang define để sử dụng, nếu Accepted thì ko thể outRoom
-                                                   .SingleOrDefault();
-                    // team thua trả đủ
-                    if (transactionJoinRoomMatch != null)
+                    var memberInRoom = _beatSportsDbContext.RoomMembers.Where(rm => rm.RoomMatchId == room.Id).ToList();
+                    foreach (var member in memberInRoom)
                     {
-                        totalAmountLose += (transactionJoinRoomMatch.TransactionAmount
-                                                ?? throw new BadRequestException("Đã có lỗi, giao dịch tham gia phòng có số dư bằng 0."));
-                    }
-                }
-
-                // lấy danh sách transaction thắng
-                foreach (var memberWin in roomMemberWin)
-                {
-                    var customer = _beatSportsDbContext.Customers.Where(c => c.Id == memberWin.CustomerId).SingleOrDefault();
-                    var wallet = _beatSportsDbContext.Wallets.Where(a => a.AccountId == customer.AccountId).SingleOrDefault();
-
-                    var transactionJoinRoomMatch = _beatSportsDbContext.Transactions
-                                                   .Where(t => t.RoomMatchId == room.Id
-                                                               && t.WalletId == wallet.Id
-                                                               && t.TransactionType == "JoinRoom")
-                                                   // [TransactionStatus] == Pending đang define để sử dụng, nếu Accepted thì ko thể outRoom
-                                                   .SingleOrDefault();
-                    // team thắng dùng costTeamWin trả tiền. Lấy TransactionAmount - costTeamWin ra số dư trả lại cho thành viên
-                    if (transactionJoinRoomMatch != null)
-                    {
-                        totalAmountRefund += ((transactionJoinRoomMatch.TransactionAmount
-                            ?? throw new BadRequestException("Đã có lỗi, giao dịch tham gia phòng có số dư bằng 0.")) - costTeamWin);
-                        totalAmountWin += costTeamWin;
-
-                        wallet.Balance += ((transactionJoinRoomMatch.TransactionAmount
-                            ?? throw new BadRequestException("Đã có lỗi, giao dịch tham gia phòng có số dư bằng 0.")) - costTeamWin);
-                        _beatSportsDbContext.Wallets.Update(wallet);
-                        // thanh toán tiền các thành viên tham gia phòng, tiền trả cho thành viên thắng
-                        var refundMemberTransaction = new Domain.Entities.Transaction
+                        member.MatchingResultStatus = "NoResult";
+                        _beatSportsDbContext.RoomMembers.Update(member);
+                        var customer = _beatSportsDbContext.Customers.Where(c => c.Id == member.CustomerId).SingleOrDefault();
+                        var notification = new Notification
                         {
-                            WalletId = wallet.Id,
-                            TransactionMessage = "Hoàn trả tiền cho thành viên đội thắng cuộc thành công.",
-                            TransactionStatus = "Approved",
-                            TransactionAmount = (totalAmountWin + totalAmountLose),
-                            TransactionDate = DateTime.Now,
-                            TransactionType = "RefundRoomMember",
-                            RoomMatchId = room.Id,
+                            AccountId = customer.AccountId,
+                            Title = "Cập nhật lại kết quả cho trận đấu",
+                            Message = "các thành viên trong phòng đã bỏ phiếu bằng nhau, yêu cầu các thành viên cập nhật lại cho đúng với kết quả.",
+                            IsRead = false,
+                            Type = "ResultRoomMatch",
+                            RoomMatchId = room.Id.ToString()
                         };
-                        _beatSportsDbContext.Transactions.Add(refundMemberTransaction);
+                        _beatSportsDbContext.Notifications.Add(notification);
+
+                        var account = _beatSportsDbContext.Accounts.Where(a => a.Id == customer.AccountId).SingleOrDefault();
+                        var bookingRoomMatch = _beatSportsDbContext.Bookings.Where(rm => rm.Id == room.BookingId).SingleOrDefault();
+                        if (bookingRoomMatch == null)
+                        {
+                            throw new NotFoundException("Đã có lỗi, đơn hàng không tồn tại trong phòng đấu.");
+                        }
+                        var courtSub = _beatSportsDbContext.CourtSubdivisions.Where(rm => rm.Id == bookingRoomMatch.CourtSubdivisionId).SingleOrDefault();
+                        if (courtSub == null)
+                        {
+                            throw new NotFoundException("Đã có lỗi, không tìm thấy sân nhỏ của đơn hàng.");
+                        }
+                        var court = _beatSportsDbContext.Courts.Where(rm => rm.Id == courtSub.CourtId).SingleOrDefault();
+                        if (court == null)
+                        {
+                            throw new NotFoundException("Đã có lỗi, không tìm thấy sân lớn.");
+                        }
+                        if (account != null)
+                        {
+                            if (!string.IsNullOrEmpty(account.Email))
+                            {
+                                _emailService.SendEmailAsync(
+                                account.Email,
+                                "Cập nhật lại kết quả trận đấu - Kết quả phiếu bầu hòa",
+                                $@"<html>
+                                    <head>
+                                        <style>
+                                            body {{
+                                                font-family: Montserrat, sans-serif;
+                                                margin: 0;
+                                                padding: 0;
+                                                background-color: #f4f4f4;
+                                            }}
+                                            .container {{
+                                                width: 100%;
+                                                max-width: 600px;
+                                                margin: 0 auto;
+                                                background-color: #ffffff;
+                                                padding: 20px;
+                                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                                            }}
+                                            .header {{
+                                                background-color: #007bff;
+                                                color: #ffffff;
+                                                padding: 10px 0;
+                                                text-align: center;
+                                                font-size: 24px;
+                                            }}
+                                            .content {{
+                                                margin: 20px 0;
+                                                line-height: 1.6;
+                                                text-align: center;
+                                            }}
+                                            .footer {{
+                                                margin: 20px 0;
+                                                text-align: center;
+                                                color: #777;
+                                                font-size: 12px;
+                                            }}
+                                            .button {{
+                                                background-color: #45B441;
+                                                color: #ffffff;
+                                                padding: 10px 20px;
+                                                text-decoration: none;
+                                                border-radius: 5px;
+                                                display: inline-block;
+                                                font-size: 16px;
+                                                margin-top: 20px;
+                                            }}
+                                            .match-info {{
+                                                text-align: left;
+                                                margin-top: 20px;
+                                                font-size: 14px;
+                                            }}
+                                            .match-info p {{
+                                                margin: 5px 0;
+                                            }}
+                                            .match-info .title {{
+                                                font-weight: bold;
+                                                color: #111111;
+                                            }}
+                                        </style>
+                                    </head>
+                                    <body>
+                                        <div class='container'>
+                                            <div class='header'>
+                                                Cập nhật lại kết quả trận đấu
+                                            </div>
+                                            <div class='content'>
+                                                <p>Kính gửi {account.FirstName + " " + account.LastName},</p>
+                                                <p>Do kết quả phiếu bầu hiện tại giữa các đội đang hòa, chúng tôi cần bạn cập nhật lại kết quả trận đấu để xác định chính xác đội chiến thắng.</p>
+                                                <p>Việc này sẽ đảm bảo tính công bằng và minh bạch trong hệ thống thanh toán.</p>
+                                                <a href='beatsportsappuser://matching/matching-badminton-detail/{room.Id}' class='button'>Cập nhật lại kết quả</a>
+
+                                                <div class='match-info'>
+                                                    <p class='title'>Thông tin trận đấu:</p>
+                                                    <p><strong>Thời gian thi đấu:</strong> {room.StartTimeRoom.ToString("HH:mm dd/MM/yyyy")}</p>
+                                                    <p><strong>Sân đấu:</strong> {court.CourtName}</p>
+                                                    <p><strong>Địa chỉ:</strong> {court.Address}</p>
+                                                </div>
+                                            </div>
+                                            <div class='footer'>
+                                                <p>© 2024 BeatSports. All rights reserved.</p>
+                                            </div>
+                                        </div>
+                                    </body>
+                                </html>"
+                                );
+                            }
+                        }
                     }
                 }
 
-                // cộng tiền đội thắng và đội thua lại cho chủ phòng
-                var roomMasterInRoomMember = _beatSportsDbContext.RoomMembers
-                                                    .Where(rm => rm.RoomMatchId == room.Id
-                                                                && rm.RoleInRoom == RoleInRoomEnums.Master)
-                                                    .SingleOrDefault();
-                var roomMasterCus = _beatSportsDbContext.Customers.Where(c => c.Id == roomMasterInRoomMember.CustomerId).SingleOrDefault();
-                var walletRoomMaster = _beatSportsDbContext.Wallets.Where(a => a.AccountId == roomMasterCus.AccountId).SingleOrDefault();
-
-                walletRoomMaster.Balance += (totalAmountWin + totalAmountLose);
-                _beatSportsDbContext.Wallets.Update(walletRoomMaster);
-                // thanh toán tiền các thành viên tham gia phòng, tiền trả cho chủ phòng
-                var refundMasterTransaction = new Domain.Entities.Transaction
+                // chênh nhau hoặc tất cả về 1 vote, thì xem như team đó thắng
+                // Team B thắng
+                else if (voteTeamA.Count < voteTeamB.Count)
                 {
-                    WalletId = walletRoomMaster.Id,
-                    TransactionMessage = "Tiền sân đã được các thành viên trong nhóm hoàn trả cho chủ phòng thành công.",
-                    TransactionStatus = "Approved",
-                    TransactionAmount = (totalAmountWin + totalAmountLose),
-                    TransactionDate = DateTime.Now,
-                    TransactionType = "RefundRoomMaster",
-                    RoomMatchId = room.Id,
-                };
-                _beatSportsDbContext.Transactions.Add(refundMasterTransaction);
+                    var roomMemberLose = _beatSportsDbContext.RoomMembers
+                                                   .Where(rm => rm.RoomMatchId == room.Id
+                                                               && rm.Team == "A")
+                                                   .ToList();
+                    
+                    var roomMemberWin = _beatSportsDbContext.RoomMembers
+                                                        .Where(rm => rm.RoomMatchId == room.Id
+                                                                    && rm.Team == "B")
+                                                        .ToList();
+                    // chia tiền thắng
+                    var bookingRoomMatch = _beatSportsDbContext.Bookings.Where(rm => rm.Id == room.BookingId).SingleOrDefault();
+                    var ratingRoomExist = _beatSportsDbContext.RatingRooms.Where(rm => rm.Id == room.RatingRoomId).SingleOrDefault();
+                    var teamSize = (decimal)room.MaximumMember / 2;
+                    var teamCost = (bookingRoomMatch.TotalAmount * (decimal)(ratingRoomExist?.LoseRatePercent ?? 0));
+                    var costTeamWin = teamCost / teamSize;
+
+                    decimal totalAmountRefund = 0;
+                    decimal amountMemberReceiveRefund = 0;
+                    decimal totalAmountWin = 0;
+                    decimal totalAmountLose = 0;
+
+                    // lấy danh sách transaction thua
+                    foreach (var memberLose in roomMemberLose)
+                    {
+                        var customer = _beatSportsDbContext.Customers.Where(c => c.Id == memberLose.CustomerId).SingleOrDefault();
+                        var wallet = _beatSportsDbContext.Wallets.Where(a => a.AccountId == customer.AccountId).SingleOrDefault();
+
+                        var transactionJoinRoomMatch = _beatSportsDbContext.Transactions
+                                                       .Where(t => t.RoomMatchId == room.Id
+                                                                   && t.WalletId == wallet.Id
+                                                                   && t.TransactionType == "JoinRoom")
+                                                       // [TransactionStatus] == Pending đang define để sử dụng, nếu Accepted thì ko thể outRoom
+                                                       .SingleOrDefault();
+                        // team thua trả đủ
+                        if (transactionJoinRoomMatch != null)
+                        {
+                            totalAmountLose += (transactionJoinRoomMatch.TransactionAmount
+                                                    ?? throw new BadRequestException("Đã có lỗi, giao dịch tham gia phòng có số dư bằng 0."));
+                        }
+                    }
+
+                    // lấy danh sách transaction thắng
+                    foreach (var memberWin in roomMemberWin)
+                    {
+                        var customer = _beatSportsDbContext.Customers.Where(c => c.Id == memberWin.CustomerId).SingleOrDefault();
+                        var wallet = _beatSportsDbContext.Wallets.Where(a => a.AccountId == customer.AccountId).SingleOrDefault();
+
+                        var transactionJoinRoomMatch = _beatSportsDbContext.Transactions
+                                                       .Where(t => t.RoomMatchId == room.Id
+                                                                   && t.WalletId == wallet.Id
+                                                                   && t.TransactionType == "JoinRoom")
+                                                       // [TransactionStatus] == Pending đang define để sử dụng, nếu Accepted thì ko thể outRoom
+                                                       .SingleOrDefault();
+                        // team thắng dùng costTeamWin trả tiền. Lấy TransactionAmount - costTeamWin ra số dư trả lại cho thành viên
+                        if (transactionJoinRoomMatch != null)
+                        {
+                            totalAmountRefund += ((transactionJoinRoomMatch.TransactionAmount
+                                ?? throw new BadRequestException("Đã có lỗi, giao dịch tham gia phòng có số dư bằng 0.")) - costTeamWin);
+                            totalAmountWin += costTeamWin;
+
+                            wallet.Balance += ((transactionJoinRoomMatch.TransactionAmount
+                                ?? throw new BadRequestException("Đã có lỗi, giao dịch tham gia phòng có số dư bằng 0.")) - costTeamWin);
+                            _beatSportsDbContext.Wallets.Update(wallet);
+                            // thanh toán tiền các thành viên tham gia phòng, tiền trả cho thành viên thắng
+                            var refundMemberTransaction = new Domain.Entities.Transaction
+                            {
+                                WalletId = wallet.Id,
+                                TransactionMessage = "Hoàn trả tiền cho thành viên đội thắng cuộc thành công.",
+                                TransactionStatus = "Approved",
+                                TransactionAmount = (totalAmountWin + totalAmountLose),
+                                TransactionDate = DateTime.Now,
+                                TransactionType = "RefundRoomMember",
+                                RoomMatchId = room.Id,
+                            };
+                            _beatSportsDbContext.Transactions.Add(refundMemberTransaction);
+                        }
+                    }
+
+                    // cộng tiền đội thắng và đội thua lại cho chủ phòng
+                    var roomMasterInRoomMember = _beatSportsDbContext.RoomMembers
+                                                        .Where(rm => rm.RoomMatchId == room.Id
+                                                                    && rm.RoleInRoom == RoleInRoomEnums.Master)
+                                                        .SingleOrDefault();
+                    var roomMasterCus = _beatSportsDbContext.Customers.Where(c => c.Id == roomMasterInRoomMember.CustomerId).SingleOrDefault();
+                    var walletRoomMaster = _beatSportsDbContext.Wallets.Where(a => a.AccountId == roomMasterCus.AccountId).SingleOrDefault();
+
+                    walletRoomMaster.Balance += (totalAmountWin + totalAmountLose);
+                    _beatSportsDbContext.Wallets.Update(walletRoomMaster);
+                    // thanh toán tiền các thành viên tham gia phòng, tiền trả cho chủ phòng
+                    var refundMasterTransaction = new Domain.Entities.Transaction
+                    {
+                        WalletId = walletRoomMaster.Id,
+                        TransactionMessage = "Tiền sân đã được các thành viên trong nhóm hoàn trả cho chủ phòng thành công.",
+                        TransactionStatus = "Approved",
+                        TransactionAmount = (totalAmountWin + totalAmountLose),
+                        TransactionDate = DateTime.Now,
+                        TransactionType = "RefundRoomMaster",
+                        RoomMatchId = room.Id,
+                    };
+                    _beatSportsDbContext.Transactions.Add(refundMasterTransaction);
+                }
+                // Team A thắng
+                else if (voteTeamA.Count > voteTeamB.Count)
+                {
+                    var roomMemberWin = _beatSportsDbContext.RoomMembers
+                                                   .Where(rm => rm.RoomMatchId == room.Id
+                                                               && rm.Team == "A")
+                                                   .ToList();
+                    
+                    var roomMemberLose = _beatSportsDbContext.RoomMembers
+                                                        .Where(rm => rm.RoomMatchId == room.Id
+                                                                    && rm.Team == "B")
+                                                        .ToList();
+                    // chia tiền thắng
+                    var bookingRoomMatch = _beatSportsDbContext.Bookings.Where(rm => rm.Id == room.BookingId).SingleOrDefault();
+                    var ratingRoomExist = _beatSportsDbContext.RatingRooms.Where(rm => rm.Id == room.RatingRoomId).SingleOrDefault();
+                    var teamSize = (decimal)room.MaximumMember / 2;
+                    var teamCost = (bookingRoomMatch.TotalAmount * (decimal)(ratingRoomExist?.LoseRatePercent ?? 0));
+                    var costTeamWin = teamCost / teamSize;
+
+                    decimal totalAmountRefund = 0;
+                    decimal amountMemberReceiveRefund = 0;
+                    decimal totalAmountWin = 0;
+                    decimal totalAmountLose = 0;
+
+                    // lấy danh sách transaction thua
+                    foreach (var memberLose in roomMemberLose)
+                    {
+                        var customer = _beatSportsDbContext.Customers.Where(c => c.Id == memberLose.CustomerId).SingleOrDefault();
+                        var wallet = _beatSportsDbContext.Wallets.Where(a => a.AccountId == customer.AccountId).SingleOrDefault();
+
+                        var transactionJoinRoomMatch = _beatSportsDbContext.Transactions
+                                                       .Where(t => t.RoomMatchId == room.Id
+                                                                   && t.WalletId == wallet.Id
+                                                                   && t.TransactionType == "JoinRoom")
+                                                       // [TransactionStatus] == Pending đang define để sử dụng, nếu Accepted thì ko thể outRoom
+                                                       .SingleOrDefault();
+                        // team thua trả đủ
+                        if (transactionJoinRoomMatch != null)
+                        {
+                            totalAmountLose += (transactionJoinRoomMatch.TransactionAmount
+                                                    ?? throw new BadRequestException("Đã có lỗi, giao dịch tham gia phòng có số dư bằng 0."));
+                        }
+                    }
+
+                    // lấy danh sách transaction thắng
+                    foreach (var memberWin in roomMemberWin)
+                    {
+                        var customer = _beatSportsDbContext.Customers.Where(c => c.Id == memberWin.CustomerId).SingleOrDefault();
+                        var wallet = _beatSportsDbContext.Wallets.Where(a => a.AccountId == customer.AccountId).SingleOrDefault();
+
+                        var transactionJoinRoomMatch = _beatSportsDbContext.Transactions
+                                                       .Where(t => t.RoomMatchId == room.Id
+                                                                   && t.WalletId == wallet.Id
+                                                                   && t.TransactionType == "JoinRoom")
+                                                       // [TransactionStatus] == Pending đang define để sử dụng, nếu Accepted thì ko thể outRoom
+                                                       .SingleOrDefault();
+                        // team thắng dùng costTeamWin trả tiền. Lấy TransactionAmount - costTeamWin ra số dư trả lại cho thành viên
+                        if (transactionJoinRoomMatch != null)
+                        {
+                            totalAmountRefund += ((transactionJoinRoomMatch.TransactionAmount
+                                ?? throw new BadRequestException("Đã có lỗi, giao dịch tham gia phòng có số dư bằng 0.")) - costTeamWin);
+                            totalAmountWin += costTeamWin;
+
+                            wallet.Balance += ((transactionJoinRoomMatch.TransactionAmount
+                                ?? throw new BadRequestException("Đã có lỗi, giao dịch tham gia phòng có số dư bằng 0.")) - costTeamWin);
+                            _beatSportsDbContext.Wallets.Update(wallet);
+                            // thanh toán tiền các thành viên tham gia phòng, tiền trả cho thành viên thắng
+                            var refundMemberTransaction = new Domain.Entities.Transaction
+                            {
+                                WalletId = wallet.Id,
+                                TransactionMessage = "Hoàn trả tiền cho thành viên đội thắng cuộc thành công.",
+                                TransactionStatus = "Approved",
+                                TransactionAmount = (totalAmountWin + totalAmountLose),
+                                TransactionDate = DateTime.Now,
+                                TransactionType = "RefundRoomMember",
+                                RoomMatchId = room.Id,
+                            };
+                            _beatSportsDbContext.Transactions.Add(refundMemberTransaction);
+                        }
+                    }
+
+                    // cộng tiền đội thắng và đội thua lại cho chủ phòng
+                    var roomMasterInRoomMember = _beatSportsDbContext.RoomMembers
+                                                        .Where(rm => rm.RoomMatchId == room.Id
+                                                                    && rm.RoleInRoom == RoleInRoomEnums.Master)
+                                                        .SingleOrDefault();
+                    var roomMasterCus = _beatSportsDbContext.Customers.Where(c => c.Id == roomMasterInRoomMember.CustomerId).SingleOrDefault();
+                    var walletRoomMaster = _beatSportsDbContext.Wallets.Where(a => a.AccountId == roomMasterCus.AccountId).SingleOrDefault();
+
+                    walletRoomMaster.Balance += (totalAmountWin + totalAmountLose);
+                    _beatSportsDbContext.Wallets.Update(walletRoomMaster);
+                    // thanh toán tiền các thành viên tham gia phòng, tiền trả cho chủ phòng
+                    var refundMasterTransaction = new Domain.Entities.Transaction
+                    {
+                        WalletId = walletRoomMaster.Id,
+                        TransactionMessage = "Tiền sân đã được các thành viên trong nhóm hoàn trả cho chủ phòng thành công.",
+                        TransactionStatus = "Approved",
+                        TransactionAmount = (totalAmountWin + totalAmountLose),
+                        TransactionDate = DateTime.Now,
+                        TransactionType = "RefundRoomMaster",
+                        RoomMatchId = room.Id,
+                    };
+                    _beatSportsDbContext.Transactions.Add(refundMasterTransaction);
+                }
             }
         }
         _beatSportsDbContext.SaveChanges();

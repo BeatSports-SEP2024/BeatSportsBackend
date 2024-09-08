@@ -11,5 +11,5 @@ public class RatingRoom : BaseAuditableEntity
     public double? WinRatePercent { get; set; }    
     public double? LoseRatePercent { get; set; }
 
-    public virtual RoomMatch? RoomMatch { get; set; }
+    public virtual IList<RoomMatch>? RoomMatch { get; set; }
 }

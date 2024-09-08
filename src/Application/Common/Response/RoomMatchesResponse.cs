@@ -79,4 +79,5 @@ public class RoomMemberInRoomResponse
     public string CustomerImage { get; set; }
     public string RoleInRoom { get; set; }
     public string? Team {  get; set; }
+    public string? MatchingResultStatus {  get; set; }
 }

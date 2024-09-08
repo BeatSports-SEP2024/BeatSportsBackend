@@ -86,7 +86,7 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
         var teamSize = (decimal)request.MaximumMember / 2;
         var teamCost = (booking.TotalAmount * (decimal)(ratingRoomExist?.WinRatePercent ?? 0));
 
-        var room = new RoomMatch()
+        var room = new RoomMatch
         {
             IsPrivate = request.IsPrivate,
             SportCategory = sportCategoryEnum,
@@ -104,9 +104,8 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
         };
 
         _dbContext.RoomMatches.Add(room);
-        await _dbContext.SaveChangesAsync(cancellationToken);
 
-        var roomMember = new RoomMember()
+        var roomMember = new RoomMember
         {
             CustomerId = booking.CustomerId,
             RoomMatchId = room.Id,
@@ -114,14 +113,12 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
             Team = "A", // chủ phòng auto team A, nếu swap thì mới đổi team khác
             MatchingResultStatus = "NoResult" // 1. Tạo phòng chưa có kết quả (NoResult)
         };
-
         _dbContext.RoomMembers.Add(roomMember);
-        await _dbContext.SaveChangesAsync(cancellationToken);
 
         booking.IsRoomBooking = true;
 
         _dbContext.Bookings.Update(booking);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync();
         // Gửi email thông báo tạo phòng thành công
         var customer = await _dbContext.Customers
             .Include(c => c.Account)

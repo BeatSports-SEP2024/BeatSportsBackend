@@ -101,6 +101,7 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
                 CustomerName = cus.Account.FirstName + " " + cus.Account.LastName,
                 RoleInRoom = roomMember.RoleInRoom.GetDescriptionFromEnum(),
                 Team = roomMember.Team,
+                MatchingResultStatus = roomMember.MatchingResultStatus,
             };
 
             roomMembers.Add(result);
