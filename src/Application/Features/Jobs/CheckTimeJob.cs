@@ -135,10 +135,17 @@ public class CheckTimeJob
         // 1. Kiểm tra tất cả thành viên trong bảng roomMember của roomMatch đó đã cập nhật kết quả sau trận đấu chưa
         // (dựa theo thời gian kết thúc của bảng roomMatch)
         var expiredRooms = _beatSportsDbContext.RoomMatches
-            .Where(x => !x.IsDelete && x.EndTimeRoom <= DateTime.Now).ToList();
+            .Where(x => !x.IsDelete && x.StartTimeRoom <= DateTime.Now).ToList();
 
+        
         foreach (var room in expiredRooms)
         {
+            var transactionCheck = _beatSportsDbContext.Transactions.Where(x => x.RoomMatchId == room.Id 
+                                                && string.Compare(x.TransactionType, "RefundRoomMaster") == 0).ToList();
+            if (transactionCheck.Any())
+            {
+                continue;
+            }
             var expiredRoomMemberNoResult = _beatSportsDbContext.RoomMembers
                 .Where(rm => rm.RoomMatchId == room.Id
                             && rm.MatchingResultStatus == "NoResult")
@@ -489,6 +496,7 @@ public class CheckTimeJob
                                 WalletId = wallet.Id,
                                 TransactionMessage = "Hoàn trả tiền cho thành viên đội thắng cuộc thành công.",
                                 TransactionStatus = "Approved",
+                                AdminCheckStatus = AdminCheckEnums.Accepted,
                                 TransactionAmount = (totalAmountWin + totalAmountLose),
                                 TransactionDate = DateTime.Now,
                                 TransactionType = "RefundRoomMember",
@@ -513,6 +521,7 @@ public class CheckTimeJob
                     {
                         WalletId = walletRoomMaster.Id,
                         TransactionMessage = "Tiền sân đã được các thành viên trong nhóm hoàn trả cho chủ phòng thành công.",
+                        AdminCheckStatus = AdminCheckEnums.Accepted,
                         TransactionStatus = "Approved",
                         TransactionAmount = (totalAmountWin + totalAmountLose),
                         TransactionDate = DateTime.Now,
@@ -593,6 +602,7 @@ public class CheckTimeJob
                                 WalletId = wallet.Id,
                                 TransactionMessage = "Hoàn trả tiền cho thành viên đội thắng cuộc thành công.",
                                 TransactionStatus = "Approved",
+                                AdminCheckStatus = AdminCheckEnums.Accepted,
                                 TransactionAmount = (totalAmountWin + totalAmountLose),
                                 TransactionDate = DateTime.Now,
                                 TransactionType = "RefundRoomMember",
@@ -618,6 +628,7 @@ public class CheckTimeJob
                         WalletId = walletRoomMaster.Id,
                         TransactionMessage = "Tiền sân đã được các thành viên trong nhóm hoàn trả cho chủ phòng thành công.",
                         TransactionStatus = "Approved",
+                        AdminCheckStatus = AdminCheckEnums.Accepted,
                         TransactionAmount = (totalAmountWin + totalAmountLose),
                         TransactionDate = DateTime.Now,
                         TransactionType = "RefundRoomMaster",

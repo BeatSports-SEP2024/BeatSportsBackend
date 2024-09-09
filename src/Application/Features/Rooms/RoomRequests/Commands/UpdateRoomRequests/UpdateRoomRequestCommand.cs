@@ -53,6 +53,10 @@ public class UpdateRoomRequestCommandHandler : IRequestHandler<UpdateRoomRequest
             .FirstOrDefaultAsync();
         if (checkMasterId == null)
         {
+            if(roomMatch.StartTimeRoom <= DateTime.Now)
+            {
+                throw new BadRequestException($"Bạn không thể rời phòng. Đã quá thời gian tối thiểu cho bạn rời phòng.");
+            }
             var dataRoomMember = await _beatSportsDbContext.RoomMembers
                 .Where(rm => rm.RoomMatchId == roomMatch.Id
                             && rm.CustomerId == request.CustomerId)
@@ -80,7 +84,7 @@ public class UpdateRoomRequestCommandHandler : IRequestHandler<UpdateRoomRequest
                                 .SingleOrDefaultAsync();
                 if (transactionJoinExist == null)
                 {
-                    throw new BadRequestException($"Bạn không thể rời phòng. Đã quá thời gian tối thiểu cho bạn rời phòng.");
+                    throw new BadRequestException($"Đã có lỗi xảy ra, không tìm thấy giao dịch tham gia phòng.");
                 }
                 // update transaction trước xong mới cộng tiền
                 transactionJoinExist.TransactionStatus = "Cancel"; // hoàn trả(Cancel) thoát khỏi phòng trả tiền lại cho member thì update lại transaction

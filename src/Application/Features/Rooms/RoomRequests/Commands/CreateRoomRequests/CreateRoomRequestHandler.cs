@@ -150,7 +150,7 @@ public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand
             {
                 WalletId = walletExistMoney.Id,
                 TransactionMessage = "Tham gia phòng thành công",
-                // AdminCheckStatus không liên quan cho transaction này
+                AdminCheckStatus = AdminCheckEnums.Accepted,
                 // hoàn thành(Approved) hết giờ, tiền trả vô ví của member, đang chờ xử lý(Pending) tham gia phòng thành công nhưng chưa hết giờ,
                 // hay đã được hoàn trả(Cancel) thoát khỏi phòng trả tiền lại cho member thì update lại transaction
                 TransactionStatus = "Pending", 
