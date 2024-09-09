@@ -53,27 +53,109 @@ public class UpdateRoomRequestCommandHandler : IRequestHandler<UpdateRoomRequest
             .FirstOrDefaultAsync();
         if (checkMasterId == null)
         {
-            var dataRoomMember = await _beatSportsDbContext.RoomMembers.Where(rm => rm.RoomMatchId == roomMatch.Id && rm.CustomerId == request.CustomerId).SingleOrDefaultAsync();
-            if (dataRoomMember != null)
+            if(roomMatch.StartTimeRoom <= DateTime.Now)
             {
-                _beatSportsDbContext.RoomMembers.Remove(dataRoomMember);
+                throw new BadRequestException($"Bạn không thể rời phòng. Đã quá thời gian tối thiểu cho bạn rời phòng.");
             }
-            var dataRoomRequest = await _beatSportsDbContext.RoomRequests.Where(rm => rm.RoomMatchId == roomMatch.Id && rm.CustomerId == request.CustomerId).SingleOrDefaultAsync();
-            if (dataRoomRequest != null)
+            var dataRoomMember = await _beatSportsDbContext.RoomMembers
+                .Where(rm => rm.RoomMatchId == roomMatch.Id
+                            && rm.CustomerId == request.CustomerId)
+                .SingleOrDefaultAsync();
+            var dataRoomRequest = await _beatSportsDbContext.RoomRequests
+                .Where(rm => rm.RoomMatchId == roomMatch.Id
+                            && rm.CustomerId == request.CustomerId
+                            && rm.JoinStatus == RoomRequestEnums.Accepted)
+                .SingleOrDefaultAsync();
+            if (dataRoomMember != null && dataRoomRequest != null)
             {
-                _beatSportsDbContext.RoomRequests.Remove(dataRoomRequest);
-            }
-            await _beatSportsDbContext.SaveChangesAsync();
+                // update lại transaction rồi back tiền lại cho các thành viên khác trong room
+                // chưa có kiểm tra thời gian tối thiểu cho phép thành viên đó thoát ra nha => đang là lúc nào cũng thoát được
+                // chỗ này t đang suy nghĩ là cho cái transactionStatus đang pending thì thoát được, nếu chuyển qua approved rồi thì ko thoát được nữa
+                var walletCusExist = await _beatSportsDbContext.Wallets.Where(w => w.AccountId == customer.AccountId).SingleOrDefaultAsync();
+                if (walletCusExist == null)
+                {
+                    throw new NotFoundException($"Đã có lỗi xảy ra, không tìm thấy ví của khách hàng.");
+                }
+                var transactionJoinExist = await _beatSportsDbContext.Transactions
+                                .Where(t => t.RoomMatchId == request.RoomMatchId
+                                            && t.WalletId == walletCusExist.Id
+                                            && t.TransactionType == "JoinRoom"
+                                            && t.TransactionStatus == "Pending")
+                                .SingleOrDefaultAsync();
+                if (transactionJoinExist == null)
+                {
+                    throw new BadRequestException($"Đã có lỗi xảy ra, không tìm thấy giao dịch tham gia phòng.");
+                }
+                // update transaction trước xong mới cộng tiền
+                transactionJoinExist.TransactionStatus = "Cancel"; // hoàn trả(Cancel) thoát khỏi phòng trả tiền lại cho member thì update lại transaction
+                transactionJoinExist.TransactionType = "OutRoom"; 
+                transactionJoinExist.TransactionDate = DateTime.Now;
+                transactionJoinExist.TransactionMessage = "Rời phòng thành công";
+                transactionJoinExist.Created = DateTime.Now;
+                transactionJoinExist.LastModified = DateTime.Now;
+                _beatSportsDbContext.Transactions.Update(transactionJoinExist);
 
-            // thành viên out room
-            await _hubContext.Clients.Group(roomMatch.Id.ToString()).SendAsync("UpdateRoom", "MemberLeft", customer.Id);
+                // cộng tiền về ví cho member đó
+                walletCusExist.Balance += (transactionJoinExist.TransactionAmount ?? throw new BadRequestException("Có lỗi xảy ra, số dư giao dịch bằng 0."));
+                _beatSportsDbContext.Wallets.Update(walletCusExist);
+
+                _beatSportsDbContext.RoomMembers.Remove(dataRoomMember);
+                _beatSportsDbContext.RoomRequests.Remove(dataRoomRequest);
+
+                await _beatSportsDbContext.SaveChangesAsync();
+
+                // thành viên out room
+                await _hubContext.Clients.Group(roomMatch.Id.ToString()).SendAsync("UpdateRoom", "MemberLeft", customer.Id);
+            }
         }
         else
         {
             var ListRoomMember = await _beatSportsDbContext.RoomMembers.Where(rm => rm.RoomMatchId == roomMatch.Id).ToListAsync();
-            _beatSportsDbContext.RoomMembers.RemoveRange(ListRoomMember);
-
             var ListRoomRequest = await _beatSportsDbContext.RoomRequests.Where(rm => rm.RoomMatchId == roomMatch.Id).ToListAsync();
+
+            // sẽ dựa theo các thành viên trong bảng roomMember Update lại transaction cho các thành viên khi chủ phòng xóa phòng
+            foreach (var member in ListRoomMember)
+            {
+                var customerExist = _beatSportsDbContext.Customers
+                                .Where(c => c.Id == member.CustomerId && !c.IsDelete)
+                                .FirstOrDefault();
+                if (customerExist == null)
+                {
+                    throw new NotFoundException($"Customer is not existed");
+                }
+
+                var walletCusExist = await _beatSportsDbContext.Wallets.Where(w => w.AccountId == customerExist.AccountId).SingleOrDefaultAsync();
+                if (walletCusExist == null)
+                {
+                    throw new NotFoundException($"Đã có lỗi xảy ra, không tìm thấy ví của khách hàng.");
+                }
+
+                // Tìm transaction cho mỗi thành viên (nếu họ đã tham gia phòng)
+                // chủ phòng đang cho nó muốn out cỡ nào cũng được nên ko cần quan tâm cái này
+                // && t.TransactionStatus == "Approved" hay "Pending", chỉ quan tâm loại là đang joinRoom thôi
+                var joinTransaction = await _beatSportsDbContext.Transactions
+                    .Where(t => t.RoomMatchId == roomMatch.Id
+                                               && t.WalletId == walletCusExist.Id
+                                               && t.TransactionType == "JoinRoom")
+                    .SingleOrDefaultAsync();
+                if (joinTransaction != null)
+                {
+                    // update transaction trước xong mới cộng tiền
+                    joinTransaction.TransactionStatus = "Cancel"; // hoàn trả(Cancel) thoát khỏi phòng trả tiền lại cho member thì update lại transaction
+                    joinTransaction.TransactionType = "OutRoom"; // chủ phòng thoát là OutRoom
+                    joinTransaction.TransactionDate = DateTime.Now;
+                    joinTransaction.TransactionMessage = "Rời phòng thành công";
+                    joinTransaction.Created = DateTime.Now;
+                    joinTransaction.LastModified = DateTime.Now;
+                    _beatSportsDbContext.Transactions.Update(joinTransaction);
+
+                    // cộng tiền về ví cho member đó
+                    walletCusExist.Balance += (joinTransaction.TransactionAmount ?? throw new BadRequestException("Có lỗi xảy ra, số dư giao dịch bằng 0."));
+                    _beatSportsDbContext.Wallets.Update(walletCusExist);
+                }
+            }
+
+            _beatSportsDbContext.RoomMembers.RemoveRange(ListRoomMember);
             _beatSportsDbContext.RoomRequests.RemoveRange(ListRoomRequest);
 
 

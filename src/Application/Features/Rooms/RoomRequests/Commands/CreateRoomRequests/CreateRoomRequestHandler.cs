@@ -9,6 +9,7 @@ using BeatSportsAPI.Application.Features.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using BeatSportsAPI.Application.Common.Ultilities;
+using BeatSportsAPI.Domain.Entities;
 
 namespace BeatSportsAPI.Application.Features.Rooms.RoomRequests.Commands.CreateRoomRequests;
 public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand, BeatSportsResponse>
@@ -38,12 +39,13 @@ public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand
                                 .Where(x => x.CustomerId == customer.Id && x.JoinStatus == RoomRequestEnums.Accepted)
                                 .ToList();
 
+
         // Kiểm tra số lượng thành viên trong phòng
         var currentMemberCount = await _beatSportsDbContext.RoomMembers
             .CountAsync(rm => rm.RoomMatchId == roomMatch.Id);
         if (currentMemberCount >= roomMatch.MaximumMember)
         {
-            throw new BadRequestException("The room has reached the maximum number of members.");
+            throw new BadRequestException("Phòng này đã đủ thành viên, bạn hãy tham gia phòng khác.");
         }
 
         if (roomMatchJoinedList.Count > 0)
@@ -89,7 +91,7 @@ public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand
 
         if (roomMatch == null)
         {
-            throw new NotFoundException($"{request.RoomMatchId} is not existed");
+            throw new NotFoundException($"Phòng đã bị xóa, không tìm thấy phòng này.");
         }
 
         if (customer == null)
@@ -127,6 +129,38 @@ public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand
         }
         else
         {
+            // Kiểm tra số tiền trong ví của customer đó, dựa theo cái roomMatch có lưu TotalCostEachMember so sánh với tiền trong ví rồi trừ
+            var walletExistMoney = await _beatSportsDbContext.Wallets
+                                    .Where(w => w.AccountId == customer.AccountId)
+                                    .SingleOrDefaultAsync();
+            if (walletExistMoney == null)
+            {
+                throw new NotFoundException("Ví tiền không tại, đã xảy ra lỗi.");
+            }
+            if (walletExistMoney.Balance < (decimal)(roomMatch.TotalCostEachMember ?? 0))
+            {
+                throw new BadRequestException("Số dư trong ví của bạn không đủ để tham gia phòng, Bạn cần nạp thêm vào ví.");
+            }
+            walletExistMoney.Balance -= (decimal)(roomMatch.TotalCostEachMember!);
+            _beatSportsDbContext.Wallets.Update(walletExistMoney);
+
+            // tạo transaction cho cái giao dịch tham gia phòng, sẽ gồm 3 transaction: Tham gia(), Hoàn trả(), Rời phòng()
+            // tham gia
+            var joinRoomTransaction = new Transaction
+            {
+                WalletId = walletExistMoney.Id,
+                TransactionMessage = "Tham gia phòng thành công",
+                AdminCheckStatus = AdminCheckEnums.Accepted,
+                // hoàn thành(Approved) hết giờ, tiền trả vô ví của member, đang chờ xử lý(Pending) tham gia phòng thành công nhưng chưa hết giờ,
+                // hay đã được hoàn trả(Cancel) thoát khỏi phòng trả tiền lại cho member thì update lại transaction
+                TransactionStatus = "Pending", 
+                TransactionAmount = (decimal)(roomMatch.TotalCostEachMember!),
+                TransactionDate = DateTime.Now,
+                TransactionType = "JoinRoom", // đây sẽ là chỗ lưu loại các giao dịch
+                RoomMatchId = roomMatch.Id,
+            };
+            _beatSportsDbContext.Transactions.Add(joinRoomTransaction);
+
             var roomRequest = new RoomRequest
             {
                 CustomerId = customer.Id,

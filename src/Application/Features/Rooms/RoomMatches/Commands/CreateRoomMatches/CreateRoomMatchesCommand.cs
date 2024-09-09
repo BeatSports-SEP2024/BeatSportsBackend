@@ -16,8 +16,11 @@ public class CreateRoomMatchesCommand : IRequest<RoomMatchResponse>
     public Guid BookingId { get; set; }
     public string? RoomName { get; set; }
     //public SportCategoriesEnums SportCategoriesEnums { get; set; }
-    //public string? StartTimeRoom { get; set; }
-    //public TimeSpan EndTimeRoom { get; set; }
+    public Guid? RatingRoomId { get; set; }
+    /// <summary>
+    /// vidu cầu lông: đơn, đôi, ...
+    /// </summary>
+    public string? RoomMatchTypeName { get; set; }
     public int MaximumMember { get; set; }
     public string? RuleRoom { get; set; }
     public string? Note { get; set; }

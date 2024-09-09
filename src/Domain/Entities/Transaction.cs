@@ -6,6 +6,7 @@ public class Transaction : BaseAuditableEntity
     [ForeignKey("Wallet")]
     public Guid WalletId { get; set; }
     public Guid WalletTargetId { get; set; }
+    public Guid? RoomMatchId { get; set; }
     public string? TransactionMessage { get; set; }
     public string? TransactionPayload { get; set; }
     /// <summary>
@@ -22,7 +23,12 @@ public class Transaction : BaseAuditableEntity
     /// </summary>
     public AdminCheckEnums? AdminCheckStatus { get; set; }
     public decimal? TransactionAmount { get; set; }
-    public DateTime? TransactionDate { get; set; }    
+    public DateTime? TransactionDate { get; set; }
+    /// <summary>
+    /// Đang có tổng cộng là 
+    /// Giao dịch trong App, Payfee, Nạp tiền, Rút tiền, Đóng tiền, JoinRoom, 
+    /// OutRoom(Chủ phòng out, thành viên out đều là ...), RefundRoomMaster, RefundRoomMember (Sau khi cập nhật kết quả, trả tiền cho thành viên team win)
+    /// </summary>
     public string? TransactionType { get; set; } 
     public string? ImageOfInvoice { get; set; }
     public string? ReasonOfRejected { get; set; }

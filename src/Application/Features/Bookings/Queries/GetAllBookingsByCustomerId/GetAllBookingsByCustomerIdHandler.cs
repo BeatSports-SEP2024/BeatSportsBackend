@@ -4,8 +4,11 @@ using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Mappings;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
+using BeatSportsAPI.Domain.Entities;
+using BeatSportsAPI.Domain.Entities.CourtEntity;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeatSportsAPI.Application.Features.Bookings.Queries.GetAllBookingsByCustomerId;
 public class GetAllBookingsByCustomerIdHandler : IRequestHandler<GetAllBookingsByCustomerIdCommand, PaginatedList<BookingByCustomerId>>
@@ -53,6 +56,17 @@ public class GetAllBookingsByCustomerIdHandler : IRequestHandler<GetAllBookingsB
             CourtSubdivisionId = c.CourtSubdivisionId,
             CourtName = c.CourtSubdivision.Court.CourtName,
             CourtSubName = c.CourtSubdivision.CourtSubdivisionName,
+            SportType = c.CourtSubdivision.CourtSubdivisionSettings.SportCategories.Name,
+            CourtTypeSettings = c.CourtSubdivision.CourtSubdivisionSettings.CourtType,
+            ListSportSettingMatchesType = _dbContext.SportSettingsMatchTypes
+                                            .Where(s => s.CourtSubdivisionSettingId == c.CourtSubdivision.CourtSubdivisionSettings.Id)
+                                            .Select(matchType => new SportSettingsMatchesTypeResponse
+                                            {
+                                                SportSettingsMatchesTypeId = matchType.Id,
+                                                MatchTypeName = matchType.MatchTypeName,
+                                                TotalMember = matchType.TotalMember,
+                                            })
+                                            .ToList(),
             BookingDate = c.BookingDate,
             TotalAmount = c.TotalAmount,
             IsRoomBooking = c.IsRoomBooking,

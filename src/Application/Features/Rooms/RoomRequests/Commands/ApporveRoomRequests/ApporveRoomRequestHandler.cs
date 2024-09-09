@@ -66,14 +66,45 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
                 roomRequest.DateApprove = DateTime.UtcNow;
 
                 _beatSportsDbContext.RoomRequests.Update(roomRequest);
+
+                //Kiểm tra roomatch tối đa bao nhiêu thành viên trong 1 đội
+                var teamMemberCount = roomMatch.MaximumMember / 2;
+                // kiểm tra xem dựa theo số teamMemberCount thì team A được bao nhiêu rồi
+                // nếu đầy rồi thì appove thì th kia xuống teamB, còn chưa đầy thì cho dô A
+                var roomMemberTeamA = _beatSportsDbContext.RoomMembers
+                    .Where(rm => rm.RoomMatchId == roomRequest.RoomMatchId && rm.Team == "A")
+                    .ToList()
+                    .Count();
+                var roomMemberTeamB = _beatSportsDbContext.RoomMembers
+                    .Where(rm => rm.RoomMatchId == roomRequest.RoomMatchId && rm.Team == "B")
+                    .ToList()
+                    .Count();
+
                 // Khi được chấp nhận, thì RoomMatch có thêm thành viên
-                var roomMember = new RoomMember
+                if (roomMemberTeamA < teamMemberCount)
                 {
-                    CustomerId = roomRequest.CustomerId,
-                    RoomMatchId = roomRequest.RoomMatchId,
-                    RoleInRoom = RoleInRoomEnums.Member,
-                };
-                _beatSportsDbContext.RoomMembers.Add(roomMember);
+                    var roomMember = new RoomMember
+                    {
+                        CustomerId = roomRequest.CustomerId,
+                        RoomMatchId = roomRequest.RoomMatchId,
+                        RoleInRoom = RoleInRoomEnums.Member,
+                        Team = "A",
+                        MatchingResultStatus = "NoResult" // 1. Tạo phòng chưa có kết quả (NoResult)
+                    };
+                    _beatSportsDbContext.RoomMembers.Add(roomMember);
+                }
+                else if (roomMemberTeamB < teamMemberCount)
+                {
+                    var roomMember = new RoomMember
+                    {
+                        CustomerId = roomRequest.CustomerId,
+                        RoomMatchId = roomRequest.RoomMatchId,
+                        RoleInRoom = RoleInRoomEnums.Member,
+                        Team = "B",
+                        MatchingResultStatus = "NoResult" // 1. Tạo phòng chưa có kết quả (NoResult)
+                    };
+                    _beatSportsDbContext.RoomMembers.Add(roomMember);
+                }
 
                 var notification = new Notification
                 {
@@ -159,6 +190,35 @@ public class ApporveRoomRequestHandler : IRequestHandler<ApporveRoomRequestComma
             case "Declined":
                 //roomRequest.JoinStatus = RoomRequestEnums.Declined;
                 //roomRequest.DateApprove = DateTime.UtcNow;
+                // tại vì khi ấn tham gia là đã trừ tiền rồi nên bước nếu chủ phòng ko chấp nhận thì trả tiền lại cho th member tham gia
+                // kiểm tra lại ví tiền th customer
+                var walletCusExist = await _beatSportsDbContext.Wallets.Where(w => w.AccountId == customer.AccountId).SingleOrDefaultAsync();
+                if (walletCusExist == null)
+                {
+                    throw new NotFoundException($"Đã có lỗi xảy ra, không tìm thấy ví của khách hàng.");
+                }
+                // đang suy xét sợ th member bị th chủ phòng nó treo đến giờ approved mất nên ko ktra đk này && t.TransactionStatus == "Pending"
+                var transactionJoinExist = await _beatSportsDbContext.Transactions
+                                .Where(t => t.RoomMatchId == roomRequest.RoomMatchId
+                                            && t.WalletId == walletCusExist.Id
+                                            && t.TransactionType == "JoinRoom")
+                                .SingleOrDefaultAsync();
+                if (transactionJoinExist == null)
+                {
+                    throw new BadRequestException($"Bạn không thể rời phòng. Đã quá thời gian tối thiểu cho bạn rời phòng.");
+                }
+                // update transaction trước xong mới cộng tiền
+                transactionJoinExist.TransactionStatus = "Cancel"; // hoàn trả(Cancel) thoát khỏi phòng trả tiền lại cho member thì update lại transaction
+                transactionJoinExist.TransactionType = "OutRoom"; // chủ phòng thoát hoặc không chấp nhận cho vào
+                transactionJoinExist.TransactionDate = DateTime.Now;
+                transactionJoinExist.TransactionMessage = "Rời phòng thành công";
+                transactionJoinExist.Created = DateTime.Now;
+                transactionJoinExist.LastModified = DateTime.Now;
+                _beatSportsDbContext.Transactions.Update(transactionJoinExist);
+
+                // cộng tiền về ví cho member đó
+                walletCusExist.Balance += (transactionJoinExist.TransactionAmount ?? throw new BadRequestException("Có lỗi xảy ra, số dư giao dịch bằng 0."));
+                _beatSportsDbContext.Wallets.Update(walletCusExist);
 
                 _beatSportsDbContext.RoomRequests.Remove(roomRequest);
                 // Gửi sự kiện SignalR

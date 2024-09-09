@@ -9,6 +9,7 @@ using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BeatSportsAPI.Application.Features.Rooms.RoomMatches.Commands.CreateRoomMatches;
 public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand, RoomMatchResponse>
@@ -35,9 +36,9 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
 
         //check booking
         var booking = await _dbContext.Bookings
-            .Include(b => b.CourtSubdivision) 
-            .ThenInclude(cs => cs.CourtSubdivisionSettings) 
-            .ThenInclude(css => css.SportCategories) 
+            .Include(b => b.CourtSubdivision)
+            .ThenInclude(cs => cs.CourtSubdivisionSettings)
+            .ThenInclude(css => css.SportCategories)
             .Where(b => b.Id == request.BookingId && !b.IsDelete && b.BookingStatus == BookingEnums.Approved.ToString() && b.IsRoomBooking == false)
             .FirstOrDefaultAsync();
 
@@ -79,37 +80,45 @@ public class CreateRoomMatchesHandler : IRequestHandler<CreateRoomMatchesCommand
         //    throw new ArgumentException("Invalid date format for StartTimeRoom. Please use 'day/month/year hours:minutes' format.");
         //}
 
-        var room = new RoomMatch()
+        var ratingRoomExist = await _dbContext.RatingRooms.Where(r => r.Id == request.RatingRoomId).SingleOrDefaultAsync();
+
+        // chia tiền
+        var teamSize = (decimal)request.MaximumMember / 2;
+        var teamCost = (booking.TotalAmount * (decimal)(ratingRoomExist?.WinRatePercent ?? 0));
+
+        var room = new RoomMatch
         {
             IsPrivate = request.IsPrivate,
             SportCategory = sportCategoryEnum,
             RoomName = request.RoomName,
             BookingId = request.BookingId,
             LevelId = request.LevelId,
+            RatingRoomId = request.RatingRoomId,
+            RoomMatchTypeName = request.RoomMatchTypeName,
             StartTimeRoom = booking.PlayingDate.Add(booking.StartTimePlaying),
             EndTimeRoom = booking.PlayingDate.Add(booking.EndTimePlaying),
             MaximumMember = request.MaximumMember,
+            TotalCostEachMember = (double)(teamCost / teamSize),
             RuleRoom = request.RuleRoom,
             Note = request.Note
         };
 
         _dbContext.RoomMatches.Add(room);
-        await _dbContext.SaveChangesAsync(cancellationToken);
 
-        var roomMember = new RoomMember()
+        var roomMember = new RoomMember
         {
             CustomerId = booking.CustomerId,
             RoomMatchId = room.Id,
-            RoleInRoom = RoleInRoomEnums.Master
+            RoleInRoom = RoleInRoomEnums.Master,
+            Team = "A", // chủ phòng auto team A, nếu swap thì mới đổi team khác
+            MatchingResultStatus = "NoResult" // 1. Tạo phòng chưa có kết quả (NoResult)
         };
-
         _dbContext.RoomMembers.Add(roomMember);
-        await _dbContext.SaveChangesAsync(cancellationToken);
 
         booking.IsRoomBooking = true;
 
         _dbContext.Bookings.Update(booking);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync();
         // Gửi email thông báo tạo phòng thành công
         var customer = await _dbContext.Customers
             .Include(c => c.Account)

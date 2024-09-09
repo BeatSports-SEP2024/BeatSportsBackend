@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
+﻿using AutoMapper;
 using BeatSportsAPI.Application.Common.Exceptions;
 using BeatSportsAPI.Application.Common.Interfaces;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Common.Ultilities;
-using BeatSportsAPI.Application.Features.Campaigns.Queries.GetCampaignById;
-using BeatSportsAPI.Domain.Entities;
-using BeatSportsAPI.Domain.Entities.Room;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,6 +22,7 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
         var query = _dbContext.RoomMatches
             .Where(x => x.Id == request.RoomMatchId && !x.IsDelete)
             .Include(x => x.Level)
+            .Include(x => x.RatingRoom)
             .Include(x => x.RoomMembers)
                 .ThenInclude(rm => rm.Customer)
                     .ThenInclude(c => c.Account)
@@ -107,7 +99,9 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
                 CustomerId = cus.Id,
                 CustomerImage = cus.Account.ProfilePictureURL,
                 CustomerName = cus.Account.FirstName + " " + cus.Account.LastName,
-                RoleInRoom = roomMember.RoleInRoom.GetDescriptionFromEnum()
+                RoleInRoom = roomMember.RoleInRoom.GetDescriptionFromEnum(),
+                Team = roomMember.Team,
+                MatchingResultStatus = roomMember.MatchingResultStatus,
             };
 
             roomMembers.Add(result);
@@ -119,6 +113,13 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
 
         var master = query.RoomMembers.Any(x => x.RoleInRoom == Domain.Enums.RoleInRoomEnums.Master
                                     && x.CustomerId == request.CustomerId);
+
+        var courtSubSetting = _dbContext.CourtSubdivisionSettings.Where(cs => cs.Id == query.Booking.CourtSubdivision.CourtSubdivisionSettingId).SingleOrDefault();
+        var sport = _dbContext.SportsCategories.Where(c => c.Id == courtSubSetting!.SportCategoryId).SingleOrDefault();
+
+        // chia tiền
+        var teamSize = (decimal)query.MaximumMember / 2;
+        var teamCost = (query.Booking.TotalAmount * (decimal)(query.RatingRoom?.WinRatePercent ?? 0));
 
         var room = new RoomMatchesDetailResponse()
         {
@@ -137,7 +138,7 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
             StartTimeRoom = query.StartTimeRoom,
             EndTimeRoom = query.EndTimeRoom,
             CountMember = query.RoomMembers.Count,
-            PlayingCosts = (int)query.Booking.TotalAmount / query.MaximumMember,
+            PlayingCosts = (double)(teamCost / teamSize),
             RuleRoom = query.RuleRoom,
             JoiningRequest = roomRequests,
             RoomMembers = roomMembers,
@@ -147,8 +148,16 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
             Note = query.Note,
 
             // Thêm thông tin chủ phòng
-            MasterName = $"{masterMember.FirstName} {masterMember.LastName}" ,
-            MasterAvatar = masterMember.ProfilePictureURL
+            MasterName = $"{masterMember.FirstName} {masterMember.LastName}",
+            MasterAvatar = masterMember.ProfilePictureURL,
+
+            // phần thêm 
+            SportName = sport.Name,
+            SportCourtTypeName = courtSubSetting.CourtType,
+            RoomMatchTypeName = query.RoomMatchTypeName,
+            DescriptionRating = query.RatingRoom?.Description,
+            WinRatePercent = query.RatingRoom?.WinRatePercent,
+            LoseRatePercent = query.RatingRoom?.LoseRatePercent,
         };
 
         return Task.FromResult(room);

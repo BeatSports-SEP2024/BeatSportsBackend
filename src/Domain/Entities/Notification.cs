@@ -17,7 +17,7 @@ public class Notification : BaseAuditableEntity
     /// </summary>
     public bool IsRead { get; set; }
     /// <summary>
-    /// Loại thông báo (ví dụ: Booking, Feedback, PayFee, RoomRequestAccepted). trước tiên 3 loại này trước đi
+    /// Loại thông báo (ví dụ: Booking, Feedback, PayFee, RoomRequestAccepted, ResultRoomMatch). trước tiên 3 loại này trước đi
     /// PayFee trả tiền app cho th admin hằng tháng
     /// </summary>
     public string? Type { get; set; }

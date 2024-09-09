@@ -34,19 +34,20 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
             .ToListAsync(cancellationToken);
 
         #region Pending Room Request
-        var roomRequests = query.Where(rr => rr.CustomerId == request.CustomerId && rr.JoinStatus == 0);
+        var roomRequests = query?.Where(rr => rr.CustomerId == request.CustomerId && rr.JoinStatus == 0);
 
         if (query == null || !query.Any())
         {
             response.PendingRoomList = new List<RoomRequestResponseForCustomer>();
         }
 
-        var roomMatchIds = query.Select(rr => rr.RoomMatchId).ToList();
+        var roomMatchIds = roomRequests.Select(rr => rr.RoomMatchId).ToList();
 
         var roomMatches = await _beatSportsDbContext.RoomMatches
-            .Where(rm => roomMatchIds.Contains(rm.Id) && (rm.Booking.PlayingDate.Date > DateTime.Now.Date
+            .Where(rm => roomMatchIds.Contains(rm.Id)) 
+                                                        /*&& (rm.Booking.PlayingDate.Date > DateTime.Now.Date
                                                         || (rm.Booking.PlayingDate.Date == DateTime.Now.Date
-                                                            && rm.Booking.StartTimePlaying > DateTime.Now.TimeOfDay)))
+                                                            && rm.Booking.StartTimePlaying > DateTime.Now.TimeOfDay)))*/
             .Include(rm => rm.Booking)
                 .ThenInclude(b => b.CourtSubdivision)
                     .ThenInclude(cs => cs.Court)
@@ -97,7 +98,7 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
 
         #region Join List 
         // Danh sách phòng đang tham gia (JoiningStatus = 1 và có data trong table roomMember)
-        var joinedRoomRequests = query.Where(rr => rr.CustomerId == request.CustomerId && (int)rr.JoinStatus == 1);
+        var joinedRoomRequests = query?.Where(rr => rr.CustomerId == request.CustomerId && (int)rr.JoinStatus == 1);
 
         var joinedRoomMatchIds = joinedRoomRequests.Select(rr => rr.RoomMatchId).ToList();
 
@@ -112,9 +113,10 @@ public class GetAllRoomMatchesHandler : IRequestHandler<GetAllRoomMatchesCommand
         var allRoomMatchIds = joinedRoomMatchIds.Concat(initialMembersRoomMatchIds).Distinct().ToList();
 
         var roomMatchesForJoined = await _beatSportsDbContext.RoomMatches
-            .Where(rm => allRoomMatchIds.Contains(rm.Id) && (rm.Booking.PlayingDate.Date > DateTime.Now.Date
+            .Where(rm => allRoomMatchIds.Contains(rm.Id)) 
+                                                            /*&& (rm.Booking.PlayingDate.Date > DateTime.Now.Date
                                                             || (rm.Booking.PlayingDate.Date == DateTime.Now.Date
-                                                                && rm.Booking.StartTimePlaying > DateTime.Now.TimeOfDay)))
+                                                                && rm.Booking.StartTimePlaying > DateTime.Now.TimeOfDay)))*/
             .Include(rm => rm.Booking)
                 .ThenInclude(b => b.CourtSubdivision)
                     .ThenInclude(cs => cs.Court)
