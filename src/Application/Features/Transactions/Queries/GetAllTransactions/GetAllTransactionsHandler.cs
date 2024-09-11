@@ -119,6 +119,19 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
                 .FirstOrDefault(x => x.Id == transaction.WalletTargetId);
 
             var toUserResponse = new UserInfo();
+            var fromUserResponse = new UserInfo();
+            if (fromUserResponse != null && (transaction.TransactionType != "RefundRoomMaster" || transaction.TransactionType != "RefundRoomMember"))
+            {
+                fromUserResponse.Name = fromUser.Account.FirstName + " " + fromUser.Account.LastName;
+                fromUserResponse.WalletId = transaction.WalletTargetId;
+                fromUserResponse.Role = fromUser.Account.Role;
+            }
+            else if (fromUserResponse != null && (transaction.TransactionType == "RefundRoomMaster" || transaction.TransactionType == "RefundRoomMember"))
+            {
+                toUserResponse.Name = fromUser.Account.FirstName + " " + fromUser.Account.LastName;
+                toUserResponse.WalletId = transaction.WalletTargetId;
+                toUserResponse.Role = fromUser.Account.Role;
+            }
             if (toUser != null)
             {
                 toUserResponse.Name = toUser.Account.FirstName + " " + toUser.Account.LastName;
@@ -129,12 +142,7 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
             result.Items.Add(new TransactionResponseV2
             {
                 TransactionId = transaction.Id,
-                From = new UserInfo
-                {
-                    Name = fromUser.Account.FirstName + " " + fromUser.Account.LastName,
-                    WalletId = transaction.WalletId,
-                    Role = fromUser.Account.Role
-                },
+                From = fromUserResponse,
                 To = toUserResponse,
                 TransactionAmount = transaction.TransactionAmount,
                 TransactionStatus = transaction.TransactionStatus,
