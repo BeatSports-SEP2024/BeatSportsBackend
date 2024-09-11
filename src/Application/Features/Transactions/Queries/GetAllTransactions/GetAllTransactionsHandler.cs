@@ -140,7 +140,8 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
                 TransactionStatus = transaction.TransactionStatus,
                 AdminCheckStatus = transaction.AdminCheckStatus.ToString(),
                 TransactionDate = transaction.TransactionDate,
-                TransactionType = transaction.TransactionType
+                TransactionType = transaction.TransactionType,
+                RoomMatchId = transaction.RoomMatchId,
             });
         }
 

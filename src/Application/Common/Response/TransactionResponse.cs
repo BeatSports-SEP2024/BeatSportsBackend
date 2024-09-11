@@ -43,6 +43,7 @@ public class TransactionResponseV2
     public string AdminCheckStatus { get; set; }
     public DateTime? TransactionDate { get; set; }
     public string? TransactionType { get; set; }
+    public Guid? RoomMatchId { get; set; }
 }
 
 public class PaginatedTransactionResponse
