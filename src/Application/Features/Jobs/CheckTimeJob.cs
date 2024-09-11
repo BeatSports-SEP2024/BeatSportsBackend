@@ -497,7 +497,8 @@ public class CheckTimeJob
                                 TransactionMessage = "Hoàn trả tiền cho thành viên đội thắng cuộc thành công.",
                                 TransactionStatus = "Approved",
                                 AdminCheckStatus = AdminCheckEnums.Accepted,
-                                TransactionAmount = (totalAmountWin + totalAmountLose),
+                                TransactionAmount = ((transactionJoinRoomMatch.TransactionAmount
+                                                ?? throw new BadRequestException("Đã có lỗi, giao dịch tham gia phòng có số dư bằng 0.")) - costTeamWin),
                                 TransactionDate = DateTime.Now,
                                 TransactionType = "RefundRoomMember",
                                 RoomMatchId = room.Id,
@@ -603,7 +604,8 @@ public class CheckTimeJob
                                 TransactionMessage = "Hoàn trả tiền cho thành viên đội thắng cuộc thành công.",
                                 TransactionStatus = "Approved",
                                 AdminCheckStatus = AdminCheckEnums.Accepted,
-                                TransactionAmount = (totalAmountWin + totalAmountLose),
+                                TransactionAmount = ((transactionJoinRoomMatch.TransactionAmount
+                                                ?? throw new BadRequestException("Đã có lỗi, giao dịch tham gia phòng có số dư bằng 0.")) - costTeamWin),
                                 TransactionDate = DateTime.Now,
                                 TransactionType = "RefundRoomMember",
                                 RoomMatchId = room.Id,
