@@ -120,17 +120,21 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
 
             var toUserResponse = new UserInfo();
             var fromUserResponse = new UserInfo();
-            if (fromUserResponse != null && (transaction.TransactionType != "RefundRoomMaster" || transaction.TransactionType != "RefundRoomMember"))
+            if (fromUser != null && transaction.TransactionType != "RefundRoomMaster" && transaction.TransactionType != "RefundRoomMember")
             {
                 fromUserResponse.Name = fromUser.Account.FirstName + " " + fromUser.Account.LastName;
-                fromUserResponse.WalletId = transaction.WalletTargetId;
+                fromUserResponse.WalletId = transaction.WalletId;
                 fromUserResponse.Role = fromUser.Account.Role;
             }
-            else if (fromUserResponse != null && (transaction.TransactionType == "RefundRoomMaster" || transaction.TransactionType == "RefundRoomMember"))
+            if (transaction.TransactionType == "RefundRoomMaster" || transaction.TransactionType == "RefundRoomMember")
             {
-                toUserResponse.Name = fromUser.Account.FirstName + " " + fromUser.Account.LastName;
-                toUserResponse.WalletId = transaction.WalletTargetId;
-                toUserResponse.Role = fromUser.Account.Role;
+                if (fromUser != null)
+                {
+                    // For refund transactions, set 'to' user details based on 'fromUser'
+                    toUserResponse.Name = fromUser.Account.FirstName + " " + fromUser.Account.LastName;
+                    toUserResponse.WalletId = fromUser.Id;
+                    toUserResponse.Role = fromUser.Account.Role;
+                }
             }
             if (toUser != null)
             {
