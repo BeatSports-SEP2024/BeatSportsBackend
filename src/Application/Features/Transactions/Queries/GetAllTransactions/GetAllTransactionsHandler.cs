@@ -58,9 +58,12 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
         {
             if (!string.IsNullOrEmpty(request.KeyWord))
             {
-                filteredTransactions = filteredTransactions
-               .Where(t => t.RoomMatchId == Guid.Parse(request.KeyWord))
-               .ToList();
+                if (Guid.TryParse(request.KeyWord, out var roomMatchId))
+                {
+                    filteredTransactions = filteredTransactions
+                        .Where(t => t.RoomMatchId == roomMatchId)
+                        .ToList();
+                }
             }
         }
         if (request.Filter.Equals("TransactionType"))
