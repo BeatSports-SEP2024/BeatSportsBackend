@@ -54,6 +54,15 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
         var filteredTransactions = query.ToList();  // Tải toàn bộ giao dịch vào bộ nhớ
 
         // Bước 3: Lọc dữ liệu giao dịch dựa trên filter
+        if (request.Filter.Equals("RoomMatchId"))
+        {
+            if (!string.IsNullOrEmpty(request.KeyWord))
+            {
+                filteredTransactions = filteredTransactions
+               .Where(t => t.RoomMatchId == Guid.Parse(request.KeyWord))
+               .ToList();
+            }
+        }
         if (request.Filter.Equals("TransactionType"))
         {
             filteredTransactions = filteredTransactions
