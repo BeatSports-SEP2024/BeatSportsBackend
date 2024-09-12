@@ -22,10 +22,11 @@ public class GetAllTransactionByCustomerV1QueryHandler : IRequestHandler<GetAllT
                                                                       // Trường hợp khi ví của customer là điểm đi
                                                                       // Tức là nó "Nạp tiền"
                                                                       (x.WalletId == wallet.Id &&
-                                                                      x.TransactionType.Trim() == "Nạp tiền")
-                                                                      ||
-                                                                      (x.WalletId == wallet.Id &&
-                                                                      x.TransactionType.Trim() == "JoinRoom" || x.TransactionType.Trim() == "OutRoom" || x.TransactionType.Trim() == "RefundRoomMember")
+                                                                                 ( x.TransactionType.Trim() == "Nạp tiền" 
+                                                                                || x.TransactionType.Trim() == "JoinRoom"
+                                                                                || x.TransactionType.Trim() == "OutRoom"
+                                                                                || x.TransactionType.Trim() == "RefundRoomMember"
+                                                                                || x.TransactionType.Trim() == "RefundRoomMaster"))
                                                                       ||
                                                                       // Trường hợp trừ tiền là khi nó chuyển tiền
                                                                       (x.WalletId == wallet.Id &&
