@@ -43,7 +43,7 @@ public class GetAllTransactionsHandler : IRequestHandler<GetAllTransactionsComma
 
         // Bước 1: Lấy tất cả các giao dịch mà không bị xóa
         var query = _beatSportsDbContext.Transactions
-            .Where(t => !t.IsDelete)
+            .ToList()
             .OrderByDescending(b => b.Created);
 
         // Bước 2: Lấy toàn bộ dữ liệu người dùng để lọc về phía client
