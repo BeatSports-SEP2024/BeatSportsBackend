@@ -3,6 +3,7 @@ using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Rooms.RatingRooms.Queries.GetAllRating;
 using BeatSportsAPI.Application.Features.TransactionThridparty.Queries.GetAllTransactionForAdmin;
 using BeatSportsAPI.Application.Features.Wallets.Queries;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,7 @@ public class RatingRoomsController : ControllerBase
 
     [HttpGet]
     [Route("all")]
-    [CustomAuthorize]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<List<RatingRoomsResponse>> GetAllRating()
     {
         var response = await _mediator.Send(new GetAllRatingRoomsCommand());
