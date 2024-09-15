@@ -144,7 +144,7 @@ public class AuthController : ApiControllerBase
 
     [HttpPost]
     [Route("refresh-token")]
-    [CustomAuthorize]
+    [CustomAuthorize(RoleEnums.Admin, RoleEnums.Owner, RoleEnums.Customer)]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
     {
         var response = new BeatSportsResponse();
