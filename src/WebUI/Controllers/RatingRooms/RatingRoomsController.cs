@@ -1,4 +1,5 @@
-﻿using BeatSportsAPI.Application.Common.Response;
+﻿using BeatSportsAPI.Application.Common.Middlewares;
+using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Rooms.RatingRooms.Queries.GetAllRating;
 using BeatSportsAPI.Application.Features.TransactionThridparty.Queries.GetAllTransactionForAdmin;
 using BeatSportsAPI.Application.Features.Wallets.Queries;
@@ -20,6 +21,7 @@ public class RatingRoomsController : ControllerBase
 
     [HttpGet]
     [Route("all")]
+    [CustomAuthorize]
     public async Task<List<RatingRoomsResponse>> GetAllRating()
     {
         var response = await _mediator.Send(new GetAllRatingRoomsCommand());

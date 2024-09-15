@@ -1,10 +1,12 @@
 ﻿using BeatSportsAPI.Application.Common.Interfaces;
+using BeatSportsAPI.Application.Common.Middlewares;
 using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Feedbacks.Commands.UpdateFeedback;
 using BeatSportsAPI.Application.Features.Feedbacks.Queries.GetAllFeedbacksByCourtId;
 using BeatSportsAPI.Application.Features.Notifications.Commands.Update;
 using BeatSportsAPI.Application.Features.Notifications.Queries.GetNotificationsByAccount;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,12 +29,14 @@ public class PushNotificationController : ControllerBase
 
     [HttpGet]
     [Route("get-by-account")]
+    [CustomAuthorize(RoleEnums.Customer, RoleEnums.Owner)]
     public async Task<List<NotificationResponse>> GetNotificationByAccount([FromQuery] GetNotificationByAccountCommand request)
     {
         return await _mediator.Send(request);
     }
     [HttpPut]
     [Route("is-readed")]
+    [CustomAuthorize(RoleEnums.Customer, RoleEnums.Owner)]
     public async Task<BeatSportsResponse> Update(UpdateNotificationIsReadCommand request)
     {
         return await _mediator.Send(request);
@@ -40,6 +44,7 @@ public class PushNotificationController : ControllerBase
 
     [HttpPost]
     [Route("register-push-token")]
+    [CustomAuthorize(RoleEnums.Customer, RoleEnums.Owner)]
     public IActionResult RegisterPushToken([FromBody] RegisterPushTokenRequest request)
     {
         

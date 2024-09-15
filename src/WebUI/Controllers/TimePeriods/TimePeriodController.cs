@@ -1,11 +1,11 @@
-﻿using BeatSportsAPI.Application.Common.Response;
+﻿using BeatSportsAPI.Application.Common.Middlewares;
+using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Courts.TimePeriod.Command.CreateTimePeriod;
 using BeatSportsAPI.Application.Features.Courts.TimePeriod.Command.DeleteTimePeriod;
 using BeatSportsAPI.Application.Features.Courts.TimePeriod.Command.UpdateTimePeriod;
 using BeatSportsAPI.Application.Features.Courts.TimePeriod.Queries;
 using BeatSportsAPI.Application.Features.Courts.TimePeriod.Queries.GetTimePeriodById;
-
-
+using BeatSportsAPI.Domain.Enums;
 /*using BeatSportsAPI.Application.Features.Courts.TimePeriod.Queries;
 using BeatSportsAPI.Application.Features.Courts.TimePeriod.Queries.GetTimePeriodById;*/
 using MediatR;
@@ -23,6 +23,7 @@ public class TimePeriodController : ApiControllerBase
 
     [HttpGet]
     [Route("get-by-time-period-id")]
+    [CustomAuthorize(RoleEnums.Customer, RoleEnums.Owner)]
     public async Task<IActionResult> GetTimePeriodById([FromQuery] GetTimePeriodByIdQuery request)
     {
         if (!ModelState.IsValid)
@@ -34,6 +35,7 @@ public class TimePeriodController : ApiControllerBase
         return Ok(response);
     }
     [HttpGet]
+    [CustomAuthorize(RoleEnums.Customer, RoleEnums.Owner)]
     public async Task<IActionResult> GetTimePeriod([FromQuery] GetTimePeriodCommand request)
     {
         if (!ModelState.IsValid)
@@ -45,6 +47,7 @@ public class TimePeriodController : ApiControllerBase
         return Ok(response);
     }
     [HttpPost]
+    [CustomAuthorize(RoleEnums.Owner)]
     public async Task<IActionResult> CreateTimePeriod([FromBody] CreateTimePeriodCommand request)
     {
         if (!ModelState.IsValid)
@@ -56,6 +59,7 @@ public class TimePeriodController : ApiControllerBase
         return Ok(response);
     }
     [HttpPut]
+    [CustomAuthorize(RoleEnums.Owner)]
     public async Task<IActionResult> UpdateTimePeriod([FromBody] UpdateTimePeriodCommand request)
     {
         if (!ModelState.IsValid)
@@ -66,6 +70,7 @@ public class TimePeriodController : ApiControllerBase
         return Ok(response);
     }
     [HttpDelete]
+    [CustomAuthorize(RoleEnums.Owner)]
     public async Task<IActionResult> DeleteTimePeriod([FromQuery] DeleteTimePeriodCommand request)
     {
         if (!ModelState.IsValid)

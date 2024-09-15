@@ -1,7 +1,9 @@
-﻿using BeatSportsAPI.Application.Features.Rooms.Levels.Commands;
+﻿using BeatSportsAPI.Application.Common.Middlewares;
+using BeatSportsAPI.Application.Features.Rooms.Levels.Commands;
 using BeatSportsAPI.Application.Features.Rooms.Levels.Queries;
 using BeatSportsAPI.Application.Features.Sports.Commands;
 using BeatSportsAPI.Application.Features.Sports.Queries;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +19,7 @@ public class LevelController : ApiControllerBase
     }
 
     [HttpGet]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<IActionResult> GetAllLevel([FromQuery] GetAllLevelCommand request)
     {
         if (!ModelState.IsValid)
@@ -28,6 +31,7 @@ public class LevelController : ApiControllerBase
         return Ok(response);
     }
     [HttpPost]
+    [CustomAuthorize]
     public async Task<IActionResult> CreateNewLevel(CreateLevelCommand request)
     {
         if (!ModelState.IsValid)
@@ -39,6 +43,7 @@ public class LevelController : ApiControllerBase
         return Ok(response);
     }
     [HttpPut]
+    [CustomAuthorize]
     public async Task<IActionResult> UpdateLevel(UpdateLevelCommand request)
     {
         if (!ModelState.IsValid)
@@ -50,6 +55,7 @@ public class LevelController : ApiControllerBase
         return Ok(response);
     }
     [HttpDelete]
+    [CustomAuthorize]
     public async Task<IActionResult> DeleteLevel([FromQuery] DeleteLevelCommand request)
     {
         if (!ModelState.IsValid)

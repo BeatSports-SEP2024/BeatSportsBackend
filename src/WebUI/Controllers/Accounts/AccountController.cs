@@ -25,6 +25,7 @@ public class AccountController : ApiControllerBase
         return Ok(response);
     }
     [HttpGet("account-id")]
+    [CustomAuthorize]
     public async Task<IActionResult> GetAccountById([FromQuery] GetAccountByIdCommand request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)

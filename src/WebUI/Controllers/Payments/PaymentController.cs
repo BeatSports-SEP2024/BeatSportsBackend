@@ -1,12 +1,14 @@
 ﻿using System.Net;
 using BeatSportsAPI.Application.Common.Base;
 using BeatSportsAPI.Application.Common.Interfaces;
+using BeatSportsAPI.Application.Common.Middlewares;
 using BeatSportsAPI.Application.Features.Wallets.Commands.CreateDeposits;
 using BeatSportsAPI.Application.Features.Wallets.Commands.CreateWithdrawls;
 using BeatSportsAPI.Application.Features.Wallets.Commands.ProcessMomoPaymentReturnCommand;
 using BeatSportsAPI.Application.Features.Wallets.Commands.ProcessVnpayPaymentReturnCommand;
 using BeatSportsAPI.Application.Features.Wallets.Commands.ProcessZalopayPaymentReturnCommand;
 using BeatSportsAPI.Application.Features.Wallets.Dtos;
+using BeatSportsAPI.Domain.Enums;
 using Duende.IdentityServer.Extensions;
 using Mapster;
 using MediatR;
@@ -46,6 +48,7 @@ public class PaymentController : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(BaseResultWithData<PaymentLinkDtos>), 200)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<PaymentLinkDtos> Create([FromBody] PaymentByThirdWalletCommand request)
     {
         var response = await mediator.Send(request);

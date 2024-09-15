@@ -179,7 +179,8 @@ public class IdentityService : IIdentityService
             claims.Add(new Claim("CustomerId", user.Customer.Id.ToString()));
         }
 
-        var expiry = DateTime.UtcNow.AddHours(7);
+        //var expiry = DateTime.UtcNow.AddHours(7);
+        var expiry = DateTime.UtcNow.AddMinutes(1);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Issuer = issuer,
@@ -305,16 +306,24 @@ public class IdentityService : IIdentityService
         }
         var walletExist = await _beatSportsDbContext.Wallets.Where(w => w.AccountId == user.Id).SingleOrDefaultAsync();
 
+        var isAdmin = user.Role.Equals("Admin", StringComparison.OrdinalIgnoreCase);
+        Console.WriteLine(isAdmin);
 
-        var id = Guid.NewGuid();
+        Guid adminId = isAdmin ? user.Id : Guid.Empty;
 
-        if (user.Customer == null)
+        Guid id = Guid.NewGuid();
+
+        if (isAdmin)
         {
-            id = user.Owner.Id;
+            id = adminId; 
         }
-        else
+        else if (user.Customer == null)
         {
-            id = user.Customer.Id;
+            id = user.Owner.Id;  
+        }
+        else if (user.Owner == null)
+        {
+            id = user.Customer.Id; 
         }
 
         var loginModel = new LoginModelRequest
@@ -344,8 +353,7 @@ public class IdentityService : IIdentityService
                 AccountId = user.Id,
                 FullName = user.FirstName +" "+ user.LastName,
                 Email = user.Email,
-                WalletId = walletExist.Id,
-                
+                WalletId = walletExist?.Id ?? Guid.Empty, 
             }
         };
         return loginResponse;

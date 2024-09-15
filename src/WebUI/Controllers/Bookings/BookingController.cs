@@ -19,6 +19,8 @@ using BeatSportsAPI.Application.Features.Bookings.Queries.GetVenueBarchartByRang
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetBookingByCourtId;
 using BeatSportsAPI.Application.Features.Bookings.Queries.GetIncomeByBookingByCourtId;
 using BeatSportsAPI.Application.Features.Bookings.Commands.CheckInBooking;
+using BeatSportsAPI.Application.Common.Middlewares;
+using BeatSportsAPI.Domain.Enums;
 
 namespace WebAPI.Controllers.Bookings;
 
@@ -31,23 +33,27 @@ public class BookingController : ApiControllerBase
         _mediator = mediator;
     }
     [HttpGet]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<PaginatedList<BookingResponse>> GetAll([FromQuery] GetAllBookingCommand request)
     {
         return await _mediator.Send(request);
     }
     [HttpGet]
     [Route("dashboard")]
+    [CustomAuthorize(RoleEnums.Admin, RoleEnums.Owner)]
     public async Task<BookingDashboardResult> DashboardResult([FromQuery] GetBookingDashboardCommand request)
     {
         return await _mediator.Send(request);
     }
     [HttpPost]
     [Route("check-in")]
+    [CustomAuthorize(RoleEnums.Owner)]
     public async Task<BeatSportsResponse> CheckInBooking([FromBody] CheckInBookingCommand request)
     {
         return await _mediator.Send(request);
     }
     [HttpPost]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<IActionResult> Create(CreateBookingCommand request)
     {
         var response = await _mediator.Send(request);
@@ -71,12 +77,14 @@ public class BookingController : ApiControllerBase
     }
     [HttpGet]
     [Route("get-by-customer-id")]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<PaginatedList<BookingByCustomerId>> GetByCourtId([FromQuery] GetAllBookingsByCustomerIdCommand request)
     {
         return await _mediator.Send(request);
     }
     [HttpGet]
     [Route("get-booking-detail-before-finish")]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<BookingDetailReadyForFinishBookingResponse> GetBookingDetailReadyForFinishBookingResponse([FromQuery] GetBookingDetailReadyForFinishBookingQuery request)
     {
         var response = await _mediator.Send(request);
@@ -91,6 +99,7 @@ public class BookingController : ApiControllerBase
     }
     [HttpGet]
     [Route("get-history-by-customer-id")]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<List<BookingHistoryByCustomerId>> GetHistoryByCustomerId([FromQuery] GetBookingHistoryByCusIdCommand request)
     {
         return await _mediator.Send(request);
@@ -98,6 +107,7 @@ public class BookingController : ApiControllerBase
 
     [HttpGet]
     [Route("get-detail-history-by-customer-id")]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<BookingHistoryDetailByCustomerId> GetDetailHistoryByCustomerId([FromQuery] GetDetailBookingHistoryByCusIdCommand request)
     {
         return await _mediator.Send(request);
@@ -105,6 +115,8 @@ public class BookingController : ApiControllerBase
 
     [HttpGet]
     [Route("get-detail-history-by-booking-id")]
+    //[CustomAuthorize(RoleEnums.Admin, RoleEnums.Owner)]
+    //[CustomAuthorize(RoleEnums.Owner)]
     public async Task<BookingHistoryDetailByCustomerId> GetDetailHistoryByBookingId([FromQuery] GetDetailBookingHistoryByBookingIdCommand request)
     {
         return await _mediator.Send(request);
@@ -112,14 +124,15 @@ public class BookingController : ApiControllerBase
 
     [HttpGet]
     [Route("get-detail-history-by-booking-id-and-owner-id")]
+    [CustomAuthorize(RoleEnums.Owner)]
     public async Task<BookingHistoryDetailByCustomerId> GetDetailHistoryByBookingIdAndOwnerId([FromQuery] GetDetailBookingHistoryByBookingIdAndOwnerIdCommand request)
     {
         return await _mediator.Send(request);
     }
 
-
     [HttpPut]
     [Route("cancel-booking-process")]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<BeatSportsResponse> CancelBookingProcess([FromBody] CancelBookingProcessCommand request)
     {
         return await _mediator.Send(request);
@@ -127,6 +140,7 @@ public class BookingController : ApiControllerBase
 
     [HttpPut]
     [Route("cancel-booking-approve")]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<BeatSportsResponse> CancelBookingApprove([FromBody] CancelBookingApproveCommand request)
     {
         return await _mediator.Send(request);
@@ -134,6 +148,7 @@ public class BookingController : ApiControllerBase
 
     [HttpGet]
     [Route("invoice")]
+    [CustomAuthorize(RoleEnums.Owner)]
     public async Task<List<BookingFinishForInvoiceResponse>> GetInvoice([FromQuery] GetBookingFinishForInvoiceQuery request)
     {
         if (!ModelState.IsValid)
@@ -145,6 +160,7 @@ public class BookingController : ApiControllerBase
 
     [HttpGet]
     [Route("venue-bar-chart")]
+    [CustomAuthorize(RoleEnums.Owner)]
     public async Task<List<VenueBarchartResponse>> GetVenueBarchart([FromQuery] GetVenueBarchartByRangeDateCommand request)
     {
         if (!ModelState.IsValid)
@@ -155,6 +171,8 @@ public class BookingController : ApiControllerBase
     }
     [HttpGet]
     [Route("booking-by-court-id")]
+    //[CustomAuthorize(RoleEnums.Admin, RoleEnums.Owner)]
+    //[CustomAuthorize(RoleEnums.Owner)]
     public async Task<PaginatedList<GetBookingByCourtIdResponse>> GetAllBookingByCourtId([FromQuery] GetBookingByCourtIdCommand request)
     {
         return await _mediator.Send(request);

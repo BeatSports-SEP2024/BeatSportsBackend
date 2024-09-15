@@ -1,4 +1,5 @@
-﻿using BeatSportsAPI.Application.Common.Models;
+﻿using BeatSportsAPI.Application.Common.Middlewares;
+using BeatSportsAPI.Application.Common.Models;
 using BeatSportsAPI.Application.Common.Response;
 using BeatSportsAPI.Application.Features.Campaigns.Commands.CreateCampaign;
 using BeatSportsAPI.Application.Features.Campaigns.Commands.DeleteCampaign;
@@ -12,6 +13,7 @@ using BeatSportsAPI.Application.Features.Feedbacks.Queries.GetAllFeedbacks;
 using BeatSportsAPI.Application.Features.Feedbacks.Queries.GetAllFeedbacksByCourtId;
 using BeatSportsAPI.Application.Features.Feedbacks.Queries.GetFeedbackByBookingId;
 using BeatSportsAPI.Application.Features.Feedbacks.Queries.GetFeedbackById;
+using BeatSportsAPI.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,6 +29,7 @@ public class FeedbackController : ApiControllerBase
     }
 
     [HttpPost]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<BeatSportsResponse> Create(CreateFeedbackCommand request)
     {
         return await _mediator.Send(request);
@@ -43,12 +46,14 @@ public class FeedbackController : ApiControllerBase
     }
     [HttpGet]
     [Route("get-by-feedback-id")]
+    [CustomAuthorize]
     public async Task<FeedbackResponse> GetByFeedbackId([FromQuery] GetFeedbackByIdCommand request)
     {
         return await _mediator.Send(request);
     }
     [HttpGet]
     [Route("get-by-court-id")]
+    [CustomAuthorize]
     public async Task<PaginatedList<FeedbackResponse>> GetByCourtId([FromQuery] GetAllFeedbackByCourtIdCommand request)
     {
         return await _mediator.Send(request);
@@ -56,6 +61,7 @@ public class FeedbackController : ApiControllerBase
 
     [HttpGet]
     [Route("get-by-booking-id")]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<FeedbackResponse> GetByBookingId([FromQuery] GetFeedbackByBookingIdCommand request)
     {
         return await _mediator.Send(request);
