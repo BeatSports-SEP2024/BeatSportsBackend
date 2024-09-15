@@ -88,22 +88,22 @@ public class CourtSubdivisionController : ApiControllerBase
     }
     [HttpPut]
     [Route("accept-courtsub")]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<BeatSportsResponse> UpdateStatus(AcceptCourtSubdivisionCommand request)
     {
         return await _mediator.Send(request);
     }
-    [HttpGet]
-    [Route("court-sub-checking-v1")]
-    public async Task<CourtSubCheckedResponse> GetCourtSubAvailableV1([FromQuery] GetAllCourtSubAvailableByTimeV1Command request)
-    {
-        return await _mediator.Send(request);
-    }
+    //[HttpGet]
+    //[Route("court-sub-checking-v1")]
+    //public async Task<CourtSubCheckedResponse> GetCourtSubAvailableV1([FromQuery] GetAllCourtSubAvailableByTimeV1Command request)
+    //{
+    //    return await _mediator.Send(request);
+    //}
 
-    [HttpGet]
-    [Route("court-sub-checking-v2")]
-    public async Task<CourtSubCheckedResponseV2> GetCourtSubAvailableV2([FromQuery] GetAllCourtSubAvailableByTimeV2Command request)
-    {
-        return await _mediator.Send(request);
-    }
+    //[HttpGet]
+    //[Route("court-sub-checking-v2")]
+    //public async Task<CourtSubCheckedResponseV2> GetCourtSubAvailableV2([FromQuery] GetAllCourtSubAvailableByTimeV2Command request)
+    //{
+    //    return await _mediator.Send(request);
+    //}
 }

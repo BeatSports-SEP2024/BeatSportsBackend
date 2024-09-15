@@ -54,22 +54,21 @@ public class CampaignController : ApiControllerBase
     }
     [HttpGet]
     [Route("all")]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<PaginatedList<CampaignResponseV2>> GetAll([FromQuery] GetAllCampaignsCommand request)
     {
         return await _mediator.Send(request);
     }
     [HttpGet]
     [Route("get-by-campaign-id")]
-    [CustomAuthorize(RoleEnums.Owner)]
-    //[CustomAuthorize(RoleEnums.Owner, RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Owner, RoleEnums.Admin)]
     public async Task<CampaignResponseV3> GetByCampaignId([FromQuery] GetCampaignByIdCommand request)
     {
         return await _mediator.Send(request);
     }
     [HttpGet]
     [Route("list-pending")]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<PaginatedList<CampaignResponseV2>> GetCampaignListPending([FromQuery] GetAllCampaignWithPendingCommand request)
     {
         return await _mediator.Send(request);
@@ -92,7 +91,7 @@ public class CampaignController : ApiControllerBase
     }
     [HttpPut]
     [Route("accept-campaign")]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<BeatSportsResponse> UpdateStatus(UpdateStatusOfCampaignCommand request)
     {
         return await _mediator.Send(request);

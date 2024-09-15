@@ -31,6 +31,7 @@ public class LevelController : ApiControllerBase
         return Ok(response);
     }
     [HttpPost]
+    [CustomAuthorize]
     public async Task<IActionResult> CreateNewLevel(CreateLevelCommand request)
     {
         if (!ModelState.IsValid)
@@ -42,6 +43,7 @@ public class LevelController : ApiControllerBase
         return Ok(response);
     }
     [HttpPut]
+    [CustomAuthorize]
     public async Task<IActionResult> UpdateLevel(UpdateLevelCommand request)
     {
         if (!ModelState.IsValid)
@@ -53,6 +55,7 @@ public class LevelController : ApiControllerBase
         return Ok(response);
     }
     [HttpDelete]
+    [CustomAuthorize]
     public async Task<IActionResult> DeleteLevel([FromQuery] DeleteLevelCommand request)
     {
         if (!ModelState.IsValid)

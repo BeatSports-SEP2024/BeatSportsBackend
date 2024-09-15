@@ -35,7 +35,7 @@ public class TransactionThirdpartyController : ApiControllerBase
     }
 
     [HttpGet]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<TransactionThirdpartyForAdminResponse> GetTransactionsThridpartyByAdmin()
     {
         var response = await _mediator.Send(new GetTransactionsForAdminCommand());

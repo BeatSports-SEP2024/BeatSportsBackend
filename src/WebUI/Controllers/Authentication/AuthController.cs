@@ -144,6 +144,7 @@ public class AuthController : ApiControllerBase
 
     [HttpPost]
     [Route("refresh-token")]
+    [CustomAuthorize]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
     {
         var response = new BeatSportsResponse();
@@ -168,7 +169,7 @@ public class AuthController : ApiControllerBase
     [HttpPost]
     [Route("register/owner")]
     [SwaggerOperation("Create new owner with default wallet")]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> RegisterOwner([FromBody] RegisterOwnerModelRequest request, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)

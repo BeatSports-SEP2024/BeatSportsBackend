@@ -40,7 +40,7 @@ public class BookingController : ApiControllerBase
     }
     [HttpGet]
     [Route("dashboard")]
-    //[CustomAuthorize(RoleEnums.Admin, RoleEnums.Owner)]
+    [CustomAuthorize(RoleEnums.Admin, RoleEnums.Owner)]
     public async Task<BookingDashboardResult> DashboardResult([FromQuery] GetBookingDashboardCommand request)
     {
         return await _mediator.Send(request);

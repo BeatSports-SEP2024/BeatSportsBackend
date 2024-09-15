@@ -28,6 +28,7 @@ public class OwnerController : ApiControllerBase
     }
 
     [HttpDelete]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<BeatSportsResponse> Delete(DeleteOwnerCommand request)
     {
         return await _mediator.Send(request);
@@ -40,14 +41,14 @@ public class OwnerController : ApiControllerBase
     }
     [HttpGet]
     [SwaggerOperation("Get list of owners")]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<PaginatedList<OwnerResponse>> GetAll([FromQuery] GetAllOwnersCommand request)
     {
         return await _mediator.Send(request);
     }
     [HttpGet("id")]
     [SwaggerOperation("Get owner by Id")]
-    [CustomAuthorize(RoleEnums.Owner)]
+    [CustomAuthorize(RoleEnums.Owner, RoleEnums.Admin)]
     public async Task<IActionResult> GetOwnerById([FromQuery] GetOwnerByIdCommand request)
     {
         var response = await _mediator.Send(request);
@@ -56,7 +57,7 @@ public class OwnerController : ApiControllerBase
     }
     [HttpGet("owner-id")]
     [SwaggerOperation("Get owner with relative court by Id")]
-    //[CustomAuthorize(RoleEnums.Admin)]
+    [CustomAuthorize(RoleEnums.Admin)]
     public async Task<IActionResult> GetCourtRelativeOwner([FromQuery] GetOwnerByIdWithCourtCommand request)
     {
         var response = await _mediator.Send(request);
