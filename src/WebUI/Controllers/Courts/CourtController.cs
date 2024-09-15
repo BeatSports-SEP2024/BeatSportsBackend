@@ -50,16 +50,18 @@ public class CourtController : ApiControllerBase
         return await _mediator.Send(request);
     }
     [HttpPut]
+    [CustomAuthorize(RoleEnums.Admin, RoleEnums.Owner)]
     public async Task<BeatSportsResponse> Update(UpdateCourtCommand request)
     {
         return await _mediator.Send(request);
     }
     [HttpDelete]
+    [CustomAuthorize(RoleEnums.Admin, RoleEnums.Owner)]
     public async Task<BeatSportsResponse> Delete(DeleteCourtCommand request)
     {
         return await _mediator.Send(request);
     }
-    [HttpGet]
+    //[HttpGet]
     //public async Task<PaginatedList<CourtResponse>> GetAll([FromQuery] GetAllCourtCommand request)
     //{
     //    return await _mediator.Send(request);
