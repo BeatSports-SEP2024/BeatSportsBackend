@@ -180,7 +180,7 @@ public class IdentityService : IIdentityService
         }
 
         //var expiry = DateTime.UtcNow.AddHours(7);
-        var expiry = DateTime.UtcNow.AddMinutes(2);
+        var expiry = DateTime.UtcNow.AddMinutes(1);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Issuer = issuer,
