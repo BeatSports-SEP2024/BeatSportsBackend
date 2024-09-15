@@ -51,6 +51,7 @@ public class RoomMemberController : ApiControllerBase
 
     [HttpPost]
     [Route("swap-team")]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<BeatSportsResponse> CreateSwapTeam(SwapTeamInRoomMembersCommand request)
     {
         return await _mediator.Send(request);
@@ -58,6 +59,7 @@ public class RoomMemberController : ApiControllerBase
 
     [HttpPost]
     [Route("vote-team-win")]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<BeatSportsResponse> VoteTeam(RoomMatchesUpdateResultCommand request)
     {
         return await _mediator.Send(request);
