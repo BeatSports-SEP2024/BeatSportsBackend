@@ -24,17 +24,20 @@ public class CustomerController : ApiControllerBase
         _mediator = mediator;
     }
     [HttpDelete]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<BeatSportsResponse> Delete(DeleteCustomerCommand request)
     {
         return await _mediator.Send(request);
     }
     [HttpPut]
+    [CustomAuthorize(RoleEnums.Customer)]
     public async Task<BeatSportsResponse> Update(UpdateCustomerCommand request)
     {
         return await _mediator.Send(request);
     }
     [HttpGet]
     [SwaggerOperation("Get list of customers")]
+    [CustomAuthorize(RoleEnums.Customer, RoleEnums.Admin)]
     public async Task<PaginatedList<CustomerResponse>> GetAll([FromQuery] GetAllCustomersCommand request)
     {
         return await _mediator.Send(request);

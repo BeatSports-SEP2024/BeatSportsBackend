@@ -115,7 +115,7 @@ public class BookingController : ApiControllerBase
 
     [HttpGet]
     [Route("get-detail-history-by-booking-id")]
-    //[CustomAuthorize(RoleEnums.Admin, RoleEnums.Owner)]
+    [CustomAuthorize(RoleEnums.Admin, RoleEnums.Owner)]
     //[CustomAuthorize(RoleEnums.Owner)]
     public async Task<BookingHistoryDetailByCustomerId> GetDetailHistoryByBookingId([FromQuery] GetDetailBookingHistoryByBookingIdCommand request)
     {
@@ -171,7 +171,7 @@ public class BookingController : ApiControllerBase
     }
     [HttpGet]
     [Route("booking-by-court-id")]
-    //[CustomAuthorize(RoleEnums.Admin, RoleEnums.Owner)]
+    [CustomAuthorize(RoleEnums.Admin, RoleEnums.Owner)]
     //[CustomAuthorize(RoleEnums.Owner)]
     public async Task<PaginatedList<GetBookingByCourtIdResponse>> GetAllBookingByCourtId([FromQuery] GetBookingByCourtIdCommand request)
     {
@@ -179,6 +179,7 @@ public class BookingController : ApiControllerBase
     }
     [HttpGet]
     [Route("income-by-court-id")]
+    [CustomAuthorize(RoleEnums.Owner)]
     public async Task<List<IncomeByBookingResponse>> GetIncomeByCourtId([FromQuery] GetIncomeByBookingByCourtIdQuery request)
     {
         return await _mediator.Send(request);
