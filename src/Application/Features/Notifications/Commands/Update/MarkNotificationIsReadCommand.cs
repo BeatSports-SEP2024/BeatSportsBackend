@@ -32,17 +32,19 @@ public class MarkNotificationIsReadCommandHandler : IRequestHandler<MarkNotifica
                 Message = "Tất cả thông báo đã được đánh dấu đã đọc hết rồi!!"
             };
         }
-
-        foreach (var notification in notifications)
+        else
         {
-            notification.IsRead = true;
-            _dbContext.Notifications.Update(notification);
+            foreach (var notification in notifications)
+            {
+                notification.IsRead = true;
+                _dbContext.Notifications.Update(notification);
+            }
+            await _dbContext.SaveChangesAsync();
+
+            return new BeatSportsResponse
+            {
+                Message = "Tất cả thông báo đã được đánh dấu đã đọc thành công !!!"
+            };
         }
-        await _dbContext.SaveChangesAsync();
-
-        return new BeatSportsResponse
-        {
-            Message = "Tất cả thông báo đã được đánh dấu đã đọc thành công !!!"
-        };
     }
 }
