@@ -42,6 +42,14 @@ public class PushNotificationController : ControllerBase
         return await _mediator.Send(request);
     }
 
+    [HttpPut]
+    [Route("mark-all/is-readed")]
+    [CustomAuthorize(RoleEnums.Customer, RoleEnums.Owner)]
+    public async Task<BeatSportsResponse> UpdateAllNotiIsRead(MarkNotificationIsReadCommand request)
+    {
+        return await _mediator.Send(request);
+    }
+
     [HttpPost]
     [Route("register-push-token")]
     [CustomAuthorize(RoleEnums.Customer, RoleEnums.Owner)]
