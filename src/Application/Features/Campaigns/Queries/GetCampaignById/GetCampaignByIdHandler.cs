@@ -26,7 +26,8 @@ public class GetCampaignByIdHandler : IRequestHandler<GetCampaignByIdCommand, Ca
     public Task<CampaignResponseV3> Handle(GetCampaignByIdCommand request, CancellationToken cancellationToken)
     {
         var campaign = _dbContext.Campaigns
-                    .Where(x => x.Id == request.CampaignId && !x.IsDelete)
+                    .Where(x => x.Id == request.CampaignId && !x.IsDelete
+                        && x.EndDateApplying >= DateTime.Now)
                     .ToList();
         var court = _dbContext.Courts
                     .Where(x => x.Id == campaign.FirstOrDefault().CourtId)
