@@ -24,7 +24,9 @@ public class MarkNotificationIsReadCommandHandler : IRequestHandler<MarkNotifica
     }
     public async Task<BeatSportsResponse> Handle(MarkNotificationIsReadCommand request, CancellationToken cancellationToken)
     {
-        var notifications = await _dbContext.Notifications.Where(n => n.AccountId == request.AccountId).ToListAsync();
+        var notifications = await _dbContext.Notifications
+                            .Where(n => n.AccountId == request.AccountId 
+                                        && n.IsRead == false).ToListAsync();
         if (notifications == null || !notifications.Any())
         {
             return new BeatSportsResponse
