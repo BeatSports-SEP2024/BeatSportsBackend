@@ -33,7 +33,7 @@ public class GetAllCampaignWithPendingHandler : IRequestHandler<GetAllCampaignWi
         }
 
         var query = _dbContext.Campaigns
-            .Where(x => !x.IsDelete && x.Status == 0);
+            .Where(x => !x.IsDelete && x.Status == 0 && x.EndDateApplying >= DateTime.Now);
 
         if (request.StartDate.HasValue && request.EndDate.HasValue)
         {

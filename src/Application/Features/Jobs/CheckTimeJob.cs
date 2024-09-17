@@ -771,4 +771,19 @@ public class CheckTimeJob
             _beatSportsDbContext.SaveChanges();
         }
     }
+    public void CheckCampaignDate()
+    {
+        var campaignExpired = _beatSportsDbContext.Campaigns
+            .Where(c => !c.IsDelete 
+                    && c.EndDateApplying < DateTime.Now 
+                    && c.Status != StatusEnums.Expired) 
+            .ToList();
+
+        foreach (var campaign in campaignExpired)
+        {
+            campaign.Status = StatusEnums.Expired;
+        }
+
+        _beatSportsDbContext.SaveChanges(); 
+    }
 }
