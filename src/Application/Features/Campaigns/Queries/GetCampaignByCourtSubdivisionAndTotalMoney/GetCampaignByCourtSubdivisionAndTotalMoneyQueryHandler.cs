@@ -18,7 +18,9 @@ public class GetCampaignByCourtSubdivisionAndTotalMoneyQueryHandler : IRequestHa
     public async Task<PaginatedList<CampaignResponseV7>> Handle(GetCampaignByCourtSubdivisionAndTotalMoneyQuery request, CancellationToken cancellationToken)
     {
         var courtSub = await _dbContext.CourtSubdivisions.Where(x => x.Id == request.CourtSubdivisionId).SingleAsync();
-        var campaign = await _dbContext.Campaigns.Where(x => x.CourtId == courtSub.CourtId && !x.IsDelete && x.Status == Domain.Enums.StatusEnums.Accepted)
+        var campaign = await _dbContext.Campaigns.Where(x => x.CourtId == courtSub.CourtId 
+        && !x.IsDelete && x.Status == Domain.Enums.StatusEnums.Accepted
+        && x.EndDateApplying >= DateTime.Now)
             .Select(x => new CampaignResponseV7
             {
                 CampaignId = x.Id,
