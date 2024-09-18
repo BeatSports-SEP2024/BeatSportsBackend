@@ -13,6 +13,7 @@ using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactions
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllTransactionsByCustomer;
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetAllWithdrawalRequestByOwner;
 using BeatSportsAPI.Application.Features.Transactions.Queries.GetDetailWithdrawalRequestByOwner;
+using BeatSportsAPI.Application.Features.Transactions.Queries.GetDetailWithdrawWhenAccept;
 using BeatSportsAPI.Application.Features.Wallets.Queries;
 using BeatSportsAPI.Domain.Enums;
 using MediatR;
@@ -237,6 +238,19 @@ public class TransactionController : ApiControllerBase
     //[CustomAuthorize(RoleEnums.Owner)]
     [CustomAuthorize(RoleEnums.Owner, RoleEnums.Admin)]
     public async Task<IActionResult> MonthlyFeeOverview([FromQuery] OwnerPayFeeOverviewCommand request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var response = await _mediator.Send(request);
+
+        return Ok(response);
+    }
+    [HttpGet]
+    [Route("transaction-withdraw-detail")]
+    [CustomAuthorize(RoleEnums.Admin)]
+    public async Task<IActionResult> TransactionWithdrawDetail([FromQuery] GetDetailWithdrawWhenAcceptCommand request)
     {
         if (!ModelState.IsValid)
         {
