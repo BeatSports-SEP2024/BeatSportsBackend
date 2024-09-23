@@ -34,7 +34,7 @@ public class GetCampaignListByFilterHandler : IRequestHandler<GetCampaignListByF
                 break;
 
             case "Closed":
-                query = query.Where(tp => (int)tp.Status == 3 
+                query = query.Where(tp => (int)tp.Status == 4 
                     && tp.Court.Id == request.CourtId 
                     && tp.Court.Owner.Id == request.OwnerId);
                 break;
