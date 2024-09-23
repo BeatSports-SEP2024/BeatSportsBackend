@@ -31,7 +31,7 @@ public class GetCampaignFilterHandler : IRequestHandler<GetCampaignFilterCommand
                 CampaignImageUrl = c.CampaignImageURL,
             }).Take(3).ToList();
 
-        var historyCampaigns = query.Where(c => (int)c.Status == 3 
+        var historyCampaigns = query.Where(c => (int)c.Status == 4 
             && c.Court.Id == request.CourtId 
             && c.Court.Owner.Id == request.OwnerId
             && c.EndDateApplying <= DateTime.Now)
