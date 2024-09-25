@@ -293,7 +293,11 @@ public class CheckTimeJob
                 // kiểm tra nếu vote == nhau thì reset gửi mail, thông báo cho các thành viên vote lại
                 if (voteTeamA.Count == voteTeamB.Count)
                 {
-                    if (room.VoteCount < 2)
+                    if(room.VoteCount > 2)
+                    {
+                        return;
+                    }
+                    else if (room.VoteCount < 2)
                     {
                         room.VoteCount++;
                         var memberInRoom = _beatSportsDbContext.RoomMembers.Where(rm => rm.RoomMatchId == room.Id).ToList();
@@ -424,8 +428,9 @@ public class CheckTimeJob
                             }
                         }
                     }
-                    else
+                    else if (room.VoteCount == 2) 
                     {
+                        room.VoteCount++;
                         var roomMemberA = _beatSportsDbContext.RoomMembers
                                                    .Where(rm => rm.RoomMatchId == room.Id
                                                                && rm.Team == "A")
