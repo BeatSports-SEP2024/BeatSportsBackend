@@ -137,10 +137,9 @@ public class CheckTimeJob
         var expiredRooms = _beatSportsDbContext.RoomMatches
             .Where(x => !x.IsDelete && x.StartTimeRoom <= DateTime.Now).ToList();
 
-        
         foreach (var room in expiredRooms)
         {
-            var transactionCheck = _beatSportsDbContext.Transactions.Where(x => x.RoomMatchId == room.Id 
+            var transactionCheck = _beatSportsDbContext.Transactions.Where(x => x.RoomMatchId == room.Id
                                                 && string.Compare(x.TransactionType, "RefundRoomMaster") == 0).ToList();
             if (transactionCheck.Any())
             {
@@ -294,47 +293,50 @@ public class CheckTimeJob
                 // kiểm tra nếu vote == nhau thì reset gửi mail, thông báo cho các thành viên vote lại
                 if (voteTeamA.Count == voteTeamB.Count)
                 {
-                    var memberInRoom = _beatSportsDbContext.RoomMembers.Where(rm => rm.RoomMatchId == room.Id).ToList();
-                    foreach (var member in memberInRoom)
+                    if (room.VoteCount < 2)
                     {
-                        member.MatchingResultStatus = "NoResult";
-                        _beatSportsDbContext.RoomMembers.Update(member);
-                        var customer = _beatSportsDbContext.Customers.Where(c => c.Id == member.CustomerId).SingleOrDefault();
-                        var notification = new Notification
+                        room.VoteCount++;
+                        var memberInRoom = _beatSportsDbContext.RoomMembers.Where(rm => rm.RoomMatchId == room.Id).ToList();
+                        foreach (var member in memberInRoom)
                         {
-                            AccountId = customer.AccountId,
-                            Title = "Cập nhật lại kết quả cho trận đấu",
-                            Message = "các thành viên trong phòng đã bỏ phiếu bằng nhau, yêu cầu các thành viên cập nhật lại cho đúng với kết quả.",
-                            IsRead = false,
-                            Type = "ResultRoomMatch",
-                            RoomMatchId = room.Id.ToString()
-                        };
-                        _beatSportsDbContext.Notifications.Add(notification);
-
-                        var account = _beatSportsDbContext.Accounts.Where(a => a.Id == customer.AccountId).SingleOrDefault();
-                        var bookingRoomMatch = _beatSportsDbContext.Bookings.Where(rm => rm.Id == room.BookingId).SingleOrDefault();
-                        if (bookingRoomMatch == null)
-                        {
-                            throw new NotFoundException("Đã có lỗi, đơn hàng không tồn tại trong phòng đấu.");
-                        }
-                        var courtSub = _beatSportsDbContext.CourtSubdivisions.Where(rm => rm.Id == bookingRoomMatch.CourtSubdivisionId).SingleOrDefault();
-                        if (courtSub == null)
-                        {
-                            throw new NotFoundException("Đã có lỗi, không tìm thấy sân nhỏ của đơn hàng.");
-                        }
-                        var court = _beatSportsDbContext.Courts.Where(rm => rm.Id == courtSub.CourtId).SingleOrDefault();
-                        if (court == null)
-                        {
-                            throw new NotFoundException("Đã có lỗi, không tìm thấy sân lớn.");
-                        }
-                        if (account != null)
-                        {
-                            if (!string.IsNullOrEmpty(account.Email))
+                            member.MatchingResultStatus = "NoResult";
+                            _beatSportsDbContext.RoomMembers.Update(member);
+                            var customer = _beatSportsDbContext.Customers.Where(c => c.Id == member.CustomerId).SingleOrDefault();
+                            var notification = new Notification
                             {
-                                _emailService.SendEmailAsync(
-                                account.Email,
-                                "Cập nhật lại kết quả trận đấu - Kết quả phiếu bầu hòa",
-                                $@"<html>
+                                AccountId = customer.AccountId,
+                                Title = "Cập nhật lại kết quả cho trận đấu",
+                                Message = "các thành viên trong phòng đã bỏ phiếu bằng nhau, yêu cầu các thành viên cập nhật lại cho đúng với kết quả.",
+                                IsRead = false,
+                                Type = "ResultRoomMatch",
+                                RoomMatchId = room.Id.ToString()
+                            };
+                            _beatSportsDbContext.Notifications.Add(notification);
+
+                            var account = _beatSportsDbContext.Accounts.Where(a => a.Id == customer.AccountId).SingleOrDefault();
+                            var bookingRoomMatch = _beatSportsDbContext.Bookings.Where(rm => rm.Id == room.BookingId).SingleOrDefault();
+                            if (bookingRoomMatch == null)
+                            {
+                                throw new NotFoundException("Đã có lỗi, đơn hàng không tồn tại trong phòng đấu.");
+                            }
+                            var courtSub = _beatSportsDbContext.CourtSubdivisions.Where(rm => rm.Id == bookingRoomMatch.CourtSubdivisionId).SingleOrDefault();
+                            if (courtSub == null)
+                            {
+                                throw new NotFoundException("Đã có lỗi, không tìm thấy sân nhỏ của đơn hàng.");
+                            }
+                            var court = _beatSportsDbContext.Courts.Where(rm => rm.Id == courtSub.CourtId).SingleOrDefault();
+                            if (court == null)
+                            {
+                                throw new NotFoundException("Đã có lỗi, không tìm thấy sân lớn.");
+                            }
+                            if (account != null)
+                            {
+                                if (!string.IsNullOrEmpty(account.Email))
+                                {
+                                    _emailService.SendEmailAsync(
+                                    account.Email,
+                                    "Cập nhật lại kết quả trận đấu - Kết quả phiếu bầu hòa",
+                                    $@"<html>
                                     <head>
                                         <style>
                                             body {{
@@ -417,9 +419,135 @@ public class CheckTimeJob
                                         </div>
                                     </body>
                                 </html>"
-                                );
+                                    );
+                                }
                             }
                         }
+                    }
+                    else
+                    {
+                        var roomMemberA = _beatSportsDbContext.RoomMembers
+                                                   .Where(rm => rm.RoomMatchId == room.Id
+                                                               && rm.Team == "A")
+                                                   .ToList();
+
+                        var roomMemberB = _beatSportsDbContext.RoomMembers
+                                                            .Where(rm => rm.RoomMatchId == room.Id
+                                                                        && rm.Team == "B")
+                                                            .ToList();
+                        // chia tiền thắng
+                        var bookingRoomMatch = _beatSportsDbContext.Bookings.Where(rm => rm.Id == room.BookingId).SingleOrDefault();
+                        var ratingRoomExist = _beatSportsDbContext.RatingRooms.Where(rm => rm.Id == room.RatingRoomId).SingleOrDefault();
+                        var teamSize = (decimal)room.MaximumMember / 2;
+                        var teamCost = (bookingRoomMatch.TotalAmount * (decimal)0.5);
+                        var costTeamWin = teamCost / teamSize;
+
+                        decimal totalAmountRefund = 0;
+                        decimal amountMemberReceiveRefund = 0;
+                        decimal totalAmountWin = 0;
+                        decimal totalAmountLose = 0;
+
+                        // lấy danh sách transaction A
+                        foreach (var memberWin in roomMemberA)
+                        {
+                            var customer = _beatSportsDbContext.Customers.Where(c => c.Id == memberWin.CustomerId).SingleOrDefault();
+                            var wallet = _beatSportsDbContext.Wallets.Where(a => a.AccountId == customer.AccountId).SingleOrDefault();
+
+                            var transactionJoinRoomMatch = _beatSportsDbContext.Transactions
+                                                           .Where(t => t.RoomMatchId == room.Id
+                                                                       && t.WalletId == wallet.Id
+                                                                       && t.TransactionType == "JoinRoom")
+                                                           // [TransactionStatus] == Pending đang define để sử dụng, nếu Accepted thì ko thể outRoom
+                                                           .SingleOrDefault();
+                            // team thắng dùng costTeamWin trả tiền. Lấy TransactionAmount - costTeamWin ra số dư trả lại cho thành viên
+                            if (transactionJoinRoomMatch != null)
+                            {
+                                totalAmountRefund += ((transactionJoinRoomMatch.TransactionAmount
+                                    ?? throw new BadRequestException("Đã có lỗi, giao dịch tham gia phòng có số dư bằng 0.")) - costTeamWin);
+                                totalAmountWin += costTeamWin;
+
+                                wallet.Balance += ((transactionJoinRoomMatch.TransactionAmount
+                                    ?? throw new BadRequestException("Đã có lỗi, giao dịch tham gia phòng có số dư bằng 0.")) - costTeamWin);
+                                _beatSportsDbContext.Wallets.Update(wallet);
+                                // thanh toán tiền các thành viên tham gia phòng, tiền trả cho thành viên thắng
+                                var refundMemberTransaction = new Domain.Entities.Transaction
+                                {
+                                    WalletId = wallet.Id,
+                                    TransactionMessage = "Hoàn trả tiền cho thành viên đội thắng cuộc thành công.",
+                                    TransactionStatus = "Approved",
+                                    AdminCheckStatus = AdminCheckEnums.Accepted,
+                                    TransactionAmount = ((transactionJoinRoomMatch.TransactionAmount
+                                                    ?? throw new BadRequestException("Đã có lỗi, giao dịch tham gia phòng có số dư bằng 0.")) - costTeamWin),
+                                    TransactionDate = DateTime.Now,
+                                    TransactionType = "RefundRoomMember",
+                                    RoomMatchId = room.Id,
+                                };
+                                _beatSportsDbContext.Transactions.Add(refundMemberTransaction);
+                            }
+                        }
+
+                        // lấy danh sách transaction B
+                        foreach (var memberWin in roomMemberB)
+                        {
+                            var customer = _beatSportsDbContext.Customers.Where(c => c.Id == memberWin.CustomerId).SingleOrDefault();
+                            var wallet = _beatSportsDbContext.Wallets.Where(a => a.AccountId == customer.AccountId).SingleOrDefault();
+
+                            var transactionJoinRoomMatch = _beatSportsDbContext.Transactions
+                                                           .Where(t => t.RoomMatchId == room.Id
+                                                                       && t.WalletId == wallet.Id
+                                                                       && t.TransactionType == "JoinRoom")
+                                                           // [TransactionStatus] == Pending đang define để sử dụng, nếu Accepted thì ko thể outRoom
+                                                           .SingleOrDefault();
+                            // team thắng dùng costTeamWin trả tiền. Lấy TransactionAmount - costTeamWin ra số dư trả lại cho thành viên
+                            if (transactionJoinRoomMatch != null)
+                            {
+                                totalAmountRefund += ((transactionJoinRoomMatch.TransactionAmount
+                                    ?? throw new BadRequestException("Đã có lỗi, giao dịch tham gia phòng có số dư bằng 0.")) - costTeamWin);
+                                totalAmountWin += costTeamWin;
+
+                                wallet.Balance += ((transactionJoinRoomMatch.TransactionAmount
+                                    ?? throw new BadRequestException("Đã có lỗi, giao dịch tham gia phòng có số dư bằng 0.")) - costTeamWin);
+                                _beatSportsDbContext.Wallets.Update(wallet);
+                                // thanh toán tiền các thành viên tham gia phòng, tiền trả cho thành viên thắng
+                                var refundMemberTransaction = new Domain.Entities.Transaction
+                                {
+                                    WalletId = wallet.Id,
+                                    TransactionMessage = "Hoàn trả tiền cho thành viên đội thắng cuộc thành công.",
+                                    TransactionStatus = "Approved",
+                                    AdminCheckStatus = AdminCheckEnums.Accepted,
+                                    TransactionAmount = ((transactionJoinRoomMatch.TransactionAmount
+                                                    ?? throw new BadRequestException("Đã có lỗi, giao dịch tham gia phòng có số dư bằng 0.")) - costTeamWin),
+                                    TransactionDate = DateTime.Now,
+                                    TransactionType = "RefundRoomMember",
+                                    RoomMatchId = room.Id,
+                                };
+                                _beatSportsDbContext.Transactions.Add(refundMemberTransaction);
+                            }
+                        }
+
+                        // cộng tiền đội thắng và đội thua lại cho chủ phòng
+                        var roomMasterInRoomMember = _beatSportsDbContext.RoomMembers
+                                                            .Where(rm => rm.RoomMatchId == room.Id
+                                                                        && rm.RoleInRoom == RoleInRoomEnums.Master)
+                                                            .SingleOrDefault();
+                        var roomMasterCus = _beatSportsDbContext.Customers.Where(c => c.Id == roomMasterInRoomMember.CustomerId).SingleOrDefault();
+                        var walletRoomMaster = _beatSportsDbContext.Wallets.Where(a => a.AccountId == roomMasterCus.AccountId).SingleOrDefault();
+
+                        walletRoomMaster.Balance += (totalAmountWin + totalAmountLose);
+                        _beatSportsDbContext.Wallets.Update(walletRoomMaster);
+                        // thanh toán tiền các thành viên tham gia phòng, tiền trả cho chủ phòng
+                        var refundMasterTransaction = new Domain.Entities.Transaction
+                        {
+                            WalletId = walletRoomMaster.Id,
+                            TransactionMessage = "Tiền sân đã được các thành viên trong nhóm hoàn trả cho chủ phòng thành công.",
+                            AdminCheckStatus = AdminCheckEnums.Accepted,
+                            TransactionStatus = "Approved",
+                            TransactionAmount = (totalAmountWin + totalAmountLose),
+                            TransactionDate = DateTime.Now,
+                            TransactionType = "RefundRoomMaster",
+                            RoomMatchId = room.Id,
+                        };
+                        _beatSportsDbContext.Transactions.Add(refundMasterTransaction);
                     }
                 }
 
@@ -431,7 +559,7 @@ public class CheckTimeJob
                                                    .Where(rm => rm.RoomMatchId == room.Id
                                                                && rm.Team == "A")
                                                    .ToList();
-                    
+
                     var roomMemberWin = _beatSportsDbContext.RoomMembers
                                                         .Where(rm => rm.RoomMatchId == room.Id
                                                                     && rm.Team == "B")
@@ -538,7 +666,7 @@ public class CheckTimeJob
                                                    .Where(rm => rm.RoomMatchId == room.Id
                                                                && rm.Team == "A")
                                                    .ToList();
-                    
+
                     var roomMemberLose = _beatSportsDbContext.RoomMembers
                                                         .Where(rm => rm.RoomMatchId == room.Id
                                                                     && rm.Team == "B")
@@ -774,9 +902,9 @@ public class CheckTimeJob
     public void CheckCampaignDate()
     {
         var campaignExpired = _beatSportsDbContext.Campaigns
-            .Where(c => !c.IsDelete 
-                    && c.EndDateApplying < DateTime.Now 
-                    && c.Status != StatusEnums.Expired) 
+            .Where(c => !c.IsDelete
+                    && c.EndDateApplying < DateTime.Now
+                    && c.Status != StatusEnums.Expired)
             .ToList();
 
         foreach (var campaign in campaignExpired)
@@ -784,6 +912,6 @@ public class CheckTimeJob
             campaign.Status = StatusEnums.Expired;
         }
 
-        _beatSportsDbContext.SaveChanges(); 
+        _beatSportsDbContext.SaveChanges();
     }
 }
