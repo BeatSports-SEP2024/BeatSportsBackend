@@ -124,6 +124,7 @@ public class GetRoomMatchByIdHandler : IRequestHandler<GetRoomMatchByIdCommand, 
         var room = new RoomMatchesDetailResponse()
         {
             RoomMatchId = request.RoomMatchId,
+            VotesCount = query.VoteCount,
             CourtName = court.CourtName,
             CourtImage = courtImgList,
             RoomName = query.RoomName,

@@ -38,6 +38,7 @@ public class RoomRequestInRoom
 public class RoomMatchesDetailResponse
 {
     public Guid RoomMatchId { get; set; }
+    public int VotesCount { get; set; }
     public string? RoomName { get; set; }
     public string? CustomerName { get; set; }
     public string? CustomerImage { get; set; }
