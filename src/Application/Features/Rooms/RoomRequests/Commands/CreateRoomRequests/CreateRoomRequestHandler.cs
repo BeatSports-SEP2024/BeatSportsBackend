@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using BeatSportsAPI.Application.Common.Ultilities;
 using BeatSportsAPI.Domain.Entities;
+using Microsoft.AspNetCore.Server.IIS.Core;
 
 namespace BeatSportsAPI.Application.Features.Rooms.RoomRequests.Commands.CreateRoomRequests;
 public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand, BeatSportsResponse>
@@ -81,10 +82,7 @@ public class CreateRoomRequestHandler : IRequestHandler<CreateRoomRequestCommand
 
             if (flag > 0)
             {
-                return await Task.FromResult(new BeatSportsResponse
-                {
-                    Message = "400"
-                });
+                throw new BadRequestException("Bạn đã ở trong một phòng khác cùng thời gian!");
             }
 
         }
