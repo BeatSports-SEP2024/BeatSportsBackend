@@ -129,11 +129,9 @@ public class CheckTimeJob
         _beatSportsDbContext.SaveChanges();
     }
 
-    public void UpdateRoomWhenFinishTimePlayingBooking()
+    // send noti nếu chưa cập nhật kết quả
+    public void SendNotiForVoteTeam()
     {
-        // phòng sẽ giữ lại cho đến khi các thành viên xác nhận kết quả của trận đấu xong hết, thì sau 1 ngày thì cái phòng đó sẽ đóng vĩnh viễn
-        // 1. Kiểm tra tất cả thành viên trong bảng roomMember của roomMatch đó đã cập nhật kết quả sau trận đấu chưa
-        // (dựa theo thời gian kết thúc của bảng roomMatch)
         var expiredRooms = _beatSportsDbContext.RoomMatches
             .Where(x => !x.IsDelete && x.StartTimeRoom <= DateTime.Now).ToList();
 
@@ -276,6 +274,159 @@ public class CheckTimeJob
                         }
                     }
                 }
+            }
+        }
+        _beatSportsDbContext.SaveChanges();
+    }
+/*
+    public void UpdateRoomWhenFinishTimePlayingBooking()
+    {
+        // phòng sẽ giữ lại cho đến khi các thành viên xác nhận kết quả của trận đấu xong hết, thì sau 1 ngày thì cái phòng đó sẽ đóng vĩnh viễn
+        // 1. Kiểm tra tất cả thành viên trong bảng roomMember của roomMatch đó đã cập nhật kết quả sau trận đấu chưa
+        // (dựa theo thời gian kết thúc của bảng roomMatch)
+        var expiredRooms = _beatSportsDbContext.RoomMatches
+            .Where(x => !x.IsDelete && x.StartTimeRoom <= DateTime.Now).ToList();
+
+        foreach (var room in expiredRooms)
+        {
+            var transactionCheck = _beatSportsDbContext.Transactions.Where(x => x.RoomMatchId == room.Id
+                                                && string.Compare(x.TransactionType, "RefundRoomMaster") == 0).ToList();
+            if (transactionCheck.Any())
+            {
+                continue;
+            }
+            var expiredRoomMemberNoResult = _beatSportsDbContext.RoomMembers
+                .Where(rm => rm.RoomMatchId == room.Id
+                            && rm.MatchingResultStatus == "NoResult")
+                .ToList();
+*//*            if (expiredRoomMemberNoResult.Any())
+            {
+                *//*foreach (var roomMember in expiredRoomMemberNoResult)
+                {
+                    // 2. Nếu chưa cập nhật kq trận đấu thì gửi mail và thông báo, cách 30p, 1 tiếng gửi, ... 1 lần cho cập nhật
+                    var customer = _beatSportsDbContext.Customers.Where(c => c.Id == roomMember.CustomerId).SingleOrDefault();
+                    var notification = new Notification
+                    {
+                        AccountId = customer.AccountId,
+                        Title = "Cập nhật kết quả cho trận đấu",
+                        Message = "bạn hay vào phần kết quả của trận đấu, cập nhật đội thắng giúp chủ phòng nhận lại tiền.",
+                        IsRead = false,
+                        Type = "ResultRoomMatch",
+                        RoomMatchId = room.Id.ToString()
+                    };
+                    _beatSportsDbContext.Notifications.Add(notification);
+
+                    var account = _beatSportsDbContext.Accounts.Where(a => a.Id == customer.AccountId).SingleOrDefault();
+                    var bookingRoomMatch = _beatSportsDbContext.Bookings.Where(rm => rm.Id == room.BookingId).SingleOrDefault();
+                    if (bookingRoomMatch == null)
+                    {
+                        throw new NotFoundException("Đã có lỗi, đơn hàng không tồn tại trong phòng đấu.");
+                    }
+                    var courtSub = _beatSportsDbContext.CourtSubdivisions.Where(rm => rm.Id == bookingRoomMatch.CourtSubdivisionId).SingleOrDefault();
+                    if (courtSub == null)
+                    {
+                        throw new NotFoundException("Đã có lỗi, không tìm thấy sân nhỏ của đơn hàng.");
+                    }
+                    var court = _beatSportsDbContext.Courts.Where(rm => rm.Id == courtSub.CourtId).SingleOrDefault();
+                    if (court == null)
+                    {
+                        throw new NotFoundException("Đã có lỗi, không tìm thấy sân lớn.");
+                    }
+                    if (account != null)
+                    {
+                        if (!string.IsNullOrEmpty(account.Email))
+                        {
+                            _emailService.SendEmailAsync(
+                            account.Email,
+                            "Trận đấu đã kết thúc - Cập nhật kết quả",
+                            $@"<html>
+                                <head>
+                                    <style>
+                                        body {{
+                                            font-family: Montserrat, sans-serif;
+                                            margin: 0;
+                                            padding: 0;
+                                            background-color: #f4f4f4;
+                                        }}
+                                        .container {{
+                                            width: 100%;
+                                            max-width: 600px;
+                                            margin: 0 auto;
+                                            background-color: #ffffff;
+                                            padding: 20px;
+                                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                                        }}
+                                        .header {{
+                                            background-color: #007bff;
+                                            color: #ffffff;
+                                            padding: 10px 0;
+                                            text-align: center;
+                                            font-size: 24px;
+                                        }}
+                                        .content {{
+                                            margin: 20px 0;
+                                            line-height: 1.6;
+                                            text-align: center;
+                                        }}
+                                        .footer {{
+                                            margin: 20px 0;
+                                            text-align: center;
+                                            color: #777;
+                                            font-size: 12px;
+                                        }}
+                                        .button {{
+                                            background-color: #45B441;
+                                            color: #ffffff;
+                                            padding: 10px 20px;
+                                            text-decoration: none;
+                                            border-radius: 5px;
+                                            display: inline-block;
+                                            font-size: 16px;
+                                            margin-top: 20px;
+                                        }}
+                                        .match-info {{
+                                            text-align: left;
+                                            margin-top: 20px;
+                                            font-size: 14px;
+                                        }}
+                                        .match-info p {{
+                                            margin: 5px 0;
+                                        }}
+                                        .match-info .title {{
+                                            font-weight: bold;
+                                            color: #111111;
+                                        }}
+                                    </style>
+                                </head>
+                                <body>
+                                    <div class='container'>
+                                        <div class='header'>
+                                            Trận đấu đã kết thúc
+                                        </div>
+                                        <div class='content'>
+                                            <p>Kính gửi {account.FirstName + " " + account.LastName},</p>
+                                            <p>Trận đấu bạn tham gia đã kết thúc. Vui lòng cập nhật kết quả trận đấu để xác minh chi phí thanh toán cho chủ phòng.</p>
+                                            <p>Việc xác nhận kết quả sẽ giúp đảm bảo tính minh bạch và công bằng trong hệ thống thanh toán.</p>
+                                            <a href='beatsportsappuser://matching/matching-badminton-detail/{room.Id}' class='button'>Cập nhật kết quả</a>
+
+                                            <div class='match-info'>
+                                                <p class='title'>Thông tin trận đấu:</p>
+                                                <p><strong>Thời gian thi đấu:</strong> {room.StartTimeRoom.ToString("HH:mm dd/MM/yyyy")}</p>
+                                                <p><strong>Sân đấu:</strong> {court.CourtName}</p>
+                                                <p><strong>Địa chỉ:</strong> {court.Address}</p>
+                                            </div>
+                                        </div>
+                                        <div class='footer'>
+                                            <p>© 2024 BeatSports. All rights reserved.</p>
+                                        </div>
+                                    </div>
+                                </body>
+                            </html>"
+                            );
+                        }
+                    }
+                }*//*
+                continue;
             }
             else
             {
@@ -771,10 +922,10 @@ public class CheckTimeJob
                     };
                     _beatSportsDbContext.Transactions.Add(refundMasterTransaction);
                 }
-            }
+            }*//*
         }
         _beatSportsDbContext.SaveChanges();
-    }
+    }*/
     public void RemoveRoomWhenExpired()
     {
         // phòng sẽ giữ lại cho đến khi các thành viên xác nhận kết quả của trận đấu xong hết, thì sau 1 ngày thì cái phòng đó sẽ đóng vĩnh viễn
