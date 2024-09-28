@@ -33,11 +33,11 @@ public class RoomRequestsController : ApiControllerBase
 
         var response = await _mediator.Send(request);
 
-        if (response.Message.Equals("400"))
-        {
-            response.Message = "Bạn đã ở trong một phòng khác cùng thời gian!";
-            return BadRequest(response);
-        }
+        //if (response.Message.Equals("400"))
+        //{
+        //    response.Message = "Bạn đã ở trong một phòng khác cùng thời gian!";
+        //    return BadRequest(response);
+        //}
 
         return Ok(response);
     }
