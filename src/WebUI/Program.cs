@@ -1,17 +1,122 @@
-using BeatSportsAPI.Infrastructure.Persistence;
-using WebAPI;
+﻿using System.Text;
+using System.Text.Json.Serialization;
+using BeatSportsAPI.Application;
+using BeatSportsAPI.Domain.Entities;
+using BeatSportsAPI.Infrastructure.Common;
+using Hangfire;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Services.Momo.Config;
+using Services.VnPay.Config;
+using Services.ZaloPay.Config;
+using StackExchange.Redis;
+using WebAPI.Controllers.Queries;
+using WebAPI;
+using WebAPI.Controllers.ChatHubs;
+using BeatSportsAPI.Application.Features.Jobs;
+using Newtonsoft.Json;
+using BeatSportsAPI.Application.Features.Hubs;
+using CloudinaryDotNet;
+using dotenv.net;
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("*").AllowAnyHeader().AllowAnyMethod();
+                      });
+});
 // Add services to the container.
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddWebUIServices();
-builder.Services.AddSwaggerGen(config => 
+builder.Services.AddRouting(options =>
 {
-    config.SwaggerDoc("v1", new OpenApiInfo { Title = "BeatSportsAPI", Version = "v1"});
+    options.LowercaseUrls = true;
+});
+builder.Services.Configure<JsonOptions>(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+builder.Services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"),
+                new Hangfire.SqlServer.SqlServerStorageOptions()
+                {
+                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                    QueuePollInterval = TimeSpan.Zero,
+                    UseRecommendedIsolationLevel = true,
+                    UsePageLocksOnDequeue = true,
+                    DisableGlobalLocks = true
+                }));
+builder.Services.AddHangfireServer();
+
+builder.Services.AddHttpClient();
+builder.Services.Configure<VnpayConfig>(
+                builder.Configuration.GetSection(VnpayConfig.ConfigName));
+builder.Services.Configure<MomoConfig>(
+                builder.Configuration.GetSection(MomoConfig.ConfigName));
+builder.Services.Configure<ZaloPayConfig>(
+                builder.Configuration.GetSection(ZaloPayConfig.ConfigName));
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"])),
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ClockSkew = TimeSpan.Zero,
+        ValidateLifetime = true,
+        ValidIssuer = configuration["JWT:Issuer"],
+        ValidAudience = configuration["JWT:Audience"]
+    };
+});
+
+//SignalR
+builder.Services.AddSignalR();
+
+//GraphQl
+builder.Services.AddGraphQLServer()
+    .AddQueryType<QueryDatas>()
+    .AddType<BeatSportsAPI.Domain.Entities.Account>();
+
+// Configure Redis connection
+var redisConnectionString = GetJsonInAppSettingsExtension.GetJson("Redis:RedisConnectionStrings");
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
+builder.Services.AddScoped<StackExchange.Redis.IDatabase>(sp => sp.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
+
+builder.Services.AddControllers().AddJsonOptions(x =>
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+builder.Services.AddControllers()
+            .AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            });
+
+
+builder.Services.AddSwaggerGen(config =>
+{
+    config.SwaggerDoc("v1", new OpenApiInfo { Title = "BeatSportsAPI", Version = "v1" });
     config.DescribeAllParametersInCamelCase();
+    config.EnableAnnotations();
     config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -37,6 +142,8 @@ builder.Services.AddSwaggerGen(config =>
     });
 });
 
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -47,9 +154,9 @@ if (app.Environment.IsDevelopment())
     // Initialise and seed database
     using (var scope = app.Services.CreateScope())
     {
-        var initialiser = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitialiser>();
-        await initialiser.InitialiseAsync();
-        await initialiser.SeedAsync();
+        //var initialiser = scope.ServiceProvider.GetRequiredService<BeatSportsAPIDbContextInitialiser>();
+        //await initialiser.InitialiseAsync();
+        //await initialiser.SeedAsync();
     }
 }
 else
@@ -58,22 +165,21 @@ else
     app.UseHsts();
 }
 
-app.UseHealthChecks("/health");
+//app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+app.UseCors(MyAllowSpecificOrigins);
+app.UseDefaultFiles();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseCookiePolicy();
 
-/*app.UseSwaggerUi3(settings =>
-{
-    settings.Path = "/api";
-    settings.DocumentPath = "/api/specification.json";
-});*/
+app.UseHealthChecks("/health");
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseRouting();
 
 app.UseAuthentication();
-app.UseIdentityServer();
+//app.UseIdentityServer();
 app.UseAuthorization();
 
 app.MapControllerRoute(
@@ -83,5 +189,34 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.MapFallbackToFile("index.html"); ;
+
+//Config Graphql
+app.MapControllers();
+app.MapGraphQL("/graphql");
+
+
+#region Khúc này đăng ký HUB cho SignalR
+app.MapHub<TimePeriodHub>("/timePeriodHub");
+app.MapHub<BookingHub>("/bookingHub");
+app.MapHub<RoomRequestHub>("/creatRoomRequestHub");
+app.MapHub<ChatHub>("chatHub");
+
+#endregion
+//Hangfire Dashboard
+app.UseHangfireDashboard();
+
+// Schedule a recurring job/
+//RecurringJob.AddOrUpdate<CheckTimeJob>("my-recurring-job", job => job.CheckTimeOfCourt(), Cron.Minutely);
+RecurringJob.AddOrUpdate<CheckTimeJob>("my-recurring-job", job => job.CheckTimeOfCourt(), Cron.MinuteInterval(2));
+RecurringJob.AddOrUpdate<CheckTimeJob>("checking-time-for-booking", job => job.CheckTimeOfBooking(), Cron.Minutely);
+RecurringJob.AddOrUpdate<CheckTimeJob>("check-booking-if-expired", job => job.CheckBookingPlayDateIfFinish(), Cron.MinuteInterval(30));
+RecurringJob.AddOrUpdate<CheckTimeJob>("remove-room-match-if-expired", job => job.RemoveRoomWhenExpired(), Cron.Minutely);
+/*RecurringJob.AddOrUpdate<CheckTimeJob>("update-room-match-when-finished-booking",
+    job => job.UpdateRoomWhenFinishTimePlayingBooking(), Cron.MinuteInterval(1)); */
+RecurringJob.AddOrUpdate<CheckTimeJob>("send-noti-vote-team",
+    job => job.SendNotiForVoteTeam(), Cron.MinuteInterval(30));
+RecurringJob.AddOrUpdate<CheckTimeJob>("send-owner-pay-fee-notification",
+    job => job.NotificationForOwnerPayFee(), Cron.Monthly(1, 9 - 7, 0)); // 9h00 sáng ngày 1
+RecurringJob.AddOrUpdate<CheckTimeJob>("set-expired-campaign", job => job.CheckCampaignDate(), Cron.DayInterval(1));
 
 app.Run();

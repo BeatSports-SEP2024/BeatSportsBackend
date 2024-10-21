@@ -1,0 +1,60 @@
+name: CD
+
+on:
+  push:
+    branches: develop
+
+jobs:
+  build:
+    name: build beat-sport
+    runs-on: ubuntu-latest
+    steps:
+#      - name: Clear useless artifacts
+#        uses: c-hive/gha-remove-artifacts@v1.2.0
+#        with:
+#          age: '14 days'
+
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET 7
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      - name: Publish
+        run: |
+          
+          dotnet publish -c Release --property PublishDir='${{ github.workspace }}/site' -r win-x64 --self-contained false
+      - name: Zip Package
+        run: |
+          cd ${{ github.workspace }}/site
+          zip -r ${{ github.workspace }}/site.zip *
+      - name: Upload zip sources
+        uses: actions/upload-artifact@v3
+        with:
+          name:  beat-sport
+          path: site.zip
+
+  deploy:
+    needs: build
+    name: deploy beat-sport
+    runs-on: self-hosted
+    steps:
+      - name: Clone source zip
+        uses: actions/download-artifact@v3
+        with:
+          name: beat-sport
+      - name: Deploy to IIS
+        shell: powershell
+        run: |
+          iisreset /stop
+          Remove-Item -Recurse -Force -Confirm:$false C:\inetpub\wwwroot\BeatSport-API\
+          mkdir C:\inetpub\wwwroot\BeatSport-API
+          Expand-Archive site.zip C:\inetpub\wwwroot\BeatSport-API
+          iisreset /start

@@ -1,6 +1,7 @@
 ﻿using BeatSportsAPI.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using static Duende.IdentityServer.Models.IdentityResources;
 
 namespace WebAPI.Filters;
 public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
@@ -16,6 +17,8 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
                 { typeof(NotFoundException), HandleNotFoundException },
                 { typeof(UnauthorizedAccessException), HandleUnauthorizedAccessException },
                 { typeof(ForbiddenAccessException), HandleForbiddenAccessException },
+                { typeof(BadRequestException), HandleBadRequestException },
+
             };
     }
 
@@ -113,6 +116,25 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
         context.Result = new ObjectResult(details)
         {
             StatusCode = StatusCodes.Status403Forbidden
+        };
+
+        context.ExceptionHandled = true;
+    }
+
+    private void HandleBadRequestException(ExceptionContext context)
+    {
+        var exception = (BadRequestException)context.Exception;
+        var details = new ProblemDetails
+        {
+            Status = StatusCodes.Status400BadRequest,
+            Title = "BadRequest",
+            Detail = exception.Message,
+            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+        };
+
+        context.Result = new ObjectResult(details)
+        {
+            StatusCode = StatusCodes.Status400BadRequest
         };
 
         context.ExceptionHandled = true;

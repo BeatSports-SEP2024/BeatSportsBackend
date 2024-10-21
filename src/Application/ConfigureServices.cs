@@ -2,8 +2,10 @@
 using BeatSportsAPI.Application.Common.Behaviours;
 using FluentValidation;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+using Services.CloudinaryServices;
 
-namespace Microsoft.Extensions.DependencyInjection;
+namespace BeatSportsAPI.Application;
 public static class ConfigureServices
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
@@ -11,6 +13,7 @@ public static class ConfigureServices
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddMediatR(Assembly.GetExecutingAssembly());
+        services.AddScoped<ICloudinaryService, CloudinaryService>();    
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehaviour<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
